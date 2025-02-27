@@ -23,6 +23,9 @@ Prepare the database from the root directory of liszt-editor:
 # python3 manage.py migrate
 ```
 
+You need to retrieve the .env file with the secrets in order to get access to protected resources like Zotero.
+Contact the maintainer for that.
+
 ## Run the server
 
 Run the server from the root directory of liszt-editor:
@@ -30,3 +33,7 @@ Run the server from the root directory of liszt-editor:
 ```{bash}
 # python3 manage.py runserver
 ```
+
+## Maintainer
+
+In case of questions, contact Matthias Schrinner: matthias.schrinner@slub-dresden.de.
