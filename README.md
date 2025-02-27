@@ -9,6 +9,14 @@ First, clone the following repositories to a directories of your choice (but out
 - [dmad](https://github.com/dikastes/dmad-on-django)
 - [acdh-django-zotero](https://github.com/dikastes/acdh-django-zotero)
 
+For some dependencies (currently edwoca and acdh-django-zotero) you need to install the CSS framework and build the CSS files.
+
+```{bash}
+# npm install tailwindcss@^3.4
+# npm install daisyui@^4.12
+# npx tailwindcss -i static/<app_name>/tailwind.css -o static/<app_name>/tailwind.dist.css
+```
+
 For every dependency, build the code and `pip install` it:
 
 ```{bash}
