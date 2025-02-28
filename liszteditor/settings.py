@@ -11,6 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
+import dotenv
+
+dotenv_file = os.path.join(os.getcwd(), '.env')
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,9 +43,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'dal_select2',
     'debug_toolbar',
     'edwoca.apps.EdwocaConfig',
     'dmad_on_django.apps.DmadOnDjangoConfig',
+    'bib',
+    'django.forms'
 ]
 
 MIDDLEWARE = [
@@ -131,3 +140,7 @@ INTERNAL_IPS = [
     ]
 
 FORM_RENDERER = 'edwoca.forms.EdwocaFormRenderer'
+
+Z_ID = "5080468"
+Z_LIBRARY_TYPE = 'group'
+Z_API_KEY = os.environ['ZOTERO_API_KEY']
