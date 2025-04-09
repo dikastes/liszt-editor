@@ -138,6 +138,10 @@ venv.bak/
 # npm stuff
 node_modules/
 package-lock.json
+apps/bib/node_modules
+apps/bib/package-lock.json
+apps/edwoca/node_modules
+apps/edwoca/package-lock.json
 
 # Spyder project settings
 .spyderproject
