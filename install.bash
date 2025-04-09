@@ -1,52 +1,78 @@
 #!/bin/bash
 
+# === PARSE FLAGS ===
+VERBOSE=false
+for arg in "$@"; do
+  if [[ "$arg" == "-V" ]]; then
+    VERBOSE=true
+  fi
+done
+
+# === COLORS ===
+red()    { echo -e "\e[31m$1\e[0m"; }
+green()  { echo -e "\e[32m$1\e[0m"; }
+yellow() { echo -e "\e[33m$1\e[0m"; }
+blue()   { echo -e "\e[34m$1\e[0m"; }
+
+# === COMMAND WRAPPER ===
+run() {
+  if [ "$VERBOSE" = true ]; then
+    eval "$@"
+  else
+    eval "$@" > /dev/null 2>&1
+  fi
+}
+
+# === START ===
+
+yellow "Tip: Run this script with -V to enable verbose output."
+
 if [[ ! -f .env ]]; then
-  echo ".env file not found in the current directory. Please paste it manually."
+  red ".env file not found in the current directory. Please paste it manually."
   exit 1
 fi
-
 
 if command -v python > /dev/null; then
     PYTHON_BIN=$(command -v python)
 elif command -v python3 > /dev/null; then
     PYTHON_BIN=$(command -v python3)
 else
-    echo "Python is not installed."
+    red "Python is not installed."
     exit 1
 fi
 
-echo "Using Python: $PYTHON_BIN"
+blue "Using Python: $PYTHON_BIN"
 
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 
-echo "Creating virtual environment..."
+yellow "Creating virtual environment..."
+run "$PYTHON_BIN -m venv $SCRIPT_DIR"
 
-$PYTHON_BIN -m venv $SCRIPT_DIR
-
-echo "Installing npm dependencies..."
-
-npm install --prefix $SCRIPT_DIR
+yellow "Installing npm dependencies..."
+run "npm install --prefix $SCRIPT_DIR"
 
 (
-	cd $SCRIPT_DIR/apps/edwoca
-	npm install
-	npx tailwindcss -i static/edwoca/tailwind.css -o static/edwoca/tailwind.dist.css
-
+	cd "$SCRIPT_DIR/apps/edwoca"
+	yellow "[edwoca] Installing npm packages..."
+	run "npm install"
+	yellow "[edwoca] Compiling Tailwind CSS..."
+	run "npx tailwindcss -i static/edwoca/tailwind.css -o static/edwoca/tailwind.dist.css"
 )
 
 (
-	cd $SCRIPT_DIR/apps/bib
-	npm install
-	npx tailwindcss -i static/bib/tailwind.css -o static/bib/tailwind.dist.css
+	cd "$SCRIPT_DIR/apps/bib"
+	yellow "[bib] Installing npm packages..."
+	run "npm install"
+	yellow "[bib] Compiling Tailwind CSS..."
+	run "npx tailwindcss -i static/bib/tailwind.css -o static/bib/tailwind.dist.css"
 )
 
-echo "Installing python dependencies..."
+yellow "Installing python dependencies..."
+run "$SCRIPT_DIR/bin/pip install -r $SCRIPT_DIR/python_requirements.txt"
 
-$SCRIPT_DIR/bin/pip install -r $SCRIPT_DIR/python_requirements.txt
+yellow "Running migrations..."
+run "$SCRIPT_DIR/bin/python3 $SCRIPT_DIR/manage.py makemigrations"
+run "$SCRIPT_DIR/bin/python3 $SCRIPT_DIR/manage.py migrate"
 
-echo "Migrating..."
+green "✔ Setup complete!"
 
-$SCRIPT_DIR/bin/python3 $SCRIPT_DIR/manage.py makemigrations
-$SCRIPT_DIR/bin/python3 $SCRIPT_DIR/manage.py migrate
-
-echo "done"
