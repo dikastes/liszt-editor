@@ -1,0 +1,19 @@
+{% extends 'bib/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<h1> Datenimport </h1>
+
+<p> Bitte diese Seite nicht schließen. </p>
+
+<progress class="progress w-56" value="0" max="100"></progress>
+
+<script>
+  const bulks = {{ bulks | safe }};
+  const count = {{ count }};
+  const dashboardUrl = "{% url 'bib:dashboard' %}";
+</script>
+<script src="{% static 'bib/import.js' %}"></script>
+
+{% endblock %}

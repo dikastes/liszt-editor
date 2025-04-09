@@ -45,10 +45,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'dal_select2',
     'debug_toolbar',
-    'edwoca.apps.EdwocaConfig',
-    'dmad_on_django.apps.DmadOnDjangoConfig',
     'bib',
-    'django.forms'
+    'django.forms',
+    'edwoca',
+    'dmad_on_django'
 ]
 
 MIDDLEWARE = [

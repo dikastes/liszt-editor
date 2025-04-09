@@ -1,0 +1,234 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+<h1> {{ work }} </h1>
+
+<a href="{% url 'edwoca:index' %}" role="button" class="btn btn-primary" > zurück </a>
+<a href="{% url 'edwoca:work_delete' work.id %}" role="button" class="btn" > löschen </a>
+
+<div class="grid grid-cols-3 gap-10">
+	<!-- left sidebar -->
+	<div>
+		<h2> Werkinformationen </h2>
+		<div class="card shadow-xl mt-5">
+			<div class="card-body">
+				<h3 class="card-title mt-0"> Titel </h3>
+
+				{% for title in work.titles.all %}
+				<p class="mt-1">
+					{{ title.title }} ({{ title.language }}, {{ title.status }})
+					<a href="{% url 'edwoca:work_title_update' title.id %}" class="btn btn-sm"> bearbeiten </a>
+					<a href="{% url 'edwoca:work_title_delete' title.id %}" class="btn btn-sm"> löschen </a>
+				</p>
+				{% endfor %}
+
+				<div class="card-actions justify-end">
+					<a href="{% url 'edwoca:work_title_create' work.id %}" class="btn btn-primary btn-sm"> neuer Titel </a>
+				</div>
+			</div>
+		</div>
+
+		<div class="card shadow-xl mt-5">
+			<div class="card-body">
+				<h3 class="card-title"> Basisinformationen </h3>
+				<dl>
+					<dt> WV-Nummer <dt>
+					<dd> {{ work.work_catalog_number }} </dd>
+					<dt> GND-ID <dt>
+					<dd> {{ work.gnd_id }} </dd>
+				</dl>
+
+				<h3> Geschichte </h3>
+
+				<p>
+					{{ work.history }}
+				</p>
+				<div class="card-actions justify-end">
+					<a href="{% url 'edwoca:work_update' work.id %}" role="button" class="btn btn-primary btn-sm" > bearbeiten </a>
+				</div>
+			</div>
+		</div>
+
+		<div class="card shadow-xl mt-5">
+			<div class="card-body">
+				<h3 class="card-title mt-0"> Relationen </h3>
+
+				<p> zu Werken </p>
+
+				{% if related_work_targets %}
+				{% for related_work in related_work_targets %}
+				<p class="lead mt-1">
+					{{ related_work.target_work }} ({{ related_work.label}})
+					<a href="{% url 'edwoca:related_work_update' related_work.id %}" class="btn btn-sm"> bearbeiten </a>
+					<a href="{% url 'edwoca:related_work_delete' related_work.id %}" class="btn btn-sm"> löschen </a>
+				</p>
+				<p>
+					{{ related_work.comment }}
+				</p>
+				{% endfor %}
+				{% else %}
+				<p class="lead mt-1"> keine ausgehenden Werkrelationen </p>
+				{% endif %}
+
+				<div class="card-actions justify-end">
+					<a href="{% url 'edwoca:related_work_create' work.id %}" class="btn btn-primary btn-sm"> neue Relation </a>
+				</div>
+
+				<p> von Werken </p>
+
+				{% if related_work_sources %}
+				{% for related_work in related_work_sources %}
+				<p class="lead mt-1">
+					{{ related_work.source_work }} ({{ related_work.type}})
+					<a href="{% url 'edwoca:related_work_update' related_work.id %}" class="btn btn-sm"> bearbeiten </a>
+					<a href="{% url 'edwoca:related_work_delete' related_work.id %}" class="btn btn-sm"> löschen </a>
+				</p>
+				<p>
+					{{ related_work.comment }}
+				</p>
+				{% endfor %}
+				{% else %}
+				<p class="lead mt-1"> keine eingehenden Werkrelationen </p>
+				{% endif %}
+
+				<p> zu Personen </p>
+
+				{% if work.workcontributor_set.all %}
+				{% for contributor in work.workcontributor_set.all %}
+				<p class="lead mt-1">
+						{{ contributor.person }} ({{ contributor.role }})
+						<a href="{% url 'edwoca:work_contributor_update' contributor.id %}" class="btn btn-sm"> bearbeiten </a>
+						<a href="{% url 'edwoca:work_contributor_delete' contributor.id %}" class="btn btn-sm"> löschen </a>
+				</p>
+				{% endfor %}
+				{% else %}
+				<p class="lead mt-1"> keine Personenrelationen </p>
+				{% endif %}
+				<div class="card-actions justify-end">
+					<a href="{% url 'edwoca:work_contributor_create' work.id %}" class="btn btn-primary btn-sm"> neue Relation </a>
+				</div>
+			</div>
+		</div>
+
+		<div class="card shadow-xl mt-5">
+			<div class="card-body">
+				<h3 class="card-title mt-0"> Literaturnachweise </h3>
+
+				{% if work.workbib_set %}
+				{% for bib in work.workbib_set.all %}
+				<p class="lead mt-1">
+					{{ bib.bib }}
+					<a href="{% url 'edwoca:work_bib_update' bib.id %}" class="btn btn-sm"> bearbeiten </a>
+					<a href="{% url 'edwoca:work_bib_delete' bib.id %}" class="btn btn-sm"> löschen </a>
+				</p>
+				{% endfor %}
+				{% else %}
+				<p class="lead mt-1"> keine Literaturnachweise </p>
+				{% endif %}
+
+				<div class="card-actions justify-end">
+					<a href="{% url 'edwoca:work_bib_create' work.id %}" class="btn btn-primary btn-sm"> neue Literaturangabe </a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- main content -->
+	<div class="col-span-2">
+		<h2> Expressionsinformationen </h2>
+		<div role="tablist" class="tabs tabs-bordered my-10">
+			{% for expression in work.expressions.all %}
+			<input type="radio" name="expression-toggle" role="tab" class="tab" aria-label="{{ expression }}" checked="checked"/>
+			<div role="tabpanel" class="tab-content py-10">
+
+				<div class="card shadow-xl mt-5">
+					<div class="card-body">
+						<h3 class="card-title mt-0"> Titel </h3>
+
+						{% for title in expression.titles.all %}
+						<p class="mt-1">
+							{{ title.title }} ({{ title.language }}, {{ title.status }})
+							<a href="{% url 'edwoca:expression_title_update' title.id %}" class="btn btn-sm"> bearbeiten </a>
+							<a href="{% url 'edwoca:expression_title_delete' title.id %}" class="btn btn-sm"> löschen </a>
+						</p>
+						{% endfor %}
+
+						<div class="card-actions justify-end">
+							<a href="{% url 'edwoca:expression_title_create' expression.id %}" class="btn btn-primary btn-sm"> neuer Titel </a>
+						</div>
+					</div>
+				</div>
+
+				<div class="card shadow-xl mt-5">
+					<div class="card-body">
+						<h3 class="card-title mt-0"> Basisinformationen </h3>
+						<dl>
+							<dt> musikalisches Incipit </dt>
+							<dd> {{ expression.incipit_music }} </dd>
+							<dt> Textincipit </dt>
+							<dd> {{ expression.incipit_text }} </dd>
+							<dt> Kommentar zur zeitlichen Einordnung </dt>
+							<dd> {{ expression.period_comment }} </dd>
+						</dl>
+						<h3> Geschichte </h3>
+
+						<p>
+							{{ expression.history }}
+						</p>
+						<div class="card-actions justify-end">
+							<a href="{% url 'edwoca:expression_update' expression.id %}" class="btn"> bearbeiten </a>
+							<a href="{% url 'edwoca:expression_delete' expression.id %}" class="btn btn-primary"> Expression löschen </a>
+						</div>
+					</div>
+				</div>
+
+				<div class="card shadow-xl mt-5">
+					<div class="card-body">
+						<h3 class="card-title mt-0"> Datierung </h3>
+
+						{% if expression.period %}
+						<dl>
+							<dt> nicht vor </dt>
+							<dd> {{ expression.period.not_before }} </dd>
+							<dt> nicht nach </dt>
+							<dd> {{ expression.period.not_after }} </dd>
+							<dt> diplomatisch </dt>
+							<dd> {{ expression.period.display }} </dd>
+							<dt> detaillierte Anzeige </dt>
+							<dd> {{ expression.period.render_detailed }} </dd>
+						</dl>
+						<div class="card-actions justify-end">
+							<a href="{%url 'edwoca:expression_period_update' expression.period.id %}" class="btn"> bearbeiten </a>
+							<a href="{%url 'edwoca:expression_period_delete' expression.period.id %}" class="btn"> löschen </a>
+						</div>
+						{% else %}
+						<a href="{%url 'edwoca:expression_period_create' expression.id %}" class="btn btn-primary"> Datierung anlegen </a>
+						{% endif %}
+					</div>
+				</div>
+
+
+				<div class="card shadow-xl mt-5">
+					<div class="card-body">
+						<h3 class="card-title mt-0"> Beteiligte </h3>
+						{% for contributor in expression.expressioncontributor_set.all %}
+						<p class="mt-1">
+							{{ contributor.person }} ({{contributor.role}})
+							<a href="{% url 'edwoca:expression_contributor_update' contributor.id %}" class="btn btn-sm"> bearbeiten </a>
+							<a href="{% url 'edwoca:expression_contributor_delete' contributor.id %}" class="btn btn-sm"> löschen </a>
+						</p>
+						{% endfor %}
+						<div class="card-actions justify-end">
+							<a href="{% url 'edwoca:expression_contributor_create' expression.id %}" class="btn btn-primary btn-sm"> neuer Beteiligter </a>
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+			</div>
+
+			<a role="tab" class="tab" name="expression-toggle" href="{% url 'edwoca:expression_create' work.id %}"> neue Expression </a>
+		</div>
+	</div>
+</div>
+{% endblock %}

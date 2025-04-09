@@ -7,7 +7,10 @@ For more information on this file, see
 https://docs.djangoproject.com/en/5.1/howto/deployment/asgi/
 """
 
+import sys
 import os
+
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../apps'))
 
 from django.core.asgi import get_asgi_application
 
