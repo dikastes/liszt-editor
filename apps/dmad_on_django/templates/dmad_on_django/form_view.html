@@ -1,0 +1,98 @@
+{% extends 'dmad_on_django/base.html' %}
+
+{% block content %}
+
+<div class="flex-1 min-w-0">
+    <h2 class="card-title mt-0"> {{ object.get_designator }} </h2>
+
+    {% if object.gnd_id %}
+    <div class="tabs tabs-border">
+	<input type="radio" class="tab" aria-label="Bearbeiten" name="data-raw-toggle" checked="checked">
+	<div class="tab-content px-5 bg-white border border-base-300">
+	    <div class="prose">
+		<h4> Kurzbeschreibung </h4>
+		<p>
+		    {{ object.get_description }}
+		</p>
+		<h4> Lobid-Info </h4>
+		<p>
+		    {{ object.interim_designator }}
+		</p>
+		<h4> Anpassen </h4>
+		<form method="post">
+		    {% csrf_token %}
+		    {{ form }}
+		    <input type="submit" id="submit-form" class="hidden">
+		</form>
+	    </div>
+	</div>
+	<input type="radio" class="tab" aria-label="Rohdaten" name="data-raw-toggle" >
+	<div class="tab-content px-5 overflow-auto max-w-full h-screen bg-white border border-base-300">
+	    <pre class="whitespace-pre text-sm leading-snug"><code class="language-json">{{ object.render_raw | escape }}</code></pre>
+	</div>
+    </div>
+    {% else %}
+    <div class="bg-white p-5 border border-base-300">
+	<div class="prose">
+	    <form method="post">
+		{% csrf_token %}
+		{{ form }}
+		<input type="submit" id="submit-form" class="hidden">
+	    </form>
+	</div>
+    </div>
+    {% endif %}
+</div>
+<div class="flex-0 flex flex-col">
+    <div class="flex-1"></div>
+    <ul class="menu gap-5 flex-0">
+	<li>
+	    <a class="btn" href="{% url 'dmad_on_django:person_create' %}">
+		Datensatz anlegen
+	    </a>
+	</li>
+	{% if object.gnd_id %}
+	    <li>
+		<a class="btn" href="{% url 'dmad_on_django:person_unlink' object.id %}">
+		    GND-Verknüpfung aufheben
+		</a>
+	    </li>
+	{% else %}
+	    <li> 
+		<a class="btn" href="{% url 'dmad_on_django:person_link' object.id %}">
+		    GND-Datensatz verknüpfen
+		</a>
+	    </li>
+	{% endif %}
+	<li>
+	    <label class="btn btn-primary" for="submit-form"> speichern </label>
+	</li>
+    </ul>
+</div>
+
+{% endblock %}
+
+{% block menu %}
+<li>
+    <a href="{% url 'dmad_on_django:person_list' %}">
+	Personen 
+    </a>
+</li>
+{% comment %}
+<li>
+    <a href="{% url 'dmad_on_django:org_list' %}">
+	Korporationen
+    </a>
+</li>
+<li>
+    <a href="{% url 'dmad_on_django:place_list' %}">
+	Orte
+    </a>
+</li>
+{% endcomment %}
+<li>
+    <a href="{% url 'dmad_on_django:work_list' %}">
+	Werke
+    </a>
+</li>
+{% endblock %}

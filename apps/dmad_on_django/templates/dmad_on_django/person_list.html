@@ -1,0 +1,137 @@
+{% extends 'dmad_on_django/base.html' %}
+{% load static %}
+
+{% block content %}
+
+<div class="flex-1">
+    <div class="bg-white p-5 border border-base-300 h-96">
+	<div class="prose">
+	    <h2> Liste </h2>
+
+	    <ul id="result-list">
+		<li> <em> bitte Suchbegriff eingeben </em> </li>
+	    </ul>
+	</div>
+    </div>
+</div>
+<div class="flex-none prose" id="sidebar">
+    <ul class="menu">
+	<li>
+	    <h2 class="menu-title"> Filter </h2>
+	    <ul>
+		<li>
+		    <button id="stub-toggle"> Rumpfdatensätze </button>
+		</li>
+		<li>
+		    <button id="rework-toggle"> nachbearbeiten </button>
+		</li>
+	    </ul>
+	</li>
+    </ul>
+    {% comment %}
+        <dl>
+                <dt>rework in gnd</dt>
+                {% for state in facets.fields.rework_in_gnd %}
+                    <dd><a href="{{ request.get_full_path }}&amp;selected_facets=rework_in_gnd_exact:{{ state.0|urlencode }}">{{ state.0 }}</a> ({{ state.1 }})</dd>
+                {% endfor %}
+            {% else %}
+                <p>No facet.</p>
+            {% endif %}
+        </dl>
+    </div>
+    {% for result in object_list %}
+        <div class="search_result">
+            <h3><a href="{{ result.object.get_absolute_url }}">{{ result.object.title }}</a></h3>
+
+            <p>{{ result.object.body }}</p>
+        </div>
+    {% empty %}
+        <p>Sorry, no results found.</p>
+    {% endfor %}
+    {% endif %}
+    {% endcomment %}
+    {% comment %}
+    <div>
+        <dl>
+            {% if facets.fields.rework_in_gnd %}
+                <dt>rework in gnd</dt>
+                {# Provide only the top 5 authors #}
+                {% for state in facets.fields.rework_in_gnd %}
+                    <dd><a href="{{ request.get_full_path }}&amp;selected_facets=rework_in_gnd_exact:{{ state.0|urlencode }}">{{ state.0 }}</a> ({{ state.1 }})</dd>
+                {% endfor %}
+            {% else %}
+                <p>No facet.</p>
+            {% endif %}
+        </dl>
+    </div>
+    <ul class="menu">
+	<li>
+	    <h2 class="menu-title"> Filter </h2>
+	    <ul>
+		<li>
+		    <button id="stub-toggle"> Rumpfdatensätze </button>
+		</li>
+		<li>
+		    <button id="rework-toggle"> nachbearbeiten </button>
+		</li>
+	    </ul>
+	</li>
+    </ul>
+    {% endcomment %}
+</div>
+
+<script src="{% static 'dmad_on_django/search_local.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', _ => {
+	dmadOnDjangoSearchLocal.init({
+	    'target': 'result-list',
+	    'input': 'search-field',
+	    'data': {{ objects | safe }},
+	    'stubToggle': 'stub-toggle',
+	    'reworkToggle': 'rework-toggle'
+	});
+    });
+</script>
+
+{% endblock %}
+
+{% block menu %}
+<li>
+    <a href="{% url 'dmad_on_django:person_list' %}" class="active">
+	Personen <span class="badge">{{ person_count }}</span>
+    </a>
+</li>
+
+{% comment %}
+<li>
+    <a href="{% url 'dmad_on_django:org_list' %}">
+	Korporationen
+    </a>
+</li>
+<li>
+    <a href="{% url 'dmad_on_django:place_list' %}">
+	Orte
+    </a>
+</li>
+{% endcomment %}
+
+<li>
+    <a href="{% url 'dmad_on_django:work_list' %}">
+	Werke <span class="badge">{{ work_count }}</span>
+
+    </a>
+</li>
+{% endblock %}
+
+{% block navbar_extras %}
+    <div class="form-control">
+	<input type="text" placeholder="Suchen" class="input input-bordered w-24 md:w-auto" id="search-field" />
+    </div>
+	{% comment %}
+    <form method="get" action=".">
+	{{ form }}
+	<input class="btn" type="submit" value="Suchen" />
+    </form>
+	{% endcomment %}
+    <a href="{% url 'dmad_on_django:person_create' %}" class="btn btn-primary"> Datensatz anlegen </a>
+{% endblock %}

@@ -1,3 +1,4 @@
+import requests
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from iso639 import data as iso639_data
@@ -84,8 +85,9 @@ class Place(models.Model):
     def update_from_raw(self):
         pl_place = PyLobidPlace()
         pl_place.process_data(data=loads(self.raw_data))
-        self.long = pl_place.coords[0]
-        self.lat = pl_place.coords[1]
+        if len(pl_place.coords) > 1:
+            self.long = pl_place.coords[0]
+            self.lat = pl_place.coords[1]
         self.save()
         pref_name = PlaceName.create_from_string(pl_place.pref_name, Status.PRIMARY, self)
         pref_name.save()
@@ -118,6 +120,11 @@ class Place(models.Model):
             place.fetch_raw()
             place.update_from_raw()
             return place
+
+    def get_default_name(self):
+        if self.names.count() > 0:
+            return self.names.get(status=Status.PRIMARY).__str__()
+        return 'ohne Name'
 
     def __str__(self):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
@@ -157,9 +164,9 @@ class PersonName(models.Model):
         name.person = person
         return name.parse_comma_separated_string(comma_separated_string)
 
-
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
+
 
 class Person(models.Model):
     class Gender(models.TextChoices):
@@ -170,7 +177,14 @@ class Person(models.Model):
     raw_data = models.TextField(
             null=True
         )
-    gnd_id = models.CharField(max_length=20)
+    rework_in_gnd = models.BooleanField(
+            default=False
+        )
+    gnd_id = models.CharField(
+            max_length=20,
+            null=True,
+            blank=True
+        )
     gender = models.CharField(
             max_length=1,
             choices=Gender,
@@ -209,6 +223,35 @@ class Person(models.Model):
     activity_places = models.ManyToManyField(
             'Place'
         )
+    comment = models.TextField(
+            null = True,
+            blank = True
+        )
+    interim_designator = models.CharField(
+            max_length = 150,
+            null = True,
+            blank = True
+        )
+
+    def render_raw(self):
+        return dumps(loads(self.raw_data), indent=2, ensure_ascii=False)
+
+    def get_description(self):
+        birth_date = 'o.D.'
+        death_date = 'o.D.'
+        if self.birth_date:
+            birth_date = self.birth_date.strftime('%d.%m.%Y')
+        if self.death_date:
+            death_date = self.death_date.strftime('%d.%m.%Y')
+
+        birth_place = '?'
+        death_place = '?'
+        if self.birth_place:
+            birth_place = self.birth_place.get_default_name()
+        if self.death_place:
+            death_place = self.death_place.get_default_name()
+
+        return f"{birth_date} ({birth_place})–{death_date} ({death_place})"
 
     def update_from_raw(self):
         pl_person = PyLobidPerson()
@@ -225,7 +268,7 @@ class Person(models.Model):
                 #)
         #self.date_of_birth, self.date_of_death = pl_person.life_span.values()
         self.birth_date = Person.map_date(pl_person.life_span['birth_date_str'])
-        self.birth_date = Person.map_date(pl_person.life_span['death_date_str'])
+        self.death_date = Person.map_date(pl_person.life_span['death_date_str'])
         if 'gender' in pl_person.ent_dict:
             self.gender = Person.map_gender(pl_person.ent_dict['gender'][0]['id'])
         if 'geographicAreaCode' in pl_person.ent_dict:
@@ -287,14 +330,26 @@ class Person(models.Model):
             person.update_from_raw()
             return person
 
+    def get_designator(self):
+        if self.gnd_id:
+            return self.get_default_name()
+        return self.interim_designator or ''
+
     def get_default_name(self):
-        return self.names.get(status=Status.PRIMARY).__str__()
+        if self.names.count() > 0:
+            return self.names.get(status=Status.PRIMARY).__str__()
+        return 'ohne Name'
+
+    def search(search_string):
+        # see adb input views.py
+        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:Person)&size=5&format=json:suggest"
+        lobid_response = requests.get(lobid_url)
+        return lobid_response.json()
 
     def __str__(self):
         return f'{self.gnd_id}: {self.get_default_name()}'
 
     def map_gender(gnd_gender):
-        print(gnd_gender)
         if gnd_gender ==  'https://d-nb.info/standards/vocab/gnd/gender#male':
             return Person.Gender.MALE
         if gnd_gender ==  'https://d-nb.info/standards/vocab/gnd/gender#female':
@@ -302,7 +357,6 @@ class Person(models.Model):
         return Person.Gender.NULL
 
     def map_date(date_string):
-        print(date_string)
         date_list = date_string.split('-')
         if len(date_list) > 3:
             raise Exception('Unknown date format: %s ' % date_string)
@@ -311,7 +365,7 @@ class Person(models.Model):
         if date_list[0].isnumeric():
             year = date_list[0]
         else:
-            return null
+            return None
         if len(date_list) > 1 and date_list[1].isnumeric():
             month = date_list[1]
         if len(date_list) > 2 and date_list[2].isnumeric():
@@ -332,7 +386,10 @@ class Period(models.Model):
     def render_detailed(self):
         if self.not_before == self.not_after:
             return f"{self.display} ({self.not_before})"
-        return f"{self.display} ({self.not_before}&ndash;{self.not_after})"
+        return f"{self.display} ({self.not_before}–{self.not_after})"
 
     def __str__(self):
         return self.display
+
+class Work(models.Model):
+    pass

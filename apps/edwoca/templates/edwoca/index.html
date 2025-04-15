@@ -1,5 +1,22 @@
 {% extends 'edwoca/base.html' %}
 
+{% block menu %}
+<ul class="menu menu-lg">
+	{% comment %}
+	<li>
+	    <a href="{% url 'edwoca:work_list' %}">
+		Werke <span class="badge"> {{ work_count }} </span>
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_list' %}">
+		Quellen <span class="badge"> {{ manifestation_count }} </span>
+	    </a>
+	</li>
+	{% endcomment %}
+</ul>
+{% endblock %}
+
 {% block content %}
 
 <div class="stats">

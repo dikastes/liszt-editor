@@ -1,0 +1,5 @@
+{% if object.gnd_id == '' %}
+	True
+{% else %}
+	False
+{% endif %}
