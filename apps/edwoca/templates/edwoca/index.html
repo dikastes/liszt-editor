@@ -1,0 +1,87 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+<ul class="menu menu-lg">
+	{% comment %}
+	<li>
+	    <a href="{% url 'edwoca:work_list' %}">
+		Werke <span class="badge"> {{ work_count }} </span>
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_list' %}">
+		Quellen <span class="badge"> {{ manifestation_count }} </span>
+	    </a>
+	</li>
+	{% endcomment %}
+</ul>
+{% endblock %}
+
+{% block content %}
+
+<div class="stats">
+	<div class="stat">
+		<div class="stat-title"> Werke </div>
+		<div class="stat-value text-primary"> {{ work_count }} </div>
+		<div class="stat-desc"> mit {{ expression_count }} Fassungen </div>
+	</div>
+	<div class="stat">
+		<div class="stat-title"> Quellen </div>
+		<div class="stat-value text-primary"> {{ manifestation_count }} </div>
+		<div class="stat-desc"> mit {{ item_count }} Exemplaren </div>
+	</div>
+	<div class="stat">
+		<div class="stat-title"> Personen </div>
+		<div class="stat-value text-primary"> {{ person_count }} </div>
+	</div>
+	<div class="stat">
+		<div class="stat-title"> Orte </div>
+		<div class="stat-value text-primary"> {{ place_count }} </div>
+	</div>
+	<div class="stat">
+		<div class="stat-title"> Korporationen </div>
+		<div class="stat-value text-primary"> {{ corporation_count }} </div>
+	</div>
+</div>
+
+<div role="tablist" class="tabs tabs-bordered my-10">
+	<input type="radio" name="work-source-toggle" role="tab" class="tab" aria-label="Werke" checked="checked"/>
+	<div role="tabpanel" class="tab-content py-10">
+		<a href="{% url 'edwoca:work_create' %}" class="btn btn-primary"> neues Werk </a>
+		{% for work in entities.works %}
+		<div class="card shadow mt-5">
+			<div class="card-body">
+				<h2 class="card-title mt-0"> {{ work.get_pref_title }} </h2>
+				<p>
+					LQWV {{ work.work_catalog_number }}, 
+					<a href="https://g-nd.info/gnd/{{ work.gnd_id }}" target="_blank">GND {{ work.gnd_id }}</a>,
+					{{ work.get_alt_titles }}
+				</p>
+				<div class="card-actions justify-end">
+					<a href="{% url 'edwoca:work_detail' work.id %}" class="btn btn-primary"> ansehen </a>
+					<a href="{% url 'edwoca:work_delete' work.id %}" class="btn"> löschen </a>
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+	<input type="radio" name="work-source-toggle" role="tab" class="tab" aria-label="Quellen"/>
+	<div role="tabpanel" class="tab-content py-10">
+		<a href="{% url 'edwoca:manifestation_create' %}" class="btn btn-primary"> neue Quelle </a>
+		{% for source in entities.sources %}
+		<div class="card shadow mt-5">
+			<div class="card-body">
+				<h2 class="card-title mt-0"> {{ source.rism_id }} </h2>
+				<p>
+					{{ source.plate_number }}
+				</p>
+				<div class="card-actions justify-end">
+					<a href="{% url 'edwoca:manifestation_detail' source.id %}" class="btn btn-primary"> ansehen </a>
+					<a href="{% url 'edwoca:manifestation_delete' source.id %}" class="btn"> löschen </a>
+				</div>
+			</div>
+		</div>
+		{% endfor %}
+	</div>
+</div>
+{% endblock %}

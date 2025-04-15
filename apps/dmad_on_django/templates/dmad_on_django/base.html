@@ -1,0 +1,65 @@
+{% load static %}
+
+<html data-theme="liszt">
+    <head>
+	<link rel="stylesheet" href="{% static 'dmad_on_django/tailwind.dist.css' %}" crossorigin="anonymous" />
+    </head>
+
+    <body>
+	<div class="max-w-7xl mx-auto my-10">
+
+	    <div class="navbar bg-base-800 mb-10">
+		<div class="flex-1">
+		    <a class="btn btn-ghost text-xl" href="{% url 'dmad_on_django:index' %}">DMAd</a>
+		</div>
+		<div class="flex-none gap-2">
+		    {% block navbar_extras %}
+		    {% endblock %}
+		</div>
+	    </div>
+
+	    <div class="flex flex-row gap-10">
+		<div class="flex-0">
+		    <ul class="menu menu-lg gap-5">
+			{% block menu %}
+			<li>
+			    <a href="{% url 'dmad_on_django:person_list' %}">
+				Personen 
+			    </a>
+			</li>
+			{% comment %}
+			<li>
+			    <a href="{% url 'dmad_on_django:org_list' %}">
+				Korporationen
+			    </a>
+			</li>
+			<li>
+			    <a href="{% url 'dmad_on_django:place_list' %}">
+				Orte
+			    </a>
+			</li>
+			{% endcomment %}
+			<li>
+			    <a href="{% url 'dmad_on_django:work_list' %}">
+				Werke
+			    </a>
+			</li>
+			{% endblock %}
+		    </ul>
+		</div>
+		<div class="flex-1 min-w-0 flex flex-row">
+		    {% block content %}
+		    <p> This is the base template. </p>
+		    {% endblock %}
+		</div>
+	    </div>
+	</div>
+
+	<!-- htmx.js -->
+	<script src="{% static 'dmad_on_django/htmx.js' %}"></script>
+	<!-- jquery.js -->
+	<script src="{% static 'dmad_on_django/jquery-3.7.1.min.js' %}"></script>
+	<!-- fuse.js -->
+	<script src="{% static 'dmad_on_django/fuse.js' %}"></script>
+    </body>
+</html>

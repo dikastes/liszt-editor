@@ -1,0 +1,29 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+{% if return_pk %}
+<a class="btn btn-primary" href="{% url return_target return_pk %}"> zurück </a>
+{% else %}
+<a class="btn btn-primary" href="{% url return_target %}"> zurück </a>
+{% endif %}
+
+<div class="card shadow-xl mt-5">
+	<div class="card-body">
+		<h2 class="card-title mt-0"> {{ view_title }} </h2>
+
+		title_form_set
+		{{ title_form_set }}
+		for form in form_set
+		{% for form in title_form_set %}
+			{{ form }}
+		{% endfor %}
+		<form method="post">
+			{% csrf_token %}
+			{{ form }}
+
+			<input type="submit" value="{{ button_label }}" class="btn btn-primary my-5">
+		</form>
+</div>
+
+{% endblock %}
