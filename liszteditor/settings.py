@@ -144,3 +144,10 @@ FORM_RENDERER = 'edwoca.forms.EdwocaFormRenderer'
 Z_ID = "5080468"
 Z_LIBRARY_TYPE = 'group'
 Z_API_KEY = os.environ['ZOTERO_API_KEY']
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index')
+    },
+}
