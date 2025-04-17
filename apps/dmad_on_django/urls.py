@@ -24,17 +24,17 @@ urlpatterns = [
     ]
 
 for entity in entities:
-    #urlpatterns.append(
-        #path(
-            #f"{entity}s/list",
-            #getattr(views, f"{entity.capitalize()}SearchView").as_view(),
-            #name = f"{entity}_list"
-            #)
-        #)
     urlpatterns.append(
         path(
             f"{entity}s/list",
-            getattr(views, f"{entity}_list"),
+            getattr(views, f"{entity.capitalize()}SearchView").as_view(),
+            name = f"{entity}_list"
+            )
+        )
+    urlpatterns.append(
+        path(
+            f"{entity}s/list/<str:type>",
+            getattr(views, f"{entity.capitalize()}SearchView").as_view(),
             name = f"{entity}_list"
             )
         )
