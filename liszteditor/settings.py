@@ -148,6 +148,7 @@ Z_ID = "5080468"
 Z_LIBRARY_TYPE = 'group'
 Z_API_KEY = os.environ['ZOTERO_API_KEY']
 
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
