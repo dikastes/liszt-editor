@@ -50,26 +50,28 @@
 {% endblock %}
 
 {% block menu %}
-<li>
-    <a href="{% url 'dmad_on_django:person_list' %}">
-	Personen
-    </a>
-</li>
-{% comment %}
-<li>
-    <a href="{% url 'dmad_on_django:org_list' %}">
-	Korporationen
-    </a>
-</li>
-<li>
-    <a href="{% url 'dmad_on_django:place_list' %}">
-	Orte
-    </a>
-</li>
-{% endcomment %}
-<li>
-    <a href="{% url 'dmad_on_django:work_list' %}">
-	Werke
-    </a>
-</li>
+<ul class="menu menu-lg">
+    <li>
+	<a href="{% url 'dmad_on_django:person_list' %}">
+	    Personen
+	</a>
+    </li>
+    {% comment %}
+    <li>
+	<a href="{% url 'dmad_on_django:org_list' %}">
+	    Korporationen
+	</a>
+    </li>
+    <li>
+	<a href="{% url 'dmad_on_django:place_list' %}">
+	    Orte
+	</a>
+    </li>
+    {% endcomment %}
+    <li>
+	<a href="{% url 'dmad_on_django:work_list' %}">
+	    Werke
+	</a>
+    </li>
+</ul>
 {% endblock %}

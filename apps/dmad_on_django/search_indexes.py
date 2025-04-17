@@ -2,7 +2,7 @@ from haystack import indexes
 from .models import Person
 
 class PersonIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.CharField(
+    text = indexes.NgramField(
             document=True,
             use_template=True
         )

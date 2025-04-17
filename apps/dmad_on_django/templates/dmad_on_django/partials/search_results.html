@@ -1,0 +1,13 @@
+<ul id="search-results">
+    {% if query or type %}
+	{% for result in object_list %}
+	    <li>
+		<a href="{{ result.get_absolute_url }}">{{ result.get_designator }}</a>
+	    </li>
+	{% empty %}
+	    <li> <em> keine Suchergebnisse</em> </li>
+	{% endfor %}
+    {% else %}
+	<li> <em> bitte Suchbegriff eingeben </em> </li>
+    {% endif %}
+</ul>

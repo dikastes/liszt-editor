@@ -26,6 +26,77 @@
 		</form>
 	    </div>
 	</div>
+	<input type="radio" class="tab" aria-label="Normdatenübersicht" name="data-raw-toggle">
+	<div class="tab-content px-5 overflow-auto max-w-full h-screen bg-white border border-base-300">
+	    <div class="collapse collapse-plus">
+	        <input type="checkbox" />
+	        <div class="collapse-title">Identifikation</div>
+		<div class="collapse-content">
+		    <table class="table table-zebra">
+			<tr>
+			    <td> GND-ID </td>
+			    <td> {{ object.gnd_id }} </td>
+			</tr>
+			<tr>
+			    <td> bevorzugter Name </td>
+			    <td> {{ object.get_default_name }} </td>
+			</tr>
+			{% for alt_name in object.get_alt_names %}
+			    <tr>
+				<td> alternativer Name </td>
+				<td> {{ alt_name }} </td>
+			    </tr>
+			{% endfor %}
+		    </table>
+		</div>
+	    </div>
+	    <div class="collapse collapse-plus">
+	        <input type="checkbox"/>
+	        <div class="collapse-title">Biografie</div>
+		<div class="collapse-content">
+		    <table class="table table-zebra">
+			<tr>
+			    <td> Ländercode </td>
+			    <td> {{ object.geographic_area_code }} </td>
+			</tr>
+			<tr>
+			    <td> Geschlecht </td>
+			    <td> {{ object.gender }} </td>
+			</tr>
+			<tr>
+			    <td> Geburtsort </td>
+			    <td> {{ object.birth_place }} </td>
+			</tr>
+			<tr>
+			    <td> Sterbeort </td>
+			    <td> {{ object.death_place }} </td>
+			</tr>
+			{% for activity_place in object.activity_places.all %}
+			    <tr>
+				<td> Wirkungsort </td>
+				<td> {{ activity_place }} </td>
+			    </tr>
+			{% endfor %}
+			<tr>
+			    <td> Geburtsdatum </td>
+			    <td> {{ object.brith_date }} </td>
+			</tr>
+			<tr>
+			    <td> Sterbedatum </td>
+			    <td> {{ object.death_date }} </td>
+			</tr>
+			<tr>
+			    <td> charakteristischer Beruf </td>
+			    <td> todo </td>
+			</tr>
+			<tr>
+			    <td> todo </td>
+			    <td> {{ object.gnd_id }} </td>
+			</tr>
+		    </table>
+		</div>
+	    </div>
+	</div>
 	<input type="radio" class="tab" aria-label="Rohdaten" name="data-raw-toggle" >
 	<div class="tab-content px-5 overflow-auto max-w-full h-screen bg-white border border-base-300">
 	    <pre class="whitespace-pre text-sm leading-snug"><code class="language-json">{{ object.render_raw | escape }}</code></pre>
@@ -73,26 +144,28 @@
 {% endblock %}
 
 {% block menu %}
-<li>
-    <a href="{% url 'dmad_on_django:person_list' %}">
-	Personen 
-    </a>
-</li>
-{% comment %}
-<li>
-    <a href="{% url 'dmad_on_django:org_list' %}">
-	Korporationen
-    </a>
-</li>
-<li>
-    <a href="{% url 'dmad_on_django:place_list' %}">
-	Orte
-    </a>
-</li>
-{% endcomment %}
-<li>
-    <a href="{% url 'dmad_on_django:work_list' %}">
-	Werke
-    </a>
-</li>
+<ul class="menu menu-lg">
+    <li>
+	<a href="{% url 'dmad_on_django:person_list' %}">
+	    Personen 
+	</a>
+    </li>
+    {% comment %}
+    <li>
+	<a href="{% url 'dmad_on_django:org_list' %}">
+	    Korporationen
+	</a>
+    </li>
+    <li>
+	<a href="{% url 'dmad_on_django:place_list' %}">
+	    Orte
+	</a>
+    </li>
+    {% endcomment %}
+    <li>
+	<a href="{% url 'dmad_on_django:work_list' %}">
+	    Werke
+	</a>
+    </li>
+</ul>
 {% endblock %}

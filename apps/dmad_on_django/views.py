@@ -6,7 +6,8 @@ from .models import Person, Work
 import dmad_on_django.models as dmad_models
 from django import forms
 from json import dumps
-from haystack.generic_views import FacetedSearchView
+from haystack.generic_views import SearchView
+from .forms import SearchForm, formWidgets
 
 # Create your views here.
 def index(request):
@@ -20,19 +21,48 @@ def get_link(model_object, model):
         title += ' (R)'
     return f"<li><a href={link}>{title}</a></li>"
 
-class WorkSearchView(FacetedSearchView):
+class WorkSearchView(SearchView):
     pass
 
-class PersonSearchView(FacetedSearchView):
-    facet_fields = ['rework_in_gnd', 'entity_type', 'is_stub']
+class PersonSearchView(SearchView):
     template_name = 'dmad_on_django/person_list.html'
+    form_class = SearchForm
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
+        if self.kwargs.get('type') == 'rework':
+            context['object_list'] = Person.objects.filter(rework_in_gnd = True)
+        elif self.kwargs.get('type') == 'stub':
+            context['object_list'] = Person.objects.filter(gnd_id__isnull = True)
+        else:
+            context['object_list'] = [ result.object for result in context['object_list'] ]
         context['active'] = 'person'
+        context['type'] = self.kwargs.get('type')
         context['person_count'] = Person.objects.count()
         context['work_count'] = Work.objects.count()
+        context['rework_count'] = Person.objects.filter(rework_in_gnd = True).count()
+        context['stub_count'] = Person.objects.filter(gnd_id__isnull = True).count()
         return context
+
+    def form_invalid(self, form):
+        if self.request.htmx:
+            context = self.get_context_data(**{
+                    self.form_name: form,
+                    'object_list': self.get_queryset()
+                })
+            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        if self.request.htmx:
+            self.queryset = form.search()
+            context = self.get_context_data(**{
+                    self.form_name: form,
+                    'query': form.cleaned_data.get(self.search_field),
+                    'object_list': self.queryset
+                })
+            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
+        return super().form_valid(form)
 
 def person_list(request):
     context = {}
@@ -87,6 +117,13 @@ class CreateView(generic.CreateView):
     template_name = 'dmad_on_django/create.html'
     fields = ['interim_designator', 'gnd_id', 'comment']
 
+    def get_form_class(self):
+        return forms.modelform_factory(
+            self.model,
+            fields = self.fields,
+            widgets = formWidgets
+        )
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['entity_type'] = self.model.__name__.lower()
@@ -121,8 +158,9 @@ class UpdateView(generic.UpdateView):
 
     def get_form_class(self):
         return forms.modelform_factory(
-            self.object.__class__,
-            fields = self.get_form_fields()
+            self.model,
+            fields = self.get_form_fields(),
+            widgets = formWidgets
         )
 
     # it is not possible to edit an interim designator once
@@ -167,6 +205,13 @@ class WorkDeleteView(DeleteView):
 class LinkView(generic.UpdateView):
     template_name = 'dmad_on_django/create.html'
     fields = ['interim_designator', 'gnd_id', 'comment']
+
+    def get_form_class(self):
+        return forms.modelform_factory(
+            self.model,
+            fields = self.fields,
+            widgets = formWidgets
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

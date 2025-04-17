@@ -1,5 +1,6 @@
 import requests
 from django.db import models
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from iso639 import data as iso639_data
 from pylobid.pylobid import PyLobidClient, GNDIdError, GNDNotFoundError, GNDAPIError, PyLobidPerson, PyLobidPlace, PyLobidOrg
@@ -233,6 +234,9 @@ class Person(models.Model):
             blank = True
         )
 
+    def get_absolute_url(self):
+        return reverse('dmad_on_django:person_update', kwargs = {'pk': self.id})
+
     def render_raw(self):
         return dumps(loads(self.raw_data), indent=2, ensure_ascii=False)
 
@@ -256,17 +260,6 @@ class Person(models.Model):
     def update_from_raw(self):
         pl_person = PyLobidPerson()
         pl_person.process_data(data=loads(self.raw_data))
-        #PersonName.create_from_comma_separated_string(
-                #comma_separated_string = pl_person.pref_name,
-                #status = Status.PRIMARY,
-                #person = self
-            #)
-            #PersonName.create_from_comma_separated_string(
-                    #comma_separated_string = name,
-                    #status = Status.PRIMARY,
-                    #person = self
-                #)
-        #self.date_of_birth, self.date_of_death = pl_person.life_span.values()
         self.birth_date = Person.map_date(pl_person.life_span['birth_date_str'])
         self.death_date = Person.map_date(pl_person.life_span['death_date_str'])
         if 'gender' in pl_person.ent_dict:
@@ -339,6 +332,9 @@ class Person(models.Model):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
         return 'ohne Name'
+
+    def get_alt_names(self):
+        return self.names.filter(status=Status.ALTERNATIVE)
 
     def search(search_string):
         # see adb input views.py
