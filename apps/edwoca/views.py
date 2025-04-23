@@ -1,9 +1,10 @@
 from django.urls import reverse_lazy
 from django.shortcuts import render, get_object_or_404
 from django.core import serializers
-from django.http import HttpResponse
+from django.http import JsonResponse
 from django.views import generic
-from django.forms import HiddenInput
+from django.forms import HiddenInput, formset_factory
+from .forms import WorkTitleForm
 from .models import Work, WorkTitle, RelatedWork, WorkContributor, Expression, ExpressionContributor, ExpressionTitle, \
     Manifestation, RelatedManifestation, Item, RelatedItem, ManifestationContributor, ProvenanceState, WorkBib#, ManifestationTitle, ItemTitle
 from dmad_on_django.models import Status, Person, Period, Place
@@ -201,6 +202,7 @@ class WorkUpdateView(generic.edit.UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['title_form_set'] = formset_factory(WorkTitleForm)
         context['view_title'] = f"Werk { self.object } bearbeiten"
         context['button_label'] = "speichern"
         context['return_target'] = 'edwoca:work_detail'
@@ -910,4 +912,8 @@ def person_list(request):
             in Person.objects.all()
         ]
     serialized_persons = json_dump(persons)
-    return HttpResponse(serialized_persons, content_type='application/json')
+    return JsonResponse(serialized_persons, safe=False)
+
+def work_list(request):
+    return render('edwoca:index')
+

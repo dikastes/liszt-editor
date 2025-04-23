@@ -21,5 +21,6 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('edwoca/', include('edwoca.urls')),
+    path('dmad/', include('dmad_on_django.urls')),
     path(r'bib/', include('bib.urls',namespace='bib'))
 ] + debug_toolbar_urls()

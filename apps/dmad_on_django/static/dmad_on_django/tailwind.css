@@ -1,0 +1,17 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind typography;
+@tailwind layout;
+@tailwind badge;
+
+.hidden {
+  display: none;
+}
+
+code {
+  font-size: .8rem;
+  overflow: scroll;
+  height: 50vh;
+  font-family: monospace;
+}

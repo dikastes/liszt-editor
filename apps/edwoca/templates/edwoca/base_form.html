@@ -12,6 +12,12 @@
 	<div class="card-body">
 		<h2 class="card-title mt-0"> {{ view_title }} </h2>
 
+		title_form_set
+		{{ title_form_set }}
+		for form in form_set
+		{% for form in title_form_set %}
+			{{ form }}
+		{% endfor %}
 		<form method="post">
 			{% csrf_token %}
 			{{ form }}

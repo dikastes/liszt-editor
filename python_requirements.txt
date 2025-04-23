@@ -6,3 +6,6 @@ pyzotero
 iso639
 pylobid
 celery
+django-htmx
+django-haystack
+whoosh

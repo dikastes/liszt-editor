@@ -1,0 +1,41 @@
+{% extends 'dmad_on_django/base.html' %}
+
+{% block content %}
+
+<div class="card shadow-xl mt-5">
+	<div class="card-body">
+		<h2 class="card-title mt-0"> Liste </h2>
+
+	</div>
+</div>
+
+{% endblock %}
+
+{% block menu %}
+<li>
+    <a href="{% url 'dmad_on_django:person_list' %}">
+	Personen 
+    </a>
+</li>
+{% comment %}
+<li>
+    <a href="{% url 'dmad_on_django:org_list' %}">
+	Korporationen
+    </a>
+</li>
+<li>
+    <a href="{% url 'dmad_on_django:place_list' %}">
+	Orte
+    </a>
+</li>
+{% endcomment %}
+<li>
+    <a href="{% url 'dmad_on_django:work_list' %}" class="active">
+	Werke
+    </a>
+</li>
+{% endblock %}
+
+{% block createstub %}
+    <a href="{% url 'dmad_on_django:work_create' %}" class="btn btn-primary"> Rumpfdatensatz anlegen </a>
+{% endblock %}

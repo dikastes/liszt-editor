@@ -8,10 +8,42 @@
     </head>
 
     <body>
-	<div class="container w-full max-w-7xl mx-auto my-10 prose">
-	{% block content %}
-	    <p> This is the base template. </p>
-	{% endblock %}
+	<div class="navbar bg-base-800 mb-10">
+	    <div class="flex-1">
+		<a class="btn btn-ghost text-xl" href="{% url 'edwoca:index' %}">edwoca</a>
+	    </div>
+	    <div class="flex-none gap-2">
+		<div class="form-control">
+		    <input type="text" placeholder="Suchen" class="input input-bordered w-24 md:w-auto" id="search-field" />
+		</div>
+		<div class="dropdown dropdown-end">
+		    <div tabindex="0" role="button" class="btn btn-ghost rounded-btn">neu</div>
+		    <ul
+		        tabindex="0"
+		        class="menu dropdown-content bg-base-100 rounded-box z-[1] mt-4 w-52 p-2 shadow">
+		        <li>
+			    <a href="{% url 'edwoca:work_create' %}">Werk</a>
+			</li>
+		        <li>
+			    <a href="{% url 'edwoca:manifestation_create' %}">Quelle</a>
+			</li>
+		    </ul>
+		</div>
+	    </div>
+	</div>
+	<div class="container w-full max-w-7xl mx-auto my-10 prose flex">
+	    <div class="flex-0">
+		{% block menu %}
+		{% endblock %}
+	    </div>
+	    <div class="flex-1">
+		{% block content %}
+		{% endblock %}
+	    </div>
+	    <div class="flex-0">
+		{% block nav %}
+		{% endblock %}
+	    </div>
 	</div>
 
 	<!-- jquery.js -->

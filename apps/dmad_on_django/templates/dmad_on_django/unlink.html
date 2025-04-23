@@ -1,0 +1,62 @@
+{% extends 'dmad_on_django/base.html' %}
+
+{% block content %}
+
+<div class="flex-1">
+    <div class="prose">
+	<h2 class="card-title mt-0"> {{ object.get_designator }} </h2>
+
+	<p>
+	    Die Verknüpfung zur GND wird entfernt.
+	    Der Datensatz wird danach als <em> {{ object.interim_designator }} </em> bezeichnet.
+	    Bitte bestätigen.
+	</p>
+    </div>
+
+    <div>
+	<form method="post">
+	    {% csrf_token %}
+	    <input type="submit" id="submit-form" class="hidden">
+	</form>
+    </div>
+</div>
+<div class="flex-0 flex flex-col">
+    <div class="flex-1"></div>
+    <ul class="menu gap-5 flex-0">
+	<li> 
+	    <a class="btn" href="{% url 'dmad_on_django:person_update' object.id %}">
+		abbrechen
+	    </a>
+	</li>
+	<li>
+	    <label class="btn btn-primary" for="submit-form"> bestätigen </label>
+	</li>
+    </ul>
+</div>
+
+{% endblock %}
+
+{% block menu %}
+<li>
+    <a href="{% url 'dmad_on_django:person_list' %}">
+	Personen 
+    </a>
+</li>
+{% comment %}
+<li>
+    <a href="{% url 'dmad_on_django:org_list' %}">
+	Korporationen
+    </a>
+</li>
+<li>
+    <a href="{% url 'dmad_on_django:place_list' %}">
+	Orte
+    </a>
+</li>
+{% endcomment %}
+<li>
+    <a href="{% url 'dmad_on_django:work_list' %}">
+	Werke
+    </a>
+</li>
+{% endblock %}
