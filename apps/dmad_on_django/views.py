@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views import generic
 from django.views.generic import CreateView, UpdateView
-from .models import Person, Work
+from .models import Person, Work, Place
 import dmad_on_django.models as dmad_models
 from django import forms
 from json import dumps
@@ -43,6 +43,7 @@ class PersonSearchView(SearchView):
         context['work_count'] = Work.objects.count()
         context['rework_count'] = Person.objects.filter(rework_in_gnd = True).count()
         context['stub_count'] = Person.objects.filter(gnd_id__isnull = True).count()
+        context['place_count'] = Place.objects.count();
         return context
 
     def form_invalid(self, form):
@@ -90,6 +91,24 @@ def work_list(request):
     context['active'] = 'work'
     return render(request, 'dmad_on_django/work_list.html', context)
 
+def place_list(request):
+    context = {}
+    context['objects'] = dumps([
+            {
+                'id': place.id,
+                'designator': place.get_designator(),
+                'rendered_link': get_link(place, 'place'),
+                'rework_in_gnd': place.rework_in_gnd,
+                'gnd_id': place.gnd_id
+            }
+            for place
+            in Place.objects.all()
+        ])
+    context['active'] = 'place'
+    context['person_count'] = Person.objects.count()
+    context['work_count'] = Work.objects.count()
+    context['place_count'] = Place.objects.count()
+    return render(request, 'dmad_on_django/place_list.html', context)
 
 class UnlinkView(UpdateView):
     template_name = 'dmad_on_django/unlink.html'
@@ -301,9 +320,48 @@ def json_search(request, entity_type, hash=''):
     context['active'] = 'person'
     context['person_count'] = Person.objects.count()
     context['work_count'] = Work.objects.count()
+    context['place_count'] = Place.objects.count()
 
 class PlaceSearchView(SearchView):
-    pass
+    template_name = 'dmad_on_django/place_list.html'
+    form_class = SearchForm
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        if self.kwargs.get('type') == 'rework':
+            context['object_list'] = Place.objects.filter(rework_in_gnd = True)
+        elif self.kwargs.get('type') == 'stub':
+            context['object_list'] = Place.objects.filter(gnd_id__isnull = True)
+        else:
+            context['object_list'] = [ result.object for result in context['object_list'] ]
+        context['active'] = 'person'
+        context['type'] = self.kwargs.get('type')
+        context['person_count'] = Person.objects.count()
+        context['work_count'] = Work.objects.count()
+        context['rework_count'] = Person.objects.filter(rework_in_gnd = True).count()
+        context['stub_count'] = Person.objects.filter(gnd_id__isnull = True).count()
+        context['place_count'] = Place.objects.count();
+        return context
+    
+    def form_invalid(self, form):
+        if self.request.htmx:
+            context = self.get_context_data(**{
+                    self.form_name: form,
+                    'object_list': self.get_queryset()
+                })
+            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        if self.request.htmx:
+            self.queryset = form.search()
+            context = self.get_context_data(**{
+                    self.form_name: form,
+                    'query': form.cleaned_data.get(self.search_field),
+                    'object_list': self.queryset
+                })
+            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
+        return super().form_valid(form)
 
 class PlaceCreateView(DmadCreateView):
     pass

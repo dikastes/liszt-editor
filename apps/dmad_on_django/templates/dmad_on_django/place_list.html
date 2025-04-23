@@ -78,7 +78,7 @@
 {% block menu %}
 <ul class="menu menu-lg">
     <li>
-	<a href="{% url 'dmad_on_django:person_list' %}" class="active">
+	<a href="{% url 'dmad_on_django:person_list' %}">
 	    Personen <span class="badge">{{ person_count }}</span>
 	</a>
     </li>
@@ -96,20 +96,20 @@
 	</a>
     </li>
 	<li>
-		<a href = "{% url 'dmad_on_django:place_list' %}">
+		<a href = "{% url 'dmad_on_django:place_list' %}"  class="active">
 			Orte <span class="badge">{{ place_count }}</span>
 	</a>
 	</li>
 </ul>
-{% endblock %}
+{%endblock%}
 
 {% block navbar_extras %}
     {% if not type %}
     <form
 	method="get"
-	action="{% url 'dmad_on_django:person_list' %}"
+	action="{% url 'dmad_on_django:place_list' %}"
 	class="m-0"
-	hx-get="{% url 'dmad_on_django:person_list' %}"
+	hx-get="{% url 'dmad_on_django:place_list' %}"
 	hx-target="#search-results"
 	hx-trigger="input"
 	hx-push-url="true"
@@ -118,5 +118,5 @@
 	<input class="btn" type="submit" value="Suchen" />
     </form>
     {% endif %}
-    <a href="{% url 'dmad_on_django:person_create' %}" class="btn btn-primary"> Datensatz anlegen </a>
+    <a href="{% url 'dmad_on_django:place_create' %}" class="btn btn-primary"> Datensatz anlegen </a>
 {% endblock %}

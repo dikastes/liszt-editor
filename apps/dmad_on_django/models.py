@@ -126,6 +126,11 @@ class Place(models.Model):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
         return 'ohne Name'
+    
+    def get_designator(self):
+        if self.gnd_id:
+            return self.get_default_name()
+        return self.interim_designator or ''
 
     def __str__(self):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
@@ -151,6 +156,11 @@ class PersonName(models.Model):
             default = Status.PRIMARY,
             null=True
         )
+    interim_designator = models.CharField (
+            max_length = 150,
+            null = True,
+            blank = True
+        )
 
     def parse_comma_separated_string(self, comma_separated_string):
         names = comma_separated_string.split(',')
@@ -164,7 +174,7 @@ class PersonName(models.Model):
         name.status = status
         name.person = person
         return name.parse_comma_separated_string(comma_separated_string)
-
+    
     def __str__(self):
         return f'{self.first_name} {self.last_name}'
 
