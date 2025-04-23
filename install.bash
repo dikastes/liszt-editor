@@ -67,6 +67,15 @@ run "npm install --prefix $SCRIPT_DIR"
 	run "npx tailwindcss -i static/bib/tailwind.css -o static/bib/tailwind.dist.css"
 )
 
+(
+
+	cd "$SCRIPT_DIR/apps/dmad_on_django"
+	yellow "[dmad_on_django] Installing npm packages..."
+	run "npm install"
+	yellow "[dmad_on_django] Compiling Tailwind CSS..."
+	run "npx tailwindcss -i static/dmad_on_django/tailwind.css -o static/dmad_on_django/tailwind.dist.css"
+)
+
 yellow "Installing python dependencies..."
 run "$SCRIPT_DIR/bin/pip install -r $SCRIPT_DIR/python_requirements.txt"
 
