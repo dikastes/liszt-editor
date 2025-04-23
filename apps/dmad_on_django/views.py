@@ -2,6 +2,7 @@ from django.urls import reverse_lazy
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.views import generic
+from django.views.generic import CreateView, UpdateView
 from .models import Person, Work
 import dmad_on_django.models as dmad_models
 from django import forms
@@ -90,7 +91,7 @@ def work_list(request):
     return render(request, 'dmad_on_django/work_list.html', context)
 
 
-class UnlinkView(generic.UpdateView):
+class UnlinkView(UpdateView):
     template_name = 'dmad_on_django/unlink.html'
     fields = []
 
@@ -113,7 +114,7 @@ class PersonUnlinkView(UnlinkView):
     model = Person
 
 
-class CreateView(generic.CreateView):
+class DmadCreateView(CreateView):
     template_name = 'dmad_on_django/create.html'
     fields = ['interim_designator', 'gnd_id', 'comment']
 
@@ -131,7 +132,7 @@ class CreateView(generic.CreateView):
         return context
 
 
-class PersonCreateView(CreateView):
+class PersonCreateView(DmadCreateView):
     model = Person
 
     def get_success_url(self):
@@ -146,14 +147,14 @@ class PersonCreateView(CreateView):
         return response
 
 
-class WorkCreateView(CreateView):
+class WorkCreateView(DmadCreateView):
     model = Person
 
     def get_success_url(self):
         return reverse_lazy('dmad_on_django:work_update', kwargs = {'pk': self.object.id})
 
 
-class UpdateView(generic.UpdateView):
+class DmadUpdateView(UpdateView):
     template_name = 'dmad_on_django/form_view.html'
 
     def get_form_class(self):
@@ -179,12 +180,11 @@ class UpdateView(generic.UpdateView):
         context['object'] = self.object
         return context
 
+class WorkUpdateView(DmadUpdateView):
+    model = Work
 
-class WorkUpdateView(UpdateView):
-    model = Person
 
-
-class PersonUpdateView(UpdateView):
+class PersonUpdateView(DmadUpdateView):
     model = Person
 
 
@@ -301,3 +301,21 @@ def json_search(request, entity_type, hash=''):
     context['active'] = 'person'
     context['person_count'] = Person.objects.count()
     context['work_count'] = Work.objects.count()
+
+class PlaceSearchView(SearchView):
+    pass
+
+class PlaceCreateView(DmadCreateView):
+    pass
+
+class PlaceUpdateView(DmadUpdateView):
+    pass
+
+class PlaceLinkView(LinkView):
+    pass
+
+class PlaceUnlinkView(UnlinkView):
+    pass
+
+class PlacePullView(PullView):
+    pass

@@ -7,12 +7,12 @@ app_name='dmad_on_django'
 entities = [
         'person',
         #'org',
-        #'place',
+        'place',
         'work'
     ]
 id_bearing_actions = [ 
         'update', 
-        'delete', 
+        #'delete', 
         'link', 
         'unlink',
         'pull'
