@@ -1,5 +1,6 @@
 {% load static %}
-
+{% load django_htmx %}
+{% htmx_script %}
 <html data-theme="liszt">
     <head>
 	<link rel="stylesheet" href="{% static 'dmad_on_django/tailwind.dist.css' %}" crossorigin="anonymous" />
@@ -34,7 +35,5 @@
 	    </div>
 	</div>
 
-	<!-- htmx.js -->
-	<script src="{% static 'dmad_on_django/htmx.js' %}"></script>
     </body>
 </html>
