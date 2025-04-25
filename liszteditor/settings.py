@@ -142,7 +142,7 @@ INTERNAL_IPS = [
         '127.0.0.1',
     ]
 
-FORM_RENDERER = 'edwoca.forms.EdwocaFormRenderer'
+#FORM_RENDERER = 'edwoca.forms.EdwocaFormRenderer'
 
 Z_ID = "5080468"
 Z_LIBRARY_TYPE = 'group'
