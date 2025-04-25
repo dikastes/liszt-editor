@@ -1,15 +1,19 @@
 from django.urls import reverse_lazy
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.core import serializers
 from django.http import JsonResponse
 from django.views import generic
+from django.views.generic import ListView
 from django.forms import HiddenInput, formset_factory
-from .forms import WorkTitleForm
+from django.forms.models import inlineformset_factory
+from .forms import WorkTitleForm, WorkForm, WorkTitleFormSet
 from .models import Work, WorkTitle, RelatedWork, WorkContributor, Expression, ExpressionContributor, ExpressionTitle, \
     Manifestation, RelatedManifestation, Item, RelatedItem, ManifestationContributor, ProvenanceState, WorkBib#, ManifestationTitle, ItemTitle
 from dmad_on_django.models import Status, Person, Period, Place
+from dmad_on_django.forms import SearchForm
 from bib.models import ZotItem
 from json import dumps as json_dump
+from haystack.generic_views import SearchView
 
 
 class ReturnButtonView(generic.detail.SingleObjectTemplateResponseMixin):
@@ -147,6 +151,44 @@ class ExpressionRelationDeleteView(generic.edit.DeleteView, ReturnButtonView):
         return context
 
 
+class WorkSearchView(SearchView):
+    template_name = 'edwoca/list.html'
+    form_class = SearchForm
+
+    # redirect to list view if empty query
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q', '')
+        if not query or query == '':
+            return redirect('edwoca:work_list')
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['work_count'] = Work.objects.all().count()
+        context['manifestation_count'] = Manifestation.objects.all().count()
+        context['object_list'] = [ result.object for result in context['object_list'] ]
+        return context
+
+
+class WorkListView(ListView):
+    template_name = 'edwoca/list.html'
+    model = Work
+    paginate_by = 10
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['form'] = SearchForm()
+        context['work_count'] = Work.objects.all().count()
+        context['manifestation_count'] = Manifestation.objects.all().count()
+        return context
+
+
+class ManifestationSearchView(SearchView):
+    template_name = 'edwoca/index.html'
+    form_class = SearchForm
+
+
+"""
 class IndexView(generic.ListView):
     template_name = 'edwoca/index.html'
     context_object_name = 'entities'
@@ -167,37 +209,49 @@ class IndexView(generic.ListView):
         context['place_count'] = Place.objects.count()
         context['corporation_count'] = 0
         return context
+"""
 
+def index(request):
+    return redirect('edwoca:work_search')
 
 class WorkCreateView(generic.edit.CreateView):
     model = Work
-    fields = [
-            'work_catalog_number',
-            'gnd_id',
-            'history'
-        ]
-    template_name = 'edwoca/base_form.html'
+    form_class = WorkForm
+    template_name = 'edwoca/create.html'
 
     def get_success_url(self):
         return reverse_lazy('edwoca:work_detail', kwargs = {'pk': self.object.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['title_formset'] = WorkTitleFormSet(self.request.POST)
+        else:
+            WorkTitleFormSet.can_delete = False
+            context['title_form_set'] = WorkTitleFormSet()
         context['view_title'] = f"Neues Werk anlegen"
         context['button_label'] = "speichern"
         context['return_target'] = 'edwoca:index'
         context['return_pk'] = None
         return context
 
+    def form_valid(self, form):
+        context = self.get_context_data()
+        title_formset = context['title_formset']
+
+        if title_formset.is_valid():
+            self.object = form.save()
+            title_formset.instance = self.object
+            title_formset.save()
+            return redirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
+
 
 class WorkUpdateView(generic.edit.UpdateView):
     model = Work
-    fields = [
-            'work_catalog_number',
-            'gnd_id',
-            'history'
-        ]
-    template_name = 'edwoca/base_form.html'
+    form_class = WorkForm
+    template_name = 'edwoca/work_update.html'
     context_object_name = 'work'
 
     def get_context_data(self, **kwargs):
@@ -476,11 +530,63 @@ class ExpressionDeleteView(WorkRelationDeleteView):
         return context
 
 
-class WorkTitleUpdateView(WorkRelationUpdateView, WorkTitleView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel { self.object } des Werks { self.get_work() } bearbeiten"
-        return context
+#class WorkTitleUpdateView(WorkRelationUpdateView, WorkTitleView):
+    #def get_context_data(self, **kwargs):
+        #context = super().get_context_data(**kwargs)
+        #context['view_title'] = f"Titel { self.object } des Werks { self.get_work() } bearbeiten"
+        #return context
+
+class WorkTitleUpdateView(generic.UpdateView):
+    model = Work
+    form_class = WorkTitleFormSet
+    template_name = 'edwoca/work_title_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_title_update', kwargs = {'pk': self.object.id})
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if 'add-form' in request.POST:
+            data = request.POST.copy()
+            total_forms = int(data.get('titles-TOTAL_FORMS', 0))
+            data['titles-TOTAL_FORMS'] = str(total_forms + 1)
+            data[f'titles-{total_forms}-language'] = 'de'
+            form = WorkTitleFormSet(data, instance=self.object)
+            return self.render_to_response(self.get_context_data(form=form))
+
+        form = WorkTitleFormSet(request.POST, instance=self.object)
+        for title_form in form.forms:
+            raw_title = title_form.data.get(title_form.add_prefix('title'), '').strip()
+            if not raw_title:
+                form.empty_permitted = True
+                title_form.fields['title'].required = False
+                title_form.fields['language'].required = False
+
+        if form.is_valid():
+            form.save()
+            return redirect(reverse_lazy('edwoca:work_title_update', kwargs = {'pk': self.object.id}))
+
+        return self.render_to_response(self.get_context_data(form=form))
+
+    """
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = WorkTitleFormSet(request.POST, instance = self.object)
+
+        if 'save' in request.POST:
+            if form.is_valid():
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+
+        if 'add-form' in request.POST:
+            WorkTitleFormSet.extra += 1
+            form = WorkTitleFormSet(request.POST, instance = self.object)
+            return self.render_to_response(
+                    self.get_context_data(form = form)
+                )
+    """
 
 
 class WorkTitleDeleteView(WorkRelationDeleteView):
@@ -917,3 +1023,21 @@ def person_list(request):
 def work_list(request):
     return render('edwoca:index')
 
+
+class WorkRelationsUpdateView(generic.edit.UpdateView):
+    pass
+
+class WorkContributorsUpdateView(generic.edit.UpdateView):
+    pass
+
+class WorkRelatedWorksUpdateView(generic.edit.UpdateView):
+    pass
+
+class WorkHistoryUpdateView(generic.edit.UpdateView):
+    pass
+
+class WorkBibliographyUpdateView(generic.edit.UpdateView):
+    pass
+
+class WorkCommentUpdateView(generic.edit.UpdateView):
+    pass

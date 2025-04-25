@@ -25,7 +25,17 @@ entities = {
     }
 
 urlpatterns = [
-        path('', views.IndexView.as_view(), name = 'index'),
+        path('', views.index, name = 'index'),
+        path('works', views.WorkListView.as_view(), name = 'work_list'),
+        path('works/search', views.WorkSearchView.as_view(), name = 'work_search'),
+        path('works/<int:pk>/title', views.WorkTitleUpdateView.as_view(), name = 'work_title'),
+        path('works/<int:pk>/relations', views.WorkRelationsUpdateView.as_view(), name = 'work_relations'),
+        path('works/<int:pk>/contributors', views.WorkContributorsUpdateView.as_view(), name = 'work_contributors'),
+        path('works/<int:pk>/relatedworks', views.WorkRelatedWorksUpdateView.as_view(), name = 'work_relatedworks'),
+        path('works/<int:pk>/history', views.WorkHistoryUpdateView.as_view(), name = 'work_history'),
+        path('works/<int:pk>/bibliography', views.WorkBibliographyUpdateView.as_view(), name = 'work_bibliography'),
+        path('works/<int:pk>/comment', views.WorkCommentUpdateView.as_view(), name = 'work_comment'),
+        path('manifestations', views.ManifestationSearchView.as_view(), name = 'manifestation_search'),
         path('persons', views.person_list, name = 'person_list'),
         path('works/<int:pk>', views.WorkDetailView.as_view(), name = 'work_detail'),
         path('manifestations/<int:pk>', views.ManifestationDetailView.as_view(), name = 'manifestation_detail')
