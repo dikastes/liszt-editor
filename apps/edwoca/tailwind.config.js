@@ -1,6 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['templates/edwoca/*.html', 'templates/django/forms/widgets/*.html','static/edwoca/*.js'],
+  safelist: [
+    'items-center'
+  ],
   theme: {
     extend: {},
   },
