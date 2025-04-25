@@ -1,0 +1,45 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+<ul class="menu menu-lg">
+	<li>
+	    <a class="btn" href="{% url 'edwoca:work_list' %}">
+		zurück
+	    </a>
+	</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-white p-5 border border-base-300">
+	<h2> {{ view_title }} </h2>
+
+	<form method="post">
+		{% csrf_token %}
+		{{ title_form_set.management_form }}
+		{% for form in title_form_set %}
+			{{ form.as_daisy }}
+		{% endfor %}
+		{{ form.as_daisy }}
+
+		<input type="submit" id="submit-form" value="{{ button_label }}" class="hidden">
+	</form>
+</div>
+
+{% endblock %}
+
+{% block navbar_extras %}
+
+{% endblock %}
+
+{% block nav %}
+
+<div class="flex flex-col h-full">
+	<div class="flex-1"></div>
+	<div class="flex-0">
+	    <label class="btn btn-primary" for="submit-form"> anlegen </label>
+	</div>
+</div>
+
+{% endblock %}

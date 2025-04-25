@@ -1,0 +1,90 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+<ul class="menu menu-lg">
+	<li>
+	    <a href="{% url 'edwoca:work_title' object.id %}">
+		Titel
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_update' object.id %}" class="active">
+		Identifikation
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_relations' object.id %}">
+		Bezüge
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_contributors' object.id %}">
+		Beteiligte
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_relatedworks' object.id %}">
+		Referenzwerke
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_history' object.id %}">
+		Entstehung
+	    </a>
+	</li>
+	<li class="menu-disabled">
+	    <a href="#">
+		Uraufführung
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_bibliography' object.id %}">
+		Literatur
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_comment' object.id %}">
+		Kommentar intern
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_list' %}">
+		zurück
+	    </a>
+	</li>
+</ul>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5">
+	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+
+	<form method="post">
+		{% csrf_token %}
+		{{ form.as_daisy }}
+
+		<input type="submit" value="{{ button_label }}" class="hidden">
+	</form>
+
+	<div>
+		ToDo: WV-Konkordanz
+	</div>
+</div>
+
+{% endblock %}
+
+{% block nav %}
+<div class="flex flex-col h-full">
+	<div class="flex-1">
+		-- Navigation --
+	</div>
+	<div class="flex-0">
+		<label for="submit-form" class="btn btn-primary"> speichern </label>
+	</div>
+</div>
+{% endblock %}
+
+{% block navbar_extras %}
+{% endblock %}

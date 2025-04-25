@@ -1,0 +1,83 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+<ul class="menu menu-lg">
+	<li>
+	    <a href="{% url 'edwoca:work_title' object.id %}">
+		Titel
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_update' object.id %}">
+		Identifikation
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_relations' object.id %}">
+		Bezüge
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_contributors' object.id %}">
+		Beteiligte
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_relatedworks' object.id %}">
+		Referenzwerke
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_history' object.id %}">
+		Entstehung
+	    </a>
+	</li>
+	<li class="menu-disabled">
+	    <a href="#">
+		Uraufführung
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_bibliography' object.id %}">
+		Literatur
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_comment' object.id %}">
+		Kommentar intern
+	    </a>
+	</li>
+	<li>
+	    <a class="btn" href="{% url 'edwoca:work_list' %}">
+		zurück
+	    </a>
+	</li>
+</ul>
+
+{% endblock %}
+
+{% block content %}
+
+<div class="">
+	<div class="card-body">
+		<h2 class="card-title mt-0"> {{ view_title }} </h2>
+
+		<form method="post">
+			{{ title_form_set.management_form }}
+			{% for form in title_form_set %}
+				{{ form }}
+			{% endfor %}
+			{% csrf_token %}
+			{{ form }}
+
+			<input type="submit" value="{{ button_label }}" class="btn btn-primary my-5">
+		</form>
+</div>
+
+{% endblock %}
+
+{% block nav %}
+{% endblock %}
+
+{% block navbar_extras %}
+{% endblock %}
