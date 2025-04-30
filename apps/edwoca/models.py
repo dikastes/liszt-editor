@@ -39,9 +39,12 @@ class Work(models.Model):
             'bib.ZotItem',
             through = 'WorkBib'
         )
+    comment = models.TextField(
+            null = True
+        )
 
     def get_absolute_url(self):
-        return reverse('edwoca:work_detail', kwargs={'pk': self.id})
+        return reverse('edwoca:work_update', kwargs={'pk': self.id})
 
     def get_alt_titles(self):
         return ', '.join(alt_title.title for alt_title in self.titles.filter(status=Status.ALTERNATIVE))

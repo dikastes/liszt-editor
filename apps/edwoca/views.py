@@ -6,7 +6,8 @@ from django.views import generic
 from django.views.generic import ListView
 from django.forms import HiddenInput, formset_factory
 from django.forms.models import inlineformset_factory
-from .forms import WorkTitleForm, WorkForm, WorkTitleFormSet
+from .forms import WorkTitleForm, WorkForm, WorkTitleFormSet, WorkContributorForm, WorkContributorFormSet, \
+        WorkHistoryForm, WorkCommentForm, WorkBibFormSet
 from .models import Work, WorkTitle, RelatedWork, WorkContributor, Expression, ExpressionContributor, ExpressionTitle, \
     Manifestation, RelatedManifestation, Item, RelatedItem, ManifestationContributor, ProvenanceState, WorkBib#, ManifestationTitle, ItemTitle
 from dmad_on_django.models import Status, Person, Period, Place
@@ -220,7 +221,7 @@ class WorkCreateView(generic.edit.CreateView):
     template_name = 'edwoca/create.html'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_detail', kwargs = {'pk': self.object.id})
+        return reverse_lazy('edwoca:work_update', kwargs = {'pk': self.object.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -344,10 +345,50 @@ class WorkContributorCreateView(WorkRelationCreateView, WorkContributorView):
 
 
 class WorkContributorUpdateView(WorkRelationUpdateView, WorkContributorView):
+    pass
+
+class WorkContributorsUpdateView(generic.edit.UpdateView):
+    model = Work
+    fields = []
+    template_name = 'edwoca/work_contributor_update.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_contributors', kwargs = {'pk': self.get_object().id})
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten {self.object.person} am Werk {self.object.work} bearbeiten"
+        context['view_title'] = f"Beteiligte am Werk {self.object} bearbeiten"
+        if 'form' not in kwargs:
+            context['form'] = WorkContributorFormSet(instance = self.object)
+        else:
+            context['form'] = kwargs['form']
         return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if 'add-form' in request.POST:
+            data = request.POST.copy()
+            total_forms = int(data.get('workcontributor_set-TOTAL_FORMS', 0))
+            data['workcontributor_set-TOTAL_FORMS'] = str(total_forms + 1)
+            form = WorkContributorFormSet(data, instance=self.object)
+            return self.render_to_response(self.get_context_data(form=form))
+
+        formset = WorkContributorFormSet(
+                request.POST,
+                instance = self.object,
+                queryset = WorkContributor.objects.filter(work = self.object)
+            )
+        for form in formset:
+            if not form.instance.work:
+                form.instance.work = self.get_object()
+
+        if formset.is_valid():
+            for form in formset:
+                formset.instance.save()
+            return self.form_valid(formset)
+        else:
+            return self.form_invalid(formset)
 
 
 class WorkContributorDeleteView(WorkRelationDeleteView):
@@ -541,6 +582,14 @@ class WorkTitleUpdateView(generic.UpdateView):
     form_class = WorkTitleFormSet
     template_name = 'edwoca/work_title_update.html'
 
+    def get_context_dat(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'form' not in kwargs:
+            context['form'] = WorkTitleFormSet(instance = self.object)
+        else:
+            context['form'] = kwargs['form']
+        return context
+
     def get_success_url(self):
         return reverse_lazy('edwoca:work_title_update', kwargs = {'pk': self.object.id})
 
@@ -565,7 +614,7 @@ class WorkTitleUpdateView(generic.UpdateView):
 
         if form.is_valid():
             form.save()
-            return redirect(reverse_lazy('edwoca:work_title_update', kwargs = {'pk': self.object.id}))
+            return redirect(self.get_success_url())
 
         return self.render_to_response(self.get_context_data(form=form))
 
@@ -1025,19 +1074,75 @@ def work_list(request):
 
 
 class WorkRelationsUpdateView(generic.edit.UpdateView):
-    pass
+    model = Work
+    fields = []
+    template_name = 'edwoca/work_relations.html'
 
-class WorkContributorsUpdateView(generic.edit.UpdateView):
-    pass
+#class WorkContributorsUpdateView(generic.edit.UpdateView):
+    #model = Work
+    #fields = []
+    #template_name = 'edwoca/work_relations.html'
 
 class WorkRelatedWorksUpdateView(generic.edit.UpdateView):
-    pass
+    model = Work
+    fields = []
+    template_name = 'edwoca/work_related_works.html'
 
 class WorkHistoryUpdateView(generic.edit.UpdateView):
-    pass
+    model = Work
+    form_class = WorkHistoryForm
+    template_name = 'edwoca/work_history.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_history', kwargs={'pk': self.object.pk})
 
 class WorkBibliographyUpdateView(generic.edit.UpdateView):
-    pass
+    model = Work
+    fields = []
+    template_name = 'edwoca/work_bibliography.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_bibliography', kwargs = {'pk': self.get_object().id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['view_title'] = f"Bibliographie für Werk {self.object} bearbeiten"
+        if 'form' not in kwargs:
+            context['form'] = WorkBibFormSet(instance = self.object)
+        else:
+            context['form'] = kwargs['form']
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+
+        if 'add-form' in request.POST:
+            data = request.POST.copy()
+            total_forms = int(data.get('workbib_set-TOTAL_FORMS', 0))
+            data['workbib_set-TOTAL_FORMS'] = str(total_forms + 1)
+            form = WorkBibFormSet(data, instance=self.object)
+            return self.render_to_response(self.get_context_data(form=form))
+
+        formset = WorkBibFormSet(
+                request.POST,
+                instance = self.object,
+                queryset = WorkBib.objects.filter(work = self.object)
+            )
+        for form in formset:
+            if not form.instance.work:
+                form.instance.work = self.get_object()
+
+        if formset.is_valid():
+            for form in formset:
+                formset.instance.save()
+            return self.form_valid(formset)
+        else:
+            return self.form_invalid(formset)
 
 class WorkCommentUpdateView(generic.edit.UpdateView):
-    pass
+    model = Work
+    form_class = WorkCommentForm
+    template_name = 'edwoca/work_comment.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_history', kwargs={'pk': self.object.pk})
