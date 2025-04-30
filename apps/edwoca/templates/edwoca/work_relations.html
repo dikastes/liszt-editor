@@ -1,59 +1,7 @@
 {% extends 'edwoca/base.html' %}
 
 {% block menu %}
-<ul class="menu menu-lg">
-	<li>
-	    <a href="{% url 'edwoca:work_title' object.id %}">
-		Titel
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_update' object.id %}">
-		Identifikation
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_relations' object.id %}" class="active">
-		Bezüge
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_contributors' object.id %}">
-		Beteiligte
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_relatedworks' object.id %}">
-		Referenzwerke
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_history' object.id %}">
-		Entstehung
-	    </a>
-	</li>
-	<li class="disabled">
-	    <a href="#">
-		Uraufführung
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_bibliography' object.id %}">
-		Literatur
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_comment' object.id %}">
-		Kommentar intern
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_list' %}">
-		zurück
-	    </a>
-	</li>
-</ul>
-
+{% include 'edwoca/partials/work_menu.html' %}
 {% endblock %}
 
 {% block content %}
