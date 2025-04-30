@@ -1,14 +1,15 @@
 from django.urls import reverse_lazy
 from django.shortcuts import render
-from haystack.generic_views import SearchView
 from json import dumps
-
 from dmad_on_django.models import Person, Work, Place
 from dmad_on_django.forms import SearchForm
-from .base import DmadCreateView, DmadUpdateView, DeleteView, LinkView, UnlinkView, PullView
+
+from .base import (DmadCreateView,DmadUpdateView, DeleteView,
+                     LinkView, UnlinkView, PullView, DmadSearchView)
+
 from .base import get_link, search_gnd, json_search
 
-class PersonSearchView(SearchView):
+class PersonSearchView(DmadSearchView):
     template_name = 'dmad_on_django/person_list.html'
     form_class = SearchForm
 
@@ -30,26 +31,6 @@ class PersonSearchView(SearchView):
             'place_count': Place.objects.count()
         })
         return context
-    
-    def form_invalid(self, form):
-        if self.request.htmx:
-            context = self.get_context_data(**{
-                    self.form_name: form,
-                    'object_list': self.get_queryset()
-                })
-            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
-        return super().form_invalid(form)
-
-    def form_valid(self, form):
-        if self.request.htmx:
-            self.queryset = form.search()
-            context = self.get_context_data(**{
-                    self.form_name: form,
-                    'query': form.cleaned_data.get(self.search_field),
-                    'object_list': self.queryset
-                })
-            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
-        return super().form_valid(form)
 
 
 def person_list(request):

@@ -1,13 +1,33 @@
 from django import forms
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
+from haystack.generic_views import SearchView
 from json import dumps
 from django.http import JsonResponse
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place
-
 from dmad_on_django.forms import formWidgets
+
+def form_invalid(self, form):
+        if self.request.htmx:
+            context = self.get_context_data(**{
+                    self.form_name: form,
+                    'object_list': self.get_queryset()
+                })
+            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
+        return super().form_invalid(form)
+
+def form_valid(self, form):
+        if self.request.htmx:
+            self.queryset = form.search()
+            context = self.get_context_data(**{
+                    self.form_name: form,
+                    'query': form.cleaned_data.get(self.search_field),
+                    'object_list': self.queryset
+                })
+            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
+        return super().form_valid(form)
 
 def search_gnd(request, search_string, entity_type):
     response = getattr(dmad_models, entity_type.capitalize()).search(search_string)
@@ -147,3 +167,24 @@ class PullView(UpdateView):
     def post(self, request, **kwargs):
         self.object.update()
         return super().post(self, request, **kwargs)
+
+class DmadSearchView(SearchView):
+    def form_invalid(self, form):
+        if self.request.htmx:
+            context = self.get_context_data(**{
+                    self.form_name: form,
+                    'object_list': self.get_queryset()
+                })
+            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        if self.request.htmx:
+            self.queryset = form.search()
+            context = self.get_context_data(**{
+                    self.form_name: form,
+                    'query': form.cleaned_data.get(self.search_field),
+                    'object_list': self.queryset
+                })
+            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
+        return super().form_valid(form)
