@@ -20,6 +20,7 @@ for key in languages:
 class Status(models.TextChoices):
     PRIMARY = 'P', _('Primary')
     ALTERNATIVE = 'A', _('Alternative')
+    TEMPORARY = 'T', _('Temporary')
 
 class PlaceName(models.Model):
     name = models.CharField(
