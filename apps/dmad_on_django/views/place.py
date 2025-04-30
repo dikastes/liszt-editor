@@ -11,6 +11,7 @@ from .base import get_link
 class PlaceSearchView(DmadSearchView):
     template_name = 'dmad_on_django/place_list.html'
     form_class = SearchForm
+    search_field = "q"
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)

@@ -1,4 +1,5 @@
 from django.db import models
+from django.urls import reverse
 from json import dumps, loads
 
 from .base import Status, Language, max_trials
@@ -59,6 +60,8 @@ class Place(models.Model):
         default=0,
         null=True
     )
+    comment = models.TextField(null=True, blank=True)
+    rework_in_gnd = models.BooleanField(default=False)
     description = models.TextField(null=True)
     raw_data = models.TextField(null=True)
 
@@ -108,6 +111,9 @@ class Place(models.Model):
         if self.gnd_id:
             return self.get_default_name()
         return getattr(self, 'interim_designator', '') or ''
+    
+    def get_absolute_url(self):
+        return reverse('dmad_on_django:place_update', kwargs={'pk': self.pk})
 
     def __str__(self):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
