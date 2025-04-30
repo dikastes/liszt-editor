@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'dmad_on_django.middleware.HTMXPreloadCacheMiddleware'
 ]
 
 ROOT_URLCONF = 'liszteditor.urls'
