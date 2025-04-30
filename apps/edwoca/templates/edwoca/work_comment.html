@@ -8,7 +8,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_update' object.id %}" class="active">
+	    <a href="{% url 'edwoca:work_update' object.id %}">
 		Identifikation
 	    </a>
 	</li>
@@ -43,7 +43,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_comment' object.id %}">
+	    <a href="{% url 'edwoca:work_comment' object.id %}" class="active">
 		Kommentar intern
 	    </a>
 	</li>
@@ -65,12 +65,8 @@
 		{% csrf_token %}
 		{{ form.as_daisy }}
 
-		<input type="submit" value="{{ button_label }}" class="hidden">
+		<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
 	</form>
-
-	<div>
-		ToDo: WV-Konkordanz
-	</div>
 </div>
 
 {% endblock %}

@@ -8,7 +8,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_update' object.id %}" class="active">
+	    <a href="{% url 'edwoca:work_update' object.id %}">
 		Identifikation
 	    </a>
 	</li>
@@ -23,7 +23,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_relatedworks' object.id %}">
+	    <a href="{% url 'edwoca:work_relatedworks' object.id %}" class="active">
 		Referenzwerke
 	    </a>
 	</li>
@@ -61,16 +61,20 @@
 <div class="bg-white border border-base-300 p-5">
 	<h2 class="card-title mt-0"> {{ view_title }} </h2>
 
+	-- To Do --
+	{% comment %}
 	<form method="post">
+		{{ form.management_form }}
 		{% csrf_token %}
-		{{ form.as_daisy }}
+		{% for title_form in form %}
+			{{ title_form.as_daisy }}
+		{% endfor %}
 
-		<input type="submit" value="{{ button_label }}" class="hidden">
+		<input href="{% url 'edwoca:work_title_update' object.id %}" value="Beteiligten hinzufügen" type="submit" name="add-form" class="btn" />
+		<input type="submit" name="save" id="submit-form" class="hidden" />
 	</form>
+	{% endcomment %}
 
-	<div>
-		ToDo: WV-Konkordanz
-	</div>
 </div>
 
 {% endblock %}

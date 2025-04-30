@@ -2,7 +2,8 @@
 module.exports = {
   content: ['templates/edwoca/*.html', 'templates/django/forms/widgets/*.html','static/edwoca/*.js'],
   safelist: [
-    'items-center'
+    'items-center',
+    'mb-10'
   ],
   theme: {
     extend: {},
