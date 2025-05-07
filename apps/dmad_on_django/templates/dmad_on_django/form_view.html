@@ -52,49 +52,8 @@
 	    </div>
 	    <div class="collapse collapse-plus">
 	        <input type="checkbox"/>
-	        <div class="collapse-title">Biografie</div>
-		<div class="collapse-content">
-		    <table class="table table-zebra">
-			<tr>
-			    <td> Ländercode </td>
-			    <td> {{ object.geographic_area_code }} </td>
-			</tr>
-			<tr>
-			    <td> Geschlecht </td>
-			    <td> {{ object.gender }} </td>
-			</tr>
-			<tr>
-			    <td> Geburtsort </td>
-			    <td> {{ object.birth_place }} </td>
-			</tr>
-			<tr>
-			    <td> Sterbeort </td>
-			    <td> {{ object.death_place }} </td>
-			</tr>
-			{% for activity_place in object.activity_places.all %}
-			    <tr>
-				<td> Wirkungsort </td>
-				<td> {{ activity_place }} </td>
-			    </tr>
-			{% endfor %}
-			<tr>
-			    <td> Geburtsdatum </td>
-			    <td> {{ object.brith_date }} </td>
-			</tr>
-			<tr>
-			    <td> Sterbedatum </td>
-			    <td> {{ object.death_date }} </td>
-			</tr>
-			<tr>
-			    <td> charakteristischer Beruf </td>
-			    <td> todo </td>
-			</tr>
-			<tr>
-			    <td> todo </td>
-			    <td> {{ object.gnd_id }} </td>
-			</tr>
-		    </table>
-		</div>
+	        <div class="collapse-title">{{object.get_overview_title}}</div>
+			{{object.as_daisy|safe}}
 	    </div>
 	</div>
 	<input type="radio" class="tab" aria-label="Rohdaten" name="data-raw-toggle" >

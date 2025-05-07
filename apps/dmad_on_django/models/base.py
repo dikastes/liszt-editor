@@ -1,6 +1,8 @@
-from django.db.models import TextChoices
+from django.db.models import TextChoices, Model
 from django.utils.translation import gettext_lazy as _
 from iso639 import data as iso639_data
+from dominate.tags import div, table, tr, td
+from json import dumps, loads
 
 max_trials = 3
 
@@ -12,3 +14,21 @@ for key in languages:
 class Status(TextChoices):
     PRIMARY = 'P', _('Primary')
     ALTERNATIVE = 'A', _('Alternative')
+
+class DisplayableModel(Model):
+
+    def render_raw(self):
+        return dumps(loads(self.raw_data), indent=2, ensure_ascii=False)
+
+    def as_daisy(self):
+        doc = div(_class="collapse-content")
+
+        with doc:
+            with table(cls="table table-zebra"):
+                for label, value in self.get_table():
+                    tr(td(label), td(str(value) or "—"))
+
+        return str(doc)
+    
+    class Meta:
+        abstract = True

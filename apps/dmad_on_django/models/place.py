@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from json import dumps, loads
 
-from .base import Status, Language, max_trials
+from .base import Status, Language, max_trials, DisplayableModel
 from pylobid.pylobid import PyLobidPlace, GNDAPIError
 
 
@@ -39,7 +39,7 @@ class PlaceName(models.Model):
         return place_name
 
 
-class Place(models.Model):
+class Place(DisplayableModel):
     gnd_id = models.CharField(max_length=20)
     parent_place = models.ForeignKey(
         'Place',
@@ -117,3 +117,12 @@ class Place(models.Model):
 
     def __str__(self):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
+    
+    def get_table(self):
+
+        return [("Long", self.long),
+                ("Lat", self.lat)]
+    
+    def get_overview_title(self):
+
+        return "Angaben"

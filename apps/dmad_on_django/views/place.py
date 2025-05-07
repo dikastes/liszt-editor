@@ -32,7 +32,6 @@ class PlaceSearchView(DmadSearchView):
         })
         return context
 
-
 def place_list(request):
     context = {
         'objects': dumps([

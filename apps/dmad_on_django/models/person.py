@@ -3,7 +3,7 @@ from django.urls import reverse
 from json import dumps, loads
 import requests
 
-from .base import Status, Language, max_trials
+from .base import Status, Language, max_trials, DisplayableModel
 from .place import Place
 from pylobid.pylobid import PyLobidPerson, GNDAPIError
 
@@ -53,7 +53,7 @@ class PersonName(models.Model):
         return f'{self.first_name} {self.last_name}'
 
 
-class Person(models.Model):
+class Person(DisplayableModel):
     class Gender(models.TextChoices):
         MALE = 'm', 'male'
         FEMALE = 'f', 'female'
@@ -90,11 +90,11 @@ class Person(models.Model):
     comment = models.TextField(null=True, blank=True)
     interim_designator = models.CharField(max_length=150, null=True, blank=True)
 
+    overview_title = "Biografie"
+
     def get_absolute_url(self):
         return reverse('dmad_on_django:person_update', kwargs={'pk': self.id})
 
-    def render_raw(self):
-        return dumps(loads(self.raw_data), indent=2, ensure_ascii=False)
 
     def get_description(self):
         birth_date = self.birth_date.strftime('%d.%m.%Y') if self.birth_date else 'o.D.'
@@ -190,7 +190,28 @@ class Person(models.Model):
 
     def get_alt_names(self):
         return self.names.filter(status=Status.ALTERNATIVE)
+    
+    def get_table(self):
+            
+            rows = [
+            ("Ländercode", self.geographic_area_code),
+            ("Geschlecht", self.gender),
+            ("Geburtsort", self.birth_place),
+            ("Sterbeort", self.death_place),
+            ("Geburtsdatum", self.birth_date),
+            ("Sterbedatum", self.death_date),
+            ("Charakteristischer Beruf", "todo"),
+            ("GND-ID", self.gnd_id),
+            ]
 
+            if(len(self.activity_places.all()) > 0):
+                for place in self.activity_places:
+                    rows.append(("Wirkungsort", str(place)))
+
+            return rows
+    def get_overview_title(self):
+        return self.overview_title
+        
     @staticmethod
     def search(search_string):
         lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:Person)&size=5&format=json:suggest"
@@ -219,3 +240,5 @@ class Person(models.Model):
         if not year:
             return None
         return '-'.join([year, month, day])
+
+
