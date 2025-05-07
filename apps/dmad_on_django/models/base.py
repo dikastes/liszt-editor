@@ -26,7 +26,10 @@ class DisplayableModel(Model):
         with doc:
             with table(cls="table table-zebra"):
                 for label, value in self.get_table():
-                    tr(td(label), td(str(value) or "—"))
+                    if str(value) == "None":
+                        tr(td(label), td("—"))
+                    else:
+                        tr(td(label), td(str(value) or "—"))
 
         return str(doc)
     

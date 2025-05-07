@@ -90,8 +90,6 @@ class Person(DisplayableModel):
     comment = models.TextField(null=True, blank=True)
     interim_designator = models.CharField(max_length=150, null=True, blank=True)
 
-    overview_title = "Biografie"
-
     def get_absolute_url(self):
         return reverse('dmad_on_django:person_update', kwargs={'pk': self.id})
 
@@ -205,12 +203,12 @@ class Person(DisplayableModel):
             ]
 
             if(len(self.activity_places.all()) > 0):
-                for place in self.activity_places:
+                for place in self.activity_places.all():
                     rows.append(("Wirkungsort", str(place)))
 
             return rows
     def get_overview_title(self):
-        return self.overview_title
+        return "Biografie"
         
     @staticmethod
     def search(search_string):
