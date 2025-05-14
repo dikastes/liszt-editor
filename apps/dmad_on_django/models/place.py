@@ -4,6 +4,7 @@ from json import dumps, loads
 
 from .base import Status, Language, max_trials, DisplayableModel
 from pylobid.pylobid import PyLobidPlace, GNDAPIError
+import requests
 
 
 class PlaceName(models.Model):
@@ -108,6 +109,14 @@ class Place(DisplayableModel):
             place.fetch_raw()
             place.update_from_raw()
             return place
+        
+    @staticmethod
+    def search(search_string):
+        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:TerritorialCorporateBodyOrAdministrativeUnit)&size=5&format=json:suggest"
+        lobid_response = requests.get(lobid_url)
+        return lobid_response.json()
+        
+
 
     def get_default_name(self):
         if self.names.count() > 0:
