@@ -55,17 +55,6 @@ def person_list(request):
 class PersonCreateView(DmadCreateView):
     model = Person
 
-    def get_success_url(self):
-        return reverse_lazy('dmad_on_django:person_update', kwargs={'pk': self.object.id})
-
-    def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        if self.object.gnd_id:
-            self.object.fetch_raw()
-            self.object.update_from_raw()
-            self.object.save()
-        return response
-
 
 class PersonUpdateView(DmadUpdateView):
     model = Person

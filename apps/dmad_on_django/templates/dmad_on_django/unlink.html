@@ -20,11 +20,12 @@
 	</form>
     </div>
 </div>
+{% with prefix='dmad_on_django:'|add:entity_type %}
 <div class="flex-0 flex flex-col">
     <div class="flex-1"></div>
     <ul class="menu gap-5 flex-0">
 	<li> 
-	    <a class="btn" href="{% url 'dmad_on_django:person_update' object.id %}">
+	    <a class="btn" href="{% url prefix|add:'_update' object.id %}">
 		abbrechen
 	    </a>
 	</li>
@@ -33,7 +34,7 @@
 	</li>
     </ul>
 </div>
-
+{% endwith %}
 {% endblock %}
 
 {% block menu %}

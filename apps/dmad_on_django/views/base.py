@@ -61,6 +61,18 @@ class DmadCreateView(CreateView):
         context['entity_type'] = self.model.__name__.lower()
         context['view_title'] = 'Datensatz anlegen'
         return context
+    
+    def get_success_url(self):
+        return reverse_lazy(f'dmad_on_django:{self.model.__name__.lower()}_update',
+               kwargs={'pk': self.object.id})
+    
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if self.object.gnd_id:
+            self.object.fetch_raw()
+            self.object.update_from_raw()
+            self.object.save()
+        return response
 
 
 class DmadUpdateView(UpdateView):
@@ -85,6 +97,7 @@ class DmadUpdateView(UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['object'] = self.object
+        context['entity_type'] = self.model.__name__.lower()
         return context
 
 
@@ -134,6 +147,10 @@ class UnlinkView(UpdateView):
         class_name = self.object.__class__.__name__.lower()
         return reverse_lazy(f"dmad_on_django:{class_name}_update", kwargs={'pk': self.object.id})
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity_type'] = self.model.__name__.lower()
+        return context
 
 class PullView(UpdateView):
     template_name = 'dmad_on_django/form_view.html'

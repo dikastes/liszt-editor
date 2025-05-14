@@ -60,6 +60,13 @@ class Place(DisplayableModel):
         default=0,
         null=True
     )
+
+    interim_designator = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True
+    )
+
     comment = models.TextField(null=True, blank=True)
     rework_in_gnd = models.BooleanField(default=False)
     description = models.TextField(null=True)
@@ -126,3 +133,4 @@ class Place(DisplayableModel):
     def get_overview_title(self):
 
         return "Angaben"
+

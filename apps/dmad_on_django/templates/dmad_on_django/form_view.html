@@ -73,32 +73,35 @@
     </div>
     {% endif %}
 </div>
+{% with prefix='dmad_on_django:'|add:entity_type %}
 <div class="flex-0 flex flex-col">
     <div class="flex-1"></div>
     <ul class="menu gap-5 flex-0">
-	<li>
-	    <a class="btn" href="{% url 'dmad_on_django:person_create' %}">
-		Datensatz anlegen
-	    </a>
-	</li>
-	{% if object.gnd_id %}
-	    <li>
-		<a class="btn" href="{% url 'dmad_on_django:person_unlink' object.id %}">
-		    GND-Verknüpfung aufheben
-		</a>
-	    </li>
-	{% else %}
-	    <li> 
-		<a class="btn" href="{% url 'dmad_on_django:person_link' object.id %}">
-		    GND-Datensatz verknüpfen
-		</a>
-	    </li>
-	{% endif %}
-	<li>
-	    <label class="btn btn-primary" for="submit-form"> speichern </label>
-	</li>
+        <li>
+            <a class="btn" href="{% url prefix|add:'_create' %}">
+                Datensatz anlegen
+            </a>
+        </li>
+        {% if object.gnd_id %}
+            <li>
+                <a class="btn" href="{% url prefix|add:'_unlink' object.id %}">
+                    GND-Verknüpfung aufheben
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <a class="btn" href="{% url prefix|add:'_link' object.id %}">
+                    GND-Datensatz verknüpfen
+                </a>
+            </li>
+        {% endif %}
+		<li>
+			<label class="btn btn-primary" for="submit-form"> Speichern </label>
+		</li>
     </ul>
 </div>
+{% endwith %}
+
 
 {% endblock %}
 

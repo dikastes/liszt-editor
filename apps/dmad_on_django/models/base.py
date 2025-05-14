@@ -1,5 +1,6 @@
 from django.db.models import TextChoices, Model
 from django.utils.translation import gettext_lazy as _
+from django.urls import reverse_lazy
 from iso639 import data as iso639_data
 from dominate.tags import div, table, tr, td
 from json import dumps, loads
