@@ -209,7 +209,111 @@ class WorkTitle(models.Model):
         return title
 
 
+class Key(models.Model):
+    class Mode(models.TextChoices):
+        MAJOR = 'MA', _('Major')
+        MINOR = 'MI', _('Minor')
+
+    class Note(models.TextChoices):
+        A = 'A', _('A')
+        B = 'B', _('B')
+        C = 'C', _('C')
+        D = 'D', _('D')
+        E = 'E', _('e')
+        F = 'F', _('F')
+        G = 'G', _('G')
+
+    class Acc(models.TextChoices):
+        NULL = '', _('')
+        SHARP = '#', _('#')
+        DOUBLE_SHARP = '##', _('##')
+        FLAT = 'b', _('b')
+        DOUBLE_FLAT = 'bb', _('bb')
+
+    movement = models.OneToOneField(
+            'Movement',
+            on_delete=models.CASCADE,
+            null = True,
+            blank = True,
+            related_name = 'key'
+        )
+    note = models.CharField(
+            max_length=1,
+            choices=Note,
+            default=Note.C
+        )
+    accidental = models.CharField(
+            max_length=2,
+            choices=Acc,
+            default=Acc.NULL
+        )
+    mode = models.CharField(
+            max_length=2,
+            choices=Mode,
+            default=Mode.MAJOR
+        )
+
+
+class Metronom(models.Model):
+    class Value(models.TextChoices):
+        EIGHTH = '1/8', _('1/8')
+        QUARTER = '1/4', _('1/4')
+        DOTTED_QUARTER = '1/4.', _('1/4.')
+        HALF = '1/2', _('1/2')
+        DOTTED_HALF = '1/2.', _('1/2.')
+
+    expression = models.ForeignKey(
+            'Expression',
+            on_delete=models.CASCADE,
+            null=True,
+            blank=True,
+            related_name='metronom'
+        )
+    reference_value = models.CharField(
+            max_length=4,
+            choices=Value,
+            default=Value.QUARTER
+        )
+    bpm = models.IntegerField(
+            null = True,
+            blank = True
+        )
+
+class Movement(models.Model):
+    expression = models.ForeignKey(
+            'Expression',
+            on_delete=models.CASCADE,
+            null=True,
+            blank=True,
+            related_name='movements'
+        )
+    title = models.CharField(
+            max_length=100,
+            unique=True,
+            null=True,
+            blank=True
+        )
+    tempo = models.CharField(
+            max_length=10,
+            unique=True,
+            null=True,
+            blank=True
+        )
+    meter = models.CharField(
+            max_length=10,
+            unique=True,
+            null=True,
+            blank=True
+        )
+
+
 class Expression(models.Model):
+    work_catalog_number = models.CharField(
+            max_length=20,
+            unique=True,
+            null=True,
+            blank=True
+        )
     incipit_music = models.TextField()
     incipit_text = models.TextField()
     period = models.OneToOneField(
@@ -235,6 +339,7 @@ class Expression(models.Model):
     expressions = models.ManyToManyField(
             'Manifestation'
         )
+
 
     def __str__(self):
         try:
@@ -265,6 +370,19 @@ class ExpressionTitle(models.Model):
             'Expression',
             on_delete=models.CASCADE,
             related_name='titles'
+        )
+    gnd_id = models.CharField(
+            max_length=20,
+            unique=True,
+            null=True,
+            blank=True
+        )
+    history = models.TextField(
+            null = True,
+            blank = True
+        )
+    comment = models.TextField(
+            null = True
         )
 
     def __str__(self):

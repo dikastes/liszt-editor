@@ -7,7 +7,7 @@
 {% block content %}
 
 <div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+	<h2 class="card-title mt-0"> Titel bearbeiten </h2>
 
 	<form method="post">
 		{{ form.management_form }}
@@ -16,7 +16,7 @@
 			{{ title_form.as_daisy }}
 		{% endfor %}
 
-		<input href="{% url 'edwoca:work_title_update' object.id %}" value="Titel hinzufügen" type="submit" name="add-form" class="btn" />
+		<input  value="Titel hinzufügen" type="submit" name="add-form" class="btn" />
 		<input type="submit" name="save" id="submit-form" class="hidden" />
 	</form>
 

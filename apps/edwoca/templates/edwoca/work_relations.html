@@ -6,35 +6,109 @@
 
 {% block content %}
 
-<div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Bezugswerke </h2>
 
-	-- To Do --
-	{% comment %}
-	<form method="post">
-		{{ form.management_form }}
-		{% csrf_token %}
-		{% for title_form in form %}
-			{{ title_form.as_daisy }}
+		<h3> verknüpfte Werke </h3>
+		<ul>
+		{% for work_relation in object.source_work_of.all %}
+			<li>
+				<div class="flex">
+					<a href="{% url 'edwoca:work_update' work_relation.target_work.id %}" class="flex-1">
+						{{ work_relation.target_work }} ({{ work_relation.label }})
+					</a>
+					<form method="post" action="{% url 'edwoca:related_work_remove' work_relation.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Werke verknüpft </em> </li>
 		{% endfor %}
+		</ul>
 
-		<input href="{% url 'edwoca:work_title_update' object.id %}" value="Titel hinzufügen" type="submit" name="add-form" class="btn" />
-		<input type="submit" name="save" id="submit-form" class="hidden" />
-	</form>
-	{% endcomment %}
+		<h3> eingehende Verknüpfungen </h3>
+		<ul>
+		{% for work_relation in object.target_work_of.all %}
+			<li>
+				<a href="{% url 'edwoca:work_update' work_relation.source_work.id %}" class="flex-1">
+					{{ work_relation.source_work }} ({{ work_relation.label }})
+				</a>
+			</li>
+		{% empty %}
+			<li> <em> keine eingehenden Verknüpfungen </em> </li>
+		{% endfor %}
+		</ul>
 
+		<h3> neues Werk verknüpfen </h3>
+
+		{% if show_search_form == True %}
+
+		<form action="{% url 'edwoca:work_relations' object.id %}" method="get">
+			{{ searchform.q }}
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+		
+		<ul>
+		{% if query %}
+			{% for found_work in found_works %}
+				<li>
+					<a href="{% url 'edwoca:related_work_add' object.id found_work.object.id %}">
+						{{ found_work.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+
+		{% else %}
+
+		<form method="post">
+			{% csrf_token %}
+			{{ object }} mit {{ target_work }} verknüpfen als:
+			{{ related_work_form }}
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+
+		{% endif %}
+
+		{% comment %}
+		<a href="{% url 'edwoca:work_create' %}" class="btn btn-primary"> neues Werk anlegen </a>
+		{% endcomment %}
+	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5">
+	<div class="prose">
+		<h2> Expressionen </h2>
+
+		<ul>
+		{% for expression in object.expressions.all %}
+			<li>
+				<a href="{% url 'edwoca:expression-update' expression.id %}">
+					{{ expression }}
+				</a>
+			</li>
+		{% empty %}
+			<li> <em> keine Expressionen angelegt </em> <span class="badge badge-primary">!</span> </li>
+		{% endfor %}
+		</ul>
+
+		<a href="{% url 'edwoca:work_create' %}" class="btn btn-primary"> neue Expression anlegen </a>
+	</div>
 </div>
 
 {% endblock %}
 
 {% block nav %}
 <div class="flex flex-col h-full">
-	<div class="flex-1">
-		-- Navigation --
-	</div>
-	<div class="flex-0">
-		<label for="submit-form" class="btn btn-primary"> speichern </label>
-	</div>
+	-- Navigation --
 </div>
 {% endblock %}
 

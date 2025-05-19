@@ -3,11 +3,12 @@ from dominate.util import raw
 from django.forms.renderers import TemplatesSetting
 from django.forms.models import modelformset_factory, inlineformset_factory, ModelForm, BaseInlineFormSet
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea
-from .models import Work, WorkTitle, WorkContributor, WorkBib
+from .models import Work, WorkTitle, WorkContributor, WorkBib, Expression, ExpressionTitle, RelatedWork
 from django.utils.safestring import mark_safe
 
 class EdwocaFormRenderer(TemplatesSetting):
     form_template_name = 'edwoca/form_snippet.html'
+
 
 class WorkForm(ModelForm):
     class Meta:
@@ -78,10 +79,9 @@ class WorkCommentForm(ModelForm):
         return mark_safe(str(form))
 
 
-class WorkTitleForm(ModelForm):
+class TitleForm(ModelForm):
     class Meta:
-        model = WorkTitle
-        fields = ['title', 'language', 'status', 'id', 'work']
+        fields = ['title', 'language', 'status', 'id']
         widgets = {
                 'title': TextInput( attrs = {
                         'class': 'grow w-full'
@@ -93,14 +93,9 @@ class WorkTitleForm(ModelForm):
                         'class': 'select w-full select-bordered'
                     }),
                 'id': HiddenInput(),
-                'work': HiddenInput(),
                 'DELETE': CheckboxInput( attrs = {
                         'class': 'flex-0'
                     })
-            }
-        labels = {
-                'id': '',
-                'work': ''
             }
 
     def as_daisy(self):
@@ -139,7 +134,21 @@ class WorkTitleForm(ModelForm):
         return mark_safe(str(form))
 
 
-class SkipEmptyWorkTitleFormSet(BaseInlineFormSet):
+class WorkTitleForm(TitleForm):
+    class Meta(TitleForm.Meta):
+        model = WorkTitle
+        fields = TitleForm.Meta.fields + ['work']
+        widgets = dict(TitleForm.Meta.widgets, **{ 'work': HiddenInput() })
+
+
+class ExpressionTitleForm(TitleForm):
+    class Meta(TitleForm.Meta):
+        model = ExpressionTitle
+        fields = TitleForm.Meta.fields + ['expression']
+        widgets = dict(TitleForm.Meta.widgets, **{ 'expression': HiddenInput() })
+
+
+class SkipEmptyTitleFormSet(BaseInlineFormSet):
     def clean(self):
         super().clean()
         for form in self.forms:
@@ -148,11 +157,22 @@ class SkipEmptyWorkTitleFormSet(BaseInlineFormSet):
                 form.cleaned_data['DELETE'] = True
 
 
+ExpressionTitleFormSet = inlineformset_factory(
+        Expression,
+        ExpressionTitle,
+        form = ExpressionTitleForm,
+        formset = SkipEmptyTitleFormSet,
+        extra = 1,
+        max_num = 100,
+        can_delete = True
+    )
+
+
 WorkTitleFormSet = inlineformset_factory(
         Work,
         WorkTitle,
         form = WorkTitleForm,
-        formset = SkipEmptyWorkTitleFormSet,
+        formset = SkipEmptyTitleFormSet,
         extra = 1,
         max_num = 100,
         can_delete = True
@@ -191,7 +211,7 @@ class WorkBibForm(ModelForm):
 
         if 'DELETE' in self.fields:
             del_field = self['DELETE']
-            del_field_label = label(del_field.label, cls='input input-bordered flex items-center gap-2')
+            del_field_label = label(del_field.label, cls='input input-bordered flex flex-0 items-center gap-2')
             del_field_label.add(raw(str(del_field)))
             palette.add(del_field_label)
 
@@ -267,3 +287,48 @@ WorkBibFormSet = inlineformset_factory(
         max_num = 100,
         can_delete = True
     )
+
+class RelatedWorkForm(ModelForm):
+    class Meta:
+        model = RelatedWork
+        fields = [ 'source_work', 'target_work', 'label' ]
+        widgets = {
+                'source_work': HiddenInput(),
+                'target_work': HiddenInput(),
+                'label': Select( attrs = {
+                        'class': 'select w-full select-bordered'
+                    }),
+                'DELETE': CheckboxInput( attrs = {
+                        'class': 'flex-0'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        if self.instance.pk:
+           form.add(raw(str(self['id'])))
+        form.add(raw(str(self['work'])))
+
+        person_field = self['person']
+        role_field = self['role']
+
+        person_container = div(cls='flex-1')
+        person_container.add(raw(str(person_field)))
+
+        role_container = div(cls='flex-1')
+        role_container.add(raw(str(role_field)))
+
+        palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette.add(person_container)
+        palette.add(role_container)
+
+        if 'DELETE' in self.fields:
+            del_field = self['DELETE']
+            del_field_label = label(del_field.label, cls='input input-bordered flex items-center gap-2')
+            del_field_label.add(raw(str(del_field)))
+            palette.add(del_field_label)
+
+        form.add(palette)
+
+        return mark_safe(str(form))
