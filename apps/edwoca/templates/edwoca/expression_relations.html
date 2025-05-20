@@ -1,48 +1,34 @@
 {% extends 'edwoca/base.html' %}
 
 {% block menu %}
-{% include 'edwoca/partials/work_menu.html' %}
+{% include 'edwoca/partials/expression_menu.html' %}
 {% endblock %}
 
 {% block content %}
 
 <div class="bg-white border border-base-300 p-5 mb-10">
 	<div class="prose">
-		<h2> Bezugswerke </h2>
+		<h2> Quellen </h2>
 
-		<h3> verknüpfte Werke </h3>
 		<ul>
-		{% for work_relation in object.source_work_of.all %}
+		{% for manifestation in object.manifestations.all %}
 			<li>
 				<div class="flex">
-					<a href="{% url 'edwoca:work_update' work_relation.target_work.id %}" class="flex-1">
-						{{ work_relation.target_work }} ({{ work_relation.label }})
+					<a href="{% url 'edwoca:work_update' manifestation.id %}" class="flex-1">
+						{{ manifestation }}
 					</a>
-					<form method="post" action="{% url 'edwoca:related_work_remove' work_relation.id %}" class="flex-0">
+					<form method="post" action="{% url 'edwoca:manifestation_relation_remove' object.id manifestation.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>
 				</div>
 			</li>
 		{% empty %}
-			<li> <em> keine Werke verknüpft </em> </li>
+			<li> <em> keine Quellen verknüpft </em> <span class="badge badge-primary">!</span> </li>
 		{% endfor %}
 		</ul>
 
-		<h3> eingehende Verknüpfungen </h3>
-		<ul>
-		{% for work_relation in object.target_work_of.all %}
-			<li>
-				<a href="{% url 'edwoca:work_update' work_relation.source_work.id %}" class="flex-1">
-					{{ work_relation.source_work }} ({{ work_relation.label }})
-				</a>
-			</li>
-		{% empty %}
-			<li> <em> keine eingehenden Verknüpfungen </em> </li>
-		{% endfor %}
-		</ul>
-
-		<h3> neues Werk verknüpfen </h3>
+		<h3> neue Quelle verknüpfen </h3>
 
 		{% if show_search_form == True %}
 
@@ -53,10 +39,10 @@
 		
 		<ul>
 		{% if query %}
-			{% for found_work in found_objects %}
+			{% for found_manifestation in found_objects %}
 				<li>
-					<a href="{% url 'edwoca:related_work_add' object.id found_work.object.id %}">
-						{{ found_work.object }}
+					<a href="{% url 'edwoca:related_manifestation_add' object.id found_manifestation.object.id %}">
+						{{ found_manifestation.object }}
 					</a>
 				</li>
 			{% empty %}
@@ -71,15 +57,15 @@
 
 		<form method="post">
 			{% csrf_token %}
-			{{ object }} mit {{ target_work }} verknüpfen als:
-			{{ related_work_form }}
+			{{ object }} mit {{ target_manifestation }} verknüpfen als:
+			{{ related_manifestation_form }}
 			<input type="submit" id="submit-form" class="btn" />
 		</form>
 
 		{% endif %}
 
 		{% comment %}
-		<a href="{% url 'edwoca:work_create' %}" class="btn btn-primary"> neues Werk anlegen </a>
+		<a href="{% url 'edwoca:manifestation_create' %}" class="btn btn-primary"> neue Quelle anlegen </a>
 		{% endcomment %}
 	</div>
 </div>
@@ -94,12 +80,9 @@
 				<a href="{% url 'edwoca:expression_update' expression.id %}">
 					{{ expression }}
 				</a>
-				<a href="{% url 'edwoca:expression_delete' expression.id %}" class="flex-0 btn">
-					löschen
-				</a>
 			</li>
 		{% empty %}
-			<li> <em> keine Expressionen angelegt </em> <span class="badge badge-primary">!</span> </li>
+			<li> <em> keine Expressionen verknüpft </li>
 		{% endfor %}
 		</ul>
 
