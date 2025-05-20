@@ -3,7 +3,8 @@ from dominate.util import raw
 from django.forms.renderers import TemplatesSetting
 from django.forms.models import modelformset_factory, inlineformset_factory, ModelForm, BaseInlineFormSet
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea
-from .models import Work, WorkTitle, WorkContributor, WorkBib, Expression, ExpressionTitle, RelatedWork
+from .models import *
+from edwoca import models
 from django.utils.safestring import mark_safe
 
 class EdwocaFormRenderer(TemplatesSetting):
@@ -99,11 +100,12 @@ class TitleForm(ModelForm):
             }
 
     def as_daisy(self):
+        class_name = self.Meta.model.__name__.lower().replace('title', '')
         form = div(cls='mb-10')
 
         if self.instance.pk:
            form.add(raw(str(self['id'])))
-        form.add(raw(str(self['work'])))
+        form.add(raw(str(self[class_name])))
 
         title_field = self['title']
         lang_field = self['language']
@@ -220,10 +222,9 @@ class WorkBibForm(ModelForm):
         return mark_safe(str(form))
 
 
-class WorkContributorForm(ModelForm):
+class ContributorForm(ModelForm):
     class Meta:
-        model = WorkContributor
-        fields = [ 'person', 'role', 'id', 'work' ]
+        fields = [ 'person', 'role', 'id' ]
         widgets = {
                 'person': Select( attrs = {
                         'class': 'autocomplete-select select select-bordered'
@@ -232,18 +233,18 @@ class WorkContributorForm(ModelForm):
                         'class': 'select w-full select-bordered'
                     }),
                 'id': HiddenInput(),
-                'work': HiddenInput(),
                 'DELETE': CheckboxInput( attrs = {
                         'class': 'flex-0'
                     })
             }
 
     def as_daisy(self):
+        class_name = self.Meta.model.__name__.lower().replace('contributor', '')
         form = div(cls='mb-10')
 
         if self.instance.pk:
            form.add(raw(str(self['id'])))
-        form.add(raw(str(self['work'])))
+        form.add(raw(str(self[class_name])))
 
         person_field = self['person']
         role_field = self['role']
@@ -269,10 +270,34 @@ class WorkContributorForm(ModelForm):
         return mark_safe(str(form))
 
 
+class WorkContributorForm(ContributorForm):
+    class Meta:
+        model = WorkContributor
+        fields = ContributorForm.Meta.fields + [ 'work' ]
+        widgets = dict(ContributorForm.Meta.widgets, **{ 'work': HiddenInput() })
+
+
+class ExpressionContributorForm(ContributorForm):
+    class Meta:
+        model = ExpressionContributor
+        fields = ContributorForm.Meta.fields + [ 'expression' ]
+        widgets = dict(ContributorForm.Meta.widgets, **{ 'expression': HiddenInput() })
+
+
 WorkContributorFormSet = inlineformset_factory(
         Work,
         WorkContributor,
         form = WorkContributorForm,
+        extra = 1,
+        max_num = 100,
+        can_delete = True
+    )
+
+
+ExpressionContributorFormSet = inlineformset_factory(
+        Expression,
+        ExpressionContributor,
+        form = ExpressionContributorForm,
         extra = 1,
         max_num = 100,
         can_delete = True
@@ -332,3 +357,42 @@ class RelatedWorkForm(ModelForm):
         form.add(palette)
 
         return mark_safe(str(form))
+
+
+class ExpressionForm(ModelForm):
+    class Meta:
+        model = Expression
+        fields = [ 'work', 'work_catalog_number' ]
+        widgets = {
+                'work': HiddenInput(),
+                'work_catalog_number': TextInput( attrs = {
+                        'class': 'grow'
+                    }),
+            }
+
+    def as_daisy(self):
+        form = div()
+        for field in self.visible_fields():
+            field_label = label(field.label, _for=field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+            field_label.add(raw(str(field)))
+            form.add(field_label)
+
+        return mark_safe(str(form))
+
+
+class ExpressionTitleForm(TitleForm):
+    class Meta(TitleForm.Meta):
+        model = ExpressionTitle
+        fields = TitleForm.Meta.fields + ['expression']
+        widgets = dict(TitleForm.Meta.widgets, **{ 'expression': HiddenInput() })
+
+
+ExpressionTitleFormSet = inlineformset_factory(
+        Expression,
+        ExpressionTitle,
+        form = ExpressionTitleForm,
+        formset = SkipEmptyTitleFormSet,
+        extra = 1,
+        max_num = 100,
+        can_delete = True
+    )
