@@ -307,6 +307,31 @@ class Movement(models.Model):
         )
 
 
+class IndexNumber(models.Model):
+    class Indexes(models.TextChoices):
+        RAABE = 'RAABE', _('Raabe')
+        MULLER = 'MULLER', _('Müller/Eckhardt')
+        SEARLE = 'SEARLE', _('Searle')
+        CHIAPPARI = 'CHIAPPARI', _('Chiappari')
+
+    expression = models.ForeignKey(
+            'Expression',
+            on_delete=models.CASCADE,
+            null=True,
+            blank=True,
+            related_name='index_numbers'
+        )
+    index = models.CharField(
+            max_length=10,
+            choices=Indexes,
+            default=Indexes.RAABE
+        )
+    number = models.CharField(
+            max_length=10,
+            null=True,
+            blank=True
+        )
+
 class Expression(models.Model):
     work_catalog_number = models.CharField(
             max_length=20,
@@ -336,7 +361,11 @@ class Expression(models.Model):
             blank=True,
             related_name='expressions'
         )
-    expressions = models.ManyToManyField(
+    related_expressions = models.ManyToManyField(
+            'Expression',
+            through='RelatedExpression'
+        )
+    manifestations = models.ManyToManyField(
             'Manifestation'
         )
 
@@ -347,6 +376,34 @@ class Expression(models.Model):
         except:
             pref_title = '<ohne Titel>'
         return pref_title
+
+
+class RelatedExpression(models.Model):
+    class Label(models.TextChoices):
+        PARENT = 'PR', _('Parent')
+        RELATED = 'RE', _('Related')
+
+    source_expression = models.ForeignKey(
+            'Expression',
+            on_delete=models.CASCADE,
+            related_name="source_expression_of"
+        )
+    target_expression = models.ForeignKey(
+            'Expression',
+            on_delete=models.CASCADE,
+            related_name="target_expression_of"
+        )
+    comment = models.TextField(
+            null=True,
+            blank=True
+        )
+    label = models.CharField(max_length=2,choices=Label,default=Label.PARENT)
+
+    def is_upperclass(self):
+        return self.label in {
+            self.Label.PARENT,
+            self.Label.RELATED
+        }
 
 
 class ExpressionTitle(models.Model):
