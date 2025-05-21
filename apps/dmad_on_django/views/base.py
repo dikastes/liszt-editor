@@ -44,7 +44,6 @@ def get_link(model_object, model):
         title += ' (R)'
     return f"<li><a href={link}>{title}</a></li>"
 
-
 class NavbarContextMixin:
     '''
     If you want to use the default navbar in your view use it like this:
