@@ -34,6 +34,12 @@
 	<li>
 	    <label class="btn btn-primary" for="submit-form"> speichern </label>
 	</li>
+	<li>
+		<a href="{% url 'dmad_on_django:'|add:entity_type|add:'_list' %}" class="btn btn-primary">
+			Abbrechen
+		</a>
+		
+	</li>
     </ul>
 </div>
 
@@ -47,31 +53,4 @@
 	});
     });
 </script>
-{% endblock %}
-
-{% block menu %}
-<ul class="menu menu-lg">
-    <li>
-	<a href="{% url 'dmad_on_django:person_list' %}">
-	    Personen
-	</a>
-    </li>
-    {% comment %}
-    <li>
-	<a href="{% url 'dmad_on_django:org_list' %}">
-	    Korporationen
-	</a>
-    </li>
-    <li>
-	<a href="{% url 'dmad_on_django:place_list' %}">
-	    Orte
-	</a>
-    </li>
-    {% endcomment %}
-    <li>
-	<a href="{% url 'dmad_on_django:work_list' %}">
-	    Werke
-	</a>
-    </li>
-</ul>
 {% endblock %}

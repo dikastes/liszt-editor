@@ -46,6 +46,10 @@ def get_link(model_object, model):
 
 
 class NavbarContextMixin:
+    '''
+    If you want to use the default navbar in your view use it like this:
+    class MyView(NavbarContextMixin, ...)
+    '''
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         model = self.get_model()
