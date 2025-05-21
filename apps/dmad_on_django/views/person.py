@@ -10,6 +10,7 @@ from .base import (DmadCreateView,DmadUpdateView, DeleteView,
 from .base import get_link, search_gnd, json_search
 
 class PersonSearchView(DmadSearchView):
+    model = Person
     template_name = 'dmad_on_django/person_list.html'
     form_class = SearchForm
 
@@ -24,11 +25,8 @@ class PersonSearchView(DmadSearchView):
         context.update({
             'active': 'person',
             'type': self.kwargs.get('type'),
-            'person_count': Person.objects.count(),
-            'work_count': Work.objects.count(),
             'rework_count': Person.objects.filter(rework_in_gnd=True).count(),
-            'stub_count': Person.objects.filter(gnd_id__isnull=True).count(),
-            'place_count': Place.objects.count()
+            'stub_count': Person.objects.filter(gnd_id__isnull=True).count()
         })
         return context
 

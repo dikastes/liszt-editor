@@ -45,6 +45,22 @@ def get_link(model_object, model):
     return f"<li><a href={link}>{title}</a></li>"
 
 
+class NavbarContextMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model = self.get_model()
+        context.update({
+            'active': model.__name__.lower(),
+            'person_count': Person.objects.count(),
+            'work_count': Work.objects.count(),
+            'place_count': Place.objects.count(),
+        })
+        return context
+    
+    def get_model(self):
+            raise NotImplementedError("Subclass must override get_model()")
+
+
 class DmadCreateView(CreateView):
     template_name = 'dmad_on_django/create.html'
     fields = ['interim_designator', 'gnd_id', 'comment']
@@ -75,7 +91,7 @@ class DmadCreateView(CreateView):
         return response
 
 
-class DmadUpdateView(UpdateView):
+class DmadUpdateView(NavbarContextMixin, UpdateView):
     template_name = 'dmad_on_django/form_view.html'
 
     def get_form_class(self):
@@ -96,9 +112,13 @@ class DmadUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        model_name = self.model.__name__.lower()
         context['object'] = self.object
-        context['entity_type'] = self.model.__name__.lower()
+        context['entity_type'] = model_name
         return context
+    
+    def get_model(self):
+        return self.model
 
 
 class DeleteView(DeleteView):
@@ -165,13 +185,12 @@ class PullView(UpdateView):
         self.object.update()
         return super().post(self, request, **kwargs)
 
-class DmadSearchView(SearchView):
+class DmadSearchView(NavbarContextMixin, SearchView):
     def form_invalid(self, form):
         if self.request.htmx:
-            context = self.get_context_data(**{
-                    self.form_name: form,
-                    'object_list': self.get_queryset()
-                })
+            context = self.get_context_data()
+            context[self.form_name] = form
+            context['object_list'] = self.get_queryset()
             return render(self.request, 'dmad_on_django/partials/search_results.html', context)
         return super().form_invalid(form)
 
@@ -185,3 +204,6 @@ class DmadSearchView(SearchView):
                 })
             return render(self.request, 'dmad_on_django/partials/search_results.html', context)
         return super().form_valid(form)
+    
+    def get_model(self):
+        return self.model

@@ -9,6 +9,7 @@ from .base import DmadCreateView, DmadUpdateView, LinkView, UnlinkView, PullView
 from .base import get_link
 
 class PlaceSearchView(DmadSearchView):
+    model = Place
     template_name = 'dmad_on_django/place_list.html'
     form_class = SearchForm
     search_field = "q"
