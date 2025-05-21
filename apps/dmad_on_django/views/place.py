@@ -26,8 +26,8 @@ class PlaceSearchView(DmadSearchView):
             'type': self.kwargs.get('type'),
             'person_count': Person.objects.count(),
             'work_count': Work.objects.count(),
-            'rework_count': Person.objects.filter(rework_in_gnd=True).count(),
-            'stub_count': Person.objects.filter(gnd_id__isnull=True).count(),
+            'rework_count': Place.objects.filter(rework_in_gnd=True).count(),
+            'stub_count': Place.objects.filter(gnd_id__isnull=True).count(),
             'place_count': Place.objects.count()
         })
         return context

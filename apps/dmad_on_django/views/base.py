@@ -177,7 +177,7 @@ class DmadSearchView(SearchView):
 
     def form_valid(self, form):
         if self.request.htmx:
-            self.queryset = form.search()
+            self.queryset = form.search() #TODO: Suche spezialisieren
             context = self.get_context_data(**{
                     self.form_name: form,
                     'query': form.cleaned_data.get(self.search_field),
