@@ -41,7 +41,7 @@ class PlaceName(models.Model):
 
 
 class Place(DisplayableModel):
-    gnd_id = models.CharField(max_length=20)
+    gnd_id = models.CharField(max_length=20, null=True, blank=True)
     parent_place = models.ForeignKey(
         'Place',
         on_delete=models.SET_NULL,
@@ -80,6 +80,7 @@ class Place(DisplayableModel):
             self.long = pl_place.coords[0]
             self.lat = pl_place.coords[1]
         self.save()
+        self.names.all().delete()
         pref_name = PlaceName.create_from_string(pl_place.pref_name, Status.PRIMARY, self)
         pref_name.save()
         for name in pl_place.alt_names:
