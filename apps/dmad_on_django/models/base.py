@@ -21,6 +21,9 @@ class DisplayableModel(Model):
     def render_raw(self):
         return dumps(loads(self.raw_data), indent=2, ensure_ascii=False)
 
+    def get_alt_names(self):
+        return self.names.filter(status=Status.ALTERNATIVE)
+
     def as_daisy(self):
         doc = div(_class="collapse-content")
 

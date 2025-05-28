@@ -1,11 +1,11 @@
 from django.db import models
 from django.urls import reverse
 from json import dumps, loads
+from .geographicareacodes import PlaceGeographicAreaCode
 
 from .base import Status, Language, max_trials, DisplayableModel
 from pylobid.pylobid import PyLobidPlace, GNDAPIError
 import requests
-
 
 class PlaceName(models.Model):
     name = models.CharField(max_length=20, null=True)
@@ -19,7 +19,7 @@ class PlaceName(models.Model):
         'Place',
         on_delete=models.CASCADE,
         related_name='names',
-        null=True
+        null=True #TODO: Lösung finden
     )
     status = models.CharField(
         max_length=1,
@@ -86,6 +86,21 @@ class Place(DisplayableModel):
         for name in pl_place.alt_names:
             alt_name = PlaceName.create_from_string(name, Status.ALTERNATIVE, self)
             alt_name.save()
+        self.geographic_area_codes.all().delete()
+        self.get_geographic_area_codes_from_raw()
+
+    
+    def get_geographic_area_codes_from_raw(self):
+        json = loads(self.raw_data)
+        
+        for code in json['geographicAreaCode']:
+            
+            area_code = PlaceGeographicAreaCode.create_from_string(
+                code['id'].split('#')[1],
+                self
+            )
+            area_code.save()
+
 
     def fetch_raw(self):
         trials = max_trials
@@ -138,7 +153,12 @@ class Place(DisplayableModel):
     def get_table(self):
 
         return [("Long", self.long),
-                ("Lat", self.lat)]
+                ("Lat", self.lat)]+\
+                [
+                    ("Geographic area code",code.code)
+                    for code
+                    in self.geographic_area_codes.all()
+                ]
     
     def get_overview_title(self):
 

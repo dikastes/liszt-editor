@@ -185,9 +185,6 @@ class Person(DisplayableModel):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
         return 'ohne Name'
-
-    def get_alt_names(self):
-        return self.names.filter(status=Status.ALTERNATIVE)
     
     def get_table(self):
             
