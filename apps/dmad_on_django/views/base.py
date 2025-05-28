@@ -199,7 +199,7 @@ class DmadSearchView(NavbarContextMixin, SearchView):
 
     def form_valid(self, form):
         if self.request.htmx:
-            self.queryset = form.search().models(self.get_model()) #TODO: Suche spezialisieren
+            self.queryset = form.search().models(self.get_model())
             context = self.get_context_data(**{
                     self.form_name: form,
                     'query': form.cleaned_data.get(self.search_field),
