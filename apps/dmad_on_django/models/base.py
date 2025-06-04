@@ -1,4 +1,5 @@
 from django.db.models import TextChoices, Model
+from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from iso639 import data as iso639_data
@@ -17,6 +18,10 @@ class Status(TextChoices):
     ALTERNATIVE = 'A', _('Alternative')
 
 class DisplayableModel(Model):
+    
+    raw_data = models.TextField(null=True)
+    rework_in_gnd = models.BooleanField(default=False)
+    gnd_id = models.CharField(max_length=20, null=True, blank=True)
 
     def render_raw(self):
         return dumps(loads(self.raw_data), indent=2, ensure_ascii=False)

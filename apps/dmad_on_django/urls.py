@@ -8,7 +8,8 @@ entities = [
         'person',
         #'org',
         'place',
-        'work'
+        'work',
+        'subjectterm'
     ]
 id_bearing_actions = [ 
         'update', 

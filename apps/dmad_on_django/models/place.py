@@ -41,7 +41,6 @@ class PlaceName(models.Model):
 
 
 class Place(DisplayableModel):
-    gnd_id = models.CharField(max_length=20, null=True, blank=True)
     parent_place = models.ForeignKey(
         'Place',
         on_delete=models.SET_NULL,
@@ -69,9 +68,7 @@ class Place(DisplayableModel):
     )
 
     comment = models.TextField(null=True, blank=True)
-    rework_in_gnd = models.BooleanField(default=False)
     description = models.TextField(null=True)
-    raw_data = models.TextField(null=True)
 
     def update_from_raw(self):
         pl_place = PyLobidPlace()
@@ -88,7 +85,7 @@ class Place(DisplayableModel):
             alt_name.save()
 
         self.geographic_area_codes.all().delete()
-        PlaceGeographicAreaCode.create_geographic_area_codes_from_raw(self)
+        PlaceGeographicAreaCode.create_geographic_area_codes(self)
 
 
     def fetch_raw(self):

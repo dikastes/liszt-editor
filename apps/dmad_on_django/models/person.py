@@ -59,10 +59,7 @@ class Person(DisplayableModel):
         MALE = 'm', 'male'
         FEMALE = 'f', 'female'
         NULL = '', 'null'
-
-    raw_data = models.TextField(null=True)
-    rework_in_gnd = models.BooleanField(default=False)
-    gnd_id = models.CharField(max_length=20, null=True, blank=True)
+        
     gender = models.CharField(
         max_length=1,
         choices=Gender,
@@ -199,7 +196,6 @@ class Person(DisplayableModel):
             ("Geburtsdatum", self.birth_date),
             ("Sterbedatum", self.death_date),
             ("Charakteristischer Beruf", "todo"),
-            ("GND-ID", self.gnd_id),
             ]+\
             PersonGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
 
