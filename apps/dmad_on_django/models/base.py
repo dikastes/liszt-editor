@@ -22,6 +22,12 @@ class DisplayableModel(Model):
     raw_data = models.TextField(null=True)
     rework_in_gnd = models.BooleanField(default=False)
     gnd_id = models.CharField(max_length=20, null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+    interim_designator = models.CharField(
+        max_length=150,
+        null=True,
+        blank=True
+    )
 
     def render_raw(self):
         return dumps(loads(self.raw_data), indent=2, ensure_ascii=False)

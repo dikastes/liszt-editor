@@ -85,8 +85,6 @@ class Person(DisplayableModel):
         related_name='death_place_of'
     )
     activity_places = models.ManyToManyField(Place)
-    comment = models.TextField(null=True, blank=True)
-    interim_designator = models.CharField(max_length=150, null=True, blank=True)
 
     def get_absolute_url(self):
         return reverse('dmad_on_django:person_update', kwargs={'pk': self.id})

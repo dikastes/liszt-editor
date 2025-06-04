@@ -20,6 +20,12 @@ from .work import (
     work_list
 )
 
+from .subjectterm import (
+    SubjecttermSearchView, SubjecttermCreateView, SubjecttermUpdateView,
+    SubjecttermDeleteView, SubjecttermLinkView, SubjecttermUnlinkView,
+    SubjecttermPullView, subjectterm_list
+)
+
 __all__ = [
     "index",
     "DmadCreateView", "DmadUpdateView", "DeleteView",
@@ -40,4 +46,9 @@ __all__ = [
     "WorkSearchView", "WorkCreateView", "WorkUpdateView",
     "WorkDeleteView", "WorkLinkView", "WorkUnlinkView", "WorkPullView",
     "work_list",
+
+    # Subjectterm vies
+    "SubjecttermSearchView", "SubjecttermCreateView", "SubjecttermUpdateView",
+    "SubjecttermDeleteView", "SubjecttermLinkView", "SubjecttermUnlinkView", "SubjecttermPullView",
+    "subjectterm_list"
 ]

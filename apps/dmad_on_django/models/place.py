@@ -61,13 +61,6 @@ class Place(DisplayableModel):
         null=True
     )
 
-    interim_designator = models.CharField(
-        max_length=150,
-        null=True,
-        blank=True
-    )
-
-    comment = models.TextField(null=True, blank=True)
     description = models.TextField(null=True)
 
     def update_from_raw(self):
