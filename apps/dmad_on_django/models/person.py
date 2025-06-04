@@ -5,6 +5,7 @@ import requests
 
 from .base import Status, Language, max_trials, DisplayableModel
 from .place import Place
+from .geographicareacodes import PersonGeographicAreaCode
 from pylobid.pylobid import PyLobidPerson, GNDAPIError
 
 
@@ -68,7 +69,7 @@ class Person(DisplayableModel):
         default=Gender.NULL,
         null=True
     )
-    geographic_area_code = models.CharField(max_length=10, null=True)
+
     description = models.TextField(null=True)
     birth_date = models.DateField(null=True, blank=True)
     death_date = models.DateField(null=True, blank=True)
@@ -152,6 +153,9 @@ class Person(DisplayableModel):
 
         self.save()
 
+        self.geographic_area_codes.all().delete()
+        PersonGeographicAreaCode.create_geographic_area_codes(self)
+
     def fetch_raw(self):
         trials = max_trials
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
@@ -189,7 +193,6 @@ class Person(DisplayableModel):
     def get_table(self):
             
             rows = [
-            ("Ländercode", self.geographic_area_code),
             ("Geschlecht", self.gender),
             ("Geburtsort", self.birth_place),
             ("Sterbeort", self.death_place),
@@ -197,13 +200,17 @@ class Person(DisplayableModel):
             ("Sterbedatum", self.death_date),
             ("Charakteristischer Beruf", "todo"),
             ("GND-ID", self.gnd_id),
-            ]
+            ]+\
+            PersonGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
 
             if(len(self.activity_places.all()) > 0):
                 for place in self.activity_places.all():
                     rows.append(("Wirkungsort", str(place)))
 
+            
+
             return rows
+    
     def get_overview_title(self):
         return "Biografie"
         

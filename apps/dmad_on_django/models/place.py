@@ -86,20 +86,9 @@ class Place(DisplayableModel):
         for name in pl_place.alt_names:
             alt_name = PlaceName.create_from_string(name, Status.ALTERNATIVE, self)
             alt_name.save()
-        self.geographic_area_codes.all().delete()
-        self.get_geographic_area_codes_from_raw()
 
-    
-    def get_geographic_area_codes_from_raw(self):
-        json = loads(self.raw_data)
-        
-        for code in json['geographicAreaCode']:
-            
-            area_code = PlaceGeographicAreaCode.create_from_string(
-                code['id'].split('#')[1],
-                self
-            )
-            area_code.save()
+        self.geographic_area_codes.all().delete()
+        PlaceGeographicAreaCode.create_geographic_area_codes_from_raw(self)
 
 
     def fetch_raw(self):
@@ -154,11 +143,7 @@ class Place(DisplayableModel):
 
         return [("Long", self.long),
                 ("Lat", self.lat)]+\
-                [
-                    ("Geographic area code",code.code)
-                    for code
-                    in self.geographic_area_codes.all()
-                ]
+                PlaceGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
     
     def get_overview_title(self):
 
