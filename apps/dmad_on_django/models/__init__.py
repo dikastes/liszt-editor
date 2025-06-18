@@ -3,7 +3,7 @@ from .place import Place, PlaceName
 from .person import Person, PersonName
 from .period import Period
 from .work import Work
-from .subjectterm import GNDSubjectCategory, SubjectTermName, SubjectTerm
+from .subjectterm import GNDSubjectCategory, SubjectTermName, Subjectterm
 
 __all__ = [
     "Language", "Status", "max_trials",
@@ -11,5 +11,5 @@ __all__ = [
     "Person", "PersonName",
     "Period",
     "Work",
-    "GNDSubjectCategory", "SubjectTermName", "SubjectTerm"
+    "GNDSubjectCategory", "SubjectTermName", "Subjectterm"
 ]

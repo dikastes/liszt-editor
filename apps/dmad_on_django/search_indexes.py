@@ -1,5 +1,5 @@
 from haystack import indexes
-from .models import Person, Place, SubjectTerm
+from .models import Person, Place, Subjectterm
 
 class PersonIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.NgramField(
@@ -45,7 +45,7 @@ class SubjectTermIndex(indexes.SearchIndex, indexes.Indexable):
     )
 
     def get_model(self):
-        return SubjectTerm
+        return Subjectterm
     
     def index_queryset(self, using=None):
         return self.get_model().objects
