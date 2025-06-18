@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from iso639 import data as iso639_data
 from dominate.tags import div, table, tr, td
+from dominate.util import raw
 from json import dumps, loads
 
 max_trials = 3
@@ -39,14 +40,17 @@ class DisplayableModel(Model):
         doc = div(_class="collapse-content")
 
         with doc:
-            with table(cls="table table-zebra"):
-                for label, value in self.get_table():
+         with table(cls="table table-zebra"):
+              for label, value in self.get_table():
                     if str(value) == "None":
                         tr(td(label), td("—"))
+                    elif isinstance(value, str) and value.strip().startswith("<a "):
+                       tr(td(label), td(raw(value)))
                     else:
-                        tr(td(label), td(str(value) or "—"))
+                      tr(td(label), td(str(value) or "—"))
 
         return str(doc)
+
     
     class Meta:
         abstract = True

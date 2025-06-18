@@ -86,9 +86,9 @@
     {% if not type %}
     <form
         method="get"
-        action="{% url 'dmad_on_django:place_list' %}"
+        action="{% url 'dmad_on_django:subjectterm_list' %}"
         class="m-0"
-        hx-get="{% url 'dmad_on_django:place_list' %}"
+        hx-get="{% url 'dmad_on_django:subjectterm_list' %}"
         hx-target="#search-results"
         hx-trigger="input"
         hx-push-url="true"

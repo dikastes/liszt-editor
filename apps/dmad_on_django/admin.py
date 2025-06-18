@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Person, PersonName, Place, PlaceName, Subjectterm, SubjectTermName, Status
-
+from .models import Person, PersonName, Place, PlaceName, Subjectterm, SubjectTermName, Status, GNDSubjectCategory
 # Register your models here.
 class PlaceNameInline(admin.TabularInline):
     model = PlaceName
@@ -38,6 +37,9 @@ class SubjectTermAdmin(admin.ModelAdmin):
 
     show_parents.short_description = "Parent subject list"
 
+@admin.register(GNDSubjectCategory)
+class GNDSubjectCategoryAdmin(admin.ModelAdmin):
+    pass
     
 
     

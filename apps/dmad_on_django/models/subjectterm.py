@@ -7,18 +7,24 @@ import requests
 
 
 class GNDSubjectCategory(models.Model):
-    link = models.CharField(max_length=200)
+    link = models.CharField(max_length=200,unique=True)
     label = models.CharField(max_length=50)
 
     @staticmethod
-    def create(json):
+    def create_or_link(json):
         category = json['gndSubjectCategory'][0]
-        print(category)
-        subjectcategory = GNDSubjectCategory()
-        subjectcategory.link = category['id']
-        subjectcategory.label = category['label']
-        subjectcategory.save()
-        return subjectcategory
+
+        try:
+            return GNDSubjectCategory.objects.get(link=category['id'])
+        except GNDSubjectCategory.DoesNotExist:
+            subjectcategory = GNDSubjectCategory()
+            subjectcategory.link = category['id']
+            subjectcategory.label = category['label']
+            subjectcategory.save()
+            return subjectcategory
+        
+    def __str__(self):
+        return self.label
 
 class SubjectTermName(models.Model):
     name = models.CharField(max_length=40)
@@ -53,6 +59,16 @@ class Subjectterm(DisplayableModel):
     )
 
     parent_subjects = models.ManyToManyField('self', blank=True, symmetrical=False)
+    
+    def get_parrent_subject_table(self):
+        return [
+        (
+            "Übergeordnetes Sachschlagwort",
+            f'<a href="{s.get_absolute_url()}"class = "link link-primary">{s.get_default_name()} ({s.gnd_id})</a>'
+        )
+        for s in self.parent_subjects.all()
+    ]
+
 
     @staticmethod
     def fetch_or_get(gnd_id):
@@ -80,7 +96,7 @@ class Subjectterm(DisplayableModel):
     
     def update_from_raw(self):
         raw_data = loads(self.raw_data)
-        self.gnd_subject_category = GNDSubjectCategory.create(raw_data)
+        self.gnd_subject_category = GNDSubjectCategory.create_or_link(raw_data)
         self.save()
         self.names.all().delete()
         pref_name = SubjectTermName.create_from_string(
@@ -103,8 +119,14 @@ class Subjectterm(DisplayableModel):
             pass
         
         try:
-            for parrent in raw_data['broaderTermGeneral']:
-                self.parent_subjects.add(self.fetch_or_get(parrent['id']))
+            for parent in raw_data['broaderTermGeneral']:
+                self.parent_subjects.add(self.fetch_or_get(parent['id']))
+        except KeyError:
+            pass
+
+        try:
+            for parent in raw_data['broaderTermGeneric']:
+                self.parent_subjects.add(self.fetch_or_get(parent['id']))
         except KeyError:
             pass
         
@@ -112,7 +134,7 @@ class Subjectterm(DisplayableModel):
 
     @staticmethod
     def search(search_string):
-        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:TerritorialCorporateBodyOrAdministrativeUnit)&size=5&format=json:suggest"
+        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:AuthorityResource)&size=5&format=json:suggest"
         lobid_response = requests.get(lobid_url)
         return lobid_response.json()
         
@@ -135,7 +157,8 @@ class Subjectterm(DisplayableModel):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
 
     def get_table(self):
-            return [("a","b")]
+            return [("GND-Sachgruppe", self.gnd_subject_category.label)] +\
+            self.get_parrent_subject_table()
     
     def get_overview_title(self):
         return "Angaben"
