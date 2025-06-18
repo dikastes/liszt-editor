@@ -2,6 +2,7 @@ from django.db import models
 from .base import Status, Language, max_trials, DisplayableModel
 from json import loads
 
+
 class GNDSubjectCategory(models.Model):
     link = models.URLField(max_length=200)
     label = models.CharField(max_length=50)
@@ -27,4 +28,5 @@ class SubjectTerm(DisplayableModel):
 
     parent_subjects = models.ManyToManyField('self', blank=True)
 
-
+    def fetch_raw():
+        pass
