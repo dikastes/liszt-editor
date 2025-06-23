@@ -1,7 +1,15 @@
 {% extends 'edwoca/base.html' %}
 
 {% block menu %}
-{% include 'edwoca/partials/work_menu.html' %}
+
+{% if 'expressions' in request.path %}
+	{% include 'edwoca/partials/expression_menu.html' %}
+{% endif %}
+
+{% if 'work' in request.path %}
+	{% include 'edwoca/partials/work_menu.html' %}
+{% endif %}
+
 {% endblock %}
 
 {% block content %}

@@ -4,6 +4,12 @@
 {% include 'edwoca/partials/work_menu.html' %}
 {% endblock %}
 
+{% block navbar_title %}
+
+{% include 'edwoca/partials/title.html' %}
+
+{% endblock %}
+
 {% block content %}
 
 <div class="bg-white border border-base-300 p-5 mb-10">
@@ -15,7 +21,7 @@
 		{% for work_relation in object.source_work_of.all %}
 			<li>
 				<div class="flex">
-					<a href="{% url 'edwoca:work_update' work_relation.target_work.id %}" class="flex-1">
+					<a href="{% url 'edwoca:work_relations' work_relation.target_work.id %}" class="flex-1">
 						{{ work_relation.target_work }} ({{ work_relation.label }})
 					</a>
 					<form method="post" action="{% url 'edwoca:related_work_remove' work_relation.id %}" class="flex-0">
@@ -33,7 +39,7 @@
 		<ul>
 		{% for work_relation in object.target_work_of.all %}
 			<li>
-				<a href="{% url 'edwoca:work_update' work_relation.source_work.id %}" class="flex-1">
+				<a href="{% url 'edwoca:work_relations' work_relation.source_work.id %}" class="flex-1">
 					{{ work_relation.source_work }} ({{ work_relation.label }})
 				</a>
 			</li>
@@ -48,12 +54,13 @@
 
 		<form action="{% url 'edwoca:work_relations' object.id %}" method="get">
 			{{ searchform.q }}
+			<input type="hidden" name="target_model" value="work" />
 			<input type="submit" id="submit-form" class="btn" />
 		</form>
 		
 		<ul>
 		{% if query %}
-			{% for found_work in found_objects %}
+			{% for found_work in found_works %}
 				<li>
 					<a href="{% url 'edwoca:related_work_add' object.id found_work.object.id %}">
 						{{ found_work.object }}
@@ -72,7 +79,7 @@
 		<form method="post">
 			{% csrf_token %}
 			{{ object }} mit {{ target_work }} verknüpfen als:
-			{{ related_work_form }}
+			{{ form }}
 			<input type="submit" id="submit-form" class="btn" />
 		</form>
 
@@ -91,7 +98,7 @@
 		<ul>
 		{% for expression in object.expressions.all %}
 			<li>
-				<a href="{% url 'edwoca:expression_update' expression.id %}">
+				<a href="{% url 'edwoca:expression_relations' expression.id %}">
 					{{ expression }}
 				</a>
 				<a href="{% url 'edwoca:expression_delete' expression.id %}" class="flex-0 btn">

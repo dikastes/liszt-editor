@@ -2,33 +2,34 @@
 
 {% block menu %}
 
-{% include 'edwoca/partials/work_menu.html' %}
+{% include 'edwoca/partials/update_menu_switcher.html' %}
+
+{% endblock %}
+
+{% block navbar_title %}
+
+{% include 'edwoca/partials/title.html' %}
 
 {% endblock %}
 
 {% block content %}
 
 <div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+	<h2 class="card-title mt-0"> Titel bearbeiten </h2>
 
 	<form method="post">
 		{{ form.management_form }}
 		{% csrf_token %}
-		{% for bib_form in form %}
-			{{ bib_form.as_daisy }}
+		{% for title_form in form %}
+			{{ title_form.as_daisy }}
 		{% endfor %}
 
-		<input href="{% url 'edwoca:work_bib_update' object.id %}" value="Verweis hinzufügen" type="submit" name="add-form" class="btn" />
+		<input  value="Titel hinzufügen" type="submit" name="add-form" class="btn" />
 		<input type="submit" name="save" id="submit-form" class="hidden" />
 	</form>
 
 </div>
 
-<script>
-	document.addEventListener('DOMContentLoaded', _ => {
-		$('.autocomplete-select').SumoSelect({search:true});
-	})
-</script>
 {% endblock %}
 
 {% block nav %}
@@ -40,9 +41,7 @@
 		<label for="submit-form" class="btn btn-primary"> speichern </label>
 	</div>
 </div>
-
 {% endblock %}
-
 
 {% block navbar_extras %}
 {% endblock %}

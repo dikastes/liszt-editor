@@ -2,13 +2,13 @@
 
 {% block menu %}
 
-{% if 'expressions' in request.path %}
-	{% include 'edwoca/partials/expression_menu.html' %}
-{% endif %}
+{% include 'edwoca/partials/update_menu_switcher.html' %}
 
-{% if 'work' in request.path %}
-	{% include 'edwoca/partials/work_menu.html' %}
-{% endif %}
+{% endblock %}
+
+{% block navbar_title %}
+
+{% include 'edwoca/partials/title.html' %}
 
 {% endblock %}
 

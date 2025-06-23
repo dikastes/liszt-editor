@@ -10,9 +10,13 @@
 
     <body hx-ext="preload">
 	<div class="container w-full max-w-7xl mx-auto my-10">
-	    <div class="navbar bg-base-800 mb-10 flex">
-		<div class="flex-1">
+	    <div class="navbar bg-white border border-base-600 shadow mb-10 flex">
+		<div class="flex-none">
 		    <a class="btn btn-ghost text-xl" href="{% url 'edwoca:index' %}">edwoca</a>
+		</div>
+		<div class="flex-1 text-lg text-gray-600">
+		    {% block navbar_title %}
+		    {% endblock %}
 		</div>
 		<div class="flex-none gap-2">
 		    {% block navbar_extras %}
@@ -21,7 +25,7 @@
 			<div tabindex="0" role="button" class="btn btn-primary rounded-btn">neu</div>
 			<ul
 			    tabindex="0"
-			    class="menu dropdown-content bg-base-100 rounded-box z-[1] mt-4 w-52 p-2 shadow">
+			    class="menu dropdown-content rounded-box z-[1] mt-4 w-52 p-2 shadow">
 			    <li>
 				<a href="{% url 'edwoca:work_create' %}">Werk</a>
 			    </li>
@@ -37,7 +41,7 @@
 		    {% block menu %}
 		    {% endblock %}
 		</div>
-		<div class="flex-1">
+		<div class="flex-1 min-w-0">
 		    {% block content %}
 		    {% endblock %}
 		</div>

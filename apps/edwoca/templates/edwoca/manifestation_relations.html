@@ -1,7 +1,7 @@
 {% extends 'edwoca/base.html' %}
 
 {% block menu %}
-{% include 'edwoca/partials/expression_menu.html' %}
+{% include 'edwoca/partials/manifestation_menu.html' %}
 {% endblock %}
 
 {% block navbar_title %}
@@ -14,31 +14,36 @@
 
 <div class="bg-white border border-base-300 p-5 mb-10">
 	<div class="prose">
-		<h2> Werk </h2>
-
-		<a href="{% url 'edwoca:work_relations' object.work.id %}"> {{ object.work }} </a>
-	</div>
-</div>
-
-<div class="bg-white border border-base-300 p-5 mb-10">
-	<div class="prose">
 		<h2> Quellen </h2>
 
 		<ul>
-		{% for manifestation in object.manifestations.all %}
+		{% for manifestation_relation in object.source_manifestation_of.all %}
 			<li>
 				<div class="flex">
-					<a href="{% url 'edwoca:manifestation_update' manifestation.id %}" class="flex-1">
-						{{ manifestation }}
+					<a href="{% url 'edwoca:manifestation_relations' manifestation_relation.target_manifestation.id %}" class="flex-1">
+						{{ manifestation_relation.target_manifestation }} ({{ manifestation_relation.label }})
 					</a>
-					<form method="post" action="{% url 'edwoca:manifestation_relation_remove' object.id manifestation.id %}" class="flex-0">
+					<form method="post" action="{% url 'edwoca:related_manifestation_remove' manifestation_relation.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>
 				</div>
 			</li>
 		{% empty %}
-			<li> <em> keine Quellen verknüpft </em> <span class="badge badge-primary">!</span> </li>
+			<li> <em> keine Quellen verknüpft </em> </span> </li>
+		{% endfor %}
+		</ul>
+
+		<h3> eingehende Verknüpfungen </h3>
+		<ul>
+		{% for manifestation_relation in object.target_manifestation_of.all %}
+			<li>
+				<a href="{% url 'edwoca:manifestation_relations' manifestation_relation.source_manifestation.id %}" class="flex-1">
+					{{ manifestation_relation.source_manifestation }} ({{ manifestation_relation.label }})
+				</a>
+			</li>
+		{% empty %}
+			<li> <em> keine eingehenden Verknüpfungen </em> </li>
 		{% endfor %}
 		</ul>
 
@@ -46,7 +51,7 @@
 
 		{% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:expression_relations' object.id %}" method="get">
+		<form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get">
 			{{ searchform.q }}
 			<input type="hidden" name="target_model" value="manifestation">
 			<input type="submit" id="submit-form" class="btn" />
@@ -72,8 +77,8 @@
 
 		<form method="post">
 			{% csrf_token %}
-			{{ object }} mit {{ target_manifestation }} verknüpfen als:
-			{{ related_manifestation_form }}
+			{{ object }} mit {{ object }} verknüpfen als:
+			{{ form }}
 			<input type="submit" id="submit-form" class="btn" />
 		</form>
 
@@ -87,21 +92,21 @@
 
 <div class="bg-white border border-base-300 p-5">
 	<div class="prose">
-		<h2> Expressionen </h2>
+		<h2> Exemplare </h2>
 
 		<ul>
-		{% for expression in object.expressions.all %}
+		{% for item in object.items.all %}
 			<li>
-				<a href="{% url 'edwoca:expression_update' expression.id %}">
-					{{ expression }}
+				<a href="{% url 'edwoca:item_relations' item.id %}">
+					{{ item }}
 				</a>
 			</li>
 		{% empty %}
-			<li> <em> keine Expressionen verknüpft </li>
+			<li> <em> keine Exemplare verknüpft </li>
 		{% endfor %}
 		</ul>
 
-		<a href="{% url 'edwoca:expression_create' object.id %}" class="btn btn-primary"> neue Expression anlegen </a>
+		<a href="{% url 'edwoca:item_create' object.id %}" class="btn btn-primary"> neues Exemplar anlegen </a>
 	</div>
 </div>
 

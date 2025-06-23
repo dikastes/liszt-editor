@@ -42,10 +42,5 @@
 {% endblock %}
 
 {% block navbar_extras %}
-	<div class="form-control">
-		<form action="{% url 'edwoca:work_search' %}" method="get" class="m-0">
-			{{ form.q }}
-			<input type="submit" class="btn">
-		</form>
-	</div>
+	{% include 'edwoca/partials/search_form_switcher.html' %}
 {% endblock %}

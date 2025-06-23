@@ -1,30 +1,34 @@
 {% extends 'edwoca/base.html' %}
 
 {% block menu %}
-{% include 'edwoca/partials/work_menu.html' %}
+
+{% include 'edwoca/partials/update_menu_switcher.html' %}
+
 {% endblock %}
 
 {% block navbar_title %}
 
 {% include 'edwoca/partials/title.html' %}
 
+
 {% endblock %}
 
 {% block content %}
 
 <div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ object }} bearbeiten </h2>
+	<h2 class="card-title mt-0"> Sätze bearbeiten </h2>
 
 	<form method="post">
+		{{ form.management_form }}
 		{% csrf_token %}
-		{{ form.as_daisy }}
+		{% for title_form in form %}
+			{{ title_form.as_daisy }}
+		{% endfor %}
 
-		<input id="submit-form" type="submit" value="{{ button_label }}" class="hidden">
+		<input  value="Satz hinzufügen" type="submit" name="add-form" class="btn" />
+		<input type="submit" name="save" id="submit-form" class="hidden" />
 	</form>
-	
-	<div>
-		ToDo: WV-Konkordanz
-	</div>
+
 </div>
 
 {% endblock %}

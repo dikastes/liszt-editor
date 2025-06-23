@@ -1,7 +1,7 @@
 <ul class="menu menu-lg">
 	<li>
 	    <a
-		href="{% url 'edwoca:work_title' object.id %}"
+		href="{% url 'edwoca:manifestation_title' object.id %}"
 		{% if 'title' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
@@ -9,7 +9,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_update' object.id %}"
+	    <a href="{% url 'edwoca:manifestation_update' object.id %}"
 		{% if 'update' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
@@ -17,7 +17,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_relations' object.id %}"
+	    <a href="{% url 'edwoca:manifestation_relations' object.id %}"
 		{% if 'relations' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
@@ -25,36 +25,42 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_contributors' object.id %}"
+	    <a href="{% url 'edwoca:manifestation_classification' object.id %}"
+		{% if 'classification' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Klassifikation
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_contributors' object.id %}"
 		{% if 'contributors' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
 		Beteiligte
 	    </a>
 	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_relatedworks' object.id %}"
-		{% if 'relatedworks' in request.path %}class="active"{% endif %}
+	<li class="disabled">
+		{% comment %}
+	    <a href="{% url 'edwoca:manifestation_print' object.id %}"
+		{% if 'print' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
-		Referenzwerke
+		{% endcomment %}
+	    <a href="#">
+		Druck
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_history' object.id %}"
+	    <a href="{% url 'edwoca:manifestation_history' object.id %}"
 		{% if 'history' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
-		Entstehung
-	    </a>
-	</li>
-	<li class="disabled">
-	    <a href="#">
-		Uraufführung
+		Geschichte
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_bibliography' object.id %}"
+	    <a href="{% url 'edwoca:manifestation_bibliography' object.id %}"
 		{% if 'bibliography' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
@@ -62,7 +68,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_comment' object.id %}"
+	    <a href="{% url 'edwoca:manifestation_comment' object.id %}"
 		{% if 'comment' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
@@ -70,7 +76,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_delete' object.id %}"
+	    <a href="{% url 'edwoca:manifestation_delete' object.id %}"
 		{% if 'delete' in request.path %}class="active"{% endif %}
 		preload="mouseover"
 		>
@@ -78,7 +84,7 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_list' %}">
+	    <a href="{% url 'edwoca:manifestation_list' %}">
 		zurück
 	    </a>
 	</li>
