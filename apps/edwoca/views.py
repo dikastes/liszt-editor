@@ -23,8 +23,8 @@ def work_relation_view(request, work_id):
     except Work.DoesNotExist:
         raise Http404(f"Unknown work with id {work_id}")
 
+
 class RelationsUpdateView(generic.UpdateView):
-    fields = []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,7 +34,8 @@ class RelationsUpdateView(generic.UpdateView):
 
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['query'] = search_form.cleaned_data.get('q')
-            context['found_works'] = search_form.search()
+            target_model = getattr(edwoca_models, self.request.GET['target_model'].capitalize())
+            context[f"found_{target_model.__name__.lower()}s"] = search_form.search().models(target_model)
 
         return context
 
@@ -42,144 +43,16 @@ class RelationsUpdateView(generic.UpdateView):
 class WorkRelationsUpdateView(RelationsUpdateView):
     template_name = 'edwoca/work_relations.html'
     model = Work
+    form_class = RelatedWorkForm
 
 
-class ReturnButtonView(generic.detail.SingleObjectTemplateResponseMixin):
-    template_name = 'edwoca/base_form.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['return_target'] = 'edwoca:work_detail'
-        try:
-            context['return_pk'] = self.get_work().id
-        except:
-            context['return_pk'] = self.get_manifestation().id
-        context['button_label'] = 'anlegen'
-        return context
+class ManifestationRelationsUpdateView(RelationsUpdateView):
+    template_name = 'edwoca/manifestation_relations.html'
+    model = Manifestation
+    form_class = RelatedManifestationForm
 
 
-class WorkRelationCreateView(generic.edit.CreateView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:work_detail', kwargs = {'pk': self.get_work().id})
-
-    def get_form(self, form_class=None):
-        if form_class is None:
-            form_class = self.get_form_class()
-        form = super().get_form(form_class)
-        for entity in ['work', 'source_work']:
-            if entity in form.fields:
-                form.fields[entity].initial = self.get_work()
-                form.fields[entity].widget = HiddenInput()
-                form.fields[entity].label = ''
-        return form
-
-    def get_work(self):
-        return Work.objects.get(id=self.kwargs['work_id'])
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'anlegen'
-        return context
-
-
-class ExpressionRelationCreateView(generic.edit.CreateView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:work_detail', kwargs = {'pk': self.get_work().id})
-
-    def get_form(self, form_class=None):
-        if form_class is None:
-            form_class = self.get_form_class()
-        form = super().get_form(form_class)
-        for entity in ['expression', 'source_expression']:
-            if entity in form.fields:
-                form.fields[entity].initial = self.get_expression()
-                form.fields[entity].widget = HiddenInput()
-                form.fields[entity].label = ''
-        return form
-
-    def get_expression(self):
-        return Expression.objects.get(id=self.kwargs['expression_id'])
-
-    def get_work(self):
-        return self.get_expression().work
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'anlegen'
-        return context
-
-
-class WorkRelationUpdateView(generic.edit.UpdateView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:work_detail', kwargs = {'pk': self.get_work().id})
-
-    def get_work(self):
-        try:
-            return self.object.work
-        except:
-            return self.object.source_work
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'speichern'
-        return context
-
-
-class ExpressionRelationUpdateView(generic.edit.UpdateView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:work_detail', kwargs = {'pk': self.get_work().id})
-
-    def get_expression(self):
-        try:
-            return self.object.expression
-        except:
-            return self.object.source_expression
-
-    def get_work(self):
-        return self.get_expression().work
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'speichern'
-        return context
-
-
-class WorkRelationDeleteView(generic.edit.DeleteView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:work_detail', kwargs = {'pk': self.get_work().id})
-
-    def get_work(self):
-        try:
-            return self.object.work
-        except:
-            return self.object.source_work
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'löschen'
-        return context
-
-
-class ExpressionRelationDeleteView(generic.edit.DeleteView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:work_detail', kwargs = {'pk': self.get_work().id})
-
-    def get_expression(self):
-        try:
-            return self.object.expression
-        except:
-            return self.object.source_expression
-
-    def get_work(self):
-        return self.get_expression().work
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'löschen'
-        return context
-
-
-class WorkSearchView(SearchView):
+class EdwocaSearchView(SearchView):
     template_name = 'edwoca/list.html'
     form_class = SearchForm
 
@@ -187,7 +60,7 @@ class WorkSearchView(SearchView):
     def get(self, request, *args, **kwargs):
         query = request.GET.get('q', '')
         if not query or query == '':
-            return redirect('edwoca:work_list')
+            return redirect(f'edwoca:{self.model.__name__.lower()}_list')
         return super().get(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -197,10 +70,19 @@ class WorkSearchView(SearchView):
         context['object_list'] = [ result.object for result in context['object_list'] ]
         return context
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.models(getattr(edwoca_models, self.model.__name__))
 
-class WorkListView(ListView):
-    template_name = 'edwoca/list.html'
+
+class WorkSearchView(EdwocaSearchView):
     model = Work
+
+class ManifestationSearchView(EdwocaSearchView):
+    model = Manifestation
+
+class EdwocaListView(ListView):
+    template_name = 'edwoca/list.html'
     paginate_by = 10
 
     def get_context_data(self, **kwargs):
@@ -211,9 +93,13 @@ class WorkListView(ListView):
         return context
 
 
-class ManifestationSearchView(SearchView):
-    template_name = 'edwoca/index.html'
-    form_class = SearchForm
+class WorkListView(EdwocaListView):
+    model = Work
+
+
+class ManifestationListView(EdwocaListView):
+    model = Manifestation
+
 
 
 """
@@ -268,10 +154,12 @@ class WorkCreateView(generic.edit.CreateView):
         title_formset = context['title_formset']
 
         if title_formset.is_valid():
+            response = super().form_valid(form)
             self.object = form.save()
             title_formset.instance = self.object
             title_formset.save()
-            return redirect(self.get_success_url())
+            self.object.save()
+            return response
         else:
             return self.form_invalid(form)
 
@@ -295,15 +183,11 @@ class WorkUpdateView(generic.edit.UpdateView):
 class WorkDeleteView(generic.edit.DeleteView):
     model = Work
     success_url = reverse_lazy('edwoca:index')
-    template_name = 'edwoca/base_form.html'
+    template_name = 'edwoca/simple_form.html'
     context_object_name = 'work'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Werk {self.object} löschen"
-        context['button_label'] = "löschen"
-        context['return_target'] = 'edwoca:index'
-        context['return_pk'] = None
         return context
 
 
@@ -313,29 +197,6 @@ class WorkBibView(generic.edit.ModelFormMixin):
             'bib',
             'work'
         ]
-
-
-class WorkBibCreateView(WorkRelationCreateView, WorkBibView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Neue Literaturangabe für {self.get_work()} anlegen"
-        return context
-
-
-class WorkBibUpdateView(WorkRelationUpdateView, WorkBibView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Literaturangabe { self.object.bib } des Werks { self.get_work() } bearbeiten"
-        return context
-
-
-class WorkBibDeleteView(WorkRelationDeleteView):
-    model = WorkBib
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Literaturangabe { self.object.bib } des Werks { self.get_work() } löschen"
-        return context
 
 
 class WorkTitleView(generic.edit.ModelFormMixin):
@@ -348,13 +209,6 @@ class WorkTitleView(generic.edit.ModelFormMixin):
         ]
 
 
-class WorkTitleCreateView(WorkRelationCreateView, WorkTitleView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Neuen Titel für {self.get_work()} anlegen"
-        return context
-
-
 class WorkContributorView(generic.edit.ModelFormMixin):
     model = WorkContributor
     fields = [
@@ -362,17 +216,6 @@ class WorkContributorView(generic.edit.ModelFormMixin):
             'person',
             'role'
         ]
-
-
-class WorkContributorCreateView(WorkRelationCreateView, WorkContributorView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Neuen Beteiligten für Werk {self.get_work()} anlegen"
-        return context
-
-
-class WorkContributorUpdateView(WorkRelationUpdateView, WorkContributorView):
-    pass
 
 
 class ContributorsUpdateView(generic.edit.UpdateView):
@@ -426,13 +269,9 @@ class ExpressionContributorsUpdateView(ContributorsUpdateView):
     model = Expression
 
 
-class WorkContributorDeleteView(WorkRelationDeleteView):
-    model = WorkContributor
+class ManifestationContributorsUpdateView(ContributorsUpdateView):
+    model = Manifestation
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten {self.object.person} am Werk {self.object.work} löschen"
-        return context
 
 
 class RelatedWorkView(generic.edit.ModelFormMixin):
@@ -445,27 +284,10 @@ class RelatedWorkView(generic.edit.ModelFormMixin):
         ]
 
 
-class RelatedWorkCreateView(WorkRelationCreateView, RelatedWorkView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Werkrelation für {self.get_work()} anlegen"
-        return context
 
 
-class RelatedWorkUpdateView(WorkRelationUpdateView, RelatedWorkView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Werkrelation zwischen Werk {self.object.source_work} und {self.object.target_work} bearbeiten"
-        return context
 
 
-class RelatedWorkDeleteView(WorkRelationDeleteView):
-    model = RelatedWork
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Werkrelation zwischen Werk {self.object.source_work} und {self.object.target_work} löschen"
-        return context
 
 
 class ExpressionPeriodView(generic.edit.ModelFormMixin):
@@ -477,34 +299,9 @@ class ExpressionPeriodView(generic.edit.ModelFormMixin):
         ]
 
 
-class ExpressionPeriodCreateView(ExpressionRelationCreateView, ExpressionPeriodView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Datumsangabe für Expression { self.get_expression() } von Werk { self.get_work() } anlegen"
-        return context
-
-    def form_valid(self, form):
-        period = form.save()
-        expression = self.get_expression()
-        expression.period = period
-        expression.save()
-        return super().form_valid(form)
 
 
-class ExpressionPeriodUpdateView(ExpressionRelationUpdateView, ExpressionPeriodView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Datumsangabe für Expession {self.object.expression} bearbeiten"
-        return context
 
-
-class ExpressionPeriodDeleteView(ExpressionRelationDeleteView):
-    model = Period
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Datumsangabe von Expression {self.object.expression} löschen"
-        return context
 
 
 class ExpressionTitleView(generic.edit.ModelFormMixin):
@@ -517,27 +314,9 @@ class ExpressionTitleView(generic.edit.ModelFormMixin):
         ]
 
 
-class ExpressionTitleCreateView(ExpressionRelationCreateView, ExpressionTitleView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel für Expression {self.get_expression()} von Werk {self.get_expression().work} anlegen"
-        return context
 
 
-#class ExpressionTitleUpdateView(ExpressionRelationUpdateView, ExpressionTitleView):
-    #def get_context_data(self, **kwargs):
-        #context = super().get_context_data(**kwargs)
-        #context['view_title'] = f"Titel { self.object } der Expression { self.object.expression } bearbeiten"
-        #return context
 
-
-class ExpressionTitleDeleteView(ExpressionRelationDeleteView):
-    model = ExpressionTitle
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel { self.object } von Expression {self.object.expression} löschen"
-        return context
 
 
 class ExpressionContributorView(generic.edit.ModelFormMixin):
@@ -549,27 +328,9 @@ class ExpressionContributorView(generic.edit.ModelFormMixin):
         ]
 
 
-class ExpressionContributorCreateView(ExpressionRelationCreateView, ExpressionContributorView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten für Expression { self.get_expression() } anlegen"
-        return context
 
 
-class ExpressionContributorUpdateView(ExpressionRelationUpdateView, ExpressionContributorView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten { self.object.person } von Expression { self.get_expression() } bearbeiten"
-        return context
 
-
-class ExpressionContributorDeleteView(ExpressionRelationDeleteView):
-    model = ExpressionContributor
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Expression { self.object } an Expression { self.get_expression() } löschen"
-        return context
 
 
 class ExpressionView(generic.edit.ModelFormMixin):
@@ -629,17 +390,8 @@ class ExpressionUpdateView(generic.UpdateView):
         return context
 
 
-class ExpressionDeleteView(WorkRelationDeleteView):
-    model = Expression
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Expression { self.object } am Werk { self.get_work() } löschen"
-        return context
-
-
-class TitleUpdateView(generic.UpdateView):
-    template_name = 'edwoca/title_update.html'
+class FormsetUpdateView(generic.UpdateView):
+    template_name = 'edwoca/simple_formset.html'
 
     def get_context_dat(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -654,9 +406,9 @@ class TitleUpdateView(generic.UpdateView):
 
         if 'add-form' in request.POST:
             data = request.POST.copy()
-            total_forms = int(data.get('titles-TOTAL_FORMS', 0))
-            data['titles-TOTAL_FORMS'] = str(total_forms + 1)
-            data[f'titles-{total_forms}-language'] = 'de'
+            total_forms = int(data.get(f'{self.formset_property}-TOTAL_FORMS', 0))
+            data[f'{self.formset_property}-TOTAL_FORMS'] = str(total_forms + 1)
+            data[f'{self.formset_property}-{total_forms}-language'] = 'de'
             form = self.form_class(data, instance=self.object)
             return self.render_to_response(self.get_context_data(form=form))
 
@@ -675,29 +427,31 @@ class TitleUpdateView(generic.UpdateView):
         return self.render_to_response(self.get_context_data(form=form))
 
 
-class ExpressionTitleUpdateView(TitleUpdateView):
+class ExpressionTitleUpdateView(FormsetUpdateView):
     model = Expression
     form_class = ExpressionTitleFormSet
+    formset_property = 'titles'
 
     def get_success_url(self):
         return reverse_lazy('edwoca:expression_title_update', kwargs = {'pk': self.object.id})
 
 
-class WorkTitleUpdateView(TitleUpdateView):
+class WorkTitleUpdateView(FormsetUpdateView):
     model = Work
     form_class = WorkTitleFormSet
+    formset_property = 'titles'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_title_update', kwargs = {'pk': self.object.id})
+        return reverse_lazy('edwoca:work_title', kwargs = {'pk': self.object.id})
 
 
-class WorkTitleDeleteView(WorkRelationDeleteView):
-    model = WorkTitle
+class ItemTitleUpdateView(FormsetUpdateView):
+    model = Item
+    form_class = ItemTitleFormSet
+    formset_property = 'titles'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel { self.object } des Werks { self.get_work() } löschen"
-        return context
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_title', kwargs = {'pk': self.object.id})
 
 
 class WorkDetailView(generic.detail.DetailView):
@@ -723,31 +477,40 @@ class ManifestationDetailView(generic.detail.DetailView):
 
 class ManifestationCreateView(generic.edit.CreateView):
     model = Manifestation
-    fields = [
-            'rism_id',
-            'plate_number'
-        ]
-    template_name = 'edwoca/base_form.html'
+    form_class = ManifestationForm
+    template_name = 'edwoca/create.html'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_detail', kwargs = {'pk': self.object.id})
+        return reverse_lazy('edwoca:manifestation_update', kwargs = {'pk': self.object.id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Neue Manifestation anlegen"
-        context['button_label'] = "anlegen"
-        context['return_target'] = 'edwoca:index'
-        context['return_pk'] = None
+        if self.request.POST:
+            context['title_formset'] = ManifestationTitleFormSet(self.request.POST)
+        else:
+            ManifestationTitleFormSet.can_delete = False
+            context['title_form_set'] = ManifestationTitleFormSet()
         return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        title_formset = context['title_formset']
+
+        if title_formset.is_valid():
+            response = super().form_valid(form)
+            self.object = form.save()
+            title_formset.instance = self.object
+            title_formset.save()
+            self.object.save()
+            return response
+        else:
+            return self.form_invalid(form)
 
 
 class ManifestationUpdateView(generic.edit.UpdateView):
     model = Manifestation
-    fields = [
-            'rism_id',
-            'plate_number'
-        ]
-    template_name = 'edwoca/base_form.html'
+    form_class = ManifestationForm
+    template_name = 'edwoca/simple_form.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -760,136 +523,11 @@ class ManifestationUpdateView(generic.edit.UpdateView):
 
 class ManifestationDeleteView(generic.edit.DeleteView):
     model = Manifestation
-    success_url = reverse_lazy('edwoca:index')
-    template_name = 'edwoca/base_form.html'
+    success_url = reverse_lazy('edwoca:manifestation_list')
+    template_name = 'edwoca/simple_form.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Manifestation {self.object} löschen"
-        context['button_label'] = "löschen"
-        context['return_target'] = 'edwoca:index'
-        context['return_pk'] = None
-        return context
-
-
-class ManifestationRelationCreateView(generic.edit.CreateView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_detail', kwargs = {'pk': self.get_manifestation().id})
-
-    def get_form(self, form_class=None):
-        if form_class is None:
-            form_class = self.get_form_class()
-        form = super().get_form(form_class)
-        for entity in ['manifestation', 'source_manifestation']:
-            if entity in form.fields:
-                form.fields[entity].initial = self.get_manifestation()
-                form.fields[entity].widget = HiddenInput()
-                form.fields[entity].label = ''
-        return form
-
-    def get_manifestation(self):
-        return Manifestation.objects.get(id=self.kwargs['manifestation_id'])
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'anlegen'
-        return context
-
-
-class ItemRelationCreateView(generic.edit.CreateView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_detail', kwargs = {'pk': self.get_manifestation().id})
-
-    def get_form(self, form_class=None):
-        if form_class is None:
-            form_class = self.get_form_class()
-        form = super().get_form(form_class)
-        for entity in ['item', 'source_item']:
-            if entity in form.fields:
-                form.fields[entity].initial = self.get_expression()
-                form.fields[entity].widget = HiddenInput()
-                form.fields[entity].label = ''
-        return form
-
-    def get_item(self):
-        return Item.objects.get(id=self.kwargs['item_id'])
-
-    def get_manifestation(self):
-        return self.get_item().manifestation
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'anlegen'
-        return context
-
-
-class ManifestationRelationUpdateView(generic.edit.UpdateView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_detail', kwargs = {'pk': self.get_manifestation().id})
-
-    def get_manifestation(self):
-        try:
-            return self.object.manifestation
-        except:
-            return self.object.source_manifestation
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'speichern'
-        return context
-
-
-class ItemRelationUpdateView(generic.edit.UpdateView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_detail', kwargs = {'pk': self.get_manifestation().id})
-
-    def get_item(self):
-        try:
-            return self.object.item
-        except:
-            return self.object.source_item
-
-    def get_manifestation(self):
-        return self.get_item().manifestation
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'speichern'
-        return context
-
-
-class ManifestationRelationDeleteView(generic.edit.DeleteView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_detail', kwargs = {'pk': self.get_manifestation().id})
-
-    def get_manifestation(self):
-        try:
-            return self.object.manifestation
-        except:
-            return self.object.source_manifestation
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'löschen'
-        return context
-
-
-class ItemRelationDeleteView(generic.edit.DeleteView, ReturnButtonView):
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_detail', kwargs = {'pk': self.get_manifestation().id})
-
-    def get_item(self):
-        try:
-            return self.object.item
-        except:
-            return self.object.source_item
-
-    def get_manifestation(self):
-        return self.get_expression().manifestation
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['button_label'] = 'löschen'
         return context
 
 
@@ -911,52 +549,6 @@ class ItemContributorView(generic.edit.ModelFormMixin):
         ]
 
 
-class ManifestationContributorCreateView(ManifestationContributorView, ManifestationRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten für Manifestation { self.get_manifestation() } anlegen"
-        return context
-
-
-class ItemContributorCreateView(ManifestationContributorView, ManifestationRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten für Exemplar { self.get_item() } anlegen"
-        return context
-
-
-class ManifestationContributorUpdateView(ManifestationContributorView, ManifestationRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten { self.person } für Manifestation { self.get_manifestation() } bearbeiten"
-        return context
-
-
-class ItemContributorUpdateView(ManifestationContributorView, ManifestationRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten { self.person } für Exemplar { self.get_item() } bearbeiten"
-        return context
-
-
-class ManifestationContributorDeleteView(WorkRelationDeleteView):
-    model = WorkContributor
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten {self.object.person} an Manifestation {self.object.manifestation} löschen"
-        return context
-
-
-class ItemContributorDeleteView(WorkRelationDeleteView):
-    model = WorkContributor
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Beteiligten {self.object.person} am Item {self.object.item} löschen"
-        return context
-
-
 class RelatedManifestationView(generic.edit.ModelFormMixin):
     model = RelatedManifestation
     fields = [
@@ -965,27 +557,6 @@ class RelatedManifestationView(generic.edit.ModelFormMixin):
             'comment',
             'label'
         ]
-
-
-class RelatedManifestationCreateView(RelatedManifestationView, ManifestationRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Manifestationsrelation für {self.get_manifestation()} anlegen"
-        return context
-
-
-class RelatedManifestationUpdateView(RelatedManifestationView, ManifestationRelationUpdateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Manifestationsrelation zwischen {self.source_manifestation} und {self.target_manifestation} bearbeiten"
-        return context
-
-
-class RelatedManifestationDeleteView(RelatedManifestationView, ManifestationRelationDeleteView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Manifestationsrelation zwischen {self.source_manifestation} und {self.target_manifestation} löschen"
-        return context
 
 
 class ItemView(generic.edit.ModelFormMixin):
@@ -998,26 +569,6 @@ class ItemView(generic.edit.ModelFormMixin):
             'manifestation'
         ]
 
-class ItemCreateView(ItemView, ManifestationRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Exemplar für {self.get_manifestation()} anlegen"
-        return context
-
-
-class ItemUpdateView(ItemView, ManifestationRelationUpdateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Exemplar {self.object} von {self.get_manifestation()} bearbeiten"
-        return context
-
-
-class ItemDeleteView(ItemView, ManifestationRelationDeleteView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Exemplar {self.object} und {self.get_manifestation()} löschen"
-        return context
-
 
 class ProvenanceStateView(generic.edit.ModelFormMixin):
     model = ProvenanceState
@@ -1028,89 +579,13 @@ class ProvenanceStateView(generic.edit.ModelFormMixin):
         ]
 
 
-class ProvenanceStateCreateView(ProvenanceStateView, ItemRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Provenienzeintrag für {self.get_item()} anlegen"
-        return context
+class ManifestationTitleUpdateView(FormsetUpdateView):
+    model = Manifestation
+    form_class = ManifestationTitleFormSet
+    formset_property = 'titles'
 
-
-class ProvenanceStateUpdateView(ProvenanceStateView, ItemRelationUpdateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Provenienzeintrag von {self.person} für {self.get_item()} bearbeiten"
-        return context
-
-
-class ProvenanceStateDeleteView(ProvenanceStateView, ItemRelationDeleteView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Provenienzeintrag von {self.person} für {self.get_item()} löschen"
-        return context
-
-
-"""
-class ManifestationTitleView(generic.edit.ModelFormMixin):
-    model = ManifestationTitle
-    fields = [
-            'title',
-            'status',
-            'language',
-            'manifestation'
-        ]
-
-
-class ManifestationTitleCreateView(ManifestationTitleView, ManifestationRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel für Manifestation {self.get_manifestation()} anlegen"
-        return context
-
-
-class ManifestationTitleUpdateView(ManifestationTitleView, ManifestationRelationUpdateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel {self.object} für Manifestation {self.get_manifestation()} bearbeiten"
-        return context
-
-
-class ManifestationTitleDeleteView(ManifestationTitleView, ManifestationRelationDeleteView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel {self.object} für Manifestation {self.get_manifestation()} löschen"
-        return context
-
-
-class ItemTitleView(generic.edit.ModelFormMixin):
-    model = ItemTitle
-    fields = [
-            'title',
-            'status',
-            'language',
-            'item'
-        ]
-
-
-class ItemTitleCreateView(ItemTitleView, ItemRelationCreateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel für Exemplar {self.get_item()} anlegen"
-        return context
-
-
-class ItemTitleUpdateView(ItemTitleView, ItemRelationUpdateView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel {self.object} für Exemplar {self.get_item()} bearbeiten"
-        return context
-
-
-class ItemTitleDeleteView(ItemTitleView, ItemRelationDeleteView):
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Titel {self.object} für Exemplar {self.get_item()} löschen"
-        return context
-"""
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_title', kwargs = {'pk': self.object.id})
 
 
 def person_list(request):
@@ -1126,137 +601,190 @@ def work_list(request):
     return render('edwoca:index')
 
 
-#class WorkRelationsUpdateView(generic.edit.UpdateView):
-    #model = Work
-    #fields = []
-    #template_name = 'edwoca/work_relations.html'
-
-#class WorkContributorsUpdateView(generic.edit.UpdateView):
-    #model = Work
-    #fields = []
-    #template_name = 'edwoca/work_relations.html'
-
 class WorkRelatedWorksUpdateView(generic.edit.UpdateView):
     model = Work
     fields = []
     template_name = 'edwoca/work_related_works.html'
 
-class WorkHistoryUpdateView(generic.edit.UpdateView):
-    model = Work
-    form_class = WorkHistoryForm
-    template_name = 'edwoca/work_history.html'
+class SimpleFormView(generic.edit.UpdateView):
+    template_name = 'edwoca/simple_form.html'
+
+    def get_form_class(self):
+        class_name = f"{self.model.__name__}{self.property.capitalize()}Form"
+        return getattr(edwoca_forms, class_name)
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_history', kwargs={'pk': self.object.pk})
+        return reverse_lazy(f"edwoca:{self.model.__name__.lower()}_{self.property}", kwargs={'pk': self.object.pk})
 
-class WorkBibliographyUpdateView(generic.edit.UpdateView):
+
+class WorkHistoryUpdateView(SimpleFormView):
     model = Work
-    fields = []
-    template_name = 'edwoca/work_bibliography.html'
+    property = 'history'
+
+
+class ManifestationHistoryUpdateView(SimpleFormView):
+    model = Manifestation
+    property = 'history'
+
+
+class BibliographyUpdateView(generic.edit.UpdateView):
+    template_name = 'edwoca/bibliography.html'
+    instance = None  # wird im dispatch gesetzt
+
+    def get_form_class():
+        return getattr(edwoca_forms, f"{self.model.__name__}BibFormSet")
+
+    def dispatch(self, request, *args, **kwargs):
+        self.instance = get_object_or_404(self.model, pk=kwargs['pk'])
+        return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_bibliography', kwargs = {'pk': self.get_object().id})
+        return reverse_lazy(f"edwoca:{self.model.__name__.lower()}_bibliography", kwargs={'pk': self.instance.pk})
+
+    def get_form(self, form_class=None):
+        formset_class = getattr(edwoca_forms, f"{self.model.__name__}BibFormSet")
+        if self.request.method == 'POST':
+            return formset_class(self.request.POST, instance=self.instance)
+        return formset_class(instance=self.instance)
+
+    def form_valid(self, formset):
+        formset.save()
+        return super().form_valid(formset)
+
+    def form_invalid(self, formset):
+        return self.render_to_response(self.get_context_data(form=formset))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Bibliographie für Werk {self.object} bearbeiten"
-        if 'form' not in kwargs:
-            context['form'] = WorkBibFormSet(instance = self.object)
-        else:
-            context['form'] = kwargs['form']
+        context['object'] = self.instance
+        context['form'] = kwargs.get('form', self.get_form())
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
 
-        if 'add-form' in request.POST:
-            data = request.POST.copy()
-            total_forms = int(data.get('workbib_set-TOTAL_FORMS', 0))
-            data['workbib_set-TOTAL_FORMS'] = str(total_forms + 1)
-            form = WorkBibFormSet(data, instance=self.object)
-            return self.render_to_response(self.get_context_data(form=form))
-
-        formset = WorkBibFormSet(
-                request.POST,
-                instance = self.object,
-                queryset = WorkBib.objects.filter(work = self.object)
-            )
-        for form in formset:
-            if not form.instance.work:
-                form.instance.work = self.get_object()
-
-        if formset.is_valid():
-            for form in formset:
-                formset.instance.save()
-            return self.form_valid(formset)
-        else:
-            return self.form_invalid(formset)
-
-class WorkCommentUpdateView(generic.edit.UpdateView):
+class WorkBibliographyUpdateView(FormsetUpdateView):
     model = Work
-    form_class = WorkCommentForm
-    template_name = 'edwoca/work_comment.html'
+    form_class = WorkBibFormSet
+    property = 'bib'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_history', kwargs={'pk': self.object.pk})
+        return reverse_lazy('edwoca:work_bibliography_update', kwargs = {'pk': self.object.id})
 
 
-class RelatedWorkAddView(generic.edit.UpdateView):
-    model = Work
-    fields = []
-    template_name = 'edwoca/work_relations.html'
+class ManifestationBibliographyUpdateView(FormsetUpdateView):
+    model = Manifestation
+    form_class = ManifestationBibFormSet
+    property = 'bib'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_relations', kwargs={'pk': self.object.pk})
+        return reverse_lazy('edwoca:manifestation_bibliography_update', kwargs = {'pk': self.object.id})
+
+
+class WorkCommentUpdateView(SimpleFormView):
+    model = Work
+    property = 'comment'
+
+
+class ManifestationCommentUpdateView(SimpleFormView):
+    model = Manifestation
+    property = 'comment'
+
+
+class RelatedEntityAddView(generic.edit.FormView):
+
+    def get_form_name(self):
+        return f"{self.model.__name__}Form"
+
+    def get_model_name(self):
+        return self.model.__name__.lower().replace('related', '')
+
+    def get_form_class(self):
+        return getattr(edwoca_forms, self.get_form_name())
+
+    def get_success_url(self):
+        return reverse_lazy(f"edwoca:{self.get_model_name()}_relations", kwargs={'pk': self.kwargs['pk']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        kwargs['initial'] = {
+            f"source_{self.get_model_name()}": self.kwargs['pk'],
+            f"target_{self.get_model_name()}": self.kwargs[f"target_{self.get_model_name()}"],
+        }
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        model = getattr(edwoca_models, self.get_model_name().capitalize())
         context['show_search_form'] = False
-        if self.request.POST:
-            context['related_work_form'] = RelatedWorkForm(self.request.POST)
-        else:
-            context['related_work_form'] = RelatedWorkForm( initial = {
-                    'source_work': self.kwargs['pk'],
-                    'target_work': self.kwargs['target_work']
-                })
-        context['target_work'] = Work.objects.get(pk=self.kwargs['target_work'])
-
+        context[f"target_{self.get_model_name()}"] = model.objects.get(pk=self.kwargs[f"target_{self.get_model_name()}"])
+        context['object'] = model.objects.get(pk=self.kwargs["pk"])
         return context
 
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-
-        form = RelatedWorkForm(request.POST)
-
-        if form.is_valid():
-            form.instance.save()
-            return self.form_valid(form)
-        else:
-            return self.form_invalid(form)
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
 
 
-class RelatedWorkRemove(generic.DeleteView):
+class RelatedWorkAddView(RelatedEntityAddView):
+    template_name = 'edwoca/work_relations.html'
+    model = RelatedWork
+
+
+class RelatedManifestationAddView(RelatedEntityAddView):
+    template_name = 'edwoca/manifestation_relations.html'
+    model = RelatedManifestation
+
+
+class RelatedWorkRemoveView(generic.DeleteView):
     model = RelatedWork
 
     def get_success_url(self):
         return reverse_lazy('edwoca:work_relations', kwargs={'pk': self.object.source_work.id})
 
 
+class RelatedManifestationRemoveView(generic.DeleteView):
+    model = RelatedManifestation
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_work.id})
+
+
 class ExpressionRelationsUpdateView(RelationsUpdateView):
     template_name = 'edwoca/expression_relations.html'
     model = Expression
+    form_class = RelatedExpressionForm
 
 
-class RelatedExpressionAddView(generic.CreateView):
-    pass
+class RelatedExpressionAddView(RelatedEntityAddView):
+    template_name = 'edwoca/expression_relations.html'
+    model = RelatedExpression
 
 
 class RelatedExpressionRemoveView(generic.DeleteView):
-    pass
+    model = RelatedExpression
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:expression_relations', kwargs={'pk': self.object.source_work.id})
 
 
 class ExpressionHistoryUpdateView(generic.UpdateView):
+    model = Expression
+    form_class = ExpressionHistoryForm
+    template_name = 'edwoca/simple_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:expression_history', kwargs={'pk': self.object.pk})
+
+
+class ManifestationPrintUpdateView(generic.UpdateView):
     pass
+    #model = Manifestation
+    #property = 'print'
+
+
+class ManifestationClassificationUpdateView(SimpleFormView):
+    model = Manifestation
+    property = 'classification'
 
 
 class ExpressionCategorisationUpdateView(generic.UpdateView):
@@ -1267,12 +795,134 @@ class ExpressionMediumofperformanceUpdateView(generic.UpdateView):
     pass
 
 
-class ExpressionMovementsUpdateView(generic.UpdateView):
-    pass
+class ExpressionMovementsUpdateView(FormsetUpdateView):
+    model = Expression
+    form_class = MovementFormSet
+    template_name = 'edwoca/expression_movement.html'
+    formset_property = 'movements'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:expression_movement', kwargs={'pk': self.object.pk})
 
 
 class ExpressionCommentUpdateView(generic.UpdateView):
-    pass
+    model = Expression
+    form_class = ExpressionCommentForm
+    template_name = 'edwoca/simple_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:expression_history', kwargs={'pk': self.object.pk})
+
 
 class ExpressionDeleteView(generic.DeleteView):
+    model = Expression
+    template_name = 'edwoca/simple_form.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_update', kwargs={'pk': self.object.work.id})
+
+
+class ItemUpdateView(generic.UpdateView):
+    model = Item
+    form_class = ItemForm
+    template_name = 'edwoca/item_update.html'
+
+
+class ItemCreateView(generic.CreateView):
+    model = Item
+    form_class = ItemForm
+    template_name = 'edwoca/create.html'
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_update', kwargs = {'pk': self.object.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.request.POST:
+            context['title_formset'] = ItemTitleFormSet(self.request.POST)
+        else:
+            ItemTitleFormSet.can_delete = False
+            context['title_form_set'] = ItemTitleFormSet()
+        context['view_title'] = f"Neues Exemplar anlegen"
+        context['button_label'] = "speichern"
+        context['return_target'] = 'edwoca:index'
+        context['return_pk'] = None
+        return context
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        title_formset = context['title_formset']
+
+        instance = form.save(commit=False)
+        instance.manifestation = Manifestation.objects.get(id=self.kwargs['manifestation_id'])
+
+        if title_formset.is_valid():
+            instance.save()
+            self.object = form.save()
+            title_formset.instance = self.object
+            title_formset.save()
+            return redirect(self.get_success_url())
+        else:
+            return self.form_invalid(form)
+
+
+class ItemDeleteView(generic.DeleteView):
     pass
+
+
+class ItemLocationUpdateView(SimpleFormView):
+    model = Item
+    property = 'location'
+
+
+class ItemRelationsUpdateView(RelationsUpdateView):
+    template_name = 'edwoca/item_relations.html'
+    model = Item
+    form_class = RelatedItemForm
+
+
+class RelatedItemAddView(RelatedEntityAddView):
+    template_name = 'edwoca/item_relations.html'
+    model = RelatedItem
+
+
+class RelatedItemRemoveView(generic.DeleteView):
+    model = RelatedItem
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_relations', kwargs={'pk': self.object.source_item.id})
+
+
+class ItemContributorsUpdateView(ContributorsUpdateView):
+    model = Item
+
+
+class ItemProvenanceUpdateView(generic.UpdateView):
+    pass
+
+
+class ItemDetailsUpdateView(SimpleFormView):
+    model = Item
+    property = 'details'
+
+
+class ItemDescriptionUpdateView(SimpleFormView):
+    model = Item
+    property = 'description'
+
+
+class ItemDigcopyUpdateView(SimpleFormView):
+    model = Item
+    property = 'digcopy'
+
+
+class ItemCommentUpdateView(SimpleFormView):
+    model = Item
+    property = 'comment'
+
+
+class ItemDeleteView(generic.DeleteView):
+    model = Item
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_update', kwargs={'pk': self.object.work.id})
