@@ -50,10 +50,19 @@ class Work(models.Model):
         return ', '.join(alt_title.title for alt_title in self.titles.filter(status=Status.ALTERNATIVE))
 
     def get_pref_title(self):
-        try:
-            return self.titles.get(status=Status.PRIMARY).title
-        except:
-            return '<ohne Titel>'
+        primary_title = self.titles.filter(status = Status.PRIMARY).first()
+        if primary_title:
+            return primary_title.title
+
+        temporary_title = self.titles.filter(status = Status.TEMPORARY).first()
+        if temporary_title:
+            return f"{temporary_title.title} (T)"
+
+        alternative_title = self.titles.filter(status = Status.TEMPORARY).first()
+        if alternative_title:
+            return f"{alternative_title.title} (A)"
+
+        return '<ohne Titel>'
 
     def __str__(self):
         return f"{self.work_catalog_number}: {self.get_pref_title()}"
@@ -86,6 +95,54 @@ class Work(models.Model):
         return work
 
 
+class EventContributor(models.Model):
+    class Role(models.TextChoices):
+        COMPOSER = 'CP', _('Composer')
+        WRITER = 'WR', _('Writer')
+        TRANSLATOR = 'TR', _('Translator')
+        POET = 'PT', _('Poet')
+        DEDICATEE = 'DD', _('Dedicatee')
+
+    event = models.ForeignKey(
+        'Event',
+        on_delete=models.CASCADE
+    )
+    person = models.ForeignKey(
+        'dmad.Person',
+        on_delete=models.CASCADE
+    )
+    role = models.CharField(max_length=10, choices=Role, default=Role.COMPOSER)
+
+
+class ItemContributor(models.Model):
+    class Role(models.TextChoices):
+        COMPOSER = 'CP', _('Composer')
+        WRITER = 'WR', _('Writer')
+        TRANSLATOR = 'TR', _('Translator')
+        POET = 'PT', _('Poet')
+        DEDICATEE = 'DD', _('Dedicatee')
+
+    item = models.ForeignKey(
+        'Item',
+        on_delete=models.CASCADE,
+        #related_name='contributors'
+    )
+    person = models.ForeignKey(
+        'dmad.Person',
+        on_delete=models.CASCADE,
+        #related_name='contributed_to'
+    )
+    role = models.CharField(max_length=10, choices=Role, default=Role.COMPOSER)
+
+    def to_mei(self):
+        contributor = ET.Element('persName')
+        contributor.attrib['role'] = self.role
+        contributor.attrib['auth'] = 'GND'
+        contributor.attrib['auth.uri'] = 'd-nb.info/gnd'
+        contributor.attrib['codedval'] = self.person.gnd_id
+        contributor.text = self.person.name
+
+        return contributor
 class WorkContributor(models.Model):
     class Role(models.TextChoices):
         COMPOSER = 'CP', _('Composer')
@@ -115,6 +172,17 @@ class WorkContributor(models.Model):
         contributor.text = self.person.name
 
         return contributor
+
+
+class ManifestationBib(models.Model):
+    manifestation = models.ForeignKey(
+        'Manifestation',
+        on_delete=models.CASCADE
+    )
+    bib = models.ForeignKey(
+        'bib.ZotItem',
+        on_delete=models.CASCADE
+    )
 
 
 class WorkBib(models.Model):
@@ -187,15 +255,14 @@ class RelatedWork(models.Model):
         }
 
 
-class WorkTitle(models.Model):
+class WemiTitle(models.Model):
     class Meta:
         ordering = ['title']
+        abstract = True
 
     title = models.CharField(max_length=100)
     status = models.CharField(max_length=1,choices=Status,default=Status.PRIMARY)
     language = models.CharField(max_length=15, choices=Language, default=Language['DE'])
-    work = models.ForeignKey('Work', on_delete=models.CASCADE, related_name='titles')
-
 
     def __str__(self):
         return self.title
@@ -207,6 +274,14 @@ class WorkTitle(models.Model):
         title.text = self.title
         title.attrib['lang'] = to_iso639_1(self.language)
         return title
+
+
+class WorkTitle(WemiTitle):
+    work = models.ForeignKey('Work', on_delete=models.CASCADE, related_name='titles')
+
+
+class ItemTitle(WemiTitle):
+    item = models.ForeignKey('Item', on_delete=models.CASCADE, related_name='titles')
 
 
 class Key(models.Model):
@@ -368,6 +443,9 @@ class Expression(models.Model):
     manifestations = models.ManyToManyField(
             'Manifestation'
         )
+    comment = models.TextField(
+            null = True
+        )
 
 
     def __str__(self):
@@ -406,55 +484,34 @@ class RelatedExpression(models.Model):
         }
 
 
-class ExpressionTitle(models.Model):
-    class Meta:
-        ordering = ['title']
-
-    title = models.CharField(
-            max_length=100
-        )
-    status = models.CharField(
-            max_length=1,
-            choices=Status,
-            default=Status.PRIMARY
-        )
-    language = models.CharField(
-            max_length=15,
-            choices=Language,
-            default=Language['DE']
-        )
+class ExpressionTitle(WemiTitle):
     expression = models.ForeignKey(
             'Expression',
             on_delete=models.CASCADE,
             related_name='titles'
         )
-    gnd_id = models.CharField(
-            max_length=20,
-            unique=True,
-            null=True,
-            blank=True
-        )
-    history = models.TextField(
-            null = True,
-            blank = True
-        )
-    comment = models.TextField(
-            null = True
-        )
 
-    def __str__(self):
-        return self.title
 
-    def to_mei(self):
-        title = ET.Element('title')
-        if self.status == Status.ALTERNATIVE:
-            title.attrib['type'] = 'alternative'
-        title.text = self.title
-        title.attrib['lang'] = to_iso639_1(self.language)
-        return title
+class ManifestationTitle(WemiTitle):
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete=models.CASCADE,
+            related_name='titles'
+        )
 
 
 class Manifestation(models.Model):
+    class ManifestationType(models.TextChoices):
+        MANUSCRIPT = 'MS', _('Parent')
+
+    class EditionType(models.TextChoices):
+        PIANO_REDUCTION = 'PR', _('Piano Reduction')
+        SCORE = 'SC', _('Score')
+
+    class State(models.TextChoices):
+        COMPLETE= 'CP', _('complete')
+        INCOMPLETE= 'INC', _('incomplete')
+
     rism_id = models.CharField(
             unique=True,
             max_length=20,
@@ -466,7 +523,7 @@ class Manifestation(models.Model):
             null = True,
             blank = True
         )
-    period = models.ForeignKey(
+    period = models.OneToOneField(
             'dmad.Period',
             on_delete = models.SET_NULL,
             blank = True,
@@ -482,10 +539,85 @@ class Manifestation(models.Model):
             'dmad.Person',
             through = 'ManifestationContributor'
         )
-    manifestations = models.ManyToManyField(
+    related_manifestations = models.ManyToManyField(
             'Manifestation',
             through = 'RelatedManifestation'
         )
+    manifestation_type = models.CharField(
+            max_length=10,
+            choices=ManifestationType,
+            default=ManifestationType.MANUSCRIPT
+        )
+    edition_type = models.CharField(
+            max_length=10,
+            choices=EditionType,
+            default=EditionType.SCORE
+        )
+    state = models.CharField(
+            max_length=10,
+            choices=State,
+            default=State.COMPLETE
+        )
+    history = models.TextField(
+            blank = True,
+            null = True
+        )
+    comment = models.TextField(
+            null=True,
+            blank=True
+        )
+    bib = models.ManyToManyField(
+            'bib.ZotItem',
+            through = 'ManifestationBib'
+        )
+
+    def get_absolute_url(self):
+        return reverse('edwoca:manifestation_update', kwargs={'pk': self.id})
+
+    def get_pref_title(self):
+        primary_title = self.titles.filter(status = Status.PRIMARY).first()
+        if primary_title:
+            return primary_title.title
+
+        temporary_title = self.titles.filter(status = Status.TEMPORARY).first()
+        if temporary_title:
+            return f"{temporary_title.title} (T)"
+
+        alternative_title = self.titles.filter(status = Status.TEMPORARY).first()
+        if alternative_title:
+            return f"{alternative_title.title} (A)"
+
+        return '<ohne Titel>'
+
+    def __str__(self):
+        return f"{self.rism_id}: {self.get_pref_title()}"
+
+class Event(models.Model):
+    class Type(models.TextChoices):
+        PUBLISHED = 'PUB', _('Published')
+
+    period = models.OneToOneField(
+            'dmad.Period',
+            on_delete=models.SET_NULL,
+            null = True,
+            blank = True,
+            related_name = 'event'
+        )
+    event_type = models.CharField(
+            max_length=10,
+            choices=Type,
+            default=Type.PUBLISHED
+        )
+    contributors = models.ManyToManyField(
+            'dmad.Person',
+            through = 'EventContributor'
+        )
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete=models.SET_NULL,
+            null = True
+        )
+
 
 
 class RelatedManifestation(models.Model):
@@ -507,7 +639,11 @@ class RelatedManifestation(models.Model):
             null=True,
             blank=True
         )
-    label = models.CharField(max_length=2,choices=Label,default=Label.PARENT)
+    label = models.CharField(
+            max_length=2,
+            choices=Label,
+            default=Label.PARENT
+        )
 
 
 class Item(models.Model):
@@ -520,7 +656,7 @@ class Item(models.Model):
             null=True,
             blank=True
         )
-    history = models.TextField(
+    location = models.TextField(
             null = True,
             blank = True
         )
@@ -534,6 +670,33 @@ class Item(models.Model):
             on_delete = models.CASCADE,
             related_name = 'items'
         )
+    rism_id = models.CharField(
+            unique=True,
+            max_length=20,
+            null = True,
+            blank = True
+        )
+    comment = models.TextField(
+            null = True
+        )
+
+    def get_pref_title(self):
+        primary_title = self.titles.filter(status = Status.PRIMARY).first()
+        if primary_title:
+            return primary_title.title
+
+        temporary_title = self.titles.filter(status = Status.TEMPORARY).first()
+        if temporary_title:
+            return f"{temporary_title.title} (T)"
+
+        alternative_title = self.titles.filter(status = Status.TEMPORARY).first()
+        if alternative_title:
+            return f"{alternative_title.title} (A)"
+
+        return '<ohne Titel>'
+
+    def __str__(self):
+        return f"{self.rism_id}: {self.get_pref_title()}"
 
 
 class ProvenanceState(models.Model):
