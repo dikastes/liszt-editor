@@ -143,6 +143,8 @@ class ItemContributor(models.Model):
         contributor.text = self.person.name
 
         return contributor
+
+
 class WorkContributor(models.Model):
     class Role(models.TextChoices):
         COMPOSER = 'CP', _('Composer')
