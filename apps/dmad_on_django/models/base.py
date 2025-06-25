@@ -79,6 +79,9 @@ class DisplayableModel(models.Model):
                       tr(td(label), td(str(value) or "—"))
 
         return str(doc)
+    
+    def get_table(self):
+        raise NotImplemented("Please override get_table")
 
     
     class Meta:
