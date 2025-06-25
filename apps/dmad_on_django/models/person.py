@@ -151,7 +151,7 @@ class Person(DisplayableModel):
         self.geographic_area_codes.all().delete()
         PersonGeographicAreaCode.create_geographic_area_codes(self)
 
-        self.gnd_subject_category = GNDSubjectCategory.create_or_link(self.raw_data)
+        self.gnd_subject_category = GNDSubjectCategory.create_or_link(loads(self.raw_data))
 
     def fetch_raw(self):
         trials = max_trials
