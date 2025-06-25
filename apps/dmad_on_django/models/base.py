@@ -1,9 +1,4 @@
-<<<<<<< HEAD
-from django.db.models import TextChoices, Model, CharField
-=======
-from django.db.models import TextChoices, Model
 from django.db import models
->>>>>>> 16-create-crud-process-for-subject-terms
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from iso639 import data as iso639_data
@@ -18,11 +13,11 @@ Language = {key: languages[key] for key in ['DE', 'FR', 'HU', 'EN']}
 for key in languages:
     Language[key] = languages[key]
 
-class Status(TextChoices):
+class Status(models.TextChoices):
     PRIMARY = 'P', _('Primary')
     ALTERNATIVE = 'A', _('Alternative')
 
-class DisplayableModel(Model):
+class DisplayableModel(models.Model):
     
     raw_data = models.TextField(null=True)
     rework_in_gnd = models.BooleanField(default=False)
@@ -59,9 +54,9 @@ class DisplayableModel(Model):
     class Meta:
         abstract = True
         
-class GNDSubjectCategory(Model):
-    link = CharField(max_length=200,unique=True)
-    label = CharField(max_length=50)
+class GNDSubjectCategory(models.Model):
+    link = models.CharField(max_length=200,unique=True)
+    label = models.CharField(max_length=50)
 
     @staticmethod
     def create_or_link(json):
