@@ -17,6 +17,31 @@ class Status(models.TextChoices):
     PRIMARY = 'P', _('Primary')
     ALTERNATIVE = 'A', _('Alternative')
 
+class GNDSubjectCategory(models.Model):
+    link = models.CharField(max_length=200,unique=True)
+    label = models.CharField(max_length=50)
+
+    @staticmethod
+    def create_or_link(json):
+        category = json['gndSubjectCategory'][0]
+
+        try:
+            return GNDSubjectCategory.objects.get(link=category['id'])
+        except GNDSubjectCategory.DoesNotExist:
+            subjectcategory = GNDSubjectCategory()
+            subjectcategory.link = category['id']
+            subjectcategory.label = category['label']
+            subjectcategory.save()
+            return subjectcategory
+
+    def get_subject_category_table(entity):
+        
+        return [("GND Sachgruppe",
+                  f'<a href="{entity.link}"target = "_blank" class = "link link-primary">{entity.label}</a>')]
+
+    def __str__(self):
+        return self.label
+    
 class DisplayableModel(models.Model):
     
     raw_data = models.TextField(null=True)
@@ -27,6 +52,11 @@ class DisplayableModel(models.Model):
         max_length=150,
         null=True,
         blank=True
+    )
+    gnd_subject_category = models.ForeignKey(
+        GNDSubjectCategory,
+        on_delete=models.SET_NULL,
+        null=True
     )
 
     def render_raw(self):
@@ -54,22 +84,3 @@ class DisplayableModel(models.Model):
     class Meta:
         abstract = True
         
-class GNDSubjectCategory(models.Model):
-    link = models.CharField(max_length=200,unique=True)
-    label = models.CharField(max_length=50)
-
-    @staticmethod
-    def create_or_link(json):
-        category = json['gndSubjectCategory'][0]
-
-        try:
-            return GNDSubjectCategory.objects.get(link=category['id'])
-        except GNDSubjectCategory.DoesNotExist:
-            subjectcategory = GNDSubjectCategory()
-            subjectcategory.link = category['id']
-            subjectcategory.label = category['label']
-            subjectcategory.save()
-            return subjectcategory
-        
-    def __str__(self):
-        return self.label

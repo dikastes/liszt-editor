@@ -31,11 +31,6 @@ class SubjectTermName(models.Model):
         )
 
 class Subjectterm(DisplayableModel):
-    gnd_subject_category = models.ForeignKey(
-        GNDSubjectCategory,
-        on_delete=models.SET_NULL,
-        null=True
-    )
 
     parent_subjects = models.ManyToManyField('self', blank=True, symmetrical=False)
     
@@ -136,10 +131,8 @@ class Subjectterm(DisplayableModel):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
 
     def get_table(self):
-            category_label = self.gnd_subject_category.label
-            category_link = self.gnd_subject_category.link
-            return [("GND-Sachgruppe",
-                    f'<a href="{category_link}"target = "_blank" class = "link link-primary">{category_label}</a>')] +\
+            
+            return GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category) +\
             self.get_parrent_subject_table()
     
     def get_overview_title(self):

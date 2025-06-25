@@ -3,7 +3,7 @@ from django.urls import reverse
 from json import dumps, loads
 import requests
 
-from .base import Status, Language, max_trials, DisplayableModel
+from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
 from .place import Place
 from .geographicareacodes import PersonGeographicAreaCode
 from pylobid.pylobid import PyLobidPerson, GNDAPIError
@@ -151,6 +151,8 @@ class Person(DisplayableModel):
         self.geographic_area_codes.all().delete()
         PersonGeographicAreaCode.create_geographic_area_codes(self)
 
+        self.gnd_subject_category = GNDSubjectCategory.create_or_link(self.raw_data)
+
     def fetch_raw(self):
         trials = max_trials
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
@@ -195,13 +197,12 @@ class Person(DisplayableModel):
             ("Sterbedatum", self.death_date),
             ("Charakteristischer Beruf", "todo"),
             ]+\
-            PersonGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
+            PersonGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
+            GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category)
 
             if(len(self.activity_places.all()) > 0):
                 for place in self.activity_places.all():
                     rows.append(("Wirkungsort", str(place)))
-
-            
 
             return rows
     
