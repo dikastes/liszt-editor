@@ -48,3 +48,11 @@ class PersonGeographicAreaCode(GeographicAreaCode):
         related_name='geographic_area_codes',
         null=True
     )
+
+class WorkGeographicAreaCode(GeographicAreaCode):
+    work = models.ForeignKey(
+        'Work',
+        on_delete=models.CASCADE,
+        related_name='geographic_area_codes',
+        null=True
+    )

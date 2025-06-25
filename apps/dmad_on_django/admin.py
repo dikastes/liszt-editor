@@ -1,6 +1,5 @@
 from django.contrib import admin
-from .models import Person, PersonName, Place, PlaceName
-
+from .models import Person, PersonName, Place, PlaceName, Subjectterm, SubjectTermName, Status, GNDSubjectCategory, Work
 # Register your models here.
 class PlaceNameInline(admin.TabularInline):
     model = PlaceName
@@ -23,3 +22,25 @@ def update_from_gnd(modeladmin, request, queryset):
 class PersonAdmin(admin.ModelAdmin):
     inlines = [PersonNameInline]
     actions = [update_from_gnd]
+
+@admin.register(Subjectterm)
+class SubjectTermAdmin(admin.ModelAdmin):
+    inlines = [SubhjectTermInline]
+    actions = [update_from_gnd]
+    readonly_fields = ['show_parents']
+
+    def show_parents(self, obj):
+        return ", ".join(p.__str__() for p in obj.parent_subjects.all())
+
+    show_parents.short_description = "Parent subject list"
+
+@admin.register(GNDSubjectCategory)
+class GNDSubjectCategoryAdmin(admin.ModelAdmin):
+    pass
+
+@admin.register(Work)
+class WorkAdmin(admin.ModelAdmin):
+    pass
+    
+
+    

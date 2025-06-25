@@ -1,4 +1,4 @@
-from django.db.models import TextChoices, Model
+from django.db.models import TextChoices, Model, CharField
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from iso639 import data as iso639_data
@@ -39,3 +39,23 @@ class DisplayableModel(Model):
     
     class Meta:
         abstract = True
+        
+class GNDSubjectCategory(Model):
+    link = CharField(max_length=200,unique=True)
+    label = CharField(max_length=50)
+
+    @staticmethod
+    def create_or_link(json):
+        category = json['gndSubjectCategory'][0]
+
+        try:
+            return GNDSubjectCategory.objects.get(link=category['id'])
+        except GNDSubjectCategory.DoesNotExist:
+            subjectcategory = GNDSubjectCategory()
+            subjectcategory.link = category['id']
+            subjectcategory.label = category['label']
+            subjectcategory.save()
+            return subjectcategory
+        
+    def __str__(self):
+        return self.label
