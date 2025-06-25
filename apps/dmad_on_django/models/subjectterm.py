@@ -157,7 +157,10 @@ class Subjectterm(DisplayableModel):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
 
     def get_table(self):
-            return [("GND-Sachgruppe", self.gnd_subject_category.label)] +\
+            category_label = self.gnd_subject_category.label
+            category_link = self.gnd_subject_category.link
+            return [("GND-Sachgruppe",
+                    f'<a href="{category_link}"target = "_blank" class = "link link-primary">{category_label}</a>')] +\
             self.get_parrent_subject_table()
     
     def get_overview_title(self):
