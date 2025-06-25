@@ -26,18 +26,18 @@
                         <li>
                             <button id="stub-toggle"> Rumpfdatensätze </button>
                             {% if type == 'rework' %}
-                                <a href="{% url 'dmad_on_django:place_list' %}" class="active"> nachbearbeiten ({{ rework_count }}) </a> 
+                                <a href="{% url 'dmad_on_django:subjectterm_list' %}" class="active"> nachbearbeiten ({{ rework_count }}) </a> 
                             {% else %}
-                                <a href="{% url 'dmad_on_django:place_list' 'rework' %}"> nachbearbeiten ({{ rework_count }}) </a> 
+                                <a href="{% url 'dmad_on_django:subjectterm_list' 'rework' %}"> nachbearbeiten ({{ rework_count }}) </a> 
                             {% endif %}
                         </li>
                     {% endif %}
                     {% if stub_count > 0 %}
                         <li>
                             {% if type == 'stub' %}
-                                <a href="{% url 'dmad_on_django:place_list' %}" class="active"> Rumpfdatensätze ({{ stub_count }})</a>
+                                <a href="{% url 'dmad_on_django:subjectterm_list' %}" class="active"> Rumpfdatensätze ({{ stub_count }})</a>
                             {% else %}
-                                <a href="{% url 'dmad_on_django:place_list' 'stub' %}"> Rumpfdatensätze ({{ stub_count }})</a>
+                                <a href="{% url 'dmad_on_django:subjectterm_list' 'stub' %}"> Rumpfdatensätze ({{ stub_count }})</a>
                             {% endif %}
                         </li>
                     {% endif %}
@@ -57,18 +57,18 @@
 			<li>
 			    <button id="stub-toggle"> Rumpfdatensätze </button>
 			    {% if type == 'rework' %}
-				<a href="{% url 'dmad_on_django:person_list' %}" class="active" > nachbearbeiten ({{ rework_count }}) </a> 
+				<a href="{% url 'dmad_on_django:subjectterm_list' %}" class="active" > nachbearbeiten ({{ rework_count }}) </a> 
 			    {% else %}
-				<a href="{% url 'dmad_on_django:person_list' 'rework' %}" > nachbearbeiten ({{ rework_count }}) </a> 
+				<a href="{% url 'dmad_on_django:subjectterm_list' 'rework' %}" > nachbearbeiten ({{ rework_count }}) </a> 
 			    {% endif %}
 			</li>
 		    {% endif %}
 		    {% if stub_count > 0 %}
 			<li>
 			    {% if type == 'stub' %}
-				<a href="{% url 'dmad_on_django:person_list' %}" class="active"> Rumpfdatensätze ({{ stub_count }})</a>
+				<a href="{% url 'dmad_on_django:subjectterm_list' %}" class="active"> Rumpfdatensätze ({{ stub_count }})</a>
 			    {% else %}
-				<a href="{% url 'dmad_on_django:person_list' 'stub' %}"> Rumpfdatensätze ({{ stub_count }})</a>
+				<a href="{% url 'dmad_on_django:subjectterm_list' 'stub' %}"> Rumpfdatensätze ({{ stub_count }})</a>
 			    {% endif %}
 			</li>
 		    {% endif %}
@@ -86,9 +86,9 @@
     {% if not type %}
     <form
         method="get"
-        action="{% url 'dmad_on_django:place_list' %}"
+        action="{% url 'dmad_on_django:subjectterm_list' %}"
         class="m-0"
-        hx-get="{% url 'dmad_on_django:place_list' %}"
+        hx-get="{% url 'dmad_on_django:subjectterm_list' %}"
         hx-target="#search-results"
         hx-trigger="input"
         hx-push-url="true"
@@ -97,7 +97,7 @@
         <input class="btn" type="submit" value="Suchen" />
     </form>
     {% endif %}
-    <a href="{% url 'dmad_on_django:place_create' %}" class="btn btn-primary"> Datensatz anlegen </a>
+    <a href="{% url 'dmad_on_django:subjectterm_create' %}" class="btn btn-primary"> Datensatz anlegen </a>
 {% endblock %}
 
 

@@ -6,7 +6,7 @@ from haystack.generic_views import SearchView
 from json import dumps
 from django.http import JsonResponse
 import dmad_on_django.models as dmad_models
-from dmad_on_django.models import Person, Work, Place
+from dmad_on_django.models import Person, Work, Place, Subjectterm
 from dmad_on_django.forms import formWidgets
 
 def search_gnd(request, search_string, entity_type):
@@ -57,6 +57,7 @@ class NavbarContextMixin:
             'person_count': Person.objects.count(),
             'work_count': Work.objects.count(),
             'place_count': Place.objects.count(),
+            'subjectterm_count': Subjectterm.objects.count()
         })
         return context
     

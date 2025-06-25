@@ -7,6 +7,9 @@ class PlaceNameInline(admin.TabularInline):
 class PersonNameInline(admin.TabularInline):
     model = PersonName
 
+class SubhjectTermInline(admin.TabularInline):
+    model = SubjectTermName
+
 @admin.register(Place)
 class PlaceAdmin(admin.ModelAdmin):
     inlines = [PlaceNameInline]

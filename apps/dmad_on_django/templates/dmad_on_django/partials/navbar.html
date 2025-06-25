@@ -17,4 +17,10 @@
             Orte <span class="badge">{{ place_count }}</span>
         </a>
     </li>
+    <li>
+        <a href="{% url 'dmad_on_django:subjectterm_list' %}"
+           class="{% if active == 'subjectterm' %}active{% endif %}">
+            Sachschlagworte <span class="badge">{{ subjectterm_count }}</span>
+        </a>
+    </li>
 </ul>

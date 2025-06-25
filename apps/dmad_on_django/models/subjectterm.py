@@ -1,10 +1,38 @@
 from django.db import models
 from django.urls import reverse
+<<<<<<< HEAD
 from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
+=======
+from .base import Status, Language, max_trials, DisplayableModel
+>>>>>>> 16-create-crud-process-for-subject-terms
 from json import loads, dumps
 from pylobid.pylobid import PyLobidClient, GNDAPIError
 import requests
 
+<<<<<<< HEAD
+=======
+
+class GNDSubjectCategory(models.Model):
+    link = models.CharField(max_length=200,unique=True)
+    label = models.CharField(max_length=50)
+
+    @staticmethod
+    def create_or_link(json):
+        category = json['gndSubjectCategory'][0]
+
+        try:
+            return GNDSubjectCategory.objects.get(link=category['id'])
+        except GNDSubjectCategory.DoesNotExist:
+            subjectcategory = GNDSubjectCategory()
+            subjectcategory.link = category['id']
+            subjectcategory.label = category['label']
+            subjectcategory.save()
+            return subjectcategory
+        
+    def __str__(self):
+        return self.label
+
+>>>>>>> 16-create-crud-process-for-subject-terms
 class SubjectTermName(models.Model):
     name = models.CharField(max_length=40)
     status = models.CharField(
@@ -113,7 +141,11 @@ class Subjectterm(DisplayableModel):
 
     @staticmethod
     def search(search_string):
+<<<<<<< HEAD
         lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:SubjectHeading)&size=5&format=json:suggest"
+=======
+        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:AuthorityResource)&size=5&format=json:suggest"
+>>>>>>> 16-create-crud-process-for-subject-terms
         lobid_response = requests.get(lobid_url)
         return lobid_response.json()
         
