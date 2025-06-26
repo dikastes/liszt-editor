@@ -21,9 +21,9 @@ from .work import (
 )
 
 from .subjectterm import (
-    SubjecttermSearchView, SubjecttermCreateView, SubjecttermUpdateView,
-    SubjecttermDeleteView, SubjecttermLinkView, SubjecttermUnlinkView,
-    SubjecttermPullView, subjectterm_list
+    SubjectTermSearchView, SubjectTermCreateView, SubjectTermUpdateView,
+    SubjectTermDeleteView, SubjectTermLinkView, SubjectTermUnlinkView,
+    SubjectTermPullView, subject_term_list
 )
 
 __all__ = [
@@ -47,8 +47,8 @@ __all__ = [
     "WorkDeleteView", "WorkLinkView", "WorkUnlinkView", "WorkPullView",
     "work_list",
 
-    # Subjectterm vies
-    "SubjecttermSearchView", "SubjecttermCreateView", "SubjecttermUpdateView",
-    "SubjecttermDeleteView", "SubjecttermLinkView", "SubjecttermUnlinkView", "SubjecttermPullView",
-    "subjectterm_list"
+    # SubjectTerm vies
+    "SubjectTermSearchView", "SubjectTermCreateView", "SubjectTermUpdateView",
+    "SubjectTermDeleteView", "SubjectTermLinkView", "SubjectTermUnlinkView", "SubjectTermPullView",
+    "subjectTerm_list"
 ]
