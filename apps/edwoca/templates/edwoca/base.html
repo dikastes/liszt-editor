@@ -1,4 +1,5 @@
 {% load static %}
+{% load django_htmx %}
 
 <html data-theme="liszt">
     <head>
@@ -7,50 +8,56 @@
 	<link rel="stylesheet" href="{% static 'edwoca/sumoselect.css' %}" crossorigin="anonymous" />
     </head>
 
-    <body>
-	<div class="navbar bg-base-800 mb-10">
-	    <div class="flex-1">
-		<a class="btn btn-ghost text-xl" href="{% url 'edwoca:index' %}">edwoca</a>
-	    </div>
-	    <div class="flex-none gap-2">
-		<div class="form-control">
-		    <input type="text" placeholder="Suchen" class="input input-bordered w-24 md:w-auto" id="search-field" />
+    <body hx-ext="preload">
+	<div class="container w-full max-w-7xl mx-auto my-10">
+	    <div class="navbar bg-white border border-base-600 shadow mb-10 flex">
+		<div class="flex-none">
+		    <a class="btn btn-ghost text-xl" href="{% url 'edwoca:index' %}">edwoca</a>
 		</div>
-		<div class="dropdown dropdown-end">
-		    <div tabindex="0" role="button" class="btn btn-ghost rounded-btn">neu</div>
-		    <ul
-		        tabindex="0"
-		        class="menu dropdown-content bg-base-100 rounded-box z-[1] mt-4 w-52 p-2 shadow">
-		        <li>
-			    <a href="{% url 'edwoca:work_create' %}">Werk</a>
-			</li>
-		        <li>
-			    <a href="{% url 'edwoca:manifestation_create' %}">Quelle</a>
-			</li>
-		    </ul>
+		<div class="flex-1 text-lg text-gray-600">
+		    {% block navbar_title %}
+		    {% endblock %}
+		</div>
+		<div class="flex-none gap-2">
+		    {% block navbar_extras %}
+		    {% endblock %}
+		    <div class="dropdown dropdown-end">
+			<div tabindex="0" role="button" class="btn btn-primary rounded-btn">neu</div>
+			<ul
+			    tabindex="0"
+			    class="menu dropdown-content rounded-box z-[1] mt-4 w-52 p-2 shadow">
+			    <li>
+				<a href="{% url 'edwoca:work_create' %}">Werk</a>
+			    </li>
+			    <li>
+				<a href="{% url 'edwoca:manifestation_create' %}">Quelle</a>
+			    </li>
+			</ul>
+		    </div>
 		</div>
 	    </div>
-	</div>
-	<div class="container w-full max-w-7xl mx-auto my-10 prose flex">
-	    <div class="flex-0">
-		{% block menu %}
-		{% endblock %}
-	    </div>
-	    <div class="flex-1">
-		{% block content %}
-		{% endblock %}
-	    </div>
-	    <div class="flex-0">
-		{% block nav %}
-		{% endblock %}
+	    <div class="flex gap-10">
+		<div class="flex-0">
+		    {% block menu %}
+		    {% endblock %}
+		</div>
+		<div class="flex-1 min-w-0">
+		    {% block content %}
+		    {% endblock %}
+		</div>
+		<div class="flex-0">
+		    {% block nav %}
+		    {% endblock %}
+		</div>
 	    </div>
 	</div>
 
 	<!-- jquery.js -->
+	<script src="/static/django_htmx/htmx.min.js"></script>
+	<script src="{% static 'edwoca/htmx-preload.js' %}"></script>
 	<script src="{% static 'edwoca/jquery-3.7.1.min.js' %}"></script>
 	<script src="https://cdn.rawgit.com/ichord/Caret.js/master/dist/jquery.caret.min.js"></script>
 	<script src="https://cdn.rawgit.com/ichord/At.js/master/dist/js/jquery.atwho.min.js"></script>
 	<script src="{% static 'edwoca/sumoselect.js' %}"></script>
-	<script src="{% static 'edwoca/editor.js' %}"></script>
     </body>
 </html>

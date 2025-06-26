@@ -1,0 +1,44 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+{% include 'edwoca/partials/work_menu.html' %}
+{% endblock %}
+
+{% block navbar_title %}
+
+{% include 'edwoca/partials/title.html' %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5">
+	<h2 class="card-title mt-0"> {{ object }} bearbeiten </h2>
+
+	<form method="post">
+		{% csrf_token %}
+		{{ form.as_daisy }}
+
+		<input id="submit-form" type="submit" value="{{ button_label }}" class="hidden">
+	</form>
+	
+	<div>
+		ToDo: WV-Konkordanz
+	</div>
+</div>
+
+{% endblock %}
+
+{% block nav %}
+<div class="flex flex-col h-full">
+	<div class="flex-1">
+		-- Navigation --
+	</div>
+	<div class="flex-0">
+		<label for="submit-form" class="btn btn-primary"> speichern </label>
+	</div>
+</div>
+{% endblock %}
+
+{% block navbar_extras %}
+{% endblock %}

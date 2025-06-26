@@ -12,18 +12,25 @@
 	<div class="card-body">
 		<h2 class="card-title mt-0"> {{ view_title }} </h2>
 
-		title_form_set
-		{{ title_form_set }}
-		for form in form_set
-		{% for form in title_form_set %}
-			{{ form }}
-		{% endfor %}
 		<form method="post">
 			{% csrf_token %}
+			{% for form in title_form_set %}
+				{{ form }}
+			{% endfor %}
 			{{ form }}
 
 			<input type="submit" value="{{ button_label }}" class="btn btn-primary my-5">
 		</form>
 </div>
 
+{% endblock %}
+
+{% block navbar_extras %}
+	<div class="form-control">
+		<form>
+			{{ searchform }}
+			<input type="submit" class="btn">
+		</form>
+			<input type="text" placeholder="Suchen" class="input input-bordered w-24 md:w-auto" id="search-field" />
+	</div>
 {% endblock %}

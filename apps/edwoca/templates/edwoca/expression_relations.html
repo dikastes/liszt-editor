@@ -1,0 +1,117 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+{% include 'edwoca/partials/expression_menu.html' %}
+{% endblock %}
+
+{% block navbar_title %}
+
+{% include 'edwoca/partials/title.html' %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Werk </h2>
+
+		<a href="{% url 'edwoca:work_relations' object.work.id %}"> {{ object.work }} </a>
+	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Quellen </h2>
+
+		<ul>
+		{% for manifestation in object.manifestations.all %}
+			<li>
+				<div class="flex">
+					<a href="{% url 'edwoca:manifestation_update' manifestation.id %}" class="flex-1">
+						{{ manifestation }}
+					</a>
+					<form method="post" action="{% url 'edwoca:manifestation_relation_remove' object.id manifestation.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Quellen verknüpft </em> <span class="badge badge-primary">!</span> </li>
+		{% endfor %}
+		</ul>
+
+		<h3> neue Quelle verknüpfen </h3>
+
+		{% if show_search_form == True %}
+
+		<form action="{% url 'edwoca:expression_relations' object.id %}" method="get">
+			{{ searchform.q }}
+			<input type="hidden" name="target_model" value="manifestation">
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+		
+		<ul>
+		{% if query %}
+			{% for found_manifestation in found_manifestations %}
+				<li>
+					<a href="{% url 'edwoca:related_manifestation_add' object.id found_manifestation.object.id %}">
+						{{ found_manifestation.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+
+		{% else %}
+
+		<form method="post">
+			{% csrf_token %}
+			{{ object }} mit {{ target_manifestation }} verknüpfen als:
+			{{ related_manifestation_form }}
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+
+		{% endif %}
+
+		{% comment %}
+		<a href="{% url 'edwoca:manifestation_create' %}" class="btn btn-primary"> neue Quelle anlegen </a>
+		{% endcomment %}
+	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5">
+	<div class="prose">
+		<h2> Expressionen </h2>
+
+		<ul>
+		{% for expression in object.expressions.all %}
+			<li>
+				<a href="{% url 'edwoca:expression_update' expression.id %}">
+					{{ expression }}
+				</a>
+			</li>
+		{% empty %}
+			<li> <em> keine Expressionen verknüpft </li>
+		{% endfor %}
+		</ul>
+
+		<a href="{% url 'edwoca:expression_create' object.id %}" class="btn btn-primary"> neue Expression anlegen </a>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block nav %}
+<div class="flex flex-col h-full">
+	-- Navigation --
+</div>
+{% endblock %}
+
+{% block navbar_extras %}
+{% endblock %}
