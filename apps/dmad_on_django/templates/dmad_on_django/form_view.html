@@ -52,49 +52,8 @@
 	    </div>
 	    <div class="collapse collapse-plus">
 	        <input type="checkbox"/>
-	        <div class="collapse-title">Biografie</div>
-		<div class="collapse-content">
-		    <table class="table table-zebra">
-			<tr>
-			    <td> Ländercode </td>
-			    <td> {{ object.geographic_area_code }} </td>
-			</tr>
-			<tr>
-			    <td> Geschlecht </td>
-			    <td> {{ object.gender }} </td>
-			</tr>
-			<tr>
-			    <td> Geburtsort </td>
-			    <td> {{ object.birth_place }} </td>
-			</tr>
-			<tr>
-			    <td> Sterbeort </td>
-			    <td> {{ object.death_place }} </td>
-			</tr>
-			{% for activity_place in object.activity_places.all %}
-			    <tr>
-				<td> Wirkungsort </td>
-				<td> {{ activity_place }} </td>
-			    </tr>
-			{% endfor %}
-			<tr>
-			    <td> Geburtsdatum </td>
-			    <td> {{ object.brith_date }} </td>
-			</tr>
-			<tr>
-			    <td> Sterbedatum </td>
-			    <td> {{ object.death_date }} </td>
-			</tr>
-			<tr>
-			    <td> charakteristischer Beruf </td>
-			    <td> todo </td>
-			</tr>
-			<tr>
-			    <td> todo </td>
-			    <td> {{ object.gnd_id }} </td>
-			</tr>
-		    </table>
-		</div>
+	        <div class="collapse-title">{{object.get_overview_title}}</div>
+			{{object.as_daisy|safe}}
 	    </div>
 	</div>
 	<input type="radio" class="tab" aria-label="Rohdaten" name="data-raw-toggle" >
@@ -114,58 +73,38 @@
     </div>
     {% endif %}
 </div>
+{% with prefix='dmad_on_django:'|add:entity_type %}
 <div class="flex-0 flex flex-col">
     <div class="flex-1"></div>
     <ul class="menu gap-5 flex-0">
-	<li>
-	    <a class="btn" href="{% url 'dmad_on_django:person_create' %}">
-		Datensatz anlegen
-	    </a>
-	</li>
-	{% if object.gnd_id %}
-	    <li>
-		<a class="btn" href="{% url 'dmad_on_django:person_unlink' object.id %}">
-		    GND-Verknüpfung aufheben
-		</a>
-	    </li>
-	{% else %}
-	    <li> 
-		<a class="btn" href="{% url 'dmad_on_django:person_link' object.id %}">
-		    GND-Datensatz verknüpfen
-		</a>
-	    </li>
-	{% endif %}
-	<li>
-	    <label class="btn btn-primary" for="submit-form"> speichern </label>
-	</li>
+        <li>
+            <a class="btn" href="{% url prefix|add:'_create' %}">
+                Datensatz anlegen
+            </a>
+        </li>
+        {% if object.gnd_id %}
+            <li>
+                <a class="btn" href="{% url prefix|add:'_unlink' object.id %}">
+                    GND-Verknüpfung aufheben
+                </a>
+            </li>
+        {% else %}
+            <li>
+                <a class="btn" href="{% url prefix|add:'_link' object.id %}">
+                    GND-Datensatz verknüpfen
+                </a>
+            </li>
+        {% endif %}
+		<li>
+			<label class="btn btn-primary" for="submit-form"> Speichern </label>
+		</li>
     </ul>
 </div>
+{% endwith %}
+
 
 {% endblock %}
 
-{% block menu %}
-<ul class="menu menu-lg">
-    <li>
-	<a href="{% url 'dmad_on_django:person_list' %}">
-	    Personen 
-	</a>
-    </li>
-    {% comment %}
-    <li>
-	<a href="{% url 'dmad_on_django:org_list' %}">
-	    Korporationen
-	</a>
-    </li>
-    <li>
-	<a href="{% url 'dmad_on_django:place_list' %}">
-	    Orte
-	</a>
-    </li>
-    {% endcomment %}
-    <li>
-	<a href="{% url 'dmad_on_django:work_list' %}">
-	    Werke
-	</a>
-    </li>
-</ul>
-{% endblock %}
+{%block menu%}
+{%include 'dmad_on_django/partials/navbar.html'%}
+{%endblock%}

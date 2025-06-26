@@ -1,0 +1,26 @@
+<ul class="menu menu-lg">
+    <li>
+        <a href="{% url 'dmad_on_django:person_list' %}"
+           class="{% if active == 'person' %}active{% endif %}">
+            Personen <span class="badge">{{ person_count }}</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'dmad_on_django:work_list' %}"
+           class="{% if active == 'work' %}active{% endif %}">
+            Werke <span class="badge">{{ work_count }}</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'dmad_on_django:place_list' %}"
+           class="{% if active == 'place' %}active{% endif %}">
+            Orte <span class="badge">{{ place_count }}</span>
+        </a>
+    </li>
+    <li>
+        <a href="{% url 'dmad_on_django:subject_term_list' %}"
+           class="{% if active == 'subjectterm' %}active{% endif %}">
+            Sachschlagworte <span class="badge">{{ subjectterm_count }}</span>
+        </a>
+    </li>
+</ul>

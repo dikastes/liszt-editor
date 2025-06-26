@@ -8,3 +8,4 @@ pylobid
 django-htmx
 django-haystack
 whoosh
+dominate

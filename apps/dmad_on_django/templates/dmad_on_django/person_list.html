@@ -22,7 +22,6 @@
 		<ul>
 		    {% if rework_count > 0 %}
 			<li>
-			    <button id="stub-toggle"> Rumpfdatensätze </button>
 			    {% if type == 'rework' %}
 				<a href="{% url 'dmad_on_django:person_list' %}" class="active" > nachbearbeiten ({{ rework_count }}) </a> 
 			    {% else %}
@@ -75,33 +74,10 @@
 
 {% endblock %}
 
-{% block menu %}
-<ul class="menu menu-lg">
-    <li>
-	<a href="{% url 'dmad_on_django:person_list' %}" class="active">
-	    Personen <span class="badge">{{ person_count }}</span>
-	</a>
-    </li>
-    {% comment %}
-    <li>
-	<a href="{% url 'dmad_on_django:org_list' %}">
-	    Korporationen
-	</a>
-    </li>
-    <li>
-	<a href="{% url 'dmad_on_django:place_list' %}">
-	    Orte
-	</a>
-    </li>
-    {% endcomment %}
-    <li>
-	<a href="{% url 'dmad_on_django:work_list' %}">
-	    Werke <span class="badge">{{ work_count }}</span>
+{%block menu%}
+{%include 'dmad_on_django/partials/navbar.html'%}
+{%endblock%}
 
-	</a>
-    </li>
-</ul>
-{% endblock %}
 
 {% block navbar_extras %}
     {% if not type %}
