@@ -1,0 +1,99 @@
+<ul class="menu menu-lg">
+	<li>
+	    <a
+		href="{% url 'edwoca:expression_title' object.id %}"
+		{% if 'title' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Titel
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_update' object.id %}"
+		{% if 'update' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Identifikation
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_relations' object.id %}"
+		{% if 'relations' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Bezüge
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_contributors' object.id %}"
+		{% if 'contributors' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Beteiligte
+	    </a>
+	</li>
+	<li class="disabled">
+	    {% comment %}
+	        <a href="{% url 'edwoca:expression_categorisation' object.id %}"
+	    	{% if 'categorisation' in request.path %}class="active"{% endif %}
+	    	preload="mouseover"
+	    	>
+	    {% endcomment %}
+	    <a href="#">
+		Kategorisierung
+	    </a>
+	</li>
+	<li class="disabled">
+	    {% comment %}
+	        <a href="{% url 'edwoca:expression_mediumofperformance' object.id %}"
+		    {% if 'mediumofperformance' in request.path %}class="active"{% endif %}
+		    preload="mouseover"
+		    >
+	    {% endcomment %}
+	    <a href="#">
+		Besetzung
+	    </a>
+	</li>
+	<li>
+	        <a href="{% url 'edwoca:expression_movements' object.id %}"
+		    {% if 'movements' in request.path %}class="active"{% endif %}
+		    preload="mouseover"
+		    >
+		Sätze
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_history' object.id %}"
+		{% if 'mediumofperformance' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Entstehung
+	    </a>
+	</li>
+	<li class="disabled">
+	    <a href="#">
+		Aufführungen
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_comment' object.id %}"
+		{% if 'comment' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Kommentar intern
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_delete' object.id %}"
+		{% if 'delete' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		löschen
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_list' %}">
+		zurück
+	    </a>
+	</li>
+</ul>

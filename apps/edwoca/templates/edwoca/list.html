@@ -1,0 +1,46 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+<ul class="menu menu-lg">
+	<li>
+		<h2 class="menu-title"> Kerndaten </h2>
+		<ul>
+			<li>
+			    <a href="{% url 'edwoca:work_search' %}">
+				Werke <span class="badge"> {{ work_count }} </span>
+			    </a>
+			</li>
+			<li>
+			    <a href="{% url 'edwoca:manifestation_search' %}">
+				Quellen <span class="badge"> {{ manifestation_count }} </span>
+			    </a>
+			</li>
+		</ul>
+	</li>
+	<li>
+		<h2 class="menu-title"> weitere </h2>
+		<ul>
+			<li>
+			    <a href="{% url 'dmad_on_django:person_list' %}">
+				Personen <span class="badge"> {{ work_count }} </span>
+			    </a>
+			</li>
+		</ul>
+	</li>
+</ul>
+{% endblock %}
+
+{% block content %}
+
+<div class="border bg-white border-base-300 p-5 h-96">
+	<div class="prose">
+		<ul id="result-list" class="list-disc">
+			{% include 'edwoca/partials/result_list.html' %}
+		</ul>
+	</div>
+</div>
+{% endblock %}
+
+{% block navbar_extras %}
+	{% include 'edwoca/partials/search_form_switcher.html' %}
+{% endblock %}

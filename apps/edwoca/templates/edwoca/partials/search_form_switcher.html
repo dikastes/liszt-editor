@@ -1,0 +1,15 @@
+<div class="form-control">
+	{% if 'work' in request.path %}
+		<form action="{% url 'edwoca:work_search' %}" method="get" class="m-0">
+			{{ form.q }}
+			<input type="submit" class="btn">
+		</form>
+	{% endif %}
+
+	{% if 'manifestation' in request.path %}
+		<form action="{% url 'edwoca:manifestation_search' %}" method="get" class="m-0">
+			{{ form.q }}
+			<input type="submit" class="btn">
+		</form>
+	{% endif %}
+</div>
