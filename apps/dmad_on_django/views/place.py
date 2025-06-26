@@ -23,13 +23,9 @@ class PlaceSearchView(DmadSearchView):
         else:
             context['object_list'] = [result.object for result in context['object_list']]
         context.update({
-            'active': 'place',
             'type': self.kwargs.get('type'),
-            'person_count': Person.objects.count(),
-            'work_count': Work.objects.count(),
             'rework_count': Place.objects.filter(rework_in_gnd=True).count(),
-            'stub_count': Place.objects.filter(gnd_id__isnull=True).count(),
-            'place_count': Place.objects.count()
+            'stub_count': Place.objects.filter(gnd_id__isnull=True).count()
         })
         return context
 
