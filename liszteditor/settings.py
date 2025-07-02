@@ -63,6 +63,7 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django_htmx.middleware.HtmxMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'dmad_on_django.middleware.HTMXPreloadCacheMiddleware'
 ]
 
 ROOT_URLCONF = 'liszteditor.urls'
@@ -142,7 +143,7 @@ INTERNAL_IPS = [
         '127.0.0.1',
     ]
 
-FORM_RENDERER = 'edwoca.forms.EdwocaFormRenderer'
+#FORM_RENDERER = 'edwoca.forms.EdwocaFormRenderer'
 
 Z_ID = "5080468"
 Z_LIBRARY_TYPE = 'group'

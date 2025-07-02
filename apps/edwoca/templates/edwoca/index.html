@@ -2,47 +2,35 @@
 
 {% block menu %}
 <ul class="menu menu-lg">
-	{% comment %}
 	<li>
-	    <a href="{% url 'edwoca:work_list' %}">
-		Werke <span class="badge"> {{ work_count }} </span>
-	    </a>
+		<h2 class="menu-title"> Kerndaten </h2>
+		<ul>
+			<li>
+			    <a href="{% url 'edwoca:work_search' %}">
+				Werke <span class="badge"> {{ work_count }} </span>
+			    </a>
+			</li>
+			<li>
+			    <a href="{% url 'edwoca:manifestation_search' %}">
+				Quellen <span class="badge"> {{ manifestation_count }} </span>
+			    </a>
+			</li>
+		</ul>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:manifestation_list' %}">
-		Quellen <span class="badge"> {{ manifestation_count }} </span>
-	    </a>
+		<h2 class="menu-title"> weitere </h2>
+		<ul>
+			<li>
+			    <a href="{% url 'dmad_on_django:person_list' %}">
+				Personen <span class="badge"> {{ work_count }} </span>
+			    </a>
+			</li>
+		</ul>
 	</li>
-	{% endcomment %}
 </ul>
 {% endblock %}
 
 {% block content %}
-
-<div class="stats">
-	<div class="stat">
-		<div class="stat-title"> Werke </div>
-		<div class="stat-value text-primary"> {{ work_count }} </div>
-		<div class="stat-desc"> mit {{ expression_count }} Fassungen </div>
-	</div>
-	<div class="stat">
-		<div class="stat-title"> Quellen </div>
-		<div class="stat-value text-primary"> {{ manifestation_count }} </div>
-		<div class="stat-desc"> mit {{ item_count }} Exemplaren </div>
-	</div>
-	<div class="stat">
-		<div class="stat-title"> Personen </div>
-		<div class="stat-value text-primary"> {{ person_count }} </div>
-	</div>
-	<div class="stat">
-		<div class="stat-title"> Orte </div>
-		<div class="stat-value text-primary"> {{ place_count }} </div>
-	</div>
-	<div class="stat">
-		<div class="stat-title"> Korporationen </div>
-		<div class="stat-value text-primary"> {{ corporation_count }} </div>
-	</div>
-</div>
 
 <div role="tablist" class="tabs tabs-bordered my-10">
 	<input type="radio" name="work-source-toggle" role="tab" class="tab" aria-label="Werke" checked="checked"/>
@@ -84,4 +72,13 @@
 		{% endfor %}
 	</div>
 </div>
+{% endblock %}
+
+{% block navbar_extras %}
+	<div class="form-control">
+		<form class="m-0">
+			{{ form.q }}
+			<input type="submit" class="btn">
+		</form>
+	</div>
 {% endblock %}

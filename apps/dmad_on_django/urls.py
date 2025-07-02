@@ -1,4 +1,5 @@
 from django.urls import path, include
+from .tools import snake_to_camel_case
 
 from . import views
 
@@ -9,7 +10,7 @@ entities = [
         #'org',
         'place',
         'work',
-        'subjectterm'
+        'subject_term'
     ]
 id_bearing_actions = [ 
         'update', 
@@ -28,21 +29,21 @@ for entity in entities:
     urlpatterns.append(
         path(
             f"{entity}s/list",
-            getattr(views, f"{entity.capitalize()}SearchView").as_view(),
+            getattr(views, f"{snake_to_camel_case(entity)}SearchView").as_view(),
             name = f"{entity}_list"
             )
         )
     urlpatterns.append(
         path(
             f"{entity}s/list/<str:type>",
-            getattr(views, f"{entity.capitalize()}SearchView").as_view(),
+            getattr(views, f"{snake_to_camel_case(entity)}SearchView").as_view(),
             name = f"{entity}_list"
             )
         )
     urlpatterns.append(
         path(
             f"{entity}s/create",
-            getattr(views, f"{entity.capitalize()}CreateView").as_view(),
+            getattr(views, f"{snake_to_camel_case(entity)}CreateView").as_view(),
             name = f"{entity}_create"
             )
         )
@@ -50,7 +51,7 @@ for entity in entities:
         urlpatterns.append(
             path(
                 f"{entity}s/{action}/<int:pk>",
-                getattr(views, f"{entity.capitalize()}{action.capitalize()}View").as_view(),
+                getattr(views, f"{snake_to_camel_case(entity)}{action.capitalize()}View").as_view(),
                 name = f"{entity}_{action}"
                 )
             )

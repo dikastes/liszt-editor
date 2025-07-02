@@ -1,0 +1,97 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+{% include 'edwoca/partials/item_menu.html' %}
+{% endblock %}
+
+{% block navbar_title %}
+
+{% include 'edwoca/partials/title.html' %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Manifestation </h2>
+
+		<a href="{% url 'edwoca:manifestation_relations' object.manifestation.id %}"> {{ object.manifestation }} </a>
+	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Exemplare </h2>
+
+		<ul>
+		{% for item_relation in object.source_item_of.all %}
+			<li>
+				<div class="flex">
+					<a href="{% url 'edwoca:item_update' item.id %}" class="flex-1">
+						{{ item_relation.item }}
+					</a>
+					<form method="post" action="{% url 'edwoca:item_relation_remove' item_relation.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Exemplare verknüpft </em> <span class="badge badge-primary">!</span> </li>
+		{% endfor %}
+		</ul>
+
+		<h3> neues Exemplar verknüpfen </h3>
+
+		{% if show_search_form == True %}
+
+		<form action="{% url 'edwoca:item_relations' object.id %}" method="get">
+			{{ searchform.q }}
+			<input type="hidden" name="target_model" value="item">
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+		
+		<ul>
+		{% if query %}
+			{% for found_item in found_items %}
+				<li>
+					<a href="{% url 'edwoca:related_item_add' object.id found_item.object.id %}">
+						{{ found_item.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+
+		{% else %}
+
+		<form method="post">
+			{% csrf_token %}
+			{{ object }} mit {{ target_item }} verknüpfen als:
+			{{ related_item_form }}
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+
+		{% endif %}
+
+		{% comment %}
+		<a href="{% url 'edwoca:manifestation_create' %}" class="btn btn-primary"> neue Quelle anlegen </a>
+		{% endcomment %}
+	</div>
+</div>
+
+{% endblock %}
+
+{% block nav %}
+<div class="flex flex-col h-full">
+	-- Navigation --
+</div>
+{% endblock %}
+
+{% block navbar_extras %}
+{% endblock %}

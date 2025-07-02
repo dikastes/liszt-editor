@@ -6,16 +6,24 @@ from dominate.tags import div, table, tr, td
 from dominate.util import raw
 from json import dumps, loads
 
+
 max_trials = 3
 
+
 languages = { iso_data['iso639_1'].upper(): iso_data['name'] for iso_data in iso639_data }
+
 Language = {key: languages[key] for key in ['DE', 'FR', 'HU', 'EN']}
+
 for key in languages:
     Language[key] = languages[key]
+
+
 
 class Status(models.TextChoices):
     PRIMARY = 'P', _('Primary')
     ALTERNATIVE = 'A', _('Alternative')
+    TEMPORARY = 'T', _('Temporary')
+
 
 class GNDSubjectCategory(models.Model):
     link = models.CharField(max_length=200,unique=True)
@@ -69,8 +77,8 @@ class DisplayableModel(models.Model):
         doc = div(_class="collapse-content")
 
         with doc:
-         with table(cls="table table-zebra"):
-              for label, value in self.get_table():
+            with table(cls="table table-zebra"):
+                for label, value in self.get_table():
                     if str(value) == "None":
                         tr(td(label), td("—"))
                     elif isinstance(value, str) and value.strip().startswith("<a "):
@@ -79,6 +87,7 @@ class DisplayableModel(models.Model):
                       tr(td(label), td(str(value) or "—"))
 
         return str(doc)
+
     
     def get_table(self):
         raise NotImplemented("Please override get_table")

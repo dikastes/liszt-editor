@@ -25,12 +25,70 @@ entities = {
     }
 
 urlpatterns = [
-        path('', views.IndexView.as_view(), name = 'index'),
-        path('persons', views.person_list, name = 'person_list'),
-        path('works/<int:pk>', views.WorkDetailView.as_view(), name = 'work_detail'),
-        path('manifestations/<int:pk>', views.ManifestationDetailView.as_view(), name = 'manifestation_detail')
+        path('', views.index, name = 'index'),
+        path('works', views.WorkListView.as_view(), name = 'work_list'),
+        path('works/search', views.WorkSearchView.as_view(), name = 'work_search'),
+        path('works/new', views.WorkCreateView.as_view(), name = 'work_create'),
+        path('works/update/<int:pk>', views.WorkUpdateView.as_view(), name = 'work_update'),
+        path('works/<int:pk>/title', views.WorkTitleUpdateView.as_view(), name = 'work_title'),
+        path('works/<int:pk>/relations', views.WorkRelationsUpdateView.as_view(), name = 'work_relations'),
+        path('works/<int:pk>/relations/addrelatedwork/<int:target_work>', views.RelatedWorkAddView.as_view(), name = 'related_work_add'),
+        path('works/removerelatedwork/<int:pk>', views.RelatedWorkRemoveView.as_view(), name = 'related_work_remove'),
+        path('works/<int:pk>/contributors', views.WorkContributorsUpdateView.as_view(), name = 'work_contributors'),
+        path('works/<int:pk>/relatedworks', views.WorkRelatedWorksUpdateView.as_view(), name = 'work_relatedworks'),
+        path('works/<int:pk>/history', views.WorkHistoryUpdateView.as_view(), name = 'work_history'),
+        path('works/<int:pk>/bibliography', views.WorkBibliographyUpdateView.as_view(), name = 'work_bibliography'),
+        path('works/<int:pk>/comment', views.WorkCommentUpdateView.as_view(), name = 'work_comment'),
+        path('works/<int:pk>/delete', views.WorkDeleteView.as_view(), name = 'work_delete'),
+        path('expressions/<int:pk>/update', views.ExpressionUpdateView.as_view(), name = 'expression_update'),
+        path('expressions/<int:pk>/delete', views.ExpressionDeleteView.as_view(), name = 'expression_delete'),
+        path('expressions/<int:pk>/title', views.ExpressionTitleUpdateView.as_view(), name = 'expression_title'),
+        path('expressions/<int:pk>/relations', views.ExpressionRelationsUpdateView.as_view(), name = 'expression_relations'),
+        path('expressions/<int:pk>/relations/addrelatedexpression/<int:target_expression>', views.RelatedExpressionAddView.as_view(), name = 'related_expression_add'),
+        path('expressions/removerelatedexpression/<int:pk>', views.RelatedExpressionRemoveView.as_view(), name = 'related_expression_remove'),
+        path('expressions/<int:pk>/contributors', views.ExpressionContributorsUpdateView.as_view(), name = 'expression_contributors'),
+        path('expressions/<int:pk>/history', views.ExpressionHistoryUpdateView.as_view(), name = 'expression_history'),
+        path('expressions/<int:pk>/categorisation', views.ExpressionCategorisationUpdateView.as_view(), name = 'expression_categorisation'),
+        path('expressions/<int:pk>/mediumofperformance', views.ExpressionMediumofperformanceUpdateView.as_view(), name = 'expression_mediumofperformance'),
+        path('expressions/<int:pk>/movements', views.ExpressionMovementsUpdateView.as_view(), name = 'expression_movements'),
+        path('expressions/<int:pk>/comment', views.ExpressionCommentUpdateView.as_view(), name = 'expression_comment'),
+        path('expressions/<int:work_id>/createexpression', views.ExpressionCreateView.as_view(), name = 'expression_create'),
+        path('expressions/<int:pk>/delete', views.ExpressionDeleteView.as_view(), name = 'expression_delete'),
+        path('manifestations', views.ManifestationListView.as_view(), name = 'manifestation_list'),
+        path('manifestations/search', views.ManifestationSearchView.as_view(), name = 'manifestation_search'),
+        path('manifestations', views.ManifestationListView.as_view(), name = 'manifestation_list'),
+        path('manifestations/<int:pk>', views.ManifestationUpdateView.as_view(), name = 'manifestation_update'),
+        path('manifestations/new', views.ManifestationCreateView.as_view(), name = 'manifestation_create'),
+        path('manifestations/<int:pk>/delete', views.ManifestationDeleteView.as_view(), name = 'manifestation_delete'),
+        path('manifestations/<int:pk>/title', views.ManifestationTitleUpdateView.as_view(), name = 'manifestation_title'),
+        path('manifestations/<int:pk>/relations', views.ManifestationRelationsUpdateView.as_view(), name = 'manifestation_relations'),
+        path('manifestations/<int:pk>/relations/addrelatedmanifestation/<int:target_manifestation>', views.RelatedManifestationAddView.as_view(), name = 'related_manifestation_add'),
+        path('manifestations/removerelatedmanifestation/<int:pk>', views.RelatedManifestationRemoveView.as_view(), name = 'related_manifestation_remove'),
+        path('manifestations/<int:pk>/contributors', views.ManifestationContributorsUpdateView.as_view(), name = 'manifestation_contributors'),
+        path('manifestations/<int:pk>/history', views.ManifestationHistoryUpdateView.as_view(), name = 'manifestation_history'),
+        path('manifestations/<int:pk>/bibliography', views.ManifestationBibliographyUpdateView.as_view(), name = 'manifestation_bibliography'),
+        path('manifestations/<int:pk>/comment', views.ManifestationCommentUpdateView.as_view(), name = 'manifestation_comment'),
+        path('manifestations/<int:pk>/classification', views.ManifestationClassificationUpdateView.as_view(), name = 'manifestation_classification'),
+        path('manifestations/<int:pk>/print', views.ManifestationPrintUpdateView.as_view(), name = 'manifestation_print'),
+        path('manifestations/<int:pk>/delete', views.ManifestationDeleteView.as_view(), name = 'manifestation_delete'),
+        path('items/<int:pk>', views.ItemUpdateView.as_view(), name = 'item_update'),
+        path('items/<int:manifestation_id>/createitem', views.ItemCreateView.as_view(), name = 'item_create'),
+        path('items/<int:pk>/delete', views.ItemDeleteView.as_view(), name = 'item_delete'),
+        path('items/<int:pk>/title', views.ItemTitleUpdateView.as_view(), name = 'item_title'),
+        path('items/<int:pk>/location', views.ItemLocationUpdateView.as_view(), name = 'item_location'),
+        path('items/<int:pk>/relations', views.ItemRelationsUpdateView.as_view(), name = 'item_relations'),
+        path('items/<int:pk>/relations/addrelatedmanifestation/<int:target_item>', views.RelatedItemAddView.as_view(), name = 'related_item_add'),
+        path('items/removerelatedmanifestation/<int:pk>', views.RelatedItemRemoveView.as_view(), name = 'related_item_remove'),
+        path('items/<int:pk>/contributors', views.ItemContributorsUpdateView.as_view(), name = 'item_contributors'),
+        path('items/<int:pk>/provenance', views.ItemProvenanceUpdateView.as_view(), name = 'item_provenance'),
+        path('items/<int:pk>/details', views.ItemDetailsUpdateView.as_view(), name = 'item_details'),
+        path('items/<int:pk>/description', views.ItemDescriptionUpdateView.as_view(), name = 'item_description'),
+        path('items/<int:pk>/digcopy', views.ItemDigcopyUpdateView.as_view(), name = 'item_digcopy'),
+        path('items/<int:pk>/comment', views.ItemCommentUpdateView.as_view(), name = 'item_comment'),
+        path('items/<int:pk>/delete', views.ItemDeleteView.as_view(), name = 'item_delete'),
     ]
 
+"""
 for entity in entities:
     entity_class = ''.join(e.capitalize() for e in entity.split('_'))
     if entities[entity] == '':
@@ -54,7 +112,6 @@ for entity in entities:
                     name = f"{entity}_{action}"
                 )
             )
-"""
 urlpatterns = [
         path('', views.IndexView.as_view(), name = 'index'),
         path('works/<int:pk>', views.WorkDetailView.as_view(), name = 'work_detail'),

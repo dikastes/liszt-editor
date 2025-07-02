@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Person, PersonName, Place, PlaceName, Subjectterm, SubjectTermName, Status, GNDSubjectCategory, Work
+from .models import Person, PersonName, Place, PlaceName, SubjectTerm, SubjectTermName, Status, GNDSubjectCategory, Work
 # Register your models here.
 class PlaceNameInline(admin.TabularInline):
     model = PlaceName
@@ -26,7 +26,7 @@ class PersonAdmin(admin.ModelAdmin):
     inlines = [PersonNameInline]
     actions = [update_from_gnd]
 
-@admin.register(Subjectterm)
+@admin.register(SubjectTerm)
 class SubjectTermAdmin(admin.ModelAdmin):
     inlines = [SubhjectTermInline]
     actions = [update_from_gnd]

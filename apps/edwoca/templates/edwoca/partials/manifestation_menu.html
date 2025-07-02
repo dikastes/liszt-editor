@@ -1,0 +1,91 @@
+<ul class="menu menu-lg">
+	<li>
+	    <a
+		href="{% url 'edwoca:manifestation_title' object.id %}"
+		{% if 'title' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Titel
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_update' object.id %}"
+		{% if 'update' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Identifikation
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_relations' object.id %}"
+		{% if 'relations' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Bezüge
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_classification' object.id %}"
+		{% if 'classification' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Klassifikation
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_contributors' object.id %}"
+		{% if 'contributors' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Beteiligte
+	    </a>
+	</li>
+	<li class="disabled">
+		{% comment %}
+	    <a href="{% url 'edwoca:manifestation_print' object.id %}"
+		{% if 'print' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		{% endcomment %}
+	    <a href="#">
+		Druck
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_history' object.id %}"
+		{% if 'history' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Geschichte
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_bibliography' object.id %}"
+		{% if 'bibliography' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Literatur
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_comment' object.id %}"
+		{% if 'comment' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		Kommentar
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_delete' object.id %}"
+		{% if 'delete' in request.path %}class="active"{% endif %}
+		preload="mouseover"
+		>
+		löschen
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_list' %}">
+		zurück
+	    </a>
+	</li>
+</ul>
