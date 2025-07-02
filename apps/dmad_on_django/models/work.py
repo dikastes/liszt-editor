@@ -58,7 +58,7 @@ class Work(DisplayableModel):
         null=True
     )
 
-    broader_terms = models.ManyToManyField(SubjectTerm, blank=True, symmetrical=False)
+    broader_terms = models.ManyToManyField('self', blank=True, symmetrical=False)
     
     def fetch_raw(self):
         trials = max_trials
@@ -93,10 +93,10 @@ class Work(DisplayableModel):
         pl_work.process_data(data=loads(self.raw_data))
         self.date_of_creation = pl_work.date_of_creation
 
+        self.save()
+
         for item in pl_work.creators:
             self.creators.add(Person.fetch_or_get(item['id']))
-
-        self.save()
 
         self.names.all().delete()
         pref_name = WorkName.create_from_string(pl_work.pref_name, Status.PRIMARY, self)
@@ -110,7 +110,7 @@ class Work(DisplayableModel):
 
         if pl_work.broader_terms:
             for term in pl_work.broader_terms:
-                self.broader_terms.add(SubjectTerm.fetch_or_get(term['id']))
+                self.broader_terms.add(self.fetch_or_get(term['id']))
         
         if pl_work.form_of_work:
             self.form_of_work = SubjectTerm.fetch_or_get(pl_work.form_of_work[0]['id'])
@@ -155,7 +155,7 @@ class Work(DisplayableModel):
             table.append(("Opus o.ä.", self.opus_or_other))
 
         if self.form_of_work:
-            table.append(("Gattung", f'<a href="{self.form_of_work.get_absolute_url()}" target="_blank" class="link link-primary">{self.form_of_work}</a>'))
+            table.append(("Gattung", f'<a href="{self.form_of_work.get_absolute_url()}"class="link link-primary">{self.form_of_work}</a>'))
 
         if self.creators.exists():
             for creator in self.creators.all():
@@ -163,7 +163,7 @@ class Work(DisplayableModel):
 
         if self.broader_terms.exists():
             for term in self.broader_terms.all():
-                table.append(("Oberbegriffe", f'<a href="{term.get_absolute_url()}" target="_blank" class="link link-primary">{term}</a>'))
+                table.append(("Oberbegriffe", f'<a href="{term.get_absolute_url()}"class="link link-primary">{term}</a>'))
 
         table += GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category) +\
                 WorkGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
