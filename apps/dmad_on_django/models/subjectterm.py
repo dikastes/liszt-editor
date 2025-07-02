@@ -5,27 +5,6 @@ from json import loads, dumps
 from pylobid.pylobid import PyLobidClient, GNDAPIError
 import requests
 
-
-class GNDSubjectCategory(models.Model):
-    link = models.CharField(max_length=200,unique=True)
-    label = models.CharField(max_length=50)
-
-    @staticmethod
-    def create_or_link(json):
-        category = json['gndSubjectCategory'][0]
-
-        try:
-            return GNDSubjectCategory.objects.get(link=category['id'])
-        except GNDSubjectCategory.DoesNotExist:
-            subjectcategory = GNDSubjectCategory()
-            subjectcategory.link = category['id']
-            subjectcategory.label = category['label']
-            subjectcategory.save()
-            return subjectcategory
-
-    def __str__(self):
-        return self.label
-
 class SubjectTermName(models.Model):
     name = models.CharField(max_length=40)
     status = models.CharField(
@@ -51,7 +30,6 @@ class SubjectTermName(models.Model):
             subject_term=subject_term
         )
 
-class Subjectterm(DisplayableModel):
 class SubjectTerm(DisplayableModel):
     gnd_subject_category = models.ForeignKey(
         GNDSubjectCategory,
@@ -159,11 +137,5 @@ class SubjectTerm(DisplayableModel):
             return GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category) +\
             self.get_parrent_subject_table()
     
-            category_label = self.gnd_subject_category.label
-            category_link = self.gnd_subject_category.link
-            return [("GND-Sachgruppe",
-                    f'<a href="{category_link}"target = "_blank" class = "link link-primary">{category_label}</a>')] +\
-            self.get_parent_subject_table()
-
     def get_overview_title(self):
         return "Angaben"

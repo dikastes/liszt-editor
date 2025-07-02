@@ -2,7 +2,7 @@ from django.db import models
 
 from .base import DisplayableModel
 from dmad_on_django.models import Person
-from .subjectterm import Subjectterm
+from .subjectterm import SubjectTerm
 
 class Work(DisplayableModel):
 
@@ -18,7 +18,7 @@ class Work(DisplayableModel):
     )
 
     form_of_work = models.ForeignKey(
-        Subjectterm,
+        SubjectTerm,
         on_delete=models.SET_NULL,
         related_name='form_of_work_or_expression',
         null=True
