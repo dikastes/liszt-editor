@@ -123,6 +123,8 @@ class Person(DisplayableModel):
             self.death_place = Place.fetch_or_get(pl_person.death_place['id'])
             self.death_place.save()
 
+        self.gnd_subject_category = GNDSubjectCategory.create_or_link(loads(self.raw_data))
+
         self.save()
 
         self.activity_places.clear()

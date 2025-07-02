@@ -98,10 +98,13 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         response = super().post(request, *args, **kwargs)
-        if self.object.gnd_id:
-            self.object.fetch_raw()
-            self.object.update_from_raw()
-            self.object.save()
+        try:
+             if self.object.gnd_id:
+                self.object.fetch_raw()
+                self.object.update_from_raw()
+                self.object.save()
+        except AttributeError:
+            pass
         return response
 
 

@@ -54,7 +54,7 @@ class DisplayableModel(models.Model):
     
     raw_data = models.TextField(null=True)
     rework_in_gnd = models.BooleanField(default=False)
-    gnd_id = models.CharField(max_length=20, null=True, blank=True)
+    gnd_id = models.CharField(max_length=20, null=True, blank=True, unique=True)
     comment = models.TextField(null=True, blank=True)
     interim_designator = models.CharField(
         max_length=150,

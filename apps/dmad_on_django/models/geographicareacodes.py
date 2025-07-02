@@ -23,12 +23,15 @@ class GeographicAreaCode(models.Model):
         json = loads(entity.raw_data)
         class_name = entity.__class__.__name__ 
         instance = globals().get(f'{class_name}GeographicAreaCode')()
-        for code in json['geographicAreaCode']:
-            area_code = instance.create_from_string(
-                code['id'].split('#')[1],
-                entity
-            )
+        try:
+            for code in json['geographicAreaCode']:
+                area_code = instance.create_from_string(
+                  code['id'].split('#')[1],
+                 entity
+                )
             area_code.save()
+        except KeyError:
+            pass
 
     class Meta:
         abstract = True

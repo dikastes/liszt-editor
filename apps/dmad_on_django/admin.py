@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Person, PersonName, Place, PlaceName, SubjectTerm, SubjectTermName, Status, GNDSubjectCategory, Work
+from .models import Person, PersonName, Place, PlaceName, SubjectTerm, SubjectTermName, Status, GNDSubjectCategory, Work, WorkName
 # Register your models here.
 class PlaceNameInline(admin.TabularInline):
     model = PlaceName
@@ -7,7 +7,7 @@ class PlaceNameInline(admin.TabularInline):
 class PersonNameInline(admin.TabularInline):
     model = PersonName
 
-class SubhjectTermInline(admin.TabularInline):
+class SubjectTermInline(admin.TabularInline):
     model = SubjectTermName
 
 @admin.register(Place)
@@ -28,7 +28,7 @@ class PersonAdmin(admin.ModelAdmin):
 
 @admin.register(SubjectTerm)
 class SubjectTermAdmin(admin.ModelAdmin):
-    inlines = [SubhjectTermInline]
+    inlines = [SubjectTermInline]
     actions = [update_from_gnd]
     readonly_fields = ['show_parents']
 
@@ -41,9 +41,14 @@ class SubjectTermAdmin(admin.ModelAdmin):
 class GNDSubjectCategoryAdmin(admin.ModelAdmin):
     pass
 
+class WorkInline(admin.TabularInline):
+    model = WorkName
+
 @admin.register(Work)
 class WorkAdmin(admin.ModelAdmin):
-    pass
+    inlines = [WorkInline]
+    actions = [update_from_gnd]
+
     
 
     
