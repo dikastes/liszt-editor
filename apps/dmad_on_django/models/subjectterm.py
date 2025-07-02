@@ -135,7 +135,7 @@ class SubjectTerm(DisplayableModel):
     def get_table(self):
             
             return GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category) +\
-            self.get_parrent_subject_table()
+            self.get_parent_subject_table()
     
     def get_overview_title(self):
         return "Angaben"
