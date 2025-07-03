@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import dotenv
+from django.urls import reverse_lazy
 
 dotenv_file = os.path.join(os.getcwd(), '.env')
 if os.path.isfile(dotenv_file):
@@ -37,6 +38,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.liszt_util',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,6 +81,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.liszt_util.context_processors.current_app_name',
             ],
         },
     },
@@ -156,3 +159,26 @@ HAYSTACK_CONNECTIONS = {
         'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index')
     },
 }
+
+GLOBAL_NAVIGATION = {
+        'edwoca': {
+                'label': 'edwoca',
+                'href': reverse_lazy('edwoca:index')
+            },
+        'dmad_on_django': {
+                'label': 'DMAd',
+                'href': reverse_lazy('dmad_on_django:index')
+            },
+        'bib': {
+                'label': 'Bib',
+                'href': reverse_lazy('bib:index')
+            },
+        'musiconn': {
+                'label': 'musiconn',
+                'href': None
+            },
+        'rism': {
+                'label': 'RISM',
+                'href': None
+            }
+    }

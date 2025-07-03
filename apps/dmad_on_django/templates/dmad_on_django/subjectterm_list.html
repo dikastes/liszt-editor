@@ -1,4 +1,4 @@
-{% extends 'dmad_on_django/base.html' %}
+{% extends 'liszt_util/base.html' %}
 {% load static %}
 
 
@@ -46,36 +46,6 @@
     {% endif %}
 </div>
 {% endblock %}
-<div class="flex-none prose" id="sidebar">
-    {% if rework_count > 0 or stub_count > 0 %}
-	<ul class="menu">
-	    <li>
-		<h2 class="menu-title"> Filter </h2>
-		<ul>
-		    {% if rework_count > 0 %}
-			<li>
-			    <button id="stub-toggle"> Rumpfdatensätze </button>
-			    {% if type == 'rework' %}
-				<a href="{% url 'dmad_on_django:subject_term_list' %}" class="active" > nachbearbeiten ({{ rework_count }}) </a> 
-			    {% else %}
-				<a href="{% url 'dmad_on_django:subject_term_list' 'rework' %}" > nachbearbeiten ({{ rework_count }}) </a> 
-			    {% endif %}
-			</li>
-		    {% endif %}
-		    {% if stub_count > 0 %}
-			<li>
-			    {% if type == 'stub' %}
-				<a href="{% url 'dmad_on_django:subject_term_list' %}" class="active"> Rumpfdatensätze ({{ stub_count }})</a>
-			    {% else %}
-				<a href="{% url 'dmad_on_django:subject_term_list' 'stub' %}"> Rumpfdatensätze ({{ stub_count }})</a>
-			    {% endif %}
-			</li>
-		    {% endif %}
-		</ul>
-	    </li>
-	</ul>
-    {% endif %}
-</div>
 
 {%block menu%}
 {%include 'dmad_on_django/partials/navbar.html'%}
