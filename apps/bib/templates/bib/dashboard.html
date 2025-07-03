@@ -1,87 +1,28 @@
-{% extends 'bib/base.html' %}
+{% extends 'liszt_util/base.html' %}
 {% load static %}
 
 {% block content %}
-<div class="grid grid-cols-3 gap-10">
-  <!-- left sidebar -->
-  <div>
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-title"> Titel </div>
-        <div class="stat-value">
-          {{ count }}
-        </div>
-      </div>
-      <div class="stat">
-        <div class="stat-title"> Neue Titel </div>
-        <div class="stat-value" id="new-items">
-          {% if count > 0 %}
-            <span class="loading loading-bars lodagin-xl"></span>
-          {% else %}
-            &mdash;
-          {% endif %}
-        </div>
-      </div>
-      <div class="stat">
-        <div class="stat-title"> Updates </div>
-        <div class="stat-value" id="updates">
-          {% if count > 0 %}
-            <span class="loading loading-bars lodagin-xl"></span>
-          {% else %}
-            &mdash;
-          {% endif %}
-        </div>
-      </div>
-    </div>
-
-    <div class="card shadow mt-5">
-      <div class="card-body">
-        <h2 class="card-title mt-0"> Aktionen </h2>
-        {% if count > 0 %}
-        <a href="{% url 'bib:update' %}" class="btn"> Updates einspielen </a>
-        {% endif %}
-        {% if count > 0 %}
-        <a href="{% url 'bib:delete' %}" class="btn btn-primary"> Bibliographie löschen </a>
-        {% else %}
-        <a href="{% url 'bib:import' %}" class="btn btn-primary"> Bibliographie vollständig einspielen </a>
-        {% endif %}
-      </div>
-    </div>
-  </div>
-
+<div class="grid grid-cols-1">
   <!-- main content-->
 
-  <div class="col-span-2">
+  <div>
     {% if count > 0 %}
 
-    <h1> Titel </h1>
-
-    <div class="pagination">
-      <span class="join my-10">
-        {% if page_obj.has_previous %}
-        <a href="?page=1" class="btn join-item"> &laquo; </a>
-        <a href="?page={{ page_obj.previous_page_number }}" class="btn join-item"> &lsaquo; </a>
-        {% endif %}
-        <span class="current btn join-item btn-primary">
-          Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}
-        </span>
-        {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}" class="join-item btn"> &rsaquo; </a>
-        <a href="?page={{ page_obj.paginator.num_pages }}" class="join-item btn"> &raquo; </a>
-        {% endif %}
-      </span>
-    </div>
-
-    {% for bib in object_list %}
-    <div class="card shadow mt-5">
-      <div class="card-body">
-        <h2 class="card-title mt-0"> {{ bib.zot_title }} </h2>
-        <p> {{ bib.author }} {{ bib.zot_date }} </p>
-        <p> {{ bib.editor }}: {{ bib.zot_pub_title }} </p>
+    <div class="border bg-white border-base-300 p-5">
+      <div class="prose">
+        <ul id="result-list" class="list-disc">
+          {% for bib in object_list %}
+          <li>
+            <a href="#"> {{ bib.zot_title }} </a>
+          </li>
+          {% empty %}
+          <li>
+            <em> keine Treffer </em>
+          </li>
+          {% endfor %}
+        </ul>
       </div>
-    </div>
-    {% endfor %}
-
+	{% if page_obj.paginator.num_pages > 1 %}
     <div class="pagination">
       <span class="join my-10">
         {% if page_obj.has_previous %}
@@ -96,6 +37,8 @@
         <a href="?page={{ page_obj.paginator.num_pages }}" class="join-item btn"> &raquo; </a>
         {% endif %}
       </span>
+    </div>
+	{% endif %}
     </div>
 
     {% else %}
@@ -120,4 +63,11 @@
 <script src="{% static 'bib/dashboard_info.js' %}"></script>
 {% endif %}
 
+{% endblock %}
+
+{% block menu %}
+{% include 'bib/partials/dashboard_sidebar.html' %}
+{% endblock %}
+
+{% block nav %}
 {% endblock %}

@@ -25,7 +25,7 @@ bulk_size = 50
 
 class Dashboard(ListView):
     model = ZotItem
-    paginate_by = 20
+    paginate_by = 10
     template_name = 'bib/dashboard.html'
 
     def get_context_data(self, **kwargs):

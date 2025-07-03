@@ -6,7 +6,7 @@ from . import dal_views
 app_name = 'bib'
 
 urlpatterns = [
-    path('', views.Dashboard.as_view(), name="dashboard"),
+    path('', views.Dashboard.as_view(), name="index"),
     path('update/', views.update, name="update"),
     path('delete/', views.delete, name="delete"),
     path('import/', views.import_complete, name="import"),
