@@ -11,6 +11,7 @@ class WorkListView(EdwocaListView):
     model = Work
 
 
+
 class WorkCreateView(CreateView):
     model = Work
     form_class = WorkForm
@@ -21,11 +22,12 @@ class WorkCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context['title_formset'] = WorkTitleFormSet(self.request.POST)
-        else:
-            WorkTitleFormSet.can_delete = False
-            context['title_form_set'] = WorkTitleFormSet()
+        if 'title_formset' not in context:
+            if self.request.POST:
+                context['title_formset'] = WorkTitleFormSet(self.request.POST, self.request.FILES)
+            else:
+                WorkTitleFormSet.can_delete = False
+                context['title_form_set'] = WorkTitleFormSet()
         context['view_title'] = f"Neues Werk anlegen"
         context['button_label'] = "speichern"
         context['return_target'] = 'edwoca:index'
@@ -33,18 +35,20 @@ class WorkCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        title_formset = context['title_formset']
+        self.object = form.save(commit=False)
+        title_formset = WorkTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
 
         if title_formset.is_valid():
-            response = super().form_valid(form)
-            self.object = form.save()
-            title_formset.instance = self.object
-            title_formset.save()
             self.object.save()
-            return response
+            title_formset.save()
+            return redirect(self.get_success_url())
         else:
-            return self.form_invalid(form)
+            self.object = None # Reset object so get_context_data doesn't try to use it for instance
+            return self.form_invalid(form, title_formset=title_formset)
+
+    def form_invalid(self, form, title_formset=None):
+        context = self.get_context_data(form=form, title_formset=title_formset)
+        return self.render_to_response(context)
 
 
 class WorkUpdateView(UpdateView):
@@ -52,15 +56,6 @@ class WorkUpdateView(UpdateView):
     form_class = WorkForm
     template_name = 'edwoca/work_update.html'
     context_object_name = 'work'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title_form_set'] = formset_factory(WorkTitleForm)
-        context['view_title'] = f"Werk { self.object } bearbeiten"
-        context['button_label'] = "speichern"
-        context['return_target'] = 'edwoca:work_detail'
-        context['return_pk'] = self.object.id
-        return context
 
 
 class WorkDeleteView(DeleteView):
