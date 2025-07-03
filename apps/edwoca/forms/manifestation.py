@@ -96,7 +96,7 @@ class ManifestationContributorForm(ContributorForm):
         widgets = dict(ContributorForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
 
 
-class ManifestationHistoryForm(ModelForm, SimpleForm):
+class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
     not_before = DateTimeField(widget = SelectDateWidget( attrs = {'class':'select select-bordered'}))
     not_after = DateTimeField(widget = SelectDateWidget( attrs = {'class':'select select-bordered'}))
     display = DateTimeField(widget = TextInput( attrs = { 'class': 'grow'}))
@@ -106,7 +106,7 @@ class ManifestationHistoryForm(ModelForm, SimpleForm):
         fields = ['history', 'id']
         widgets = {
                 'history': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     })
             }
 

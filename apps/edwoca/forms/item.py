@@ -34,13 +34,13 @@ class ItemTitleForm(TitleForm):
         widgets = dict(TitleForm.Meta.widgets, **{ 'item': HiddenInput() })
 
 
-class ItemLocationForm(ModelForm, SimpleForm):
+class ItemLocationForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Item
         fields = ['location']
         widgets = {
                 'location': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     })
             }
 

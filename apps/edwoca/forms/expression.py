@@ -36,13 +36,13 @@ class ExpressionTitleForm(TitleForm):
         widgets = dict(TitleForm.Meta.widgets, **{ 'expression': HiddenInput() })
 
 
-class ExpressionHistoryForm(ModelForm, SimpleForm):
+class ExpressionHistoryForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Work
         fields = ['history']
         widgets = {
                 'history': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     })
             }
 

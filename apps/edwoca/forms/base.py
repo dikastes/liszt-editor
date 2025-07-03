@@ -6,7 +6,7 @@ from dominate.tags import div, label, span
 from dominate.util import raw
 
 
-class SimpleForm:
+class SimpleFormMixin:
     text_area_classes = 'textarea textarea-bordered w-full'
 
     def as_daisy(self):
@@ -143,14 +143,14 @@ class ContributorForm(ModelForm):
         return mark_safe(str(form))
 
 
-class CommentForm(ModelForm, SimpleForm):
+class CommentForm(ModelForm, SimpleFormMixin):
     class Meta:
         fields = ['private_comment', 'public_comment']
         widgets = {
                 'private_comment': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     }),
                 'public_comment': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     })
             }
