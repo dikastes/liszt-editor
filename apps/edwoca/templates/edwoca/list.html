@@ -1,4 +1,4 @@
-{% extends 'edwoca/base.html' %}
+{% extends 'liszt_util/base.html' %}
 
 {% block menu %}
 <ul class="menu menu-lg">
@@ -32,15 +32,45 @@
 
 {% block content %}
 
-<div class="border bg-white border-base-300 p-5 h-96">
+<div class="border bg-white border-base-300 p-5">
 	<div class="prose">
 		<ul id="result-list" class="list-disc">
 			{% include 'edwoca/partials/result_list.html' %}
 		</ul>
 	</div>
+	{% if page_obj.paginator.num_pages > 1 %}
+    <div class="pagination">
+      <span class="join my-10">
+        {% if page_obj.has_previous %}
+        <a href="?page=1" class="btn join-item"> &laquo; </a>
+        <a href="?page={{ page_obj.previous_page_number }}" class="btn join-item"> &lsaquo; </a>
+        {% endif %}
+        <span class="current btn join-item btn-primary">
+          Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}
+        </span>
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}" class="join-item btn"> &rsaquo; </a>
+        <a href="?page={{ page_obj.paginator.num_pages }}" class="join-item btn"> &raquo; </a>
+        {% endif %}
+      </span>
+    </div>
+	{% endif %}
 </div>
 {% endblock %}
 
 {% block navbar_extras %}
 	{% include 'edwoca/partials/search_form_switcher.html' %}
+	<div class="dropdown dropdown-end">
+			<div tabindex="0" role="button" class="btn btn-primary rounded-btn">neu</div>
+			<ul
+			    tabindex="0"
+			    class="menu dropdown-content rounded-box z-[1] mt-4 w-52 p-2 shadow">
+			    <li>
+				<a href="{% url 'edwoca:work_create' %}">Werk</a>
+			    </li>
+			    <li>
+				<a href="{% url 'edwoca:manifestation_create' %}">Quelle</a>
+			    </li>
+			</ul>
+		    </div>
 {% endblock %}
