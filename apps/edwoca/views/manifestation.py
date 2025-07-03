@@ -24,40 +24,35 @@ class ManifestationCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context['title_formset'] = ManifestationTitleFormSet(self.request.POST)
-        else:
-            ManifestationTitleFormSet.can_delete = False
-            context['title_form_set'] = ManifestationTitleFormSet()
+        if 'title_formset' not in context:
+            if self.request.POST:
+                context['title_formset'] = ManifestationTitleFormSet(self.request.POST, self.request.FILES)
+            else:
+                ManifestationTitleFormSet.can_delete = False
+                context['title_form_set'] = ManifestationTitleFormSet()
         return context
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        title_formset = context['title_formset']
+        self.object = form.save(commit=False)
+        title_formset = ManifestationTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
 
         if title_formset.is_valid():
-            response = super().form_valid(form)
-            self.object = form.save()
-            title_formset.instance = self.object
-            title_formset.save()
             self.object.save()
-            return response
+            title_formset.save()
+            return redirect(self.get_success_url())
         else:
-            return self.form_invalid(form)
+            self.object = None
+            return self.form_invalid(form, title_formset=title_formset)
+
+    def form_invalid(self, form, title_formset=None):
+        context = self.get_context_data(form=form, title_formset=title_formset)
+        return self.render_to_response(context)
 
 
 class ManifestationUpdateView(UpdateView):
     model = Manifestation
     form_class = ManifestationForm
     template_name = 'edwoca/simple_form.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['view_title'] = f"Manifestation { self.object } bearbeiten"
-        context['button_label'] = "speichern"
-        context['return_target'] = 'edwoca:manifestation_detail'
-        context['return_pk'] = self.object.id
-        return context
 
 
 class ManifestationDeleteView(DeleteView):

@@ -17,40 +17,36 @@ class ExpressionCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form = context['form']
-        if self.request.POST:
-            context['title_formset'] = ExpressionTitleFormSet(self.request.POST)
-        else:
-            ExpressionTitleFormSet.can_delete = False
-            context['title_form_set'] = ExpressionTitleFormSet()
+        if 'title_formset' not in context:
+            if self.request.POST:
+                context['title_formset'] = ExpressionTitleFormSet(self.request.POST, self.request.FILES)
+            else:
+                ExpressionTitleFormSet.can_delete = False
+                context['title_form_set'] = ExpressionTitleFormSet()
         return context
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        title_formset = context['title_formset']
-
-        instance = form.save(commit=False)
-        instance.work = Work.objects.get(id=self.kwargs['work_id'])
+        self.object = form.save(commit=False)
+        self.object.work = Work.objects.get(id=self.kwargs['work_id'])
+        title_formset = ExpressionTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
 
         if title_formset.is_valid():
-            instance.save()
-            self.object = form.save()
-            title_formset.instance = self.object
+            self.object.save()
             title_formset.save()
             return redirect(self.get_success_url())
         else:
-            return self.form_invalid(form)
+            self.object = None
+            return self.form_invalid(form, title_formset=title_formset)
+
+    def form_invalid(self, form, title_formset=None):
+        context = self.get_context_data(form=form, title_formset=title_formset)
+        return self.render_to_response(context)
 
 
 class ExpressionUpdateView(UpdateView):
     model = Expression
     form_class = ExpressionForm
     template_name = 'edwoca/expression_update.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title_form_set'] = formset_factory(ExpressionTitleForm)
-        return context
 
 
 class ExpressionTitleUpdateView(FormsetUpdateView):

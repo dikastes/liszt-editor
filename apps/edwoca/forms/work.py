@@ -37,13 +37,13 @@ class WorkTitleForm(TitleForm):
         widgets = dict(TitleForm.Meta.widgets, **{ 'work': HiddenInput() })
 
 
-class WorkHistoryForm(ModelForm, SimpleForm):
+class WorkHistoryForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Work
         fields = ['history']
         widgets = {
                 'history': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     })
             }
 
