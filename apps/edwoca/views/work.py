@@ -69,7 +69,7 @@ class WorkDeleteView(DeleteView):
         return context
 
 
-class WorkTitleUpdateView(FormsetUpdateView):
+class WorkTitleUpdateView(TitleUpdateView):
     model = Work
     form_class = WorkTitleFormSet
     formset_property = 'titles'

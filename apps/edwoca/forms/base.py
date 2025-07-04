@@ -67,7 +67,8 @@ class TitleForm(ModelForm):
         palette.add(lang_container)
         palette.add(status_container)
 
-        if 'DELETE' in self.fields:
+        # checken ob das form initialisiert ist, sonst kein delete-button
+        if 'DELETE' in self.fields and self.instance.pk:
             del_field = self['DELETE']
             del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
             del_field_label.add(raw(str(del_field)))

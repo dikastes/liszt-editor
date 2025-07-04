@@ -49,7 +49,7 @@ class ExpressionUpdateView(UpdateView):
     template_name = 'edwoca/expression_update.html'
 
 
-class ExpressionTitleUpdateView(FormsetUpdateView):
+class ExpressionTitleUpdateView(TitleUpdateView):
     model = Expression
     form_class = ExpressionTitleFormSet
     formset_property = 'titles'

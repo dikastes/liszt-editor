@@ -65,7 +65,7 @@ class ManifestationDeleteView(DeleteView):
         return context
 
 
-class ManifestationTitleUpdateView(FormsetUpdateView):
+class ManifestationTitleUpdateView(TitleUpdateView):
     model = Manifestation
     form_class = ManifestationTitleFormSet
     formset_property = 'titles'
