@@ -15,13 +15,14 @@ import os
 import dotenv
 from django.urls import reverse_lazy
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 dotenv_file = os.path.join(os.getcwd(), '.env')
 if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+else:
+    print("Could not find .env file")
+    exit(1)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -34,6 +35,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+if not DEBUG:
+    ALLOWED_HOSTS.append(os.environ['DOMAIN_NAME'])
 
 # Application definition
 
