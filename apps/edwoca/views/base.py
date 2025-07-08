@@ -2,8 +2,9 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, FormView
+from django.db.models import Case, When
 from dmad_on_django.forms import SearchForm
-from dmad_on_django.models import Person
+from dmad_on_django.models import Person, Status
 from haystack.generic_views import SearchView
 from ..models import Work, Manifestation
 from edwoca import forms as edwoca_forms
@@ -108,6 +109,24 @@ class FormsetUpdateView(UpdateView):
             return redirect(self.get_success_url())
 
         return self.render_to_response(self.get_context_data(form=form))
+
+
+class TitleUpdateView(FormsetUpdateView):
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'form' not in kwargs and hasattr(self, 'object') and self.object:
+            manager = getattr(self.object, self.formset_property)
+            queryset = manager.order_by(
+                Case(
+                    When(status=Status.PRIMARY, then=0),
+                    When(status=Status.ALTERNATIVE, then=1),
+                    When(status=Status.TEMPORARY, then=2),
+                    default=3
+                )
+            )
+            context['form'] = self.form_class(instance=self.object, queryset=queryset)
+        return context
 
 
 class RelationsUpdateView(UpdateView):
