@@ -6,7 +6,6 @@ liszteditor/whoosh_index/
 __pycache__/
 *.py[cod]
 *$py.class
-**/tailwind.dist.css
 
 # C extensions
 *.so
