@@ -6,7 +6,7 @@ from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
 
 
-class ItemTitleUpdateView(FormsetUpdateView):
+class ItemTitleUpdateView(TitleUpdateView):
     model = Item
     form_class = ItemTitleFormSet
     formset_property = 'titles'
