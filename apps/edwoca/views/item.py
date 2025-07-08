@@ -90,6 +90,18 @@ class RelatedItemRemoveView(DeleteView):
 
 class ItemContributorsUpdateView(ContributorsUpdateView):
     model = Item
+    form_class = ItemContributorForm
+
+
+class ItemContributorAddView(ContributorAddView):
+    model = ItemContributor
+
+
+class ItemContributorRemoveView(DeleteView):
+    model = ItemContributor
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_contributors', kwargs={'pk': self.object.item.id})
 
 
 class ItemProvenanceUpdateView(UpdateView):

@@ -60,6 +60,18 @@ class ExpressionTitleUpdateView(TitleUpdateView):
 
 class ExpressionContributorsUpdateView(ContributorsUpdateView):
     model = Expression
+    form_class = ExpressionContributorForm
+
+
+class ExpressionContributorAddView(ContributorAddView):
+    model = ExpressionContributor
+
+
+class ExpressionContributorRemoveView(DeleteView):
+    model = ExpressionContributor
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:expression_contributors', kwargs={'pk': self.object.expression.id})
 
 
 class ExpressionRelationsUpdateView(RelationsUpdateView):

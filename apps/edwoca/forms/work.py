@@ -56,51 +56,17 @@ class WorkCommentForm(CommentForm):
 
 
 class WorkContributorForm(ContributorForm):
-    class Meta:
+    class Meta(ContributorForm.Meta):
         model = WorkContributor
-        fields = ContributorForm.Meta.fields + [ 'work' ]
+        fields = ContributorForm.Meta.fields + ['work']
         widgets = dict(ContributorForm.Meta.widgets, **{ 'work': HiddenInput() })
 
 
-class WorkBibForm(ModelForm):
-    class Meta:
+class WorkBibForm(BaseBibForm):
+    class Meta(BaseBibForm.Meta):
         model = WorkBib
-        fields = [ 'bib', 'id', 'work' ]
-        widgets = {
-                'bib': Select( attrs = {
-                        'class': 'autocomplete-select select select-bordered w-full'
-                    }),
-                'id': HiddenInput(),
-                'work': HiddenInput(),
-                'DELETE': CheckboxInput( attrs = {
-                        'class': 'flex-0'
-                    })
-            }
-
-    def as_daisy(self):
-        form = div(cls='mb-10')
-
-        if self.instance.pk:
-           form.add(raw(str(self['id'])))
-        form.add(raw(str(self['work'])))
-
-        bib_field = self['bib']
-
-        bib_container = div(cls='flex-1')
-        bib_container.add(raw(str(bib_field)))
-
-        palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette.add(bib_container)
-
-        if 'DELETE' in self.fields:
-            del_field = self['DELETE']
-            del_field_label = label(del_field.label, cls='input input-bordered flex flex-0 items-center gap-2')
-            del_field_label.add(raw(str(del_field)))
-            palette.add(del_field_label)
-
-        form.add(palette)
-
-        return mark_safe(str(form))
+        fields = BaseBibForm.Meta.fields + [ 'work' ]
+        widgets = dict(BaseBibForm.Meta.widgets, **{ 'work': HiddenInput() })
 
 
 class RelatedWorkForm(ModelForm):
@@ -126,24 +92,10 @@ class RelatedWorkForm(ModelForm):
         return mark_safe(str(form))
 
 
-WorkBibFormSet = inlineformset_factory(
-        Work,
-        WorkBib,
-        form = WorkBibForm,
-        extra = 1,
-        max_num = 100,
-        can_delete = True
-    )
 
 
-WorkContributorFormSet = inlineformset_factory(
-        Work,
-        WorkContributor,
-        form = WorkContributorForm,
-        extra = 1,
-        max_num = 100,
-        can_delete = True
-    )
+
+
 
 
 WorkTitleFormSet = inlineformset_factory(

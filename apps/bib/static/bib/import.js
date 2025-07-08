@@ -13,7 +13,7 @@ function conditionalRedirect() {
 
   bulkCount--;
   if (bulkCount == 0) {
-    location = dashboardUrl;
+    location = indexUrl;
   }
 }
 

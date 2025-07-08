@@ -58,15 +58,15 @@
 
 {% if count > 0 %}
 <script>
-  const dashboard_info_link = "{% url 'bib:dashboard_info' %}";
+  const index_info_link = "{% url 'bib:index_info' %}";
 </script>
-<script src="{% static 'bib/dashboard_info.js' %}"></script>
+<script src="{% static 'bib/index_info.js' %}"></script>
 {% endif %}
 
 {% endblock %}
 
 {% block menu %}
-{% include 'bib/partials/dashboard_sidebar.html' %}
+{% include 'bib/partials/index_sidebar.html' %}
 {% endblock %}
 
 {% block nav %}

@@ -52,6 +52,10 @@ class ZotItem(models.Model):
         blank=True, verbose_name="title",
         help_text="Stores all information from zoteros 'title' field."
     )
+    zot_short_title = models.TextField(
+        blank=True, verbose_name="shortTitle",
+        help_text="Stores all information from zoteros 'shortTitle' field."
+    )
     zot_pub_title = models.TextField(
         blank=True, verbose_name="publicationTitle",
         help_text="Stores all information from zoteros 'publicationTitle' field."
@@ -86,6 +90,9 @@ class ZotItem(models.Model):
 
     def __str__(self):
         return f"{self.author}: {self.zot_title}; {self.zot_pub_title}"
+
+    def preview(self):
+        return f"{self.author} ({self.zot_date}): {self.zot_title}"
 
     def save(self, get_bibtex=False, *args, **kwargs):
         if get_bibtex:

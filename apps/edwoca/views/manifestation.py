@@ -88,6 +88,18 @@ class RelatedManifestationRemoveView(DeleteView):
 
 class ManifestationContributorsUpdateView(ContributorsUpdateView):
     model = Manifestation
+    form_class = ManifestationContributorForm
+
+
+class ManifestationContributorAddView(ContributorAddView):
+    model = ManifestationContributor
+
+
+class ManifestationContributorRemoveView(DeleteView):
+    model = ManifestationContributor
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_contributors', kwargs={'pk': self.object.manifestation.id})
 
 
 class ManifestationRelationsUpdateView(RelationsUpdateView):
@@ -103,7 +115,7 @@ class ManifestationHistoryUpdateView(SimpleFormView):
 
 class ManifestationBibliographyUpdateView(FormsetUpdateView):
     model = Manifestation
-    form_class = ManifestationBibFormSet
+    form_class = ManifestationBibForm
     property = 'bib'
 
     def get_success_url(self):

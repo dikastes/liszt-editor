@@ -16,31 +16,29 @@
 
 <div class="bg-white border border-base-300 p-5">
 	<div class="prose">
-		<h2> Beteiligte </h2>
+		<h2> Literatur </h2>
 
 		<ul>
-		{% for contributor in object.contributor_relations.all %}
+		{% for work_bib in object.workbib_set.all %}
 			<li>
 				<div class="flex">
-					<a href="{% url 'dmad_on_django:person_update' contributor.person.id %}" class="flex-1">
-						{{ contributor.person }} ({{ contributor.role }})
-					</a>
-					<form method="post" action="{% url 'edwoca:work_contributor_remove' contributor.id %}" class="flex-0">
+					{{ work_bib.bib }}
+					<form method="post" action="{% url 'edwoca:work_bib_remove' work_bib.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>
 				</div>
 			</li>
 		{% empty %}
-			<li> <em> keine Beteiligte verknüpft </em> </li>
+			<li> <em> keine bibliografischen Einträge verknüpft </em> </li>
 		{% endfor %}
 		</ul>
 
-		<h3> neuen Beteiligten verknüpfen </h3>
+		<h3> neuen Titel verknüpfen </h3>
 
 		{% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:work_contributors' object.id %}" method="get">
+		<form action="{% url 'edwoca:work_bibliography' object.id %}" method="get">
 			{{ searchform.q }}
 			<input type="hidden" name="target_model" value="work" />
 			<input type="submit" id="submit-form" class="btn" />
@@ -48,11 +46,12 @@
 		
 		<ul>
 		{% if query %}
-			{% for found_contributor in found_contributors %}
+			{% for found_bib in found_bibs %}
 				<li>
-					<a href="{% url 'edwoca:work_contributor_add' object.id found_contributor.object.id %}">
-						{{ found_contributor.object }}
-					</a>
+					<form method="POST" action="{% url 'edwoca:work_bib_add' object.id found_bib.object.pk %}">
+						{% csrf_token %}
+						<input type="submit" value="{{ found_bib.object }}">
+					</form>
 				</li>
 			{% empty %}
 				<li> <em> keine Suchergebnisse </em> </li>
@@ -64,12 +63,14 @@
 
 		{% else %}
 
+		{% comment %}
 		<form method="post">
 			{% csrf_token %}
 			{{ person }} mit {{ object }} verknüpfen als:
 			{{ form }}
 			<input type="submit" id="submit-form" class="btn" />
 		</form>
+		{% endcomment %}
 
 		{% endif %}
 	</div>
