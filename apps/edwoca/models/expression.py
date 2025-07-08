@@ -72,7 +72,8 @@ class RelatedExpression(RelatedEntity):
 class ExpressionContributor(BaseContributor):
     expression = models.ForeignKey(
         'Expression',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='contributor_relations'
     )
 
 

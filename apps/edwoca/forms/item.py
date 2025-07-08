@@ -53,7 +53,7 @@ class ItemCommentForm(CommentForm):
 
 
 class ItemContributorForm(ContributorForm):
-    class Meta:
+    class Meta(ContributorForm.Meta):
         model = ItemContributor
         fields = ContributorForm.Meta.fields + [ 'item' ]
         widgets = dict(ContributorForm.Meta.widgets, **{ 'item': HiddenInput() })
@@ -93,14 +93,7 @@ ItemTitleFormSet = inlineformset_factory(
     )
 
 
-ItemContributorFormSet = inlineformset_factory(
-        Item,
-        ItemContributor,
-        form = ItemContributorForm,
-        extra = 1,
-        max_num = 100,
-        can_delete = True
-    )
+
 
 
 class ProvenanceForm(ModelForm):

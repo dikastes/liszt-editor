@@ -95,7 +95,8 @@ class ManifestationBib(BaseBib):
 class ManifestationContributor(BaseContributor):
     manifestation = models.ForeignKey(
         'Manifestation',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='contributor_relations'
     )
 
 

@@ -3,6 +3,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, FormView
 from dmad_on_django.forms import SearchForm
+from dmad_on_django.models import Person
 from haystack.generic_views import SearchView
 from ..models import Work, Manifestation
 from edwoca import forms as edwoca_forms
@@ -162,43 +163,56 @@ class RelatedEntityAddView(FormView):
 
 
 class ContributorsUpdateView(UpdateView):
-    fields = []
     template_name = 'edwoca/contributor_update.html'
-
-    def get_success_url(self):
-        return reverse_lazy(f"edwoca:{self.model.__name__.lower()}_contributors", kwargs = {'pk': self.get_object().id})
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if 'form' not in kwargs:
-            context['form'] = getattr(edwoca_forms, f"{self.model.__name__}ContributorFormSet")(instance = self.object)
-        else:
-            context['form'] = kwargs['form']
+        search_form = SearchForm(self.request.GET or None)
+        context['searchform'] = search_form
+        context['show_search_form'] = True
+
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_contributors"] = search_form.search().models(Person)
+
         return context
 
-    def post(self, request, *args, **kwargs):
-        model_name = self.model.__name__
-        self.object = self.get_object()
+    def get_model(self):
+        return self.model.__name__
 
-        if 'add-form' in request.POST:
-            data = request.POST.copy()
-            total_forms = int(data.get('workcontributor_set-TOTAL_FORMS', 0))
-            data['workcontributor_set-TOTAL_FORMS'] = str(total_forms + 1)
-            form = getattr(edwoca_forms, f"{model_name}ContributorFormSet")(data, instance=self.object)
-            return self.render_to_response(self.get_context_data(form=form))
 
-        formset = getattr(edwoca_forms, f"{model_name}ContributorFormSet")(
-                request.POST,
-                instance = self.object,
-                queryset = getattr(edwoca_models, f"{model_name}Contributor").objects.filter(**{model_name.lower(): self.object})
-            )
-        for form in formset:
-            if not getattr(form.instance, model_name.lower()):
-                setattr(form.instance, model_name.lower(), self.get_object())
+class ContributorAddView(FormView):
+    template_name = 'edwoca/contributor_update.html'
 
-        if formset.is_valid():
-            for form in formset:
-                formset.instance.save()
-            return self.form_valid(formset)
-        else:
-            return self.form_invalid(formset)
+    def get_form_name(self):
+        return f"{self.model.__name__}Form"
+
+    def get_model_name(self):
+        return self.model.__name__.lower().replace('contributor', '')
+
+    def get_form_class(self):
+        return getattr(edwoca_forms, self.get_form_name())
+
+    def get_success_url(self):
+        return reverse_lazy(f"edwoca:{self.get_model_name()}_contributors", kwargs={'pk': self.kwargs['pk']})
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        kwargs['initial'] = {
+            f"{self.get_model_name()}": self.kwargs['pk'],
+            'person': self.kwargs['person'],
+        }
+        return kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        model = getattr(edwoca_models, self.get_model_name().capitalize())
+        context['show_search_form'] = False
+        context['person'] = Person.objects.get(pk=self.kwargs['person'])
+        context['object'] = model.objects.get(pk=self.kwargs["pk"])
+        return context
+
+    def form_valid(self, form):
+        form.save()
+        return super().form_valid(form)
