@@ -1,5 +1,6 @@
 from .base import *
 from ..forms.work import *
+from bib.models import ZotItem
 from django.forms.models import formset_factory
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -106,16 +107,20 @@ class WorkSearchView(EdwocaSearchView):
     model = Work
 
 
-class WorkBibView(ModelFormMixin):
-    model = WorkBib
-    fields = [
-            'bib',
-            'work'
-        ]
-
-
 class WorkContributorsUpdateView(ContributorsUpdateView):
     model = Work
+    form_class = WorkContributorForm
+
+
+class WorkContributorAddView(ContributorAddView):
+    model = WorkContributor
+
+
+class WorkContributorRemoveView(DeleteView):
+    model = WorkContributor
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_contributors', kwargs={'pk': self.object.work.id})
 
 
 class WorkHistoryUpdateView(SimpleFormView):
@@ -123,15 +128,44 @@ class WorkHistoryUpdateView(SimpleFormView):
     property = 'history'
 
 
-class WorkBibliographyUpdateView(FormsetUpdateView):
+class WorkBibliographyUpdateView(UpdateView):
     model = Work
-    form_class = WorkBibFormSet
+    form_class = WorkBibForm
     property = 'bib'
+    template_name = 'edwoca/bib_update.html'
 
     def get_success_url(self):
         return reverse_lazy('edwoca:work_bibliography', kwargs = {'pk': self.object.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_form = SearchForm(self.request.GET or None)
+        context['searchform'] = search_form
+        context['show_search_form'] = True
+
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_bibs"] = search_form.search().models(ZotItem)
+        return context
 
 
 class WorkCommentUpdateView(SimpleFormView):
     model = Work
     property = 'comment'
+
+
+class WorkBibAddView(FormView):
+    def post(self, request, *args, **kwargs):
+        work_id = self.kwargs['pk']
+        zotitem_key = self.kwargs['zotitem_key']
+        work = Work.objects.get(pk=work_id)
+        zotitem = ZotItem.objects.get(zot_key=zotitem_key)
+        WorkBib.objects.get_or_create(work=work, bib=zotitem)
+        return redirect(reverse_lazy('edwoca:work_bibliography', kwargs={'pk': work_id}))
+
+
+class WorkBibDeleteView(DeleteView):
+    model = WorkBib
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_bibliography', kwargs={'pk': self.object.work.id})

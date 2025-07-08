@@ -61,7 +61,7 @@ class ItemContributor(BaseContributor):
     item = models.ForeignKey(
         'Item',
         on_delete=models.CASCADE,
-        #related_name='contributors'
+        related_name='contributor_relations'
     )
 
 

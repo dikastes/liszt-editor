@@ -23,17 +23,17 @@ api_key = settings.Z_API_KEY
 bulk_size = 50
 
 
-class Dashboard(ListView):
+class Index(ListView):
     model = ZotItem
     paginate_by = 10
-    template_name = 'bib/dashboard.html'
+    template_name = 'bib/index.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['count'] = ZotItem.objects.all().count()
         return context
 
-def dashboard_info(request):
+def index_info(request):
     context = {}
     count = ZotItem.objects.all().count()
     first_object = ZotItem.objects.all()[:1].get()
@@ -52,7 +52,7 @@ def sync_zotero(request):
 
 def delete(request):
     ZotItem.objects.all().delete()
-    return redirect('bib:dashboard')
+    return redirect('bib:index')
 
 
 def import_complete(request):
@@ -91,4 +91,4 @@ def update_zotitems(request):
 
 
 def update(request):
-    return redirect('bib:dashboard')
+    return redirect('bib:index')

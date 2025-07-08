@@ -48,49 +48,15 @@ class ManifestationCommentForm(CommentForm):
         widgets = CommentForm.Meta.widgets
 
 
-class ManifestationBibForm(ModelForm):
-    class Meta:
+class ManifestationBibForm(BaseBibForm):
+    class Meta(BaseBibForm.Meta):
         model = ManifestationBib
-        fields = [ 'bib', 'id', 'manifestation' ]
-        widgets = {
-                'bib': Select( attrs = {
-                        'class': 'autocomplete-select select select-bordered w-full'
-                    }),
-                'id': HiddenInput(),
-                'manifestation': HiddenInput(),
-                'DELETE': CheckboxInput( attrs = {
-                        'class': 'flex-0'
-                    })
-            }
-
-    def as_daisy(self):
-        form = div(cls='mb-10')
-
-        if self.instance.pk:
-           form.add(raw(str(self['id'])))
-        form.add(raw(str(self['manifestation'])))
-
-        bib_field = self['bib']
-
-        bib_container = div(cls='flex-1')
-        bib_container.add(raw(str(bib_field)))
-
-        palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette.add(bib_container)
-
-        if 'DELETE' in self.fields:
-            del_field = self['DELETE']
-            del_field_label = label(del_field.label, cls='input input-bordered flex flex-0 items-center gap-2')
-            del_field_label.add(raw(str(del_field)))
-            palette.add(del_field_label)
-
-        form.add(palette)
-
-        return mark_safe(str(form))
+        fields = BaseBibForm.Meta.fields + [ 'manifestation' ]
+        widgets = dict(BaseBibForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
 
 
 class ManifestationContributorForm(ContributorForm):
-    class Meta:
+    class Meta(ContributorForm.Meta):
         model = ManifestationContributor
         fields = ContributorForm.Meta.fields + [ 'manifestation' ]
         widgets = dict(ContributorForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
@@ -262,21 +228,7 @@ ManifestationTitleFormSet = inlineformset_factory(
     )
 
 
-ManifestationBibFormSet = inlineformset_factory(
-        Manifestation,
-        ManifestationBib,
-        form = ManifestationBibForm,
-        extra = 1,
-        max_num = 100,
-        can_delete = True
-    )
 
 
-ManifestationContributorFormSet = inlineformset_factory(
-        Manifestation,
-        ManifestationContributor,
-        form = ManifestationContributorForm,
-        extra = 1,
-        max_num = 100,
-        can_delete = True
-    )
+
+
