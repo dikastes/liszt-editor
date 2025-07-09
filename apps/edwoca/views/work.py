@@ -12,7 +12,6 @@ class WorkListView(EdwocaListView):
     model = Work
 
 
-
 class WorkCreateView(CreateView):
     model = Work
     form_class = WorkForm
@@ -146,6 +145,7 @@ class WorkBibliographyUpdateView(UpdateView):
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['query'] = search_form.cleaned_data.get('q')
             context[f"found_bibs"] = search_form.search().models(ZotItem)
+        context['entity_type_name'] = 'work'
         return context
 
 
