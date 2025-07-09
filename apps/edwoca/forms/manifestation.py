@@ -161,7 +161,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         not_before_field = self['not_before']
         not_after_field = self['not_after']
         display_field = self['display']
-        history_field = self['history']
+        #history_field = self['history']
 
         not_before_container = label(cls='form-control')
         not_before_label = div(not_before_field.label, cls='label-text')
@@ -180,12 +180,12 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
         display_container.add(raw(str(display_field)))
 
-        history_wrap = label(cls='form-control')
-        history_label = div(cls='label')
-        history_span = span(history_field.label, cls='label-text')
-        history_label.add(history_span)
-        history_wrap.add(history_label)
-        history_wrap.add(raw(str(history_field)))
+        #history_wrap = label(cls='form-control')
+        #history_label = div(cls='label')
+        #history_span = span(history_field.label, cls='label-text')
+        #history_label.add(history_span)
+        #history_wrap.add(history_label)
+        #history_wrap.add(raw(str(history_field)))
 
         period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
         period_palette.add(not_before_container)
@@ -194,7 +194,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
 
         form.add(period_palette)
         form.add(display_container)
-        form.add(history_wrap)
+        #form.add(history_wrap)
 
         return mark_safe(str(form))
 
