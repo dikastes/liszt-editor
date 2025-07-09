@@ -19,11 +19,11 @@
 		<h2> Literatur </h2>
 
 		<ul>
-		{% for work_bib in object.workbib_set.all %}
+		{% for work_bib in object.bib_set.all %}
 			<li>
 				<div class="flex">
 					{{ work_bib.bib }}
-					<form method="post" action="{% url 'edwoca:work_bib_remove' work_bib.id %}" class="flex-0">
+					<form method="post" action="{% url 'edwoca:'|add:entity_type_name|add:'_bib_remove' work_bib.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>
@@ -38,9 +38,9 @@
 
 		{% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:work_bibliography' object.id %}" method="get">
+		<form action="{% url 'edwoca:'|add:entity_type_name|add:'_bibliography' object.id %}" method="get">
 			{{ searchform.q }}
-			<input type="hidden" name="target_model" value="work" />
+			<input type="hidden" name="target_model" value="{{ entity_type_name }}" />
 			<input type="submit" id="submit-form" class="btn" />
 		</form>
 		
@@ -48,9 +48,9 @@
 		{% if query %}
 			{% for found_bib in found_bibs %}
 				<li>
-					<form method="POST" action="{% url 'edwoca:work_bib_add' object.id found_bib.object.pk %}">
+					<form method="POST" action="{% url 'edwoca:'|add:entity_type_name|add:'_bib_add' object.id found_bib.object.pk %}">
 						{% csrf_token %}
-						<input type="submit" value="{{ found_bib.object }}">
+						<input type="submit" value="{{ found_bib.object }}" class="cursor-pointer">
 					</form>
 				</li>
 			{% empty %}
@@ -62,15 +62,6 @@
 		</ul>
 
 		{% else %}
-
-		{% comment %}
-		<form method="post">
-			{% csrf_token %}
-			{{ person }} mit {{ object }} verknüpfen als:
-			{{ form }}
-			<input type="submit" id="submit-form" class="btn" />
-		</form>
-		{% endcomment %}
 
 		{% endif %}
 	</div>

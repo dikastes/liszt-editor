@@ -5,13 +5,19 @@ from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status
 
 
+class TitleTypes(models.TextChoices):
+    ENVELOPE = 'EN', _('Envelope')
+    TITLE_PAGE = 'TP', _('Title Page')
+    HEAD_TITLE = 'HT', _('Head Title')
+
+
 class Manifestation(WemiBaseClass):
     class ManifestationType(models.TextChoices):
         MANUSCRIPT = 'MS', _('Parent')
 
     class EditionType(models.TextChoices):
-        PIANO_REDUCTION = 'PR', _('Piano Reduction')
         SCORE = 'SC', _('Score')
+        PARTS = 'PA', _('Parts')
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
@@ -71,24 +77,85 @@ class Manifestation(WemiBaseClass):
             'bib.ZotItem',
             through = 'ManifestationBib'
         )
+    dedicatee = models.ForeignKey(
+            'dmad.Person',
+            on_delete=models.SET_NULL,
+            related_name='dedicated_manifestations',
+            blank=True,
+            null=True
+        )
+    dedication = models.TextField(
+            max_length=100,
+            blank=True,
+            null=True
+        )
+    watermark = models.TextField(
+            max_length=100,
+            blank=True,
+            null=True
+        )
+    watermark_url = models.URLField(
+            blank=True,
+            null=True
+        )
+
+    def get_pref_title(self):
+        titles = self.titles.all()
+
+        envelope_title = next((t.title for t in titles if t.title_type == TitleTypes.ENVELOPE), None)
+        if envelope_title:
+            return envelope_title
+
+        title_page_title = next((t.title for t in titles if t.title_type == TitleTypes.TITLE_PAGE), None)
+        if title_page_title:
+            return title_page_title
+
+        head_title = next((t.title for t in titles if t.title_type == TitleTypes.HEAD_TITLE), None)
+        if head_title:
+            return head_title
+
+        return '<ohne Titel>'
 
     def __str__(self):
-        title = self.get_pref_title() or '<ohne Titel>'
-        return f'{self.rism_id}: {title}'
+        return f'{self.rism_id}: {self.get_pref_title()}'
 
 
-class ManifestationTitle(WemiTitle):
+class ManifestationTitle(models.Model):
+
+    title = models.CharField(
+            max_length=100,
+            null=True,
+            blank=True
+        )
+    title_type = models.CharField(
+            max_length=2,
+            choices=TitleTypes,
+            default=TitleTypes.ENVELOPE
+        )
+    writer = models.ForeignKey(
+            'dmad.Person',
+            on_delete=models.SET_NULL,
+            related_name='written_manifestation_titles',
+            blank=True,
+            null=True
+        )
+    medium = models.CharField(
+            max_length=100,
+            null=True,
+            blank=True
+        )
     manifestation = models.ForeignKey(
             'Manifestation',
             on_delete=models.CASCADE,
-            related_name='titles'
+            related_name='titles',
         )
 
 
 class ManifestationBib(BaseBib):
     manifestation = models.ForeignKey(
         'Manifestation',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='bib_set'
     )
 
 

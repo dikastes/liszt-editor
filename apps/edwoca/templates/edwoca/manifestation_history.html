@@ -1,0 +1,87 @@
+{% extends 'liszt_util/base.html' %}
+
+{% block menu %}
+
+{% include 'edwoca/partials/update_menu_switcher.html' %}
+
+{% endblock %}
+
+{% block navbar_title %}
+
+{% include 'edwoca/partials/title.html' %}
+
+{% endblock %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5">
+	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+
+	<form method="post">
+		{% csrf_token %}
+		{{ form.as_daisy }}
+
+		<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+	</form>
+
+	{% if object.place %}
+		<label class="input input-bordered flex items-center gap-2">
+			Ort
+			<input type="text" class="grow disabled" value="{{ object.place }}" />
+			<a href="{% url 'edwoca:manifestation_remove_place' object.id %}"> löschen </a>
+		</label>
+	{% else %}
+		<h3> Ort verknüpfen </h3>
+
+		{% if show_search_form == True %}
+
+		<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get">
+			{{ searchform.q }}
+			<input type="hidden" name="target_model" value="manifestation" />
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+		
+		<ul>
+		{% if query %}
+			{% for found_place in found_places %}
+				<li>
+					<a href="{% url 'edwoca:manifestation_place_add' object.id found_place.object.id %}">
+						{{ found_place.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+
+		{% else %}
+
+		<form method="post">
+			{% csrf_token %}
+			{{ person }} mit {{ object }} verknüpfen als:
+			{{ form }}
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+
+		{% endif %}
+	{% endif %}
+</div>
+
+{% endblock %}
+
+{% block nav %}
+<div class="flex flex-col h-full">
+	<div class="flex-1">
+		-- Navigation --
+	</div>
+	<div class="flex-0">
+		<label for="submit-form" class="btn btn-primary"> speichern </label>
+	</div>
+</div>
+{% endblock %}
+
+{% block navbar_extras %}
+{% endblock %}
