@@ -34,11 +34,62 @@ class ManifestationForm(ModelForm):
         return mark_safe(str(form))
 
 
-class ManifestationTitleForm(TitleForm):
+class ManifestationTitleForm(ModelForm):
     class Meta(TitleForm.Meta):
         model = ManifestationTitle
-        fields = TitleForm.Meta.fields + ['manifestation']
-        widgets = dict(TitleForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
+        fields = ['title', 'title_type', 'medium']
+        widgets = {
+                'title': TextInput( attrs = {
+                        'class': 'grow w-full'
+                    }),
+                'title_type': Select( attrs = {
+                        'class': 'autocomplete-select select select-bordered w-full'
+                    }),
+                'medium': TextInput( attrs = {
+                        'class': 'grow w-full'
+                    }),
+                'DELETE': CheckboxInput( attrs = {
+                        'class': 'flex-0'
+                    })
+                }
+
+    def as_daisy(self):
+        class_name = self.Meta.model.__name__.lower().replace('title', '')
+        form = div(cls='mb-10')
+
+        if self.instance.pk:
+           form.add(raw(str(self['id'])))
+        form.add(raw(str(self[class_name])))
+
+        title_field = self['title']
+        type_field = self['title_type']
+        medium_field = self['medium']
+
+        title_field_label = label(title_field.label, cls='input input-bordered flex items-center gap-2 my-5')
+        title_field_label.add(raw(str(title_field)))
+
+        type_container = div(cls='flex-1')
+        type_container.add(raw(str(type_field)))
+
+        medium_field_label = label(title_field.label, cls='input input-bordered flex items-center gap-2 my-5')
+        medium_field_label.add(raw(str(medium_field)))
+
+        palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette.add(title_field_label)
+        palette.add(type_container)
+        palette.add(medium_field_label)
+
+        # checken ob das form initialisiert ist, sonst kein delete-button
+        if 'DELETE' in self.fields and self.instance.pk:
+            del_field = self['DELETE']
+            del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
+            del_field_label.add(raw(str(del_field)))
+            palette.add(del_field_label)
+
+        form.add(title_field_label)
+        form.add(palette)
+
+        return mark_safe(str(form))
 
 
 class ManifestationCommentForm(CommentForm):

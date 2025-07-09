@@ -10,8 +10,8 @@ class Manifestation(WemiBaseClass):
         MANUSCRIPT = 'MS', _('Parent')
 
     class EditionType(models.TextChoices):
-        PIANO_REDUCTION = 'PR', _('Piano Reduction')
         SCORE = 'SC', _('Score')
+        PARTS = 'PA', _('Parts')
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
@@ -71,17 +71,65 @@ class Manifestation(WemiBaseClass):
             'bib.ZotItem',
             through = 'ManifestationBib'
         )
+    dedicatee = models.ForeignKey(
+            'dmad.Person',
+            on_delete=models.SET_NULL,
+            related_name='dedicated_manifestations',
+            blank=True,
+            null=True
+        )
+    dedication = models.TextField(
+            max_length=100,
+            blank=True,
+            null=True
+        )
+    watermark = models.TextField(
+            max_length=100,
+            blank=True,
+            null=True
+        )
+    watermark_url = models.URLField(
+            blank=True,
+            null=True
+        )
 
     def __str__(self):
         title = self.get_pref_title() or '<ohne Titel>'
         return f'{self.rism_id}: {title}'
 
 
-class ManifestationTitle(WemiTitle):
+class ManifestationTitle(models.Model):
+    class TitleTypes(models.TextChoices):
+        ENVELOPE = 'EN', _('Envelope')
+        TITLE_PAGE = 'TP', _('Title Page')
+        HEAD_TITLE = 'HT', _('Head Title')
+
+    title = models.CharField(
+            max_length=100,
+            null=True,
+            blank=True
+        )
+    title_type = models.CharField(
+            max_length=2,
+            choices=TitleTypes,
+            default=TitleTypes.ENVELOPE
+        )
+    writer = models.ForeignKey(
+            'dmad.Person',
+            on_delete=models.SET_NULL,
+            related_name='written_manifestation_titles',
+            blank=True,
+            null=True
+        )
+    medium = models.CharField(
+            max_length=100,
+            null=True,
+            blank=True
+        )
     manifestation = models.ForeignKey(
             'Manifestation',
             on_delete=models.CASCADE,
-            related_name='titles'
+            related_name='titles',
         )
 
 
