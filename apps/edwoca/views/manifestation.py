@@ -1,9 +1,12 @@
 from .base import *
 from ..forms.manifestation import *
-from django.shortcuts import redirect
-from django.urls import reverse_lazy
-from django.views.generic import DeleteView
+from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse_lazy, reverse
+from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
+from dmad_on_django.models import Place
+from ..models.manifestation import ManifestationBib
+from bib.models import ZotItem
 
 
 class ManifestationListView(EdwocaListView):
@@ -111,15 +114,79 @@ class ManifestationRelationsUpdateView(RelationsUpdateView):
 class ManifestationHistoryUpdateView(SimpleFormView):
     model = Manifestation
     property = 'history'
+    template_name = 'edwoca/manifestation_history.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_form = SearchForm(self.request.GET or None)
+        context['searchform'] = search_form
+        context['show_search_form'] = True
+
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_places"] = search_form.search().models(Place)
+
+        return context
+
+    def get_model(self):
+        return self.model.__name__
 
 
-class ManifestationBibliographyUpdateView(FormsetUpdateView):
+def manifestation_add_place_view(request, pk, place_id):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    place = get_object_or_404(Place, pk=place_id)
+
+    manifestation.place = place
+    manifestation.save()
+
+    return redirect('edwoca:manifestation_history', pk=pk)
+
+
+def manifestation_remove_place_view(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+
+    manifestation.place = None
+    manifestation.save()
+
+    return redirect('edwoca:manifestation_history', pk=pk)
+
+
+class ManifestationBibAddView(FormView):
+    def post(self, request, *args, **kwargs):
+        manifestation_id = self.kwargs['pk']
+        zotitem_key = self.kwargs['zotitem_key']
+        manifestation = Manifestation.objects.get(pk=manifestation_id)
+        zotitem = ZotItem.objects.get(zot_key=zotitem_key)
+        ManifestationBib.objects.get_or_create(manifestation=manifestation, bib=zotitem)
+        return redirect(reverse_lazy('edwoca:manifestation_bibliography', kwargs={'pk': manifestation_id}))
+
+class ManifestationBibDeleteView(DeleteView):
+    model = ManifestationBib
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_bibliography', kwargs={'pk': self.object.manifestation.id})
+
+
+class ManifestationBibliographyUpdateView(UpdateView):
     model = Manifestation
     form_class = ManifestationBibForm
     property = 'bib'
+    template_name = 'edwoca/bib_update.html'
 
     def get_success_url(self):
         return reverse_lazy('edwoca:manifestation_bibliography', kwargs = {'pk': self.object.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_form = SearchForm(self.request.GET or None)
+        context['searchform'] = search_form
+        context['show_search_form'] = True
+
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_bibs"] = search_form.search().models(ZotItem)
+        context['entity_type_name'] = 'manifestation'
+        return context
 
 
 class ManifestationCommentUpdateView(SimpleFormView):
