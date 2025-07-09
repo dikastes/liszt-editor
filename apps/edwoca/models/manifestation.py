@@ -5,6 +5,12 @@ from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status
 
 
+class TitleTypes(models.TextChoices):
+    ENVELOPE = 'EN', _('Envelope')
+    TITLE_PAGE = 'TP', _('Title Page')
+    HEAD_TITLE = 'HT', _('Head Title')
+
+
 class Manifestation(WemiBaseClass):
     class ManifestationType(models.TextChoices):
         MANUSCRIPT = 'MS', _('Parent')
@@ -93,16 +99,28 @@ class Manifestation(WemiBaseClass):
             null=True
         )
 
+    def get_pref_title(self):
+        titles = self.titles.all()
+
+        envelope_title = next((t.title for t in titles if t.title_type == TitleTypes.ENVELOPE), None)
+        if envelope_title:
+            return envelope_title
+
+        title_page_title = next((t.title for t in titles if t.title_type == TitleTypes.TITLE_PAGE), None)
+        if title_page_title:
+            return title_page_title
+
+        head_title = next((t.title for t in titles if t.title_type == TitleTypes.HEAD_TITLE), None)
+        if head_title:
+            return head_title
+
+        return '<ohne Titel>'
+
     def __str__(self):
-        title = self.get_pref_title() or '<ohne Titel>'
-        return f'{self.rism_id}: {title}'
+        return f'{self.rism_id}: {self.get_pref_title()}'
 
 
 class ManifestationTitle(models.Model):
-    class TitleTypes(models.TextChoices):
-        ENVELOPE = 'EN', _('Envelope')
-        TITLE_PAGE = 'TP', _('Title Page')
-        HEAD_TITLE = 'HT', _('Head Title')
 
     title = models.CharField(
             max_length=100,
@@ -136,7 +154,8 @@ class ManifestationTitle(models.Model):
 class ManifestationBib(BaseBib):
     manifestation = models.ForeignKey(
         'Manifestation',
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        related_name='bib_set'
     )
 
 
