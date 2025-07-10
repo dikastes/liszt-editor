@@ -4047,6 +4047,10 @@ details.collapse summary::-webkit-details-marker {
   height: 100vh;
 }
 
+.min-h-inherit {
+  min-height: inherit;
+}
+
 .min-h-screen {
   min-height: 100vh;
 }
@@ -4171,6 +4175,10 @@ details.collapse summary::-webkit-details-marker {
 
 .border {
   border-width: 1px;
+}
+
+.border-r-0 {
+  border-right-width: 0px;
 }
 
 .border-base-300 {
