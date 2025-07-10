@@ -1,31 +1,17 @@
-{% extends 'liszt_util/base.html' %}
+{% extends 'edwoca/base.html' %}
+
 
 {% block menu %}
 <ul class="menu menu-lg">
 	<li>
-		<h2 class="menu-title"> Kerndaten </h2>
-		<ul>
-			<li>
-			    <a href="{% url 'edwoca:work_search' %}">
-				Werke <span class="badge"> {{ work_count }} </span>
-			    </a>
-			</li>
-			<li>
-			    <a href="{% url 'edwoca:manifestation_search' %}">
-				Quellen <span class="badge"> {{ manifestation_count }} </span>
-			    </a>
-			</li>
-		</ul>
+	    <a href="{% url 'edwoca:work_search' %}">
+		Werke <span class="badge"> {{ work_count }} </span>
+	    </a>
 	</li>
 	<li>
-		<h2 class="menu-title"> weitere </h2>
-		<ul>
-			<li>
-			    <a href="{% url 'dmad_on_django:person_list' %}">
-				Personen <span class="badge"> {{ work_count }} </span>
-			    </a>
-			</li>
-		</ul>
+	    <a href="{% url 'edwoca:manifestation_search' %}">
+		Quellen <span class="badge"> {{ manifestation_count }} </span>
+	    </a>
 	</li>
 </ul>
 {% endblock %}
@@ -59,9 +45,10 @@
 {% endblock %}
 
 {% block navbar_extras %}
+{{ block.super }}
 	{% include 'edwoca/partials/search_form_switcher.html' %}
-	<div class="dropdown dropdown-end">
-			<div tabindex="0" role="button" class="btn btn-primary rounded-btn">neu</div>
+	<div class="dropdown dropdown-end min-h-inherit">
+			<div tabindex="0" role="button" class="btn btn-primary rounded-btn min-h-inherit rounded-none">neu</div>
 			<ul
 			    tabindex="0"
 			    class="menu dropdown-content rounded-box z-[1] mt-4 w-52 p-2 shadow">
@@ -73,4 +60,7 @@
 			    </li>
 			</ul>
 		    </div>
+{% endblock %}
+
+{% block nav %}
 {% endblock %}

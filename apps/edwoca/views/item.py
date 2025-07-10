@@ -6,7 +6,14 @@ from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
 
 
-class ItemTitleUpdateView(TitleUpdateView):
+class ItemMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity_type'] = 'item'
+        return context
+
+
+class ItemTitleUpdateView(ItemMixin, TitleUpdateView):
     model = Item
     form_class = ItemTitleFormSet
     formset_property = 'titles'
@@ -15,13 +22,13 @@ class ItemTitleUpdateView(TitleUpdateView):
         return reverse_lazy('edwoca:item_title', kwargs = {'pk': self.object.id})
 
 
-class ItemUpdateView(UpdateView):
+class ItemUpdateView(ItemMixin, UpdateView):
     model = Item
     form_class = ItemForm
     template_name = 'edwoca/item_update.html'
 
 
-class ItemCreateView(CreateView):
+class ItemCreateView(ItemMixin, CreateView):
     model = Item
     form_class = ItemForm
     template_name = 'edwoca/create.html'
@@ -61,22 +68,22 @@ class ItemCreateView(CreateView):
         return self.render_to_response(context)
 
 
-class ItemDeleteView(DeleteView):
+class ItemDeleteView(ItemMixin, DeleteView):
     pass
 
 
-class ItemLocationUpdateView(SimpleFormView):
+class ItemLocationUpdateView(ItemMixin, SimpleFormView):
     model = Item
     property = 'location'
 
 
-class ItemRelationsUpdateView(RelationsUpdateView):
+class ItemRelationsUpdateView(ItemMixin, RelationsUpdateView):
     template_name = 'edwoca/item_relations.html'
     model = Item
     form_class = RelatedItemForm
 
 
-class RelatedItemAddView(RelatedEntityAddView):
+class RelatedItemAddView(ItemMixin, RelatedEntityAddView):
     template_name = 'edwoca/item_relations.html'
     model = RelatedItem
 
@@ -88,12 +95,12 @@ class RelatedItemRemoveView(DeleteView):
         return reverse_lazy('edwoca:item_relations', kwargs={'pk': self.object.source_item.id})
 
 
-class ItemContributorsUpdateView(ContributorsUpdateView):
+class ItemContributorsUpdateView(ItemMixin, ContributorsUpdateView):
     model = Item
     form_class = ItemContributorForm
 
 
-class ItemContributorAddView(ContributorAddView):
+class ItemContributorAddView(ItemMixin, ContributorAddView):
     model = ItemContributor
 
 
@@ -104,31 +111,31 @@ class ItemContributorRemoveView(DeleteView):
         return reverse_lazy('edwoca:item_contributors', kwargs={'pk': self.object.item.id})
 
 
-class ItemProvenanceUpdateView(UpdateView):
+class ItemProvenanceUpdateView(ItemMixin, UpdateView):
     pass
 
 
-class ItemDetailsUpdateView(SimpleFormView):
+class ItemDetailsUpdateView(ItemMixin, SimpleFormView):
     model = Item
     property = 'details'
 
 
-class ItemDescriptionUpdateView(SimpleFormView):
+class ItemDescriptionUpdateView(ItemMixin, SimpleFormView):
     model = Item
     property = 'description'
 
 
-class ItemDigcopyUpdateView(SimpleFormView):
+class ItemDigcopyUpdateView(ItemMixin, SimpleFormView):
     model = Item
     property = 'digcopy'
 
 
-class ItemCommentUpdateView(SimpleFormView):
+class ItemCommentUpdateView(ItemMixin, SimpleFormView):
     model = Item
     property = 'comment'
 
 
-class ItemDeleteView(DeleteView):
+class ItemDeleteView(ItemMixin, DeleteView):
     model = Item
 
     def get_success_url(self):

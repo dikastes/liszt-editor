@@ -1,0 +1,9 @@
+{% if entity_type == 'expression' %}
+    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">E-{{ object.id }}</div>
+{% elif entity_type == 'work' %}
+    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">W-{{ object.id }}</div>
+{% elif entity_type == 'manifestation' %}
+    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">M-{{ object.id }}</div>
+{% elif entity_type == 'item' %}
+    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">I-{{ object.id }}</div>
+{% endif %}

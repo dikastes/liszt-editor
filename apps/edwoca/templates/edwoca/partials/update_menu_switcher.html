@@ -1,15 +1,9 @@
-{% if 'expressions' in request.path %}
-	{% include 'edwoca/partials/expression_menu.html' %}
-{% endif %}
-
-{% if 'work' in request.path %}
-	{% include 'edwoca/partials/work_menu.html' %}
-{% endif %}
-
-{% if 'manifestation' in request.path %}
-	{% include 'edwoca/partials/manifestation_menu.html' %}
-{% endif %}
-
-{% if 'item' in request.path %}
-	{% include 'edwoca/partials/item_menu.html' %}
+{% if entity_type == 'expression' %}
+    {% include 'edwoca/partials/expression_menu.html' %}
+{% elif entity_type == 'work' %}
+    {% include 'edwoca/partials/work_menu.html' %}
+{% elif entity_type == 'manifestation' %}
+    {% include 'edwoca/partials/manifestation_menu.html' %}
+{% elif entity_type == 'item' %}
+    {% include 'edwoca/partials/item_menu.html' %}
 {% endif %}

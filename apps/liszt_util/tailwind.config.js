@@ -31,7 +31,11 @@ module.exports = {
     'textarea-bordered',
   ],
   theme: {
-    extend: {},
+    extend: {
+      minHeight: {
+        'inherit': 'inherit',
+      }
+    },
   },
   plugins: [
     require('@tailwindcss/typography'),
