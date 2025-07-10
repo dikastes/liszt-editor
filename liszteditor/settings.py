@@ -85,6 +85,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.liszt_util.context_processors.current_app_name',
+                'apps.edwoca.context_processors.entity_type',
             ],
         },
     },
