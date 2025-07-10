@@ -7,7 +7,14 @@ from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
 
 
-class ExpressionCreateView(CreateView):
+class ExpressionMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity_type'] = 'expression'
+        return context
+
+
+class ExpressionCreateView(ExpressionMixin, CreateView):
     model = Expression
     form_class = ExpressionForm
     template_name = 'edwoca/create.html'
@@ -43,13 +50,13 @@ class ExpressionCreateView(CreateView):
         return self.render_to_response(context)
 
 
-class ExpressionUpdateView(UpdateView):
+class ExpressionUpdateView(ExpressionMixin, UpdateView):
     model = Expression
     form_class = ExpressionForm
     template_name = 'edwoca/expression_update.html'
 
 
-class ExpressionTitleUpdateView(TitleUpdateView):
+class ExpressionTitleUpdateView(ExpressionMixin, TitleUpdateView):
     model = Expression
     form_class = ExpressionTitleFormSet
     formset_property = 'titles'
@@ -58,12 +65,12 @@ class ExpressionTitleUpdateView(TitleUpdateView):
         return reverse_lazy('edwoca:expression_title', kwargs = {'pk': self.object.id})
 
 
-class ExpressionContributorsUpdateView(ContributorsUpdateView):
+class ExpressionContributorsUpdateView(ExpressionMixin, ContributorsUpdateView):
     model = Expression
     form_class = ExpressionContributorForm
 
 
-class ExpressionContributorAddView(ContributorAddView):
+class ExpressionContributorAddView(ExpressionMixin, ContributorAddView):
     model = ExpressionContributor
 
 
@@ -74,17 +81,13 @@ class ExpressionContributorRemoveView(DeleteView):
         return reverse_lazy('edwoca:expression_contributors', kwargs={'pk': self.object.expression.id})
 
 
-class ExpressionRelationsUpdateView(RelationsUpdateView):
+class ExpressionRelationsUpdateView(ExpressionMixin, RelationsUpdateView):
     template_name = 'edwoca/expression_relations.html'
     model = Expression
     form_class = RelatedExpressionForm
 
-    #def get_context_data(self, **kwargs):
-        #context = super().get_context_data(**kwargs)
-        #breakpoint()
 
-
-class RelatedExpressionAddView(RelatedEntityAddView):
+class RelatedExpressionAddView(ExpressionMixin, RelatedEntityAddView):
     template_name = 'edwoca/expression_relations.html'
     model = RelatedExpression
 
@@ -96,7 +99,7 @@ class RelatedExpressionRemoveView(DeleteView):
         return reverse_lazy('edwoca:expression_relations', kwargs={'pk': self.object.source_work.id})
 
 
-class ExpressionHistoryUpdateView(UpdateView):
+class ExpressionHistoryUpdateView(ExpressionMixin, UpdateView):
     model = Expression
     form_class = ExpressionHistoryForm
     template_name = 'edwoca/simple_form.html'
@@ -105,15 +108,15 @@ class ExpressionHistoryUpdateView(UpdateView):
         return reverse_lazy('edwoca:expression_history', kwargs={'pk': self.object.pk})
 
 
-class ExpressionCategorisationUpdateView(UpdateView):
+class ExpressionCategorisationUpdateView(ExpressionMixin, UpdateView):
     pass
 
 
-class ExpressionMediumofperformanceUpdateView(UpdateView):
+class ExpressionMediumofperformanceUpdateView(ExpressionMixin, UpdateView):
     pass
 
 
-class ExpressionMovementsUpdateView(FormsetUpdateView):
+class ExpressionMovementsUpdateView(ExpressionMixin, FormsetUpdateView):
     model = Expression
     form_class = MovementFormSet
     template_name = 'edwoca/expression_movement.html'
@@ -123,7 +126,7 @@ class ExpressionMovementsUpdateView(FormsetUpdateView):
         return reverse_lazy('edwoca:expression_movement', kwargs={'pk': self.object.pk})
 
 
-class ExpressionCommentUpdateView(UpdateView):
+class ExpressionCommentUpdateView(ExpressionMixin, UpdateView):
     model = Expression
     form_class = ExpressionCommentForm
     template_name = 'edwoca/simple_form.html'
@@ -132,7 +135,7 @@ class ExpressionCommentUpdateView(UpdateView):
         return reverse_lazy('edwoca:expression_comment', kwargs={'pk': self.object.pk})
 
 
-class ExpressionDeleteView(DeleteView):
+class ExpressionDeleteView(ExpressionMixin, DeleteView):
     model = Expression
     template_name = 'edwoca/simple_form.html'
 

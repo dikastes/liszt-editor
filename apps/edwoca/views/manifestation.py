@@ -9,6 +9,13 @@ from ..models.manifestation import ManifestationBib
 from bib.models import ZotItem
 
 
+class ManifestationMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity_type'] = 'manifestation'
+        return context
+
+
 class ManifestationListView(EdwocaListView):
     model = Manifestation
 
@@ -17,7 +24,7 @@ class ManifestationSearchView(EdwocaSearchView):
     model = Manifestation
 
 
-class ManifestationCreateView(CreateView):
+class ManifestationCreateView(ManifestationMixin, CreateView):
     model = Manifestation
     form_class = ManifestationForm
     template_name = 'edwoca/create.html'
@@ -52,23 +59,19 @@ class ManifestationCreateView(CreateView):
         return self.render_to_response(context)
 
 
-class ManifestationUpdateView(UpdateView):
+class ManifestationUpdateView(ManifestationMixin, UpdateView):
     model = Manifestation
     form_class = ManifestationForm
     template_name = 'edwoca/simple_form.html'
 
 
-class ManifestationDeleteView(DeleteView):
+class ManifestationDeleteView(ManifestationMixin, DeleteView):
     model = Manifestation
     success_url = reverse_lazy('edwoca:manifestation_list')
     template_name = 'edwoca/simple_form.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
-
-class ManifestationTitleUpdateView(TitleUpdateView):
+class ManifestationTitleUpdateView(ManifestationMixin, TitleUpdateView):
     model = Manifestation
     form_class = ManifestationTitleFormSet
     formset_property = 'titles'
@@ -77,7 +80,7 @@ class ManifestationTitleUpdateView(TitleUpdateView):
         return reverse_lazy('edwoca:manifestation_title', kwargs = {'pk': self.object.id})
 
 
-class RelatedManifestationAddView(RelatedEntityAddView):
+class RelatedManifestationAddView(ManifestationMixin, RelatedEntityAddView):
     template_name = 'edwoca/manifestation_relations.html'
     model = RelatedManifestation
 
@@ -89,12 +92,12 @@ class RelatedManifestationRemoveView(DeleteView):
         return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_work.id})
 
 
-class ManifestationContributorsUpdateView(ContributorsUpdateView):
+class ManifestationContributorsUpdateView(ManifestationMixin, ContributorsUpdateView):
     model = Manifestation
     form_class = ManifestationContributorForm
 
 
-class ManifestationContributorAddView(ContributorAddView):
+class ManifestationContributorAddView(ManifestationMixin, ContributorAddView):
     model = ManifestationContributor
 
 
@@ -105,13 +108,13 @@ class ManifestationContributorRemoveView(DeleteView):
         return reverse_lazy('edwoca:manifestation_contributors', kwargs={'pk': self.object.manifestation.id})
 
 
-class ManifestationRelationsUpdateView(RelationsUpdateView):
+class ManifestationRelationsUpdateView(ManifestationMixin, RelationsUpdateView):
     template_name = 'edwoca/manifestation_relations.html'
     model = Manifestation
     form_class = RelatedManifestationForm
 
 
-class ManifestationHistoryUpdateView(SimpleFormView):
+class ManifestationHistoryUpdateView(ManifestationMixin, SimpleFormView):
     model = Manifestation
     property = 'history'
     template_name = 'edwoca/manifestation_history.html'
@@ -167,7 +170,7 @@ class ManifestationBibDeleteView(DeleteView):
         return reverse_lazy('edwoca:manifestation_bibliography', kwargs={'pk': self.object.manifestation.id})
 
 
-class ManifestationBibliographyUpdateView(UpdateView):
+class ManifestationBibliographyUpdateView(ManifestationMixin, UpdateView):
     model = Manifestation
     form_class = ManifestationBibForm
     property = 'bib'
@@ -185,21 +188,20 @@ class ManifestationBibliographyUpdateView(UpdateView):
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['query'] = search_form.cleaned_data.get('q')
             context[f"found_bibs"] = search_form.search().models(ZotItem)
-        context['entity_type_name'] = 'manifestation'
         return context
 
 
-class ManifestationCommentUpdateView(SimpleFormView):
+class ManifestationCommentUpdateView(ManifestationMixin, SimpleFormView):
     model = Manifestation
     property = 'comment'
 
 
-class ManifestationPrintUpdateView(UpdateView):
+class ManifestationPrintUpdateView(ManifestationMixin, UpdateView):
     pass
     #model = Manifestation
     #property = 'print'
 
 
-class ManifestationClassificationUpdateView(SimpleFormView):
+class ManifestationClassificationUpdateView(ManifestationMixin, SimpleFormView):
     model = Manifestation
     property = 'classification'

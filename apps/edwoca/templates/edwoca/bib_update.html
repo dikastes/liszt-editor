@@ -1,16 +1,6 @@
-{% extends 'liszt_util/base.html' %}
+{% extends 'edwoca/base.html' %}
 
-{% block menu %}
 
-{% include 'edwoca/partials/update_menu_switcher.html' %}
-
-{% endblock %}
-
-{% block navbar_title %}
-
-{% include 'edwoca/partials/title.html' %}
-
-{% endblock %}
 
 {% block content %}
 
@@ -23,7 +13,7 @@
 			<li>
 				<div class="flex">
 					{{ work_bib.bib }}
-					<form method="post" action="{% url 'edwoca:'|add:entity_type_name|add:'_bib_remove' work_bib.id %}" class="flex-0">
+					<form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_bib_remove' work_bib.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>
@@ -38,9 +28,9 @@
 
 		{% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:'|add:entity_type_name|add:'_bibliography' object.id %}" method="get">
+		<form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get">
 			{{ searchform.q }}
-			<input type="hidden" name="target_model" value="{{ entity_type_name }}" />
+			<input type="hidden" name="target_model" value="{{ entity_type}}" />
 			<input type="submit" id="submit-form" class="btn" />
 		</form>
 		
@@ -48,7 +38,7 @@
 		{% if query %}
 			{% for found_bib in found_bibs %}
 				<li>
-					<form method="POST" action="{% url 'edwoca:'|add:entity_type_name|add:'_bib_add' object.id found_bib.object.pk %}">
+					<form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_bib_add' object.id found_bib.object.pk %}">
 						{% csrf_token %}
 						<input type="submit" value="{{ found_bib.object }}" class="cursor-pointer">
 					</form>
@@ -70,16 +60,6 @@
 
 {% endblock %}
 
-{% block nav %}
-<div class="flex flex-col h-full">
-	<div class="flex-1">
-		-- Navigation --
-	</div>
-	<div class="flex-0">
-		<label for="submit-form" class="btn btn-primary"> speichern </label>
-	</div>
-</div>
-{% endblock %}
 
-{% block navbar_extras %}
-{% endblock %}
+
+
