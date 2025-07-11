@@ -27,15 +27,19 @@ class EdwocaListView(ListView):
         return context
 
 
-class ModelMustBeSetMixin:
-    def get_model(self):
+class EntityMixin:
+    def get_model_name(self):
         if not self.model:
             raise ImproperlyConfigured(f"{self.__class__.__name__} requires a 'model' attribute.")
+        return self.model.__name__.lower()
 
-        return self.model.__name__
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['entity_type'] = self.get_model_name()
+        return context
 
 
-class EdwocaSearchView(SearchView, ModelMustBeSetMixin):
+class EdwocaSearchView(EntityMixin, SearchView):
     template_name = 'edwoca/list.html'
     form_class = SearchForm
 
@@ -44,7 +48,7 @@ class EdwocaSearchView(SearchView, ModelMustBeSetMixin):
 
         # redirect to list view if empty query
         if not query or query == '':
-            return redirect(f'edwoca:{self.get_model().lower()}_list')
+            return redirect(f'edwoca:{self.get_model_name().lower()}_list')
 
         return super().get(request, *args, **kwargs)
 
@@ -60,18 +64,23 @@ class EdwocaSearchView(SearchView, ModelMustBeSetMixin):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        return qs.models(getattr(edwoca_models, self.get_model()))
+        return qs.models(getattr(edwoca_models, self.get_model_name()))
 
 
-class SimpleFormView(UpdateView, ModelMustBeSetMixin):
+class SimpleFormView(EntityMixin, UpdateView):
     template_name = 'edwoca/simple_form.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['property'] = self.property
+        return context
+
     def get_form_class(self):
-        class_name = f"{self.get_model()}{self.get_property().capitalize()}Form"
+        class_name = f"{self.get_model_name().capitalize()}{self.get_property().capitalize()}Form"
         return getattr(edwoca_forms, class_name)
 
     def get_success_url(self):
-        return reverse_lazy(f"edwoca:{self.get_model().lower()}_{self.get_property()}", kwargs={'pk': self.object.pk})
+        return reverse_lazy(f"edwoca:{self.get_model_name().lower()}_{self.get_property()}", kwargs={'pk': self.object.pk})
 
     def get_property(self):
         if not self.property:
@@ -196,18 +205,12 @@ class ContributorsUpdateView(UpdateView):
 
         return context
 
-    def get_model(self):
-        return self.model.__name__
 
-
-class ContributorAddView(FormView):
+class ContributorAddView(EntityMixin, FormView):
     template_name = 'edwoca/contributor_update.html'
 
     def get_form_name(self):
         return f"{self.model.__name__}Form"
-
-    def get_model_name(self):
-        return self.model.__name__.lower().replace('contributor', '')
 
     def get_form_class(self):
         return getattr(edwoca_forms, self.get_form_name())
@@ -224,12 +227,16 @@ class ContributorAddView(FormView):
         }
         return kwargs
 
+    def get_model_name(self):
+        return super().get_model_name().lower().replace('contributor', '')
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         model = getattr(edwoca_models, self.get_model_name().capitalize())
         context['show_search_form'] = False
         context['person'] = Person.objects.get(pk=self.kwargs['person'])
         context['object'] = model.objects.get(pk=self.kwargs["pk"])
+        context['entity_type'] = self.get_model_name()
         return context
 
     def form_valid(self, form):

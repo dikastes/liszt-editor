@@ -15,11 +15,13 @@
 	</form>
 
 	{% if object.place %}
-		<label class="input input-bordered flex items-center gap-2">
-			Ort
-			<input type="text" class="grow disabled" value="{{ object.place }}" />
-			<a href="{% url 'edwoca:manifestation_remove_place' object.id %}"> löschen </a>
-		</label>
+		<div class="flex gap-5">
+			<label class="flex-1 input input-bordered flex items-center gap-2">
+				Ort
+				<input type="text" class="grow" disabled value="{{ object.place }}" />
+			</label>
+			<a class="flex-0 btn" href="{% url 'edwoca:manifestation_remove_place' object.id %}"> löschen </a>
+		</div>
 	{% else %}
 		<h3> Ort verknüpfen </h3>
 
@@ -60,8 +62,14 @@
 	{% endif %}
 </div>
 
+<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
+	<p class="prose">
+		{% include 'edwoca/partials/contributors_preview.html' %}
+	</p>
+
+	<p class="prose">
+		{% include 'edwoca/partials/bib_preview.html' %}
+	</p>
+</div>
+
 {% endblock %}
-
-
-
-

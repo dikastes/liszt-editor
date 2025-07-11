@@ -8,18 +8,14 @@ from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, ModelFormMixin
 
 
-class WorkMixin:
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['entity_type'] = 'work'
-        return context
+
 
 
 class WorkListView(EdwocaListView):
     model = Work
 
 
-class WorkCreateView(WorkMixin, CreateView):
+class WorkCreateView(EntityMixin, CreateView):
     model = Work
     form_class = WorkForm
     template_name = 'edwoca/create.html'
@@ -58,14 +54,14 @@ class WorkCreateView(WorkMixin, CreateView):
         return self.render_to_response(context)
 
 
-class WorkUpdateView(WorkMixin, UpdateView):
+class WorkUpdateView(EntityMixin, UpdateView):
     model = Work
     form_class = WorkForm
     template_name = 'edwoca/work_update.html'
     context_object_name = 'work'
 
 
-class WorkDeleteView(WorkMixin, DeleteView):
+class WorkDeleteView(EntityMixin, DeleteView):
     model = Work
     success_url = reverse_lazy('edwoca:index')
     template_name = 'edwoca/simple_form.html'
@@ -76,7 +72,7 @@ class WorkDeleteView(WorkMixin, DeleteView):
         return context
 
 
-class WorkTitleUpdateView(WorkMixin, TitleUpdateView):
+class WorkTitleUpdateView(EntityMixin, TitleUpdateView):
     model = Work
     form_class = WorkTitleFormSet
     formset_property = 'titles'
@@ -85,19 +81,19 @@ class WorkTitleUpdateView(WorkMixin, TitleUpdateView):
         return reverse_lazy('edwoca:work_title', kwargs = {'pk': self.object.id})
 
 
-class WorkRelationsUpdateView(WorkMixin, RelationsUpdateView):
+class WorkRelationsUpdateView(EntityMixin, RelationsUpdateView):
     template_name = 'edwoca/work_relations.html'
     model = Work
     form_class = RelatedWorkForm
 
 
-class WorkRelatedWorksUpdateView(WorkMixin, UpdateView):
+class WorkRelatedWorksUpdateView(EntityMixin, UpdateView):
     model = Work
     fields = []
     template_name = 'edwoca/work_related_works.html'
 
 
-class RelatedWorkAddView(WorkMixin, RelatedEntityAddView):
+class RelatedWorkAddView(EntityMixin, RelatedEntityAddView):
     template_name = 'edwoca/work_relations.html'
     model = RelatedWork
 
@@ -113,12 +109,12 @@ class WorkSearchView(EdwocaSearchView):
     model = Work
 
 
-class WorkContributorsUpdateView(WorkMixin, ContributorsUpdateView):
+class WorkContributorsUpdateView(EntityMixin, ContributorsUpdateView):
     model = Work
     form_class = WorkContributorForm
 
 
-class WorkContributorAddView(WorkMixin, ContributorAddView):
+class WorkContributorAddView(ContributorAddView):
     model = WorkContributor
 
 
@@ -129,12 +125,12 @@ class WorkContributorRemoveView(DeleteView):
         return reverse_lazy('edwoca:work_contributors', kwargs={'pk': self.object.work.id})
 
 
-class WorkHistoryUpdateView(WorkMixin, SimpleFormView):
+class WorkHistoryUpdateView(SimpleFormView):
     model = Work
     property = 'history'
 
 
-class WorkBibliographyUpdateView(WorkMixin, UpdateView):
+class WorkBibliographyUpdateView(EntityMixin, UpdateView):
     model = Work
     form_class = WorkBibForm
     property = 'bib'
@@ -155,7 +151,7 @@ class WorkBibliographyUpdateView(WorkMixin, UpdateView):
         return context
 
 
-class WorkCommentUpdateView(WorkMixin, SimpleFormView):
+class WorkCommentUpdateView(SimpleFormView):
     model = Work
     property = 'comment'
 

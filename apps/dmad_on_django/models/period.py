@@ -4,7 +4,7 @@ from django.db import models
 class Period(models.Model):
     not_before = models.DateField(null=True, blank=True)
     not_after = models.DateField(null=True, blank=True)
-    display = models.TextField()
+    display = models.TextField(null=True, blank=True)
 
     def render_detailed(self):
         if self.not_before == self.not_after:
