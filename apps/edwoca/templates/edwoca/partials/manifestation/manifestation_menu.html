@@ -1,0 +1,85 @@
+<ul class="menu menu-lg">
+	<li class="disabled">
+		{% comment %}
+	    <a
+		href="{% url 'edwoca:manifestation_update' object.id %}"
+		{% if 'update' in request.path %}class="active"{% endif %}
+		>
+		{% endcomment %}
+	    <a href="#">
+		Kopf
+	    </a>
+	</li>
+	<li class="disabled">
+		{% comment %}
+	    <a href="{% url 'edwoca:manifestation_classification' object.id %}"
+		{% if 'classification' in request.path %}class="active"{% endif %}
+		>
+		{% endcomment %}
+	    <a href="#">
+		Quellenart
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_relations' object.id %}"
+		{% if 'relations' in request.path %}class="active"{% endif %}
+		>
+		Bezüge
+	    </a>
+	</li>
+	<li class="disabled">
+		{% comment %}
+	    <a href="{% url 'edwoca:manifestation_title' object.id %}"
+		{% if 'title' in request.path %}class="active"{% endif %}
+		>
+		{% endcomment %}
+	    <a href="#">
+		Titelei und Widmung
+	    </a>
+	</li>
+	<li class="disabled">
+	    <a href="#">
+		Eckdaten Werk
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_history' object.id %}"
+		{% if 'history' in request.path %}class="active"{% endif %}
+		>
+		Datierung und Ort
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_contributors' object.id %}"
+		{% if 'contributors' in request.path %}class="active"{% endif %}
+		>
+		Beteiligte
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_bibliography' object.id %}"
+		{% if 'bibliography' in request.path %}class="active"{% endif %}
+		>
+		Literatur
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_comment' object.id %}"
+		{% if 'comment' in request.path %}class="active"{% endif %}
+		>
+		Kommentar
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_delete' object.id %}"
+		{% if 'delete' in request.path %}class="active"{% endif %}
+		>
+		löschen
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_list' %}">
+		zurück
+	    </a>
+	</li>
+</ul>

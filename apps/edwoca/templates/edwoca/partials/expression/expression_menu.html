@@ -1,0 +1,89 @@
+<ul class="menu menu-lg">
+	<li>
+	    <a
+		href="{% url 'edwoca:expression_title' object.id %}"
+		{% if 'title' in request.path %}class="active"{% endif %}
+		>
+		Titel
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_update' object.id %}"
+		{% if 'update' in request.path %}class="active"{% endif %}
+		>
+		Identifikation
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_relations' object.id %}"
+		{% if 'relations' in request.path %}class="active"{% endif %}
+		>
+		Bezüge
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_contributors' object.id %}"
+		{% if 'contributors' in request.path %}class="active"{% endif %}
+		>
+		Beteiligte
+	    </a>
+	</li>
+	<li class="disabled">
+	    {% comment %}
+	        <a href="{% url 'edwoca:expression_categorisation' object.id %}"
+	    	{% if 'categorisation' in request.path %}class="active"{% endif %}
+	    	>
+	    {% endcomment %}
+	    <a href="#">
+		Kategorisierung
+	    </a>
+	</li>
+	<li class="disabled">
+	    {% comment %}
+	        <a href="{% url 'edwoca:expression_mediumofperformance' object.id %}"
+		    {% if 'mediumofperformance' in request.path %}class="active"{% endif %}
+		    >
+	    {% endcomment %}
+	    <a href="#">
+		Besetzung
+	    </a>
+	</li>
+	<li>
+	        <a href="{% url 'edwoca:expression_movements' object.id %}"
+		    {% if 'movements' in request.path %}class="active"{% endif %}
+		    >
+		Sätze
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_history' object.id %}"
+		{% if 'mediumofperformance' in request.path %}class="active"{% endif %}
+		>
+		Entstehung
+	    </a>
+	</li>
+	<li class="disabled">
+	    <a href="#">
+		Aufführungen
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_comment' object.id %}"
+		{% if 'comment' in request.path %}class="active"{% endif %}
+		>
+		Kommentar
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:expression_delete' object.id %}"
+		{% if 'delete' in request.path %}class="active"{% endif %}
+		>
+		löschen
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:work_list' %}">
+		zurück
+	    </a>
+	</li>
+</ul>
