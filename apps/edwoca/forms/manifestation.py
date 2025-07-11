@@ -2,7 +2,7 @@ from .base import *
 from ..models.manifestation import *
 from dominate.tags import div, label, span
 from dominate.util import raw
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 from dmad_on_django.models import Period
@@ -116,7 +116,7 @@ class ManifestationContributorForm(ContributorForm):
 class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
     not_before = DateTimeField(widget = SelectDateWidget( attrs = {'class':'select select-bordered'}))
     not_after = DateTimeField(widget = SelectDateWidget( attrs = {'class':'select select-bordered'}))
-    display = DateTimeField(widget = TextInput( attrs = { 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
         model = Manifestation
@@ -169,6 +169,8 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         not_before_selects.add(raw(str(not_before_field)))
         not_before_container.add(not_before_label)
         not_before_container.add(not_before_selects)
+        if not_before_field.errors:
+            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
 
         not_after_container = label(cls='form-control')
         not_after_label = div(not_after_field.label, cls='label-text')
@@ -176,9 +178,13 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         not_after_selects.add(raw(str(not_after_field)))
         not_after_container.add(not_after_label)
         not_after_container.add(not_after_selects)
+        if not_after_field.errors:
+            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
         display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
         display_container.add(raw(str(display_field)))
+        if display_field.errors:
+            display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
 
         #history_wrap = label(cls='form-control')
         #history_label = div(cls='label')

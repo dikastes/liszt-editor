@@ -4,6 +4,8 @@
 
 {% block content %}
 
+{% include 'edwoca/partials/preview_'|add:property|add:'_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5">
 	<h2 class="card-title mt-0"> {{ view_title }} </h2>
 
@@ -14,6 +16,8 @@
 		<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
 	</form>
 </div>
+
+{% include 'edwoca/partials/preview_'|add:property|add:'_epilog.html' %}
 
 {% endblock %}
 

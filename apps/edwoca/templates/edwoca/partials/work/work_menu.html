@@ -3,7 +3,6 @@
 	    <a
 		href="{% url 'edwoca:work_title' object.id %}"
 		{% if 'title' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Titel
 	    </a>
@@ -11,7 +10,6 @@
 	<li>
 	    <a href="{% url 'edwoca:work_update' object.id %}"
 		{% if 'update' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Identifikation
 	    </a>
@@ -19,7 +17,6 @@
 	<li>
 	    <a href="{% url 'edwoca:work_relations' object.id %}"
 		{% if 'relations' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Bezüge
 	    </a>
@@ -27,7 +24,6 @@
 	<li>
 	    <a href="{% url 'edwoca:work_contributors' object.id %}"
 		{% if 'contributors' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Beteiligte
 	    </a>
@@ -35,7 +31,6 @@
 	<li>
 	    <a href="{% url 'edwoca:work_relatedworks' object.id %}"
 		{% if 'relatedworks' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Referenzwerke
 	    </a>
@@ -43,7 +38,6 @@
 	<li>
 	    <a href="{% url 'edwoca:work_history' object.id %}"
 		{% if 'history' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Entstehung
 	    </a>
@@ -56,7 +50,6 @@
 	<li>
 	    <a href="{% url 'edwoca:work_bibliography' object.id %}"
 		{% if 'bibliography' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Literatur
 	    </a>
@@ -64,7 +57,6 @@
 	<li>
 	    <a href="{% url 'edwoca:work_comment' object.id %}"
 		{% if 'comment' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Kommentar
 	    </a>
@@ -72,7 +64,6 @@
 	<li>
 	    <a href="{% url 'edwoca:work_delete' object.id %}"
 		{% if 'delete' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		löschen
 	    </a>

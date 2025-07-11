@@ -1,0 +1,10 @@
+{% if entity_type == 'expression' %}
+{% elif entity_type == 'work' %}
+{% elif entity_type == 'manifestation' %}
+<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
+    <p class="prose">
+	{% include 'edwoca/partials/bib_preview.html' %}
+    </p>
+</div>
+{% elif entity_type == 'item' %}
+{% endif %}

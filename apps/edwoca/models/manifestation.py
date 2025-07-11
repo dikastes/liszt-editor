@@ -99,6 +99,10 @@ class Manifestation(WemiBaseClass):
             null=True
         )
 
+    # temporary fix as long as basic update view is unavailable
+    def get_absolute_url(self):
+        return reverse('edwoca:manifestation_relations', kwargs={'pk': self.id})
+
     def get_pref_title(self):
         titles = self.titles.all()
 

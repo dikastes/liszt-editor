@@ -1,8 +1,9 @@
 {% extends 'edwoca/base.html' %}
 
 
-
 {% block content %}
+
+{% include 'edwoca/partials/preview_contributor_prolog.html' %}
 
 <div class="bg-white border border-base-300 p-5">
 	<div class="prose">
@@ -15,7 +16,7 @@
 					<a href="{% url 'dmad_on_django:person_update' contributor.person.id %}" class="flex-1">
 						{{ contributor.person }} ({{ contributor.role }})
 					</a>
-					<form method="post" action="{% url 'edwoca:work_contributor_remove' contributor.id %}" class="flex-0">
+					<form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_contributor_remove' contributor.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>
@@ -30,9 +31,9 @@
 
 		{% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:work_contributors' object.id %}" method="get">
+		<form action="{% url 'edwoca:'|add:entity_type|add:'_contributors' object.id %}" method="get">
 			{{ searchform.q }}
-			<input type="hidden" name="target_model" value="work" />
+			<input type="hidden" name="target_model" value="{{ entity_type }}" />
 			<input type="submit" id="submit-form" class="btn" />
 		</form>
 		
@@ -40,7 +41,7 @@
 		{% if query %}
 			{% for found_contributor in found_contributors %}
 				<li>
-					<a href="{% url 'edwoca:work_contributor_add' object.id found_contributor.object.id %}">
+					<a href="{% url 'edwoca:'|add:entity_type|add:'_contributor_add' object.id found_contributor.object.id %}">
 						{{ found_contributor.object }}
 					</a>
 				</li>
@@ -66,8 +67,6 @@
 
 </div>
 
+{% include 'edwoca/partials/preview_contributor_epilog.html' %}
+
 {% endblock %}
-
-
-
-

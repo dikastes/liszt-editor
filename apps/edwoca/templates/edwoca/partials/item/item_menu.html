@@ -3,7 +3,6 @@
 	    <a
 		href="{% url 'edwoca:item_title' object.id %}"
 		{% if 'title' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Titel
 	    </a>
@@ -11,7 +10,6 @@
 	<li>
 	    <a href="{% url 'edwoca:item_update' object.id %}"
 		{% if 'update' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Identifikation
 	    </a>
@@ -19,7 +17,6 @@
 	<li>
 	    <a href="{% url 'edwoca:item_relations' object.id %}"
 		{% if 'relations' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Bezüge
 	    </a>
@@ -27,7 +24,6 @@
 	<li>
 	    <a href="{% url 'edwoca:item_location' object.id %}"
 		{% if 'location' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Verortung
 	    </a>
@@ -36,7 +32,6 @@
 		{% comment %}
 	    <a href="{% url 'edwoca:item_provenance' object.id %}"
 		{% if 'provenance' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		{% endcomment %}
 	    <a href="#">
@@ -46,7 +41,6 @@
 	<li>
 	    <a href="{% url 'edwoca:item_contributors' object.id %}"
 		{% if 'contributors' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Beteiligte
 	    </a>
@@ -55,7 +49,6 @@
 		{% comment %}
 	    <a href="{% url 'edwoca:item_details' object.id %}"
 		{% if 'details' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		{% endcomment %}
 	    <a href="#">
@@ -66,7 +59,6 @@
 		{% comment %}
 	    <a href="{% url 'edwoca:item_description' object.id %}"
 		{% if 'description' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		{% endcomment %}
 	    <a href="#">
@@ -77,7 +69,6 @@
 		{% comment %}
 	    <a href="{% url 'edwoca:item_digcopy' object.id %}"
 		{% if 'digcopy' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		{% endcomment %}
 	    <a href="#">
@@ -87,7 +78,6 @@
 	<li>
 	    <a href="{% url 'edwoca:item_comment' object.id %}"
 		{% if 'comment' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		Kommentar
 	    </a>
@@ -95,7 +85,6 @@
 	<li>
 	    <a href="{% url 'edwoca:item_delete' object.id %}"
 		{% if 'delete' in request.path %}class="active"{% endif %}
-		preload="mouseover"
 		>
 		löschen
 	    </a>
