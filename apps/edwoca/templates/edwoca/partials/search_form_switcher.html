@@ -1,13 +1,27 @@
 <div class="form-control">
-	{% if 'work' in request.path %}
+	{% if list_entity_type == 'work' %}
 		<form action="{% url 'edwoca:work_search' %}" method="get" class="m-0">
 			{{ form.q }}
 			<input type="submit" class="btn">
 		</form>
 	{% endif %}
 
-	{% if 'manifestation' in request.path %}
+	{% if list_entity_type == 'expression' %}
+		<form action="{% url 'edwoca:expression_search' %}" method="get" class="m-0">
+			{{ form.q }}
+			<input type="submit" class="btn">
+		</form>
+	{% endif %}
+
+	{% if list_entity_type == 'manifestation' %}
 		<form action="{% url 'edwoca:manifestation_search' %}" method="get" class="m-0">
+			{{ form.q }}
+			<input type="submit" class="btn">
+		</form>
+	{% endif %}
+
+	{% if list_entity_type == 'item' %}
+		<form action="{% url 'edwoca:item_search' %}" method="get" class="m-0">
 			{{ form.q }}
 			<input type="submit" class="btn">
 		</form>

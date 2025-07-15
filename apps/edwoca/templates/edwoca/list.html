@@ -4,13 +4,27 @@
 {% block menu %}
 <ul class="menu menu-lg">
 	<li>
-	    <a href="{% url 'edwoca:work_search' %}">
+	    <a href="{% url 'edwoca:work_search' %}"
+		{% if list_entity_type == 'work' %} class="active" {% endif %}>
 		Werke <span class="badge"> {{ work_count }} </span>
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:manifestation_search' %}">
-		Quellen <span class="badge"> {{ manifestation_count }} </span>
+	    <a href="{% url 'edwoca:expression_search' %}"
+		{% if list_entity_type == 'expression' %} class="active" {% endif %}>
+		Expressionen <span class="badge"> {{ expression_count }} </span>
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_search' %}"
+		{% if list_entity_type == 'manifestation' %} class="active" {% endif %}>
+		Manifestationen <span class="badge"> {{ manifestation_count }} </span>
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:item_search' %}"
+		{% if list_entity_type == 'item' %} class="active" {% endif %}>
+		Exemplare <span class="badge"> {{ item_count }} </span>
 	    </a>
 	</li>
 </ul>

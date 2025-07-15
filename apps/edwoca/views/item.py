@@ -6,7 +6,12 @@ from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
 
 
+class ItemListView(EdwocaListView):
+    model = Item
 
+
+class ItemSearchView(EdwocaSearchView):
+    model = Item
 
 
 class ItemTitleUpdateView(EntityMixin, TitleUpdateView):

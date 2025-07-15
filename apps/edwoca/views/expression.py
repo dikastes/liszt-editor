@@ -7,7 +7,12 @@ from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
 
 
+class ExpressionListView(EdwocaListView):
+    model = Expression
 
+
+class ExpressionSearchView(EdwocaSearchView):
+    model = Expression
 
 
 class ExpressionCreateView(EntityMixin, CreateView):
