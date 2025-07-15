@@ -8,14 +8,11 @@ from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, ModelFormMixin
 
 
-
-
-
 class WorkListView(EdwocaListView):
     model = Work
 
 
-class WorkCreateView(EntityMixin, CreateView):
+class WorkCreateView(CreateView):
     model = Work
     form_class = WorkForm
     template_name = 'edwoca/create.html'
@@ -93,7 +90,7 @@ class WorkRelatedWorksUpdateView(EntityMixin, UpdateView):
     template_name = 'edwoca/work_related_works.html'
 
 
-class RelatedWorkAddView(EntityMixin, RelatedEntityAddView):
+class RelatedWorkAddView(RelatedEntityAddView):
     template_name = 'edwoca/work_relations.html'
     model = RelatedWork
 

@@ -5,6 +5,7 @@ from django.views.generic.edit import UpdateView, FormView
 from django.db.models import Case, When
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Person, Status
+from dmad_on_django.tools import snake_to_camel_case, camel_to_snake_case
 from haystack.generic_views import SearchView
 from ..models import Work, Manifestation
 from edwoca import forms as edwoca_forms
@@ -31,7 +32,7 @@ class EntityMixin:
     def get_model_name(self):
         if not self.model:
             raise ImproperlyConfigured(f"{self.__class__.__name__} requires a 'model' attribute.")
-        return self.model.__name__.lower()
+        return camel_to_snake_case(self.model.__name__)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -48,7 +49,7 @@ class EdwocaSearchView(EntityMixin, SearchView):
 
         # redirect to list view if empty query
         if not query or query == '':
-            return redirect(f'edwoca:{self.get_model_name().lower()}_list')
+            return redirect(f'edwoca:{camel_to_snake_case(self.get_model_name())}_list')
 
         return super().get(request, *args, **kwargs)
 
@@ -76,11 +77,11 @@ class SimpleFormView(EntityMixin, UpdateView):
         return context
 
     def get_form_class(self):
-        class_name = f"{self.get_model_name().capitalize()}{self.get_property().capitalize()}Form"
+        class_name = f"{snake_to_camel_case(self.get_model_name())}{snake_to_camel_case(self.get_property())}Form"
         return getattr(edwoca_forms, class_name)
 
     def get_success_url(self):
-        return reverse_lazy(f"edwoca:{self.get_model_name().lower()}_{self.get_property()}", kwargs={'pk': self.object.pk})
+        return reverse_lazy(f"edwoca:{camel_to_snake_case(self.get_model_name())}_{self.get_property()}", kwargs={'pk': self.object.pk})
 
     def get_property(self):
         if not self.property:
@@ -148,8 +149,8 @@ class RelationsUpdateView(UpdateView):
 
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['query'] = search_form.cleaned_data.get('q')
-            target_model = getattr(edwoca_models, self.request.GET['target_model'].capitalize())
-            context[f"found_{target_model.__name__.lower()}s"] = search_form.search().models(target_model)
+            target_model = getattr(edwoca_models, snake_to_camel_case(self.request.GET['target_model']))
+            context[f"found_{camel_to_snake_case(target_model.__name__)}s"] = search_form.search().models(target_model)
 
         return context
 
@@ -160,7 +161,10 @@ class RelatedEntityAddView(FormView):
         return f"{self.model.__name__}Form"
 
     def get_model_name(self):
-        return self.model.__name__.lower().replace('related', '')
+        return self.get_related_model_name().replace('related_', '')
+
+    def get_related_model_name(self):
+        return camel_to_snake_case(self.model.__name__)
 
     def get_form_class(self):
         return getattr(edwoca_forms, self.get_form_name())
@@ -173,15 +177,16 @@ class RelatedEntityAddView(FormView):
 
         kwargs['initial'] = {
             f"source_{self.get_model_name()}": self.kwargs['pk'],
-            f"target_{self.get_model_name()}": self.kwargs[f"target_{self.get_model_name()}"],
+            f"target_{self.get_model_name()}": self.kwargs[f"target_{self.get_related_model_name()}"],
         }
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        model = getattr(edwoca_models, self.get_model_name().capitalize())
+        model = getattr(edwoca_models, snake_to_camel_case(self.get_model_name()))
         context['show_search_form'] = False
-        context[f"target_{self.get_model_name()}"] = model.objects.get(pk=self.kwargs[f"target_{self.get_model_name()}"])
+        context[f"target_{self.get_related_model_name()}"] = model.objects.get(pk=self.kwargs[f"target_{self.get_related_model_name()}"])
+        context['entity_type'] = self.get_model_name()
         context['object'] = model.objects.get(pk=self.kwargs["pk"])
         return context
 
@@ -228,11 +233,11 @@ class ContributorAddView(EntityMixin, FormView):
         return kwargs
 
     def get_model_name(self):
-        return super().get_model_name().lower().replace('contributor', '')
+        return camel_to_snake_case(super().get_model_name()).replace('contributor', '')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        model = getattr(edwoca_models, self.get_model_name().capitalize())
+        model = getattr(edwoca_models, snake_to_camel_case(self.get_model_name()))
         context['show_search_form'] = False
         context['person'] = Person.objects.get(pk=self.kwargs['person'])
         context['object'] = model.objects.get(pk=self.kwargs["pk"])

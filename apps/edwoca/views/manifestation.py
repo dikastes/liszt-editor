@@ -9,9 +9,6 @@ from ..models.manifestation import ManifestationBib
 from bib.models import ZotItem
 
 
-
-
-
 class ManifestationListView(EdwocaListView):
     model = Manifestation
 
@@ -20,7 +17,7 @@ class ManifestationSearchView(EdwocaSearchView):
     model = Manifestation
 
 
-class ManifestationCreateView(EntityMixin, CreateView):
+class ManifestationCreateView(CreateView):
     model = Manifestation
     form_class = ManifestationForm
     template_name = 'edwoca/create.html'
