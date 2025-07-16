@@ -23,7 +23,7 @@ class ManifestationCreateView(CreateView):
     template_name = 'edwoca/create.html'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_update', kwargs = {'pk': self.object.id})
+        return self.object.get_absolute_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
