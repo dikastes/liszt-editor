@@ -31,7 +31,13 @@ class GNDSubjectCategory(models.Model):
 
     @staticmethod
     def create_or_link(json):
-        category = json['gndSubjectCategory'][0]
+
+        try:
+            category = json['gndSubjectCategory'][0]
+
+        except KeyError:
+            return None
+        
 
         try:
             return GNDSubjectCategory.objects.get(link=category['id'])
@@ -43,9 +49,15 @@ class GNDSubjectCategory(models.Model):
             return subjectcategory
 
     def get_subject_category_table(entity):
+
+        try:
+            link = entity.link
+            label = entity.label
+        except AttributeError:
+            return []
         
         return [("GND Sachgruppe",
-                  f'<a href="{entity.link}"target = "_blank" class = "link link-primary">{entity.label}</a>')]
+                  f'<a href="{link}"target = "_blank" class = "link link-primary">{label}</a>')]
 
     def __str__(self):
         return self.label
