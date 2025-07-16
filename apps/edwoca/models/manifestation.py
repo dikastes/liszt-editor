@@ -98,6 +98,7 @@ class Manifestation(WemiBaseClass):
             blank=True,
             null=True
         )
+    is_singleton = models.BooleanField(default=False)
 
     # temporary fix as long as basic update view is unavailable
     def get_absolute_url(self):
