@@ -30,11 +30,6 @@ class Item(WemiBaseClass):
             on_delete = models.CASCADE,
             related_name = 'items'
         )
-    rism_id = models.CharField(
-            max_length=20,
-            null = True,
-            blank = True
-        )
 
     def __str__(self):
         #title = self.get_pref_title() or '<ohne Titel>'
@@ -45,7 +40,7 @@ class Item(WemiBaseClass):
         return next(self.signatures.filter(status = Signature.Status.CURRENT).iterator(), 'ohne Signatur')
 
     def save(self, *args, **kwargs):
-        if self.manifestation.is_singleton and self.manifestation.items.exclude(pk=self.pk).exists():
+        if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
             raise ValidationError("Cannot add another item to a singleton manifestation.")
         super().save(*args, **kwargs)
 

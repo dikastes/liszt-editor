@@ -11,6 +11,26 @@ from dmad_on_django.models import Period
 class ManifestationForm(ModelForm):
     class Meta:
         model = Manifestation
+        fields = ['rism_id']
+        widgets = {
+                'rism_id': TextInput( attrs = {
+                        'class': 'grow h-full'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div()
+        rism_id_label = label(self['rism_id'].label, _for=self['rism_id'].id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        rism_id_label.add(raw(str(self['rism_id'])))
+        form.add(rism_id_label)
+
+        return mark_safe(str(form))
+
+
+"""
+class ManifestationForm(ModelForm):
+    class Meta:
+        model = Manifestation
         fields = [
                 #'rism_id',
                 'plate_number'
@@ -32,6 +52,7 @@ class ManifestationForm(ModelForm):
             form.add(field_label)
 
         return mark_safe(str(form))
+"""
 
 
 class ManifestationTitleForm(ModelForm):

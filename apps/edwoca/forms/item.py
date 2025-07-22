@@ -7,6 +7,7 @@ from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 
 
+"""
 class ItemForm(ModelForm):
     class Meta:
         model = Item
@@ -24,6 +25,7 @@ class ItemForm(ModelForm):
         form.add(rism_id_label)
 
         return mark_safe(str(form))
+"""
 
 
 class SignatureForm(ModelForm):

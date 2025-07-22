@@ -1,6 +1,6 @@
 from .base import *
 from ..forms.manifestation import *
-from ..forms import ItemForm, SignatureFormSet
+from ..forms import ManifestationForm, SignatureFormSet
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
@@ -69,10 +69,8 @@ def manifestation_update(request, pk):
 
     if manifestation.is_singleton:
         item = manifestation.items.first()
-        if not item:
-            item = Item.objects.create(manifestation=manifestation)
-
-        item_form = ItemForm(request.POST or None, instance=item)
+        manifestation_form = ManifestationForm(request.POST or None, instance=manifestation)
+        context['manifestation_form'] = manifestation_form
 
         if 'add_signature' in request.POST:
             data = request.POST.copy()
@@ -83,27 +81,26 @@ def manifestation_update(request, pk):
             signature_formset = SignatureFormSet(request.POST or None, instance=item)
 
         if request.method == 'POST' and 'save_changes' in request.POST:
-            if item_form.is_valid():
-                item_form.save()
+            if item and manifestation_form.is_valid():
+                manifestation_form.save()
             if signature_formset.is_valid():
                 signature_formset.save()
             return redirect('edwoca:manifestation_update', pk=pk)
 
-        context['item_form'] = item_form
         context['signature_formset'] = signature_formset
         context['library_search_form'] = SearchForm()
     else:
         if request.method == 'POST' and 'save_changes' in request.POST:
             for item in manifestation.items.all():
-                item_form = ItemForm(request.POST, instance=item, prefix=f'item_{item.id}')
-                if item_form.is_valid():
-                    item_form.save()
+                manifestation_form = ManifestationForm(request.POST, instance=item, prefix=f'item_{item.id}')
+                if manifestation_form.is_valid():
+                    manifestation_form.save()
 
                 signature_formset = SignatureFormSet(request.POST, instance=item, prefix=f'signatures_{item.id}')
                 if signature_formset.is_valid():
                     signature_formset.save()
 
-            new_item_form = ItemForm(request.POST, prefix='new_item')
+            new_item_form = ManifestationForm(request.POST, prefix='new_item')
             if new_item_form.is_valid() and new_item_form.has_changed():
                 new_item = new_item_form.save(commit=False)
                 new_item.manifestation = manifestation
@@ -128,15 +125,12 @@ def manifestation_update(request, pk):
 
             item_forms.append({
                 'item': item,
-                'form': ItemForm(request.POST or None, instance=item, prefix=f'item_{item.id}'),
                 'signature_formset': SignatureFormSet(signature_formset_data, instance=item, prefix=signature_prefix)
             })
 
-        new_item_form = ItemForm(request.POST or None, prefix='new_item')
         new_signature_formset = SignatureFormSet(request.POST or None, prefix='new_signatures')
 
         context['item_forms'] = item_forms
-        context['new_item_form'] = new_item_form
         context['new_signature_formset'] = new_signature_formset
 
     return render(request, 'edwoca/manifestation_update.html', context)
@@ -152,6 +146,20 @@ def manifestation_set_singleton(request, pk):
 def manifestation_unset_singleton(request, pk):
     manifestation = Manifestation.objects.get(id = pk)
     manifestation.unset_singleton()
+    manifestation.save()
+    return redirect('edwoca:manifestation_update', pk = pk)
+
+
+def manifestation_set_missing(request, pk):
+    manifestation = Manifestation.objects.get(id = pk)
+    manifestation.set_missing()
+    manifestation.save()
+    return redirect('edwoca:manifestation_update', pk = pk)
+
+
+def manifestation_unset_missing(request, pk):
+    manifestation = Manifestation.objects.get(id = pk)
+    manifestation.unset_missing()
     manifestation.save()
     return redirect('edwoca:manifestation_update', pk = pk)
 

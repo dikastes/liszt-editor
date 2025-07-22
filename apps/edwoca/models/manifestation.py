@@ -94,6 +94,16 @@ class Manifestation(WemiBaseClass):
             null=True
         )
     is_singleton = models.BooleanField(default=False)
+    missing_item = models.BooleanField(default=False)
+    numerus_currens = models.IntegerField(
+            null = True,
+            unique = True
+        )
+    rism_id = models.CharField(
+            max_length=20,
+            null = True,
+            blank = True
+        )
 
     def get_absolute_url(self):
         return reverse('edwoca:manifestation_update', kwargs={'pk': self.id})
@@ -131,8 +141,24 @@ class Manifestation(WemiBaseClass):
             raise Exception('A print with more than one item was declared a manuscript.')
 
         self.is_singleton = True
-        if self.items.count() == 0:
+        if self.items.count() == 0 and not self.missing_item:
             self.items.create()
+
+    def set_missing(self):
+        if self.items.count() > 1:
+            raise Exception('A manifestation with more than one item was declared as missing items.')
+        self.items.all().delete()
+
+        self.missing_item = True
+        max_numerus_currens_manifestation = Manifestation.objects.filter(missing_item = True).order_by('numerus_currens').last()
+        if max_numerus_currens_manifestation:
+            self.numerus_currens = max_numerus_currens_manifestation.numerus_currens + 1
+        else:
+            self.numerus_currens = 1
+
+    def unset_missing(self):
+        self.items.create()
+        self.missing_item = False
 
 
 class ManifestationTitle(models.Model):
