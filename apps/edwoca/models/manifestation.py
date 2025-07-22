@@ -1,4 +1,5 @@
 from .base import *
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -23,12 +24,6 @@ class Manifestation(WemiBaseClass):
         COMPLETE= 'CP', _('complete')
         INCOMPLETE= 'INC', _('incomplete')
 
-    rism_id = models.CharField(
-            unique=True,
-            max_length=20,
-            null = True,
-            blank = True
-        )
     plate_number = models.CharField(
             max_length = 10,
             null = True,
@@ -100,9 +95,8 @@ class Manifestation(WemiBaseClass):
         )
     is_singleton = models.BooleanField(default=False)
 
-    # temporary fix as long as basic update view is unavailable
     def get_absolute_url(self):
-        return reverse('edwoca:manifestation_relations', kwargs={'pk': self.id})
+        return reverse('edwoca:manifestation_update', kwargs={'pk': self.id})
 
     def get_pref_title(self):
         titles = self.titles.all()
@@ -122,7 +116,23 @@ class Manifestation(WemiBaseClass):
         return '<ohne Titel>'
 
     def __str__(self):
-        return f'{self.rism_id}: {self.get_pref_title()}'
+        return self.get_pref_title()
+
+    def save(self, *args, **kwargs):
+        if self.is_singleton and self.items.count() > 1:
+            raise ValidationError("A singleton manifestation cannot have more than one item.")
+        super().save(*args, **kwargs)
+
+    def unset_singleton(self):
+        self.is_singleton = False
+
+    def set_singleton(self):
+        if self.items.count() > 1:
+            raise Exception('A print with more than one item was declared a manuscript.')
+
+        self.is_singleton = True
+        if self.items.count() == 0:
+            self.items.create()
 
 
 class ManifestationTitle(models.Model):

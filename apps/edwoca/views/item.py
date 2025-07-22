@@ -2,7 +2,7 @@ from .base import *
 from ..forms.item import *
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
 
@@ -67,10 +67,6 @@ class ItemCreateView(EntityMixin, CreateView):
     def form_invalid(self, form, title_formset=None):
         context = self.get_context_data(form=form, title_formset=title_formset)
         return self.render_to_response(context)
-
-
-class ItemDeleteView(EntityMixin, DeleteView):
-    pass
 
 
 class ItemLocationUpdateView(SimpleFormView):
@@ -140,4 +136,31 @@ class ItemDeleteView(EntityMixin, DeleteView):
     model = Item
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_update', kwargs={'pk': self.object.work.id})
+        return self.object.manifestation.get_absolute_url()
+
+
+class LibraryListView(EdwocaListView):
+    model = Library
+
+
+class LibrarySearchView(EdwocaSearchView):
+    model = Library
+
+
+class LibraryCreateView(CreateView):
+    model = Library
+    #fields = ['siglum', 'name']
+    template_name = 'edwoca/simple_form.html'
+    form_class = LibraryForm
+
+
+class LibraryUpdateView(UpdateView):
+    model = Library
+    #fields = ['siglum', 'name']
+    template_name = 'edwoca/simple_form.html'
+    form_class = LibraryForm
+
+
+class LibraryDeleteView(DeleteView):
+    model = Library
+    template_name = 'edwoca/simple_form.html'
