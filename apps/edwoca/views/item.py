@@ -25,13 +25,13 @@ class ItemTitleUpdateView(EntityMixin, TitleUpdateView):
 
 class ItemUpdateView(EntityMixin, UpdateView):
     model = Item
-    form_class = ItemForm
+    #form_class = ItemForm
     template_name = 'edwoca/item_update.html'
 
 
 class ItemCreateView(EntityMixin, CreateView):
     model = Item
-    form_class = ItemForm
+    #form_class = ItemForm
     template_name = 'edwoca/create.html'
 
     def get_success_url(self):

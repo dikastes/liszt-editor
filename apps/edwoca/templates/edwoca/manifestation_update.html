@@ -8,8 +8,6 @@
 					<h3 class="text-lg font-bold">Exemplar bearbeiten</h3>
 					<form method="post">
 						{% csrf_token %}
-						{{ item_form.form.as_daisy }}
-
 						<h3>Signaturen</h3>
 
 						{% comment %}
@@ -29,12 +27,15 @@
 						{% endfor %}
 
 						
-						<input type="submit" name="add_signature_{{ item_form.item.id }}" value="Signatur hinzufügen" class="btn btn-secondary mt-2">
-						<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="btn btn-primary">
+						<div class="flex gap-5">
+							<div class="flex-1"></div>
+							<input type="submit" name="add_signature_{{ item_form.item.id }}" value="Signatur hinzufügen" class="flex-0 btn">
+							<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="flex-0 btn btn-primary">
+							<div class="modal-action flex-0 m-0">
+								<a href="#" class="btn">X</a>
+							</div>
+						</div>
 					</form>
-					<div class="modal-action">
-						<a href="#" class="btn">X</a>
-					</div>
 				</div>
 			</div>
 		{% endfor %}
@@ -43,8 +44,6 @@
 				<h3 class="text-lg font-bold">Exemplar anlegen</h3>
 				<form method="post" action="{% url 'edwoca:manifestation_update' object.id %}">
 					{% csrf_token %}
-					{{ new_item_form.as_daisy }}
-
 					<h3>Signaturen</h3>
 					{{ new_signature_formset.management_form }}
 					{% for form in new_signature_formset %}
@@ -54,11 +53,14 @@
 					{% endfor %}
 
 					
-					<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="btn btn-primary">
+					<div class="flex gap-5">
+						<div class="flex-1"></div>
+						<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="flex-0 btn btn-primary">
+						<div class="modal-action flex-0 m-0">
+							<a href="#" class="btn">X</a>
+						</div>
+					</div>
 				</form>
-				<div class="modal-action">
-					<a href="#" class="btn">X</a>
-				</div>
 			</div>
 		</div>
 	{% endif %}
@@ -71,60 +73,90 @@
 	{% if object.is_singleton %}
 		<h2> Manuskript </h2>
 		
-		{{ object }} ist ein <em>Manuskript</em>.
+		<!-- {{ object }} ist ein <em>Manuskript</em>. -->
 		<a class="btn btn-primary" href="{% url 'edwoca:manifestation_unset_singleton' object.id %}">
-			Als Druck deklarieren
+			Druck
 		</a>
+		{% if object.missing_item %}
+			<a class="btn btn-primary" href="{% url 'edwoca:manifestation_unset_missing' object.id %}">
+				nicht verschollen
+			</a>
+		{% else %}
+			<a class="btn btn-primary" href="{% url 'edwoca:manifestation_set_missing' object.id %}">
+				verschollen
+			</a>
+		{% endif %}
 
 		<form method="post">
 			{% csrf_token %}
-			{{ item_form.as_daisy }}
+			{{ manifestation_form.as_daisy }}
+			{% if object.missing_item %}
+				<p> Dieses Manuskript ist verschollen. </p>
+			{% else %}
 
-			<h3>Signaturen</h3>
-			{{ signature_formset.management_form }}
-			{% for form in signature_formset %}
-				<div class="signature-form">
-					{{ form.as_daisy }}
+				<h3>Signaturen</h3>
+				{{ signature_formset.management_form }}
+				{% for form in signature_formset %}
+					<div class="signature-form">
+						{{ form.as_daisy }}
+					</div>
+				{% endfor %}
+
+				
+				<div class="flex gap-5">
+					<div class="flex-1"></div>
+					<input type="submit" name="add_signature" value="Signatur hinzufügen" class="flex-0 btn btn-secondary mt-2">
+					<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
 				</div>
-			{% endfor %}
-
-			
-			<input type="submit" name="add_signature" value="Signatur hinzufügen" class="btn btn-secondary mt-2">
-			<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
+			{% endif %}
 		</form>
 
 	{% else %}
 		<h2> Druck </h2>
 		
-		{{ object }} ist ein <em>Druck</em>.
+		<!-- {{ object }} ist ein <em>Druck</em>. -->
 		{% if object.items.count > 1 %}
-			Falls Sie diese Manifestation als <em>Manuskript</em> deklarieren möchten, löschen Sie alle Exemplare außer eines.
+			<p>
+				Falls Sie diese Manifestation als <em>Manuskript</em> oder <em> verschollen </em> deklarieren möchten, löschen Sie alle Exemplare außer eines.
+			</p>
 		{% else %}
 			<a class="btn btn-primary" href="{% url 'edwoca:manifestation_set_singleton' object.id %}">
-				Als Manuskript deklarieren
+				Manuskript
 			</a>
+			{% if object.missing_item %}
+				<a class="btn btn-primary" href="{% url 'edwoca:manifestation_unset_missing' object.id %}">
+					nicht verschollen
+				</a>
+			{% else %}
+				<a class="btn btn-primary" href="{% url 'edwoca:manifestation_set_missing' object.id %}">
+					verschollen
+				</a>
+			{% endif %}
 		{% endif %}
 
 		<h2> Exemplare </h2>
-		{% for item in object.items.all %}
-			<div class="flex gap-5">
-				<p class="flex-1 m-0">
-					{{ item }}
-				</p>
-				<a href="#item-modal-{{ item.id }}" class="btn flex-0"> bearbeiten </a>
-				<form action="{% url 'edwoca:item_delete' item.id %}" method="post" class="flex-0">
-					{% csrf_token %}
-					<input type="submit" class="btn btn-primary" value="löschen"/>
-				</form>
+		{% if object.missing_item %}
+			<p> Alle Exemplare dieses Drucks sind verschollen </p>
+		{% else %}
+			{% for item in object.items.all %}
+				<div class="flex gap-5">
+					<p class="flex-1 m-0">
+						{{ item }}
+					</p>
+					<a href="#item-modal-{{ item.id }}" class="btn flex-0"> bearbeiten </a>
+					<form action="{% url 'edwoca:item_delete' item.id %}" method="post" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-primary" value="löschen"/>
+					</form>
+				</div>
+			{% empty %}
+				<p> keine Exemplare </p>
+			{% endfor %}
+			<div class="flex">
+				<div class="flex-1"></div>
+				<a href="#item-modal-new" class="btn flex-0"> neues Exemplar </a>
 			</div>
-		{% empty %}
-			<p> keine Exemplare </p>
-		{% endfor %}
-		<div class="flex">
-			<div class="flex-1"></div>
-			<a href="#item-modal-new" class="btn flex-0"> neues Exemplar </a>
-		</div>
-
+		{% endif %}
 	{% endif %}
 	</div>
 </div>
