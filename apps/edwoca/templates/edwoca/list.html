@@ -27,6 +27,12 @@
 		Exemplare <span class="badge"> {{ item_count }} </span>
 	    </a>
 	</li>
+	<li>
+	    <a href="{% url 'edwoca:library_search' %}"
+		{% if list_entity_type == 'library' %} class="active" {% endif %}>
+		Bibliotheken <span class="badge"> {{ library_count }} </span>
+	    </a>
+	</li>
 </ul>
 {% endblock %}
 
@@ -71,6 +77,9 @@
 			    </li>
 			    <li>
 				<a href="{% url 'edwoca:manifestation_create' %}">Quelle</a>
+			    </li>
+			    <li>
+				<a href="{% url 'edwoca:library_create' %}">Bibliothek</a>
 			    </li>
 			</ul>
 		    </div>

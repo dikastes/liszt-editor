@@ -7,7 +7,7 @@ from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Person, Status
 from dmad_on_django.tools import snake_to_camel_case, camel_to_snake_case
 from haystack.generic_views import SearchView
-from ..models import Work, Manifestation, Expression, Item
+from ..models import Work, Manifestation, Expression, Item, Library
 from edwoca import forms as edwoca_forms
 from edwoca import models as edwoca_models
 
@@ -27,6 +27,7 @@ class EdwocaListView(ListView):
         context['expression_count'] = Expression.objects.all().count()
         context['manifestation_count'] = Manifestation.objects.all().count()
         context['item_count'] = Item.objects.all().count()
+        context['library_count'] = Library.objects.all().count()
         context['list_entity_type'] = self.model.__name__.lower()
         return context
 
@@ -66,6 +67,7 @@ class EdwocaSearchView(SearchView):
         context['expression_count'] = Expression.objects.all().count()
         context['manifestation_count'] = Manifestation.objects.all().count()
         context['item_count'] = Item.objects.all().count()
+        context['library_count'] = Library.objects.all().count()
         context['object_list'] = [ result.object for result in context['object_list'] ]
         context['list_entity_type'] = self.get_model_name().lower()
 

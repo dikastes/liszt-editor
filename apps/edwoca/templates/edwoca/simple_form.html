@@ -1,10 +1,10 @@
 {% extends 'edwoca/base.html' %}
 
-
-
 {% block content %}
 
-{% include 'edwoca/partials/preview_'|add:property|add:'_prolog.html' %}
+{% if property %}
+	{% include 'edwoca/partials/preview_'|add:property|add:'_prolog.html' %}
+{% endif %}
 
 <div class="bg-white border border-base-300 p-5">
 	<h2 class="card-title mt-0"> {{ view_title }} </h2>
@@ -17,7 +17,9 @@
 	</form>
 </div>
 
-{% include 'edwoca/partials/preview_'|add:property|add:'_epilog.html' %}
+{% if property %}
+	{% include 'edwoca/partials/preview_'|add:property|add:'_epilog.html' %}
+{% endif %}
 
 {% endblock %}
 

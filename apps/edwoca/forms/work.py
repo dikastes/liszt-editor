@@ -92,12 +92,6 @@ class RelatedWorkForm(ModelForm):
         return mark_safe(str(form))
 
 
-
-
-
-
-
-
 WorkTitleFormSet = inlineformset_factory(
         Work,
         WorkTitle,
