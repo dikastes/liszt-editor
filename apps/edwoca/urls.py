@@ -65,7 +65,9 @@ urlpatterns = [
         path('manifestations', views.ManifestationListView.as_view(), name = 'manifestation_list'),
         path('manifestations/search', views.ManifestationSearchView.as_view(), name = 'manifestation_search'),
         path('manifestations', views.ManifestationListView.as_view(), name = 'manifestation_list'),
-        path('manifestations/<int:pk>', views.ManifestationUpdateView.as_view(), name = 'manifestation_update'),
+        path('manifestations/<int:pk>', views.manifestation_update, name = 'manifestation_update'),
+        path('manifestations/<int:pk>/set_singleton', views.manifestation_set_singleton, name = 'manifestation_set_singleton'),
+        path('manifestations/<int:pk>/unset_singleton', views.manifestation_unset_singleton, name = 'manifestation_unset_singleton'),
         path('manifestations/new', views.ManifestationCreateView.as_view(), name = 'manifestation_create'),
         path('manifestations/<int:pk>/delete', views.ManifestationDeleteView.as_view(), name = 'manifestation_delete'),
         path('manifestations/<int:pk>/title', views.ManifestationTitleUpdateView.as_view(), name = 'manifestation_title'),
@@ -104,6 +106,11 @@ urlpatterns = [
         path('items/<int:pk>/digcopy', views.ItemDigcopyUpdateView.as_view(), name = 'item_digcopy'),
         path('items/<int:pk>/comment', views.ItemCommentUpdateView.as_view(), name = 'item_comment'),
         path('items/<int:pk>/delete', views.ItemDeleteView.as_view(), name = 'item_delete'),
+        path('libraries', views.LibraryListView.as_view(), name = 'library_list'),
+        path('libraries/search', views.LibrarySearchView.as_view(), name = 'library_search'),
+        path('libraries/create', views.LibraryCreateView.as_view(), name = 'library_create'),
+        path('libraries/<int:pk>/update', views.LibraryUpdateView.as_view(), name = 'library_update'),
+        path('libraries/<int:pk>/delete', views.LibraryDeleteView.as_view(), name = 'library_delete'),
     ]
 
 """

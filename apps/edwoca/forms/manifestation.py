@@ -12,13 +12,13 @@ class ManifestationForm(ModelForm):
     class Meta:
         model = Manifestation
         fields = [
-                'rism_id',
+                #'rism_id',
                 'plate_number'
             ]
         widgets = {
-                'rism_id': TextInput( attrs = {
-                        'class': 'grow'
-                    }),
+                #'rism_id': TextInput( attrs = {
+                        #'class': 'grow'
+                    #}),
                 'plate_number': TextInput( attrs = {
                         'class': 'grow'
                     })

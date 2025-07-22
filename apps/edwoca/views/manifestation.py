@@ -1,11 +1,14 @@
 from .base import *
 from ..forms.manifestation import *
-from django.shortcuts import get_object_or_404, redirect
+from ..forms import ItemForm, SignatureFormSet
+from django.forms import inlineformset_factory
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from dmad_on_django.models import Place
 from ..models.manifestation import ManifestationBib
+from ..models.item import Signature
 from bib.models import ZotItem
 
 
@@ -23,7 +26,7 @@ class ManifestationCreateView(CreateView):
     template_name = 'edwoca/create.html'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_update', kwargs = {'pk': self.object.id})
+        return self.object.get_absolute_url()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -52,10 +55,105 @@ class ManifestationCreateView(CreateView):
         return self.render_to_response(context)
 
 
-class ManifestationUpdateView(EntityMixin, UpdateView):
-    model = Manifestation
-    form_class = ManifestationForm
-    template_name = 'edwoca/simple_form.html'
+#class ManifestationUpdateView(EntityMixin, UpdateView):
+    #model = Manifestation
+    #form_class = ManifestationForm
+    #template_name = 'edwoca/manifestation_update.html'
+
+def manifestation_update(request, pk):
+    manifestation = Manifestation.objects.get(id=pk)
+    context = {
+        'object': manifestation,
+        'entity_type': 'manifestation'
+    }
+
+    if manifestation.is_singleton:
+        item = manifestation.items.first()
+        if not item:
+            item = Item.objects.create(manifestation=manifestation)
+
+        item_form = ItemForm(request.POST or None, instance=item)
+
+        if 'add_signature' in request.POST:
+            data = request.POST.copy()
+            total_forms = int(data.get(f'signatures-TOTAL_FORMS', 0))
+            data[f'signatures-TOTAL_FORMS'] = str(total_forms + 1)
+            signature_formset = SignatureFormSet(data, instance=item)
+        else:
+            signature_formset = SignatureFormSet(request.POST or None, instance=item)
+
+        if request.method == 'POST' and 'save_changes' in request.POST:
+            if item_form.is_valid():
+                item_form.save()
+            if signature_formset.is_valid():
+                signature_formset.save()
+            return redirect('edwoca:manifestation_update', pk=pk)
+
+        context['item_form'] = item_form
+        context['signature_formset'] = signature_formset
+        context['library_search_form'] = SearchForm()
+    else:
+        if request.method == 'POST' and 'save_changes' in request.POST:
+            for item in manifestation.items.all():
+                item_form = ItemForm(request.POST, instance=item, prefix=f'item_{item.id}')
+                if item_form.is_valid():
+                    item_form.save()
+
+                signature_formset = SignatureFormSet(request.POST, instance=item, prefix=f'signatures_{item.id}')
+                if signature_formset.is_valid():
+                    signature_formset.save()
+
+            new_item_form = ItemForm(request.POST, prefix='new_item')
+            if new_item_form.is_valid() and new_item_form.has_changed():
+                new_item = new_item_form.save(commit=False)
+                new_item.manifestation = manifestation
+                new_item.save()
+                new_signature_formset = SignatureFormSet(request.POST, instance=new_item, prefix='new_signatures')
+                if new_signature_formset.is_valid():
+                    new_signature_formset.save()
+
+            return redirect('edwoca:manifestation_update', pk=pk)
+
+        item_forms = []
+        for item in manifestation.items.all():
+            signature_prefix = f'signatures_{item.id}'
+
+            signature_formset_data = request.POST or None
+
+            if f'add_signature_{item.id}' in request.POST:
+                data = request.POST.copy()
+                total_forms = int(data.get(f'{signature_prefix}-TOTAL_FORMS', 0))
+                data[f'{signature_prefix}-TOTAL_FORMS'] = str(total_forms + 1)
+                signature_formset_data = data
+
+            item_forms.append({
+                'item': item,
+                'form': ItemForm(request.POST or None, instance=item, prefix=f'item_{item.id}'),
+                'signature_formset': SignatureFormSet(signature_formset_data, instance=item, prefix=signature_prefix)
+            })
+
+        new_item_form = ItemForm(request.POST or None, prefix='new_item')
+        new_signature_formset = SignatureFormSet(request.POST or None, prefix='new_signatures')
+
+        context['item_forms'] = item_forms
+        context['new_item_form'] = new_item_form
+        context['new_signature_formset'] = new_signature_formset
+
+    return render(request, 'edwoca/manifestation_update.html', context)
+
+
+def manifestation_set_singleton(request, pk):
+    manifestation = Manifestation.objects.get(id = pk)
+    manifestation.set_singleton()
+    manifestation.save()
+    return redirect('edwoca:manifestation_update', pk = pk)
+
+
+def manifestation_unset_singleton(request, pk):
+    manifestation = Manifestation.objects.get(id = pk)
+    manifestation.unset_singleton()
+    manifestation.save()
+    return redirect('edwoca:manifestation_update', pk = pk)
 
 
 class ManifestationDeleteView(EntityMixin, DeleteView):

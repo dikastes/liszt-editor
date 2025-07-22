@@ -9,6 +9,9 @@
 	<link rel="stylesheet" href="{% static 'liszt_util/sumoselect.css' %}" crossorigin="anonymous" />
     </head>
 
+    {% block modals %}
+    {% endblock %}
+
     <body hx-ext="preload">
 	{{ current_app }}
 	<div class="container w-full max-w-7xl mx-auto flex flex-col min-h-screen">
