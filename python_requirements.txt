@@ -4,7 +4,6 @@ django-autocomplete-light
 django-debug-toolbar
 pyzotero
 iso639
-pylobid
 django-htmx
 django-haystack
 whoosh

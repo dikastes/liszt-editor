@@ -5,6 +5,11 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'apps'))
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+pylobid_outer = os.path.join(BASE_DIR, "pylobid")
+
+if pylobid_outer not in sys.path:
+    sys.path.insert(0, pylobid_outer)
 
 def main():
     """Run administrative tasks."""

@@ -107,7 +107,7 @@ class Place(DisplayableModel):
         
     @staticmethod
     def search(search_string):
-        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:TerritorialCorporateBodyOrAdministrativeUnit)&size=5&format=json:suggest"
+        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:PlaceOrGeographicName)&size=5&format=json:suggest"
         lobid_response = requests.get(lobid_url)
         return lobid_response.json()
         
