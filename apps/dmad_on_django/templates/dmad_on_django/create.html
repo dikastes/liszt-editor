@@ -28,8 +28,19 @@
     </div>
 </div>
 
+<script src="{% static 'dmad_on_django/search_gnd.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', _ => {
+	dmadOnDjangoSearchGnd.init({
+	    'target': 'gnd-search-results',
+	    'input': 'gnd-search',
+	    'entityType': '{{ entity_type }}'
+	});
+    });
+</script>
+{% endblock %}
 {% block nav %}
-<div class="flex-0 flex flex-col">
+<div class="flex-0 flex flex-col h-full">
     <div class="flex-1"></div>
     <ul class="menu gap-5 flex-0">
 	<li>
@@ -45,14 +56,3 @@
 </div>
 {% endblock %}
 
-<script src="{% static 'dmad_on_django/search_gnd.js' %}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', _ => {
-	dmadOnDjangoSearchGnd.init({
-	    'target': 'gnd-search-results',
-	    'input': 'gnd-search',
-	    'entityType': '{{ entity_type }}'
-	});
-    });
-</script>
-{% endblock %}
