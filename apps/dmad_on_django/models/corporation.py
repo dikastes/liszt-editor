@@ -74,7 +74,7 @@ class Corporation(DisplayableModel):
     )
 
     def get_absolute_url(self):
-        return reverse('dmad_on_django:person_update', kwargs={'pk': self.id})
+        return reverse('dmad_on_django:corporation_update', kwargs={'pk': self.id})
 
 
     def update_from_raw(self):
@@ -138,4 +138,6 @@ class Corporation(DisplayableModel):
             return None
         return '-'.join([year, month, day])
 
+    def get_model(self):
+        return self
 

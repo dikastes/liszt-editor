@@ -23,4 +23,9 @@
             Sachschlagworte <span class="badge">{{ subjectterm_count }}</span>
         </a>
     </li>
+    <li>
+        <a href="{% url 'dmad_on_django:corporation_list' %}"
+            class="{% if active == 'corporation' %}active{% endif %}">
+            Körperschaften <span class="badge">{{ corporation_count}}</span>
+    </li>
 </ul>
