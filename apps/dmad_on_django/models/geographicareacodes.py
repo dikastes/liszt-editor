@@ -29,7 +29,7 @@ class GeographicAreaCode(models.Model):
                   code['id'].split('#')[1],
                  entity
                 )
-            area_code.save()
+                area_code.save()
         except KeyError:
             pass
 

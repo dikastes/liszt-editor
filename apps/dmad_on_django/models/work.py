@@ -42,7 +42,9 @@ class Work(DisplayableModel):
 
     date_of_creation = models.CharField(max_length=10,null=True)
 
-    opus_or_other = models.CharField(max_length=10,null=True)
+    opus = models.CharField(max_length=10,null=True)
+
+    work_catalouge_number = models.CharField(null=True)
 
     creators = models.ManyToManyField(
         Person,
@@ -117,7 +119,11 @@ class Work(DisplayableModel):
         
         self.gnd_subject_category = GNDSubjectCategory.create_or_link(loads(self.raw_data))
 
-        self.opus_or_other = pl_work.opus_or_other 
+        if pl_work.opus:
+            self.opus = pl_work.opus
+        
+        if pl_work.work_catalouge_number:
+            self.work_catalouge_number = pl_work.work_catalouge_number
 
         self.save()
 
@@ -151,8 +157,11 @@ class Work(DisplayableModel):
         if self.date_of_creation:
             table.append(("Entstehungszeit", self.date_of_creation))
 
-        if self.opus_or_other:
-            table.append(("Opus o.ä.", self.opus_or_other))
+        if self.opus:
+            table.append(("Opus", self.opus))
+        
+        if self.work_catalouge_number:
+            table.append(("Werkverzeichnisnummer", self.work_catalouge_number))
 
         if self.form_of_work:
             table.append(("Gattung", f'<a href="{self.form_of_work.get_absolute_url()}"class="link link-primary">{self.form_of_work}</a>'))
