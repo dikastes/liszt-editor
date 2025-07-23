@@ -5,10 +5,10 @@ import requests
 
 from .base import Status, Language, max_trials, DisplayableModel
 from .place import Place
-from .geographicareacodes import PersonGeographicAreaCode
+from .geographicareacodes import CorporationGeographicAreaCode
 from .subjectterm import SubjectTerm
 from .period import Period
-from pylobid.pylobid import PyLobidPerson, GNDAPIError
+from pylobid.pylobid import PyLobidOrg, GNDAPIError
 
 
 class CorporationName(models.Model):
@@ -34,7 +34,7 @@ class CorporationName(models.Model):
 
     @staticmethod
     def create_from_string(string, status, corporation):
-        name = PersonName()
+        name = CorporationName()
         name.status = status
         name.corporation = corporation
         name.name = string
@@ -102,7 +102,7 @@ class Corporation(DisplayableModel):
             corporation.gnd_id = shortened_gnd_id
             corporation.fetch_raw()
             corporation.update_from_raw()
-            return person
+            return corporation
 
     def get_designator(self):
         if self.gnd_id:
@@ -115,11 +115,11 @@ class Corporation(DisplayableModel):
         return 'ohne Name'
 
     def get_table(self):
-        pass
+        return CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
     
     @staticmethod
     def search(search_string):
-        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:Org)&size=5&format=json:suggest"
+        lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:Company OR type:CorporateBody)&size=5&format=json:suggest"
         lobid_response = requests.get(lobid_url)
         return lobid_response.json()
 
