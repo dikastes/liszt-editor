@@ -1,4 +1,3 @@
-from django.db.models import TextChoices, Model
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
@@ -19,21 +18,65 @@ for key in languages:
     Language[key] = languages[key]
 
 
-class Status(TextChoices):
+
+class Status(models.TextChoices):
     PRIMARY = 'P', _('Primary')
     ALTERNATIVE = 'A', _('Alternative')
     TEMPORARY = 'T', _('Temporary')
 
 
-class DisplayableModel(Model):
+class GNDSubjectCategory(models.Model):
+    link = models.CharField(max_length=200,unique=True)
+    label = models.CharField(max_length=50)
+
+    @staticmethod
+    def create_or_link(json):
+
+        try:
+            category = json['gndSubjectCategory'][0]
+
+        except KeyError:
+            return None
+        
+
+        try:
+            return GNDSubjectCategory.objects.get(link=category['id'])
+        except GNDSubjectCategory.DoesNotExist:
+            subjectcategory = GNDSubjectCategory()
+            subjectcategory.link = category['id']
+            subjectcategory.label = category['label']
+            subjectcategory.save()
+            return subjectcategory
+
+    def get_subject_category_table(entity):
+
+        try:
+            link = entity.link
+            label = entity.label
+        except AttributeError:
+            return []
+        
+        return [("GND Sachgruppe",
+                  f'<a href="{link}"target = "_blank" class = "link link-primary">{label}</a>')]
+
+    def __str__(self):
+        return self.label
+    
+class DisplayableModel(models.Model):
+    
     raw_data = models.TextField(null=True)
     rework_in_gnd = models.BooleanField(default=False)
-    gnd_id = models.CharField(max_length=20, null=True, blank=True)
+    gnd_id = models.CharField(max_length=20, null=True, blank=True, unique=True)
     comment = models.TextField(null=True, blank=True)
     interim_designator = models.CharField(
         max_length=150,
         null=True,
         blank=True
+    )
+    gnd_subject_category = models.ForeignKey(
+        GNDSubjectCategory,
+        on_delete=models.SET_NULL,
+        null=True
     )
 
     def render_raw(self):
@@ -57,5 +100,11 @@ class DisplayableModel(Model):
 
         return str(doc)
 
+    
+    def get_table(self):
+        raise NotImplemented("Please override get_table")
+
+    
     class Meta:
         abstract = True
+        

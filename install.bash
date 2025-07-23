@@ -17,9 +17,14 @@ blue()   { echo -e "\e[34m$1\e[0m"; }
 # === COMMAND WRAPPER ===
 run() {
   if [ "$VERBOSE" = true ]; then
+    echo -e "\e[90m> $*\e[0m"
     eval "$@"
   else
     eval "$@" > /dev/null 2>&1
+  fi
+  if [ $? -ne 0 ]; then
+    red "✘ Command failed: $*"
+    exit 1
   fi
 }
 
@@ -27,61 +32,81 @@ run() {
 
 yellow "Tip: Run this script with -V to enable verbose output."
 
+# === CHECK ENV FILE ===
 if [[ ! -f .env ]]; then
   red ".env file not found in the current directory. Please paste it manually."
   exit 1
 fi
 
-if command -v python > /dev/null; then
-    PYTHON_BIN=$(command -v python)
-elif command -v python3 > /dev/null; then
+# === CHECK PYTHON ===
+if command -v python3 > /dev/null; then
     PYTHON_BIN=$(command -v python3)
+elif command -v python > /dev/null; then
+    PYTHON_BIN=$(command -v python)
 else
     red "Python is not installed."
     exit 1
 fi
 
-blue "Using Python: $PYTHON_BIN"
+# === CHECK GIT ===
+if ! command -v git > /dev/null; then
+    red "Git must be installed."
+    exit 1
+fi
 
+# === BASE DIR ===
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
+VENV_DIR="$SCRIPT_DIR/venv"
 
-yellow "Creating virtual environment..."
-run "$PYTHON_BIN -m venv $SCRIPT_DIR"
+blue "Using Python: $PYTHON_BIN"
+blue "Script directory: $SCRIPT_DIR"
 
-yellow "Installing npm dependencies..."
-run "npm install --prefix $SCRIPT_DIR"
+# === INSTALL Pylobid ===
+if [[ ! -d "$SCRIPT_DIR/pylobid" ]]; then
+  yellow "Installing pylobid..."
+  run git clone https://github.com/Nathmel123/pylobid "$SCRIPT_DIR/pylobid"
+else
+  yellow "pylobid already cloned. Pulling latest changes..."
+  (cd "$SCRIPT_DIR/pylobid" && run git pull)
+fi
 
-(
-	cd "$SCRIPT_DIR/apps/edwoca"
-	yellow "[edwoca] Installing npm packages..."
-	run "npm install"
-	yellow "[edwoca] Compiling Tailwind CSS..."
-	run "npx tailwindcss -i static/edwoca/tailwind.css -o static/edwoca/tailwind.dist.css"
-)
+# === CREATE VENV ===
+if [[ ! -d "$VENV_DIR" ]]; then
+  yellow "Creating virtual environment..."
+  run "$PYTHON_BIN" -m venv "$VENV_DIR"
+else
+  yellow "Virtual environment already exists."
+fi
 
-(
-	cd "$SCRIPT_DIR/apps/bib"
-	yellow "[bib] Installing npm packages..."
-	run "npm install"
-	yellow "[bib] Compiling Tailwind CSS..."
-	run "npx tailwindcss -i static/bib/tailwind.css -o static/bib/tailwind.dist.css"
-)
+# === UPGRADE PIP ===
+run "$VENV_DIR/bin/pip" install --upgrade pip
 
-(
+# === INSTALL NPM DEPS ROOT ===
+yellow "Installing root npm dependencies..."
+run "npm install --prefix \"$SCRIPT_DIR\""
 
-	cd "$SCRIPT_DIR/apps/dmad_on_django"
-	yellow "[dmad_on_django] Installing npm packages..."
-	run "npm install"
-	yellow "[dmad_on_django] Compiling Tailwind CSS..."
-	run "npx tailwindcss -i static/dmad_on_django/tailwind.css -o static/dmad_on_django/tailwind.dist.css"
-)
+# === INSTALL NPM & BUILD TAILWIND IN APPS ===
+for APP in edwoca bib dmad_on_django; do
+  (
+    cd "$SCRIPT_DIR/apps/$APP" || { red "App directory not found: $APP"; exit 1; }
+    yellow "[$APP] Installing npm packages..."
+    run "npm install"
+    yellow "[$APP] Compiling Tailwind CSS..."
+    run "npx tailwindcss -i static/$APP/tailwind.css -o static/$APP/tailwind.dist.css"
+  )
+done
 
+# === INSTALL PYTHON DEPENDENCIES ===
 yellow "Installing python dependencies..."
-run "$SCRIPT_DIR/bin/pip install -r $SCRIPT_DIR/python_requirements.txt"
+if [[ -f "$SCRIPT_DIR/python_requirements.txt" ]]; then
+  run "$VENV_DIR/bin/pip" install -r "$SCRIPT_DIR/python_requirements.txt"
+fi
+run "$VENV_DIR/bin/pip" install -e "$SCRIPT_DIR/pylobid"
 
-yellow "Running migrations..."
-run "$SCRIPT_DIR/bin/python3 $SCRIPT_DIR/manage.py makemigrations"
-run "$SCRIPT_DIR/bin/python3 $SCRIPT_DIR/manage.py migrate"
+# === DJANGO MIGRATIONS ===
+yellow "Running Django migrations..."
+run "$VENV_DIR/bin/python" "$SCRIPT_DIR/manage.py" makemigrations
+run "$VENV_DIR/bin/python" "$SCRIPT_DIR/manage.py" migrate
 
 green "✔ Setup complete!"
-
+yellow "To use this environment: source $VENV_DIR/bin/activate"

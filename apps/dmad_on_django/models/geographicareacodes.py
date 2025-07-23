@@ -23,12 +23,15 @@ class GeographicAreaCode(models.Model):
         json = loads(entity.raw_data)
         class_name = entity.__class__.__name__ 
         instance = globals().get(f'{class_name}GeographicAreaCode')()
-        for code in json['geographicAreaCode']:
-            area_code = instance.create_from_string(
-                code['id'].split('#')[1],
-                entity
-            )
-            area_code.save()
+        try:
+            for code in json['geographicAreaCode']:
+                area_code = instance.create_from_string(
+                  code['id'].split('#')[1],
+                 entity
+                )
+                area_code.save()
+        except KeyError:
+            pass
 
     class Meta:
         abstract = True
@@ -52,6 +55,13 @@ class PersonGeographicAreaCode(GeographicAreaCode):
 class CorporationGeographicAreaCode(GeographicAreaCode):
     corporation = models.ForeignKey(
         'Corporation',
+        on_delete=models.CASCADE,
+        related_name='geographic_area_codes',
+        null=True
+    )
+class WorkGeographicAreaCode(GeographicAreaCode):
+    work = models.ForeignKey(
+        'Work',
         on_delete=models.CASCADE,
         related_name='geographic_area_codes',
         null=True
