@@ -1,0 +1,75 @@
+{% extends 'edwoca/base.html' %}
+
+
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5">
+	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+
+	<form method="post">
+		{% csrf_token %}
+		{{ form.as_daisy }}
+
+		<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+	</form>
+
+	{% if object.place %}
+		<div class="flex gap-5">
+			<label class="flex-1 input input-bordered flex items-center gap-2">
+				Ort
+				<input type="text" class="grow" disabled value="{{ object.place }}" />
+			</label>
+			<a class="flex-0 btn" href="{% url 'edwoca:manifestation_remove_place' object.id %}"> löschen </a>
+		</div>
+	{% else %}
+		<h3> Ort verknüpfen </h3>
+
+		{% if show_search_form == True %}
+
+		<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get">
+			{{ searchform.q }}
+			<input type="hidden" name="target_model" value="manifestation" />
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+		
+		<ul>
+		{% if query %}
+			{% for found_place in found_places %}
+				<li>
+					<a href="{% url 'edwoca:manifestation_place_add' object.id found_place.object.id %}">
+						{{ found_place.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+
+		{% else %}
+
+		<form method="post">
+			{% csrf_token %}
+			{{ person }} mit {{ object }} verknüpfen als:
+			{{ form }}
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+
+		{% endif %}
+	{% endif %}
+</div>
+
+<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
+	<p class="prose">
+		{% include 'edwoca/partials/contributors_preview.html' %}
+	</p>
+
+	<p class="prose">
+		{% include 'edwoca/partials/bib_preview.html' %}
+	</p>
+</div>
+
+{% endblock %}

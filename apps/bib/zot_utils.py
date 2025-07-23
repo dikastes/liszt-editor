@@ -55,6 +55,7 @@ def items_to_dict(library_id, library_type, api_key, limit=15, start=0, since_ve
             bib['date'] = "{}".format(x['data'].get('date'))
             bib['itemType'] = "{}".format(x['data'].get('itemType'))
             bib['title'] = "{}".format(x['data'].get('title'))
+            bib['shortTitle'] = "{}".format(x['data'].get('shortTitle'))
             bib['publicationTitle'] = "{}".format(x['data'].get('publicationTitle'))
             bib['dateModified'] = "{}".format(x['data'].get('dateModified'))
             bib['pages'] = "{}".format(x['data'].get('pages'))
@@ -89,6 +90,7 @@ def create_zotitem(bib_item, get_bibtex=False):
     temp_item.zot_date = x['date']
     temp_item.zot_item_type = x['itemType']
     temp_item.zot_title = x['title']
+    temp_item.zot_short_title = x.get('shortTitle', '')
     temp_item.zot_pub_title = x['publicationTitle']
     temp_item.date_modified = x['dateModified']
     temp_item.zot_pages = x['pages']

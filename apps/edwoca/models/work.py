@@ -73,7 +73,7 @@ class WorkContributor(BaseContributor):
     work = models.ForeignKey(
         'Work',
         on_delete=models.CASCADE,
-        #related_name='contributors'
+        related_name='contributor_relations'
     )
 
 
@@ -81,7 +81,7 @@ class WorkBib(BaseBib):
     work = models.ForeignKey(
         'Work',
         on_delete=models.CASCADE,
-        #related_name='contributors'
+        related_name='bib_set'
     )
 
 

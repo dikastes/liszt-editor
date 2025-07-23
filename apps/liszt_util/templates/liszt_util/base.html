@@ -1,0 +1,57 @@
+{% load static %}
+{% load django_htmx %}
+{% load navigation_tags %}
+
+<html data-theme="liszt">
+    <head>
+	<link rel="stylesheet" href="https://cdn.rawgit.com/ichord/At.js/master/dist/css/jquery.atwho.css" />
+	<link rel="stylesheet" href="{% static 'liszt_util/tailwind.dist.css' %}" crossorigin="anonymous" />
+	<link rel="stylesheet" href="{% static 'liszt_util/sumoselect.css' %}" crossorigin="anonymous" />
+    </head>
+
+    {% block modals %}
+    {% endblock %}
+
+    <body hx-ext="preload">
+	{{ current_app }}
+	<div class="container w-full max-w-7xl mx-auto flex flex-col min-h-screen">
+	    <div class="navbar bg-white border border-base-300 mb-10 flex flex-0 p-0">
+		<div class="flex-none min-h-inherit">
+		    {% render_main_navbar_link %}
+		</div>
+		<div class="flex-1 text-lg text-gray-600">
+		    {% block navbar_title %}
+		    {% endblock %}
+		</div>
+		<div class="flex-none gap-2 min-h-inherit border-r-0">
+		    {% block navbar_extras %}
+		    {% endblock %}
+		    
+		</div>
+	    </div>
+	    <div class="flex gap-10 flex-1">
+		<div class="flex-0">
+		    {% block menu %}
+		    {% endblock %}
+		</div>
+		<div class="flex-1 min-w-0">
+		    {% block content %}
+		    {% endblock %}
+		</div>
+		<div class="flex-0">
+		    {% block nav %}
+		    {% endblock %}
+		</div>
+	    </div>
+	    {% render_main_menu %}
+	</div>
+
+	<!-- jquery.js -->
+	<script src="/static/django_htmx/htmx.min.js"></script>
+	<script src="{% static 'liszt_util/htmx-preload.js' %}"></script>
+	<script src="{% static 'liszt_util/jquery-3.7.1.min.js' %}"></script>
+	<script src="https://cdn.rawgit.com/ichord/Caret.js/master/dist/jquery.caret.min.js"></script>
+	<script src="https://cdn.rawgit.com/ichord/At.js/master/dist/js/jquery.atwho.min.js"></script>
+	<script src="{% static 'liszt_util/sumoselect.js' %}"></script>
+    </body>
+</html>

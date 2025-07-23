@@ -1,14 +1,6 @@
 {% extends 'edwoca/base.html' %}
 
-{% block menu %}
-{% include 'edwoca/partials/manifestation_menu.html' %}
-{% endblock %}
 
-{% block navbar_title %}
-
-{% include 'edwoca/partials/title.html' %}
-
-{% endblock %}
 
 {% block content %}
 
@@ -110,13 +102,17 @@
 	</div>
 </div>
 
-{% endblock %}
-
-{% block nav %}
-<div class="flex flex-col h-full">
-	-- Navigation --
+<div class="bg-base-200 border border-base-300 p-5 mt-5">
+	<p class="prose">
+		{% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
+	<p class="prose">
+		{% include 'edwoca/partials/contributors_preview.html' %}
+	<p class="prose">
+		{% include 'edwoca/partials/bib_preview.html' %}
+	</p>
 </div>
 {% endblock %}
 
-{% block navbar_extras %}
-{% endblock %}
+
+
+

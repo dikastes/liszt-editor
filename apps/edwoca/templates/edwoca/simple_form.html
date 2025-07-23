@@ -1,18 +1,10 @@
 {% extends 'edwoca/base.html' %}
 
-{% block menu %}
-
-{% include 'edwoca/partials/update_menu_switcher.html' %}
-
-{% endblock %}
-
-{% block navbar_title %}
-
-{% include 'edwoca/partials/title.html' %}
-
-{% endblock %}
-
 {% block content %}
+
+{% if property %}
+	{% include 'edwoca/partials/preview_'|add:property|add:'_prolog.html' %}
+{% endif %}
 
 <div class="bg-white border border-base-300 p-5">
 	<h2 class="card-title mt-0"> {{ view_title }} </h2>
@@ -25,18 +17,12 @@
 	</form>
 </div>
 
+{% if property %}
+	{% include 'edwoca/partials/preview_'|add:property|add:'_epilog.html' %}
+{% endif %}
+
 {% endblock %}
 
-{% block nav %}
-<div class="flex flex-col h-full">
-	<div class="flex-1">
-		-- Navigation --
-	</div>
-	<div class="flex-0">
-		<label for="submit-form" class="btn btn-primary"> speichern </label>
-	</div>
-</div>
-{% endblock %}
 
-{% block navbar_extras %}
-{% endblock %}
+
+

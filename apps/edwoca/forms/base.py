@@ -6,7 +6,7 @@ from dominate.tags import div, label, span
 from dominate.util import raw
 
 
-class SimpleForm:
+class SimpleFormMixin:
     text_area_classes = 'textarea textarea-bordered w-full'
 
     def as_daisy(self):
@@ -67,7 +67,8 @@ class TitleForm(ModelForm):
         palette.add(lang_container)
         palette.add(status_container)
 
-        if 'DELETE' in self.fields:
+        # checken ob das form initialisiert ist, sonst kein delete-button
+        if 'DELETE' in self.fields and self.instance.pk:
             del_field = self['DELETE']
             del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
             del_field_label.add(raw(str(del_field)))
@@ -99,9 +100,7 @@ class ContributorForm(ModelForm):
     class Meta:
         fields = [ 'person', 'role', 'id' ]
         widgets = {
-                'person': Select( attrs = {
-                        'class': 'autocomplete-select select select-bordered'
-                    }),
+                'person': HiddenInput(),
                 'role': Select( attrs = {
                         'class': 'select w-full select-bordered'
                     }),
@@ -112,45 +111,50 @@ class ContributorForm(ModelForm):
             }
 
     def as_daisy(self):
-        class_name = self.Meta.model.__name__.lower().replace('contributor', '')
         form = div(cls='mb-10')
 
-        if self.instance.pk:
-           form.add(raw(str(self['id'])))
-        form.add(raw(str(self[class_name])))
-
-        person_field = self['person']
-        role_field = self['role']
-
-        person_container = div(cls='flex-1')
-        person_container.add(raw(str(person_field)))
-
         role_container = div(cls='flex-1')
-        role_container.add(raw(str(role_field)))
+        role_container.add(raw(str(self['role'])))
 
-        palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette.add(person_container)
-        palette.add(role_container)
-
-        if 'DELETE' in self.fields:
-            del_field = self['DELETE']
-            del_field_label = label(del_field.label, cls='input input-bordered flex items-center gap-2')
-            del_field_label.add(raw(str(del_field)))
-            palette.add(del_field_label)
-
-        form.add(palette)
+        form.add(role_container)
 
         return mark_safe(str(form))
 
 
-class CommentForm(ModelForm, SimpleForm):
+class CommentForm(ModelForm, SimpleFormMixin):
     class Meta:
         fields = ['private_comment', 'public_comment']
         widgets = {
                 'private_comment': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     }),
                 'public_comment': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     })
             }
+
+
+class BaseBibForm(ModelForm):
+    class Meta:
+        fields = [ 'bib', 'id' ]
+        widgets = {
+                'bib': Select( attrs = {
+                        'class': 'autocomplete-select select select-bordered w-full'
+                    }),
+                'id': HiddenInput()
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        if self.instance.pk:
+           form.add(raw(str(self['id'])))
+
+        bib_field = self['bib']
+
+        bib_container = div(cls='flex-1')
+        bib_container.add(raw(str(bib_field)))
+
+        form.add(bib_container)
+
+        return mark_safe(str(form))

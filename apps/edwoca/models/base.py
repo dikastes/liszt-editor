@@ -69,6 +69,9 @@ class BaseContributor(models.Model):
 
         return contributor
 
+    def __str__(self):
+        return f"{self.person} ({self.role})"
+
 
 class BaseBib(models.Model):
     class Meta:

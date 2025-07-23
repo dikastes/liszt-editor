@@ -1,14 +1,6 @@
 {% extends 'edwoca/base.html' %}
 
-{% block menu %}
-<ul class="menu menu-lg">
-	<li>
-	    <a class="btn" href="{% url 'edwoca:work_list' %}">
-		zurück
-	    </a>
-	</li>
-</ul>
-{% endblock %}
+
 
 {% block content %}
 
@@ -29,17 +21,6 @@
 
 {% endblock %}
 
-{% block navbar_extras %}
 
-{% endblock %}
 
-{% block nav %}
 
-<div class="flex flex-col h-full">
-	<div class="flex-1"></div>
-	<div class="flex-0">
-	    <label class="btn btn-primary" for="submit-form"> anlegen </label>
-	</div>
-</div>
-
-{% endblock %}

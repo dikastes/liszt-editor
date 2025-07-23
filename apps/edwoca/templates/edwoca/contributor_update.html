@@ -1,53 +1,72 @@
 {% extends 'edwoca/base.html' %}
 
-{% block menu %}
-
-{% include 'edwoca/partials/update_menu_switcher.html' %}
-
-{% endblock %}
-
-{% block navbar_title %}
-
-{% include 'edwoca/partials/title.html' %}
-
-{% endblock %}
 
 {% block content %}
 
+{% include 'edwoca/partials/preview_contributor_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+	<div class="prose">
+		<h2> Beteiligte </h2>
 
-	<form method="post">
-		{{ form.management_form }}
-		{% csrf_token %}
-		{% for contributor_form in form %}
-			{{ contributor_form.as_daisy }}
+		<ul>
+		{% for contributor in object.contributor_relations.all %}
+			<li>
+				<div class="flex">
+					<a href="{% url 'dmad_on_django:person_update' contributor.person.id %}" class="flex-1">
+						{{ contributor.person }} ({{ contributor.role }})
+					</a>
+					<form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_contributor_remove' contributor.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Beteiligte verknüpft </em> </li>
 		{% endfor %}
+		</ul>
 
-		<input value="Beteiligten hinzufügen" type="submit" name="add-form" class="btn" />
-		<input type="submit" name="save" id="submit-form" class="hidden" />
-	</form>
+		<h3> neuen Beteiligten verknüpfen </h3>
+
+		{% if show_search_form == True %}
+
+		<form action="{% url 'edwoca:'|add:entity_type|add:'_contributors' object.id %}" method="get">
+			{{ searchform.q }}
+			<input type="hidden" name="target_model" value="{{ entity_type }}" />
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+		
+		<ul>
+		{% if query %}
+			{% for found_contributor in found_contributors %}
+				<li>
+					<a href="{% url 'edwoca:'|add:entity_type|add:'_contributor_add' object.id found_contributor.object.id %}">
+						{{ found_contributor.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+
+		{% else %}
+
+		<form method="post">
+			{% csrf_token %}
+			{{ person }} mit {{ object }} verknüpfen als:
+			{{ form }}
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+
+		{% endif %}
+	</div>
 
 </div>
 
-<script>
-	document.addEventListener('DOMContentLoaded', _ => {
-		$('.autocomplete-select').SumoSelect({search:true});
-	})
-</script>
+{% include 'edwoca/partials/preview_contributor_epilog.html' %}
 
-{% endblock %}
-
-{% block nav %}
-<div class="flex flex-col h-full">
-	<div class="flex-1">
-		-- Navigation --
-	</div>
-	<div class="flex-0">
-		<label for="submit-form" class="btn btn-primary"> speichern </label>
-	</div>
-</div>
-{% endblock %}
-
-{% block navbar_extras %}
 {% endblock %}

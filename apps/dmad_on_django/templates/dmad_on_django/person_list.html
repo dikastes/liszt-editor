@@ -1,4 +1,4 @@
-{% extends 'dmad_on_django/base.html' %}
+{% extends 'liszt_util/base.html' %}
 {% load static %}
 
 {% block content %}
@@ -12,8 +12,7 @@
 
 {% endblock %}
 
-{% block sidebar %}
-
+{% block nav %}
 <div class="flex-none prose" id="sidebar">
     {% if rework_count > 0 or stub_count > 0 %}
 	<ul class="menu">
@@ -94,5 +93,5 @@
 	<input class="btn" type="submit" value="Suchen" />
     </form>
     {% endif %}
-    <a href="{% url 'dmad_on_django:person_create' %}" class="btn btn-primary"> Datensatz anlegen </a>
+    {% include 'dmad_on_django/partials/create_button.html' %}
 {% endblock %}

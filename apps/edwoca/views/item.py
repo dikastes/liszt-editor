@@ -2,11 +2,19 @@ from .base import *
 from ..forms.item import *
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
-from django.views.generic import DeleteView
+from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 
 
-class ItemTitleUpdateView(FormsetUpdateView):
+class ItemListView(EdwocaListView):
+    model = Item
+
+
+class ItemSearchView(EdwocaSearchView):
+    model = Item
+
+
+class ItemTitleUpdateView(EntityMixin, TitleUpdateView):
     model = Item
     form_class = ItemTitleFormSet
     formset_property = 'titles'
@@ -15,15 +23,15 @@ class ItemTitleUpdateView(FormsetUpdateView):
         return reverse_lazy('edwoca:item_title', kwargs = {'pk': self.object.id})
 
 
-class ItemUpdateView(UpdateView):
+class ItemUpdateView(EntityMixin, UpdateView):
     model = Item
-    form_class = ItemForm
+    #form_class = ItemForm
     template_name = 'edwoca/item_update.html'
 
 
-class ItemCreateView(CreateView):
+class ItemCreateView(EntityMixin, CreateView):
     model = Item
-    form_class = ItemForm
+    #form_class = ItemForm
     template_name = 'edwoca/create.html'
 
     def get_success_url(self):
@@ -31,11 +39,12 @@ class ItemCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context['title_formset'] = ItemTitleFormSet(self.request.POST)
-        else:
-            ItemTitleFormSet.can_delete = False
-            context['title_form_set'] = ItemTitleFormSet()
+        if 'title_formset' not in context:
+            if self.request.POST:
+                context['title_formset'] = ItemTitleFormSet(self.request.POST, self.request.FILES)
+            else:
+                ItemTitleFormSet.can_delete = False
+                context['title_form_set'] = ItemTitleFormSet()
         context['view_title'] = f"Neues Exemplar anlegen"
         context['button_label'] = "speichern"
         context['return_target'] = 'edwoca:index'
@@ -43,24 +52,21 @@ class ItemCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        title_formset = context['title_formset']
-
-        instance = form.save(commit=False)
-        instance.manifestation = Manifestation.objects.get(id=self.kwargs['manifestation_id'])
+        self.object = form.save(commit=False)
+        self.object.manifestation = Manifestation.objects.get(id=self.kwargs['manifestation_id'])
+        title_formset = ItemTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
 
         if title_formset.is_valid():
-            instance.save()
-            self.object = form.save()
-            title_formset.instance = self.object
+            self.object.save()
             title_formset.save()
             return redirect(self.get_success_url())
         else:
-            return self.form_invalid(form)
+            self.object = None
+            return self.form_invalid(form, title_formset=title_formset)
 
-
-class ItemDeleteView(DeleteView):
-    pass
+    def form_invalid(self, form, title_formset=None):
+        context = self.get_context_data(form=form, title_formset=title_formset)
+        return self.render_to_response(context)
 
 
 class ItemLocationUpdateView(SimpleFormView):
@@ -68,13 +74,13 @@ class ItemLocationUpdateView(SimpleFormView):
     property = 'location'
 
 
-class ItemRelationsUpdateView(RelationsUpdateView):
+class ItemRelationsUpdateView(EntityMixin, RelationsUpdateView):
     template_name = 'edwoca/item_relations.html'
     model = Item
     form_class = RelatedItemForm
 
 
-class RelatedItemAddView(RelatedEntityAddView):
+class RelatedItemAddView(EntityMixin, RelatedEntityAddView):
     template_name = 'edwoca/item_relations.html'
     model = RelatedItem
 
@@ -86,11 +92,23 @@ class RelatedItemRemoveView(DeleteView):
         return reverse_lazy('edwoca:item_relations', kwargs={'pk': self.object.source_item.id})
 
 
-class ItemContributorsUpdateView(ContributorsUpdateView):
+class ItemContributorsUpdateView(EntityMixin, ContributorsUpdateView):
     model = Item
+    form_class = ItemContributorForm
 
 
-class ItemProvenanceUpdateView(UpdateView):
+class ItemContributorAddView(ContributorAddView):
+    model = ItemContributor
+
+
+class ItemContributorRemoveView(DeleteView):
+    model = ItemContributor
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_contributors', kwargs={'pk': self.object.item.id})
+
+
+class ItemProvenanceUpdateView(EntityMixin, UpdateView):
     pass
 
 
@@ -114,8 +132,35 @@ class ItemCommentUpdateView(SimpleFormView):
     property = 'comment'
 
 
-class ItemDeleteView(DeleteView):
+class ItemDeleteView(EntityMixin, DeleteView):
     model = Item
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_update', kwargs={'pk': self.object.work.id})
+        return self.object.manifestation.get_absolute_url()
+
+
+class LibraryListView(EdwocaListView):
+    model = Library
+
+
+class LibrarySearchView(EdwocaSearchView):
+    model = Library
+
+
+class LibraryCreateView(CreateView):
+    model = Library
+    #fields = ['siglum', 'name']
+    template_name = 'edwoca/simple_form.html'
+    form_class = LibraryForm
+
+
+class LibraryUpdateView(UpdateView):
+    model = Library
+    #fields = ['siglum', 'name']
+    template_name = 'edwoca/simple_form.html'
+    form_class = LibraryForm
+
+
+class LibraryDeleteView(DeleteView):
+    model = Library
+    template_name = 'edwoca/simple_form.html'

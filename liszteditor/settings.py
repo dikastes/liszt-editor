@@ -13,14 +13,16 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 import os
 import dotenv
+from django.urls import reverse_lazy
 
-dotenv_file = os.path.join(os.getcwd(), '.env')
-if os.path.isfile(dotenv_file):
-    dotenv.load_dotenv(dotenv_file)
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+dotenv_file = os.path.join(BASE_DIR, '.env')
+if os.path.isfile(dotenv_file):
+    dotenv.load_dotenv(dotenv_file)
+else:
+    print("Could not find .env file")
+    exit(1)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -33,10 +35,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+if not DEBUG:
+    ALLOWED_HOSTS.append(os.environ['DOMAIN_NAME'])
 
 # Application definition
 
 INSTALLED_APPS = [
+    'apps.liszt_util',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -79,6 +84,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'apps.liszt_util.context_processors.current_app_name',
+                'apps.edwoca.context_processors.entity_type',
             ],
         },
     },
@@ -133,6 +140,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static_collected')
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -149,10 +157,34 @@ Z_ID = "5080468"
 Z_LIBRARY_TYPE = 'group'
 Z_API_KEY = os.environ['ZOTERO_API_KEY']
 
-HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+# HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'
 HAYSTACK_CONNECTIONS = {
     'default': {
         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
         'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index')
     },
 }
+
+GLOBAL_NAVIGATION = {
+        'edwoca': {
+                'label': 'edwoca',
+                'href': reverse_lazy('edwoca:index')
+            },
+        'dmad_on_django': {
+                'label': 'DMAd',
+                'href': reverse_lazy('dmad_on_django:index')
+            },
+        'bib': {
+                'label': 'Bib',
+                'href': reverse_lazy('bib:index')
+            },
+        'musiconn': {
+                'label': 'musiconn',
+                'href': None
+            },
+        'rism': {
+                'label': 'RISM',
+                'href': None
+            }
+    }

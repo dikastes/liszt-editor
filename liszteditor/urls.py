@@ -16,9 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic.base import RedirectView
 from debug_toolbar.toolbar import debug_toolbar_urls
 
 urlpatterns = [
+    path('', RedirectView.as_view(pattern_name='edwoca:index'), name='home'),
     path('admin/', admin.site.urls),
     path('edwoca/', include('edwoca.urls')),
     path('dmad/', include('dmad_on_django.urls')),

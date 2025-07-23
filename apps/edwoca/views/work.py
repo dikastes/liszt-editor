@@ -1,5 +1,6 @@
 from .base import *
 from ..forms.work import *
+from bib.models import ZotItem
 from django.forms.models import formset_factory
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
@@ -21,11 +22,12 @@ class WorkCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        if self.request.POST:
-            context['title_formset'] = WorkTitleFormSet(self.request.POST)
-        else:
-            WorkTitleFormSet.can_delete = False
-            context['title_form_set'] = WorkTitleFormSet()
+        if 'title_formset' not in context:
+            if self.request.POST:
+                context['title_formset'] = WorkTitleFormSet(self.request.POST, self.request.FILES)
+            else:
+                WorkTitleFormSet.can_delete = False
+                context['title_form_set'] = WorkTitleFormSet()
         context['view_title'] = f"Neues Werk anlegen"
         context['button_label'] = "speichern"
         context['return_target'] = 'edwoca:index'
@@ -33,37 +35,30 @@ class WorkCreateView(CreateView):
         return context
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        title_formset = context['title_formset']
+        self.object = form.save(commit=False)
+        title_formset = WorkTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
 
         if title_formset.is_valid():
-            response = super().form_valid(form)
-            self.object = form.save()
-            title_formset.instance = self.object
-            title_formset.save()
             self.object.save()
-            return response
+            title_formset.save()
+            return redirect(self.get_success_url())
         else:
-            return self.form_invalid(form)
+            self.object = None # Reset object so get_context_data doesn't try to use it for instance
+            return self.form_invalid(form, title_formset=title_formset)
+
+    def form_invalid(self, form, title_formset=None):
+        context = self.get_context_data(form=form, title_formset=title_formset)
+        return self.render_to_response(context)
 
 
-class WorkUpdateView(UpdateView):
+class WorkUpdateView(EntityMixin, UpdateView):
     model = Work
     form_class = WorkForm
     template_name = 'edwoca/work_update.html'
     context_object_name = 'work'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title_form_set'] = formset_factory(WorkTitleForm)
-        context['view_title'] = f"Werk { self.object } bearbeiten"
-        context['button_label'] = "speichern"
-        context['return_target'] = 'edwoca:work_detail'
-        context['return_pk'] = self.object.id
-        return context
 
-
-class WorkDeleteView(DeleteView):
+class WorkDeleteView(EntityMixin, DeleteView):
     model = Work
     success_url = reverse_lazy('edwoca:index')
     template_name = 'edwoca/simple_form.html'
@@ -74,7 +69,7 @@ class WorkDeleteView(DeleteView):
         return context
 
 
-class WorkTitleUpdateView(FormsetUpdateView):
+class WorkTitleUpdateView(EntityMixin, TitleUpdateView):
     model = Work
     form_class = WorkTitleFormSet
     formset_property = 'titles'
@@ -83,13 +78,13 @@ class WorkTitleUpdateView(FormsetUpdateView):
         return reverse_lazy('edwoca:work_title', kwargs = {'pk': self.object.id})
 
 
-class WorkRelationsUpdateView(RelationsUpdateView):
+class WorkRelationsUpdateView(EntityMixin, RelationsUpdateView):
     template_name = 'edwoca/work_relations.html'
     model = Work
     form_class = RelatedWorkForm
 
 
-class WorkRelatedWorksUpdateView(UpdateView):
+class WorkRelatedWorksUpdateView(EntityMixin, UpdateView):
     model = Work
     fields = []
     template_name = 'edwoca/work_related_works.html'
@@ -111,16 +106,20 @@ class WorkSearchView(EdwocaSearchView):
     model = Work
 
 
-class WorkBibView(ModelFormMixin):
-    model = WorkBib
-    fields = [
-            'bib',
-            'work'
-        ]
-
-
-class WorkContributorsUpdateView(ContributorsUpdateView):
+class WorkContributorsUpdateView(EntityMixin, ContributorsUpdateView):
     model = Work
+    form_class = WorkContributorForm
+
+
+class WorkContributorAddView(ContributorAddView):
+    model = WorkContributor
+
+
+class WorkContributorRemoveView(DeleteView):
+    model = WorkContributor
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_contributors', kwargs={'pk': self.object.work.id})
 
 
 class WorkHistoryUpdateView(SimpleFormView):
@@ -128,15 +127,44 @@ class WorkHistoryUpdateView(SimpleFormView):
     property = 'history'
 
 
-class WorkBibliographyUpdateView(FormsetUpdateView):
+class WorkBibliographyUpdateView(EntityMixin, UpdateView):
     model = Work
-    form_class = WorkBibFormSet
+    form_class = WorkBibForm
     property = 'bib'
+    template_name = 'edwoca/bib_update.html'
 
     def get_success_url(self):
         return reverse_lazy('edwoca:work_bibliography', kwargs = {'pk': self.object.id})
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_form = SearchForm(self.request.GET or None)
+        context['searchform'] = search_form
+        context['show_search_form'] = True
+
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_bibs"] = search_form.search().models(ZotItem)
+        return context
 
 
 class WorkCommentUpdateView(SimpleFormView):
     model = Work
     property = 'comment'
+
+
+class WorkBibAddView(FormView):
+    def post(self, request, *args, **kwargs):
+        work_id = self.kwargs['pk']
+        zotitem_key = self.kwargs['zotitem_key']
+        work = Work.objects.get(pk=work_id)
+        zotitem = ZotItem.objects.get(zot_key=zotitem_key)
+        WorkBib.objects.get_or_create(work=work, bib=zotitem)
+        return redirect(reverse_lazy('edwoca:work_bibliography', kwargs={'pk': work_id}))
+
+
+class WorkBibDeleteView(DeleteView):
+    model = WorkBib
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_bibliography', kwargs={'pk': self.object.work.id})

@@ -7,7 +7,15 @@ from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
 
 
-class ExpressionCreateView(CreateView):
+class ExpressionListView(EdwocaListView):
+    model = Expression
+
+
+class ExpressionSearchView(EdwocaSearchView):
+    model = Expression
+
+
+class ExpressionCreateView(EntityMixin, CreateView):
     model = Expression
     form_class = ExpressionForm
     template_name = 'edwoca/create.html'
@@ -17,43 +25,39 @@ class ExpressionCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        form = context['form']
-        if self.request.POST:
-            context['title_formset'] = ExpressionTitleFormSet(self.request.POST)
-        else:
-            ExpressionTitleFormSet.can_delete = False
-            context['title_form_set'] = ExpressionTitleFormSet()
+        if 'title_formset' not in context:
+            if self.request.POST:
+                context['title_formset'] = ExpressionTitleFormSet(self.request.POST, self.request.FILES)
+            else:
+                ExpressionTitleFormSet.can_delete = False
+                context['title_form_set'] = ExpressionTitleFormSet()
         return context
 
     def form_valid(self, form):
-        context = self.get_context_data()
-        title_formset = context['title_formset']
-
-        instance = form.save(commit=False)
-        instance.work = Work.objects.get(id=self.kwargs['work_id'])
+        self.object = form.save(commit=False)
+        self.object.work = Work.objects.get(id=self.kwargs['work_id'])
+        title_formset = ExpressionTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
 
         if title_formset.is_valid():
-            instance.save()
-            self.object = form.save()
-            title_formset.instance = self.object
+            self.object.save()
             title_formset.save()
             return redirect(self.get_success_url())
         else:
-            return self.form_invalid(form)
+            self.object = None
+            return self.form_invalid(form, title_formset=title_formset)
+
+    def form_invalid(self, form, title_formset=None):
+        context = self.get_context_data(form=form, title_formset=title_formset)
+        return self.render_to_response(context)
 
 
-class ExpressionUpdateView(UpdateView):
+class ExpressionUpdateView(EntityMixin, UpdateView):
     model = Expression
     form_class = ExpressionForm
     template_name = 'edwoca/expression_update.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['title_form_set'] = formset_factory(ExpressionTitleForm)
-        return context
 
-
-class ExpressionTitleUpdateView(FormsetUpdateView):
+class ExpressionTitleUpdateView(EntityMixin, TitleUpdateView):
     model = Expression
     form_class = ExpressionTitleFormSet
     formset_property = 'titles'
@@ -62,21 +66,29 @@ class ExpressionTitleUpdateView(FormsetUpdateView):
         return reverse_lazy('edwoca:expression_title', kwargs = {'pk': self.object.id})
 
 
-class ExpressionContributorsUpdateView(ContributorsUpdateView):
+class ExpressionContributorsUpdateView(EntityMixin, ContributorsUpdateView):
     model = Expression
+    form_class = ExpressionContributorForm
 
 
-class ExpressionRelationsUpdateView(RelationsUpdateView):
+class ExpressionContributorAddView(ContributorAddView):
+    model = ExpressionContributor
+
+
+class ExpressionContributorRemoveView(DeleteView):
+    model = ExpressionContributor
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:expression_contributors', kwargs={'pk': self.object.expression.id})
+
+
+class ExpressionRelationsUpdateView(EntityMixin, RelationsUpdateView):
     template_name = 'edwoca/expression_relations.html'
     model = Expression
     form_class = RelatedExpressionForm
 
-    #def get_context_data(self, **kwargs):
-        #context = super().get_context_data(**kwargs)
-        #breakpoint()
 
-
-class RelatedExpressionAddView(RelatedEntityAddView):
+class RelatedExpressionAddView(EntityMixin, RelatedEntityAddView):
     template_name = 'edwoca/expression_relations.html'
     model = RelatedExpression
 
@@ -88,7 +100,7 @@ class RelatedExpressionRemoveView(DeleteView):
         return reverse_lazy('edwoca:expression_relations', kwargs={'pk': self.object.source_work.id})
 
 
-class ExpressionHistoryUpdateView(UpdateView):
+class ExpressionHistoryUpdateView(EntityMixin, UpdateView):
     model = Expression
     form_class = ExpressionHistoryForm
     template_name = 'edwoca/simple_form.html'
@@ -97,15 +109,15 @@ class ExpressionHistoryUpdateView(UpdateView):
         return reverse_lazy('edwoca:expression_history', kwargs={'pk': self.object.pk})
 
 
-class ExpressionCategorisationUpdateView(UpdateView):
+class ExpressionCategorisationUpdateView(EntityMixin, UpdateView):
     pass
 
 
-class ExpressionMediumofperformanceUpdateView(UpdateView):
+class ExpressionMediumofperformanceUpdateView(EntityMixin, UpdateView):
     pass
 
 
-class ExpressionMovementsUpdateView(FormsetUpdateView):
+class ExpressionMovementsUpdateView(EntityMixin, FormsetUpdateView):
     model = Expression
     form_class = MovementFormSet
     template_name = 'edwoca/expression_movement.html'
@@ -115,7 +127,7 @@ class ExpressionMovementsUpdateView(FormsetUpdateView):
         return reverse_lazy('edwoca:expression_movement', kwargs={'pk': self.object.pk})
 
 
-class ExpressionCommentUpdateView(UpdateView):
+class ExpressionCommentUpdateView(EntityMixin, UpdateView):
     model = Expression
     form_class = ExpressionCommentForm
     template_name = 'edwoca/simple_form.html'
@@ -124,7 +136,7 @@ class ExpressionCommentUpdateView(UpdateView):
         return reverse_lazy('edwoca:expression_comment', kwargs={'pk': self.object.pk})
 
 
-class ExpressionDeleteView(DeleteView):
+class ExpressionDeleteView(EntityMixin, DeleteView):
     model = Expression
     template_name = 'edwoca/simple_form.html'
 

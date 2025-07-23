@@ -1,4 +1,4 @@
-{% extends 'dmad_on_django/base.html' %}
+{% extends 'liszt_util/base.html' %}
 {% load static %}
 
 {% block content %}
@@ -28,6 +28,7 @@
     </div>
 </div>
 
+{% block nav %}
 <div class="flex-0 flex flex-col">
     <div class="flex-1"></div>
     <ul class="menu gap-5 flex-0">
@@ -42,6 +43,7 @@
 	</li>
     </ul>
 </div>
+{% endblock %}
 
 <script src="{% static 'dmad_on_django/search_gnd.js' %}"></script>
 <script>

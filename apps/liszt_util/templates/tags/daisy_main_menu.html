@@ -1,0 +1,14 @@
+<ul class="menu menu-lg menu-horizontal w-full text-base-content join justify-around bg-white border border-base-300 p-0 mt-10 rounded-none">
+    {# Iteriert über das Dictionary {key: {label, href}} #}
+    {% for key, item in menu_items.items %}
+        <li class="join-item {% if not item.href %}disabled{% endif %}">
+
+            {# 2. Setze 'active' auf den a-Tag, wenn die App dem Menüpunkt-Schlüssel entspricht #}
+            <a {% if item.href %}href="{{ item.href }}"{% endif %} 
+               class="rounded-none {% if current_app == key %}active{% endif %}">
+                {{ item.label }}
+            </a>
+
+        </li>
+    {% endfor %}
+</ul>

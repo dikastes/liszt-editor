@@ -36,13 +36,13 @@ class ExpressionTitleForm(TitleForm):
         widgets = dict(TitleForm.Meta.widgets, **{ 'expression': HiddenInput() })
 
 
-class ExpressionHistoryForm(ModelForm, SimpleForm):
+class ExpressionHistoryForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Work
         fields = ['history']
         widgets = {
                 'history': Textarea( attrs = {
-                        'class': SimpleForm.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes
                     })
             }
 
@@ -55,7 +55,7 @@ class ExpressionCommentForm(CommentForm):
 
 
 class ExpressionContributorForm(ContributorForm):
-    class Meta:
+    class Meta(ContributorForm.Meta):
         model = ExpressionContributor
         fields = ContributorForm.Meta.fields + [ 'expression' ]
         widgets = dict(ContributorForm.Meta.widgets, **{ 'expression': HiddenInput() })
@@ -202,14 +202,7 @@ ExpressionTitleFormSet = inlineformset_factory(
     )
 
 
-ExpressionContributorFormSet = inlineformset_factory(
-        Expression,
-        ExpressionContributor,
-        form = ExpressionContributorForm,
-        extra = 1,
-        max_num = 100,
-        can_delete = True
-    )
+
 
 
 MovementFormSet = inlineformset_factory(
