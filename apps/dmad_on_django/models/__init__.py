@@ -4,12 +4,13 @@ from .person import Person, PersonName
 from .period import Period
 from .work import Work
 from .subjectterm import GNDSubjectCategory, SubjectTermName, SubjectTerm
+from .corporation import Corporation, CorporationName
 
 __all__ = [
     "Language", "Status", "max_trials",
     "Place", "PlaceName",
     "Person", "PersonName",
-    "Period",
+    "Period", "Corporation", "CorporationName",
     "Work",
     "GNDSubjectCategory", "SubjectTermName", "SubjectTerm"
 ]
