@@ -20,12 +20,12 @@ After everything is done, apply migrations:
 Run the server from the root directory of liszt-editor:
 
 ```{bash}
-# bin/python3 manage.py runserver
+# venv/bin/python3 manage.py runserver
 ```
 
 Alternatively run: 
 ```{bash}
-# source bin/activate
+# source venv/bin/activate
 # python3 manage.py runserver
 ``` 
 
