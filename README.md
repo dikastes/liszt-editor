@@ -9,12 +9,6 @@ Make sure python3 is installed. Run the install script:
 # ./install.bash
 ```
 
-After everything is done, apply migrations:
-
-```{bash}
-# bin/python3 manage.py migrate
-```
-
 ## Run the server
 
 Run the server from the root directory of liszt-editor:
