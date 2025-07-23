@@ -10,12 +10,7 @@ __all__ = [
     "Language", "Status", "max_trials",
     "Place", "PlaceName",
     "Person", "PersonName",
-<<<<<<< HEAD
     "Period", "Corporation", "CorporationName",
-    "Work",
-=======
-    "Period",
     "Work", "WorkName"
->>>>>>> main
     "GNDSubjectCategory", "SubjectTermName", "SubjectTerm"
 ]
