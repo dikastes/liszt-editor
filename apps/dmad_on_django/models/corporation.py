@@ -3,7 +3,7 @@ from django.urls import reverse
 from json import dumps, loads
 import requests
 
-from .base import Status, Language, max_trials, DisplayableModel
+from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
 from .place import Place
 from .geographicareacodes import CorporationGeographicAreaCode
 from .subjectterm import SubjectTerm
@@ -78,7 +78,7 @@ class Corporation(DisplayableModel):
 
 
     def update_from_raw(self):
-        pass
+        GNDSubjectCategory.create_or_link(self.raw_data)
 
     def fetch_raw(self):
         trials = max_trials
@@ -115,7 +115,9 @@ class Corporation(DisplayableModel):
         return 'ohne Name'
 
     def get_table(self):
-        return CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
+        return CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
+        GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category)
+        
     
     @staticmethod
     def search(search_string):
@@ -141,3 +143,5 @@ class Corporation(DisplayableModel):
     def get_model(self):
         return self
 
+    def get_overview_title(self):
+        return "Angaben"

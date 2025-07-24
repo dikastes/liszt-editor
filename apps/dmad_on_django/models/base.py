@@ -37,7 +37,9 @@ class GNDSubjectCategory(models.Model):
 
         except KeyError:
             return None
-        
+
+        except TypeError:
+            return None        
 
         try:
             return GNDSubjectCategory.objects.get(link=category['id'])
