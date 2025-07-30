@@ -19,6 +19,9 @@ class Manifestation(WemiBaseClass):
     class EditionType(models.TextChoices):
         SCORE = 'SC', _('Score')
         PARTS = 'PA', _('Parts')
+        PARTICELL = 'PC', _('Particell')
+        PIANO_REDUCTION = 'PR', _('Piano Reduction')
+        CHOIR_SCORE = 'CS', _('Choir Score')
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
