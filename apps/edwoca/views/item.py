@@ -80,7 +80,7 @@ class ItemRelationsUpdateView(EntityMixin, RelationsUpdateView):
     form_class = RelatedItemForm
 
 
-class RelatedItemAddView(EntityMixin, RelatedEntityAddView):
+class RelatedItemAddView(RelatedEntityAddView):
     template_name = 'edwoca/item_relations.html'
     model = RelatedItem
 

@@ -88,7 +88,7 @@ class ExpressionRelationsUpdateView(EntityMixin, RelationsUpdateView):
     form_class = RelatedExpressionForm
 
 
-class RelatedExpressionAddView(EntityMixin, RelatedEntityAddView):
+class RelatedExpressionAddView(RelatedEntityAddView):
     template_name = 'edwoca/expression_relations.html'
     model = RelatedExpression
 
