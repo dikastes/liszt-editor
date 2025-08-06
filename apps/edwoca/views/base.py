@@ -244,7 +244,7 @@ class ContributorAddView(EntityMixin, FormView):
         return kwargs
 
     def get_model_name(self):
-        return camel_to_snake_case(super().get_model_name()).replace('contributor', '')
+        return camel_to_snake_case(super().get_model_name()).replace('_contributor', '')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -179,7 +179,7 @@ class ManifestationTitleUpdateView(EntityMixin, TitleUpdateView):
         return reverse_lazy('edwoca:manifestation_title', kwargs = {'pk': self.object.id})
 
 
-class RelatedManifestationAddView(EntityMixin, RelatedEntityAddView):
+class RelatedManifestationAddView(RelatedEntityAddView):
     template_name = 'edwoca/manifestation_relations.html'
     model = RelatedManifestation
 
