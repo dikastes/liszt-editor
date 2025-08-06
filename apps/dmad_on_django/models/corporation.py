@@ -46,13 +46,8 @@ class CorporationName(models.Model):
 class Corporation(DisplayableModel):
 
     # broaderTermInstantial -> bisher nur für Verlage überprüft
-    category = models.ForeignKey(
-        SubjectTerm,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='corporations'
-    )
+    category = models.ManyToManyField(SubjectTerm)
+    
     # placeOfBusiness
     place = models.ManyToManyField(Place)
     
@@ -76,7 +71,7 @@ class Corporation(DisplayableModel):
         pl_org = PyLobidOrg()
         pl_org.process_data(data=loads(self.raw_data))
 
-        self.gnd_subject_category = GNDSubjectCategory.create_or_link(loads(self.raw_data))
+        GNDSubjectCategory.create_or_link(self)
         self.geographic_area_codes.all().delete()
         CorporationGeographicAreaCode.create_geographic_area_codes(self)
         
@@ -132,12 +127,13 @@ class Corporation(DisplayableModel):
         return 'ohne Name'
 
     def get_table(self):
-        table = CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
-        GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category)
+        table = CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
         
         for pl in self.place.all():
             table.append(("Wirkungsort", pl))
         
+        table += GNDSubjectCategory.get_subject_category_table(self)
+
         return table
     
     @staticmethod
