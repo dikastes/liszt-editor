@@ -108,13 +108,7 @@ class Person(DisplayableModel):
 
         if 'gender' in pl_person.ent_dict:
             self.gender = Person.map_gender(pl_person.ent_dict['gender'][0]['id'])
-
-        if 'geographicAreaCode' in pl_person.ent_dict:
-            self.geographic_area_code = ', '.join([
-                area_code['id'].split('#')[1]
-                for area_code in pl_person.ent_dict['geographicAreaCode']
-            ])
-
+            
         if pl_person.birth_place['id']:
             self.birth_place = Place.fetch_or_get(pl_person.birth_place['id'])
             self.birth_place.save()

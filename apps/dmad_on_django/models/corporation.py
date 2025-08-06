@@ -10,7 +10,6 @@ from .subjectterm import SubjectTerm
 from .period import Period
 from pylobid.pylobid import PyLobidOrg, GNDAPIError
 
-
 class CorporationName(models.Model):
     name = models.CharField(max_length=50)
     language = models.CharField(
@@ -55,13 +54,8 @@ class Corporation(DisplayableModel):
         related_name='corporations'
     )
     # placeOfBusiness
-    place = models.ForeignKey(
-        Place,
-        on_delete=models.SET_NULL,
-        null=True,
-        blank=True,
-        related_name='corporations'
-    )
+    place = models.ManyToManyField(Place)
+    
     # period not before: dateOfEstablishment,
     # period not after: dateOfTermination,
     # period display: something like 1880-1882
@@ -78,7 +72,30 @@ class Corporation(DisplayableModel):
 
 
     def update_from_raw(self):
-        GNDSubjectCategory.create_or_link(self.raw_data)
+        
+        pl_org = PyLobidOrg()
+        pl_org.process_data(data=loads(self.raw_data))
+
+        self.gnd_subject_category = GNDSubjectCategory.create_or_link(loads(self.raw_data))
+        self.geographic_area_codes.all().delete()
+        CorporationGeographicAreaCode.create_geographic_area_codes(self)
+        
+        self.names.all().delete()
+        
+        pref_name = CorporationName.create_from_string(pl_org.pref_name, Status.PRIMARY, self)
+        pref_name.save()
+
+        for alt_name in pl_org.alt_names:
+            name = CorporationName.create_from_string(alt_name,Status.ALTERNATIVE,self)
+            name.save()
+
+        self.place.all().delete()
+
+        for pl in pl_org.located_in:
+            p = Place.fetch_or_get(pl['id'])
+            self.place.add(p)
+            p.save()
+
 
     def fetch_raw(self):
         trials = max_trials
@@ -115,9 +132,13 @@ class Corporation(DisplayableModel):
         return 'ohne Name'
 
     def get_table(self):
-        return CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
+        table = CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
         GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category)
         
+        for pl in self.place.all():
+            table.append(("Wirkungsort", pl))
+        
+        return table
     
     @staticmethod
     def search(search_string):

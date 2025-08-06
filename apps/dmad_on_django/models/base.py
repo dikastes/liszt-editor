@@ -31,15 +31,11 @@ class GNDSubjectCategory(models.Model):
 
     @staticmethod
     def create_or_link(json):
-
         try:
             category = json['gndSubjectCategory'][0]
 
         except KeyError:
             return None
-
-        except TypeError:
-            return None        
 
         try:
             return GNDSubjectCategory.objects.get(link=category['id'])
