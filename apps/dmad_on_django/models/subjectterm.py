@@ -31,11 +31,6 @@ class SubjectTermName(models.Model):
         )
 
 class SubjectTerm(DisplayableModel):
-    gnd_subject_category = models.ForeignKey(
-        GNDSubjectCategory,
-        on_delete=models.SET_NULL,
-        null=True
-    )
 
     parent_subjects = models.ManyToManyField('self', blank=True, symmetrical=False)
 
@@ -73,9 +68,9 @@ class SubjectTerm(DisplayableModel):
         self.raw_data=dumps(pl_subjectterm.ent_dict)
 
     def update_from_raw(self):
-        raw_data = loads(self.raw_data)
-        self.gnd_subject_category = GNDSubjectCategory.create_or_link(raw_data)
         self.save()
+        raw_data = loads(self.raw_data)
+        GNDSubjectCategory.create_or_link(self)
         self.names.all().delete()
         pref_name = SubjectTermName.create_from_string(
                 raw_data['preferredName'],
@@ -134,7 +129,7 @@ class SubjectTerm(DisplayableModel):
 
     def get_table(self):
             
-            return GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category) +\
+            return GNDSubjectCategory.get_subject_category_table(self) +\
             self.get_parent_subject_table()
     
     def get_overview_title(self):

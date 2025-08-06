@@ -123,8 +123,6 @@ class Person(DisplayableModel):
             self.death_place = Place.fetch_or_get(pl_person.death_place['id'])
             self.death_place.save()
 
-        self.gnd_subject_category = GNDSubjectCategory.create_or_link(loads(self.raw_data))
-
         self.save()
 
         self.activity_places.clear()
@@ -153,7 +151,7 @@ class Person(DisplayableModel):
         self.geographic_area_codes.all().delete()
         PersonGeographicAreaCode.create_geographic_area_codes(self)
 
-        self.gnd_subject_category = GNDSubjectCategory.create_or_link(loads(self.raw_data))
+        GNDSubjectCategory.create_or_link(self)
 
     def fetch_raw(self):
         trials = max_trials
@@ -200,7 +198,7 @@ class Person(DisplayableModel):
             ("Charakteristischer Beruf", "todo"),
             ]+\
             PersonGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
-            GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category)
+            GNDSubjectCategory.get_subject_category_table(self)
 
             if(len(self.activity_places.all()) > 0):
                 for place in self.activity_places.all():

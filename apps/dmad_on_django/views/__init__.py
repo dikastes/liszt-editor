@@ -26,6 +26,11 @@ from .subjectterm import (
     SubjectTermPullView, subject_term_list
 )
 
+from .corporation import (
+    CorporationSearchView, CorporationCreateView, CorporationUpdateView,
+    CorporationDeleteView, CorporationLinkView, CorporationUnlinkView,
+    CorporationPullView, corporation_list
+)
 __all__ = [
     "index",
     "DmadCreateView", "DmadUpdateView", "DeleteView",
@@ -47,8 +52,13 @@ __all__ = [
     "WorkDeleteView", "WorkLinkView", "WorkUnlinkView", "WorkPullView",
     "work_list",
 
-    # SubjectTerm vies
+    # SubjectTerm views
     "SubjectTermSearchView", "SubjectTermCreateView", "SubjectTermUpdateView",
     "SubjectTermDeleteView", "SubjectTermLinkView", "SubjectTermUnlinkView", "SubjectTermPullView",
-    "subjectTerm_list"
+    "subjectTerm_list",
+
+    # Corporation views
+    "CorporationSearchView", "CorporationCreateView", "CorporationUpdateView",
+    "CorporationDeleteView", "CorporationLinkView", "CorporationUnlinkView",
+    "CorporationPullView", "corporation_list"
 ]
