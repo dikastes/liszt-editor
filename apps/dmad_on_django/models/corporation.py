@@ -91,6 +91,14 @@ class Corporation(DisplayableModel):
             self.place.add(p)
             p.save()
 
+        self.period = Period.create_single_period_from_json(json_data=loads(self.raw_data))
+
+        for c in pl_org.category:
+
+            cat = SubjectTerm.fetch_or_get(c['id'])
+            self.category.add(cat)
+
+        self.save()
 
     def fetch_raw(self):
         trials = max_trials
@@ -133,6 +141,11 @@ class Corporation(DisplayableModel):
             table.append(("Wirkungsort", pl))
         
         table += GNDSubjectCategory.get_subject_category_table(self)
+
+        table.append(("Zeitraum", self.period))
+
+        for c in self.category.all():
+            table.append(("Kategorie", c))
 
         return table
     

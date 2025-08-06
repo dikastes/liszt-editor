@@ -31,8 +31,6 @@ class GNDSubjectCategory(models.Model):
 
     @staticmethod
     def create_or_link(entity):
-        
-        category = None
 
         try:
             category = loads(entity.raw_data)['gndSubjectCategory']
@@ -109,7 +107,7 @@ class DisplayableModel(models.Model):
 
     
     def get_table(self):
-        raise NotImplemented("Please override get_table")
+        raise NotImplementedError("Please override get_table")
 
     
     class Meta:
