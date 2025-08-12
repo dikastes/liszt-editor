@@ -8,7 +8,7 @@ from django.http import JsonResponse
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm
 from dmad_on_django.forms import formWidgets
-from dmad_on_django.tools import camel_to_snake_case, snake_to_camel_case
+from liszt_util.tools import camel_to_snake_case, snake_to_camel_case
 
 
 def search_gnd(request, search_string, entity_type):

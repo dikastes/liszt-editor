@@ -2,22 +2,29 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language
+from dmrism.models import WemiBaseClass
+from dmrism.models import Manifestation as DmRismManifestation
+from dmrism.models import Item as DmRismItem
 
-class WemiBaseClass(models.Model):
-    class Meta:
-        abstract = True
-
-    public_comment = models.TextField(
-            null = True
-        )
-
-    private_comment = models.TextField(
-            null = True
-        )
-
+class EdwocaUpdateUrlMixin:
     def get_absolute_url(self):
         model = self.__class__.__name__.lower()
         return reverse(f'edwoca:{model}_update', kwargs={'pk': self.id})
+
+
+class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
+    class Meta:
+        proxy = True
+
+
+class Item (EdwocaUpdateUrlMixin, DmRismItem):
+    class Meta:
+        proxy = True
+
+
+class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):
+    class Meta:
+        abstract = True
 
     def get_alt_titles(self):
         return ', '.join(alt_title.title for alt_title in self.titles.filter(status=Status.ALTERNATIVE))
@@ -39,70 +46,6 @@ class WemiBaseClass(models.Model):
             return f"{alternative_title.title} (A)"
 
         return '<ohne Titel>'
-
-
-class BaseContributor(models.Model):
-    class Meta:
-        abstract = True
-
-    class Role(models.TextChoices):
-        COMPOSER = 'CP', _('Composer')
-        WRITER = 'WR', _('Writer')
-        TRANSLATOR = 'TR', _('Translator')
-        POET = 'PT', _('Poet')
-        DEDICATEE = 'DD', _('Dedicatee')
-
-    person = models.ForeignKey(
-        'dmad.Person',
-        on_delete=models.CASCADE,
-        related_name='%(class)s_set' # Added dynamic related_name
-    )
-    role = models.CharField(max_length=10, choices=Role, default=Role.COMPOSER)
-
-    def to_mei(self):
-        contributor = ET.Element('persName')
-        contributor.attrib['role'] = self.role
-        contributor.attrib['auth'] = 'GND'
-        contributor.attrib['auth.uri'] = 'd-nb.info/gnd'
-        contributor.attrib['codedval'] = self.person.gnd_id
-        contributor.text = self.person.name
-
-        return contributor
-
-    def __str__(self):
-        return f"{self.person} ({self.role})"
-
-
-class BaseBib(models.Model):
-    class Meta:
-        abstract = True
-
-    bib = models.ForeignKey(
-        'bib.ZotItem',
-        on_delete=models.CASCADE,
-        #related_name='contributed_to'
-    )
-
-
-class RelatedEntity(models.Model):
-    class Meta:
-        abstract = True
-
-    class Label(models.TextChoices):
-        PARENT = 'PR', _('Parent')
-        RELATED = 'RE', _('Related')
-
-    comment = models.TextField(
-            null=True,
-            blank=True
-        )
-    label = models.CharField(max_length=2,choices=Label,default=Label.PARENT)
-
-    def is_upperclass(self):
-        return self.label in {
-            self.Label.PARENT,
-            self.Label.RELATED
-        }
 
 
 class EventContributor(models.Model):
