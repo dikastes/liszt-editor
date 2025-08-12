@@ -24,5 +24,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('edwoca/', include('edwoca.urls')),
     path('dmad/', include('dmad_on_django.urls')),
+    path('dmrism', include('dmrism.urls')),
     path(r'bib/', include('bib.urls',namespace='bib'))
 ] + debug_toolbar_urls()

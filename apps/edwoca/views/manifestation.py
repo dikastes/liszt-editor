@@ -7,8 +7,8 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from dmad_on_django.models import Place
-from ..models.manifestation import ManifestationBib
-from ..models.item import Signature
+from dmrism.models.manifestation import ManifestationBib
+from dmrism.models.item import Signature
 from bib.models import ZotItem
 
 

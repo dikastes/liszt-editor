@@ -1,9 +1,12 @@
 from .base import *
+from ..rism_tools import get_rism_data
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from dmad_on_django.models import Status
+from .item import Item, Signature, Library
+from dmad_on_django.models import Language
+from iso639 import find as lang_find
 
 
 class TitleTypes(models.TextChoices):
@@ -13,8 +16,10 @@ class TitleTypes(models.TextChoices):
 
 
 class Manifestation(WemiBaseClass):
-    class ManifestationType(models.TextChoices):
-        MANUSCRIPT = 'MS', _('Parent')
+    class ManifestationForm(models.TextChoices):
+        SKETCHES = 'SK', _('Sketches'),
+        FRAGMENTS = 'FR', _('Fragments'),
+        EXCERPTS = 'EX', _('Excerpts')
 
     class EditionType(models.TextChoices):
         SCORE = 'SC', _('Score')
@@ -27,6 +32,14 @@ class Manifestation(WemiBaseClass):
         COMPLETE= 'CP', _('complete')
         INCOMPLETE= 'INC', _('incomplete')
 
+    rism_id_unaligned = models.BooleanField(default=False)
+    temporary = models.BooleanField(default=False)
+    temporary_target = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE,
+            null = True,
+            related_name = 'temporary_copy'
+        )
     plate_number = models.CharField(
             max_length = 10,
             null = True,
@@ -52,10 +65,10 @@ class Manifestation(WemiBaseClass):
             'Manifestation',
             through = 'RelatedManifestation'
         )
-    manifestation_type = models.CharField(
+    manifestation_form = models.CharField(
             max_length=10,
-            choices=ManifestationType,
-            default=ManifestationType.MANUSCRIPT
+            choices=ManifestationForm,
+            default=ManifestationForm.SKETCHES
         )
     edition_type = models.CharField(
             max_length=10,
@@ -80,6 +93,12 @@ class Manifestation(WemiBaseClass):
             on_delete=models.SET_NULL,
             related_name='dedicated_manifestations',
             blank=True,
+            null=True
+        )
+    language = models.CharField(
+            max_length=15,
+            choices=Language,
+            default=None,
             null=True
         )
     dedication = models.TextField(
@@ -163,6 +182,146 @@ class Manifestation(WemiBaseClass):
         self.items.create()
         self.missing_item = False
 
+    def pull_rism_data(self):
+        EXTENT_MARKER = 'Umfang: '
+        HANDWRITING_MARKER = 'Schrift: '
+        PAPER_MARKER = 'Papier: '
+
+        data = get_rism_data(self.rism_id)
+
+        location = data.get('852')
+        siglum = location.get('a')
+        library = Library.objects.filter(siglum = siglum).first() or \
+            Library.objects.create(
+                    siglum = siglum,
+                    name = location.get('e')
+                )
+
+        signature = Signature.objects.create(
+                library = library,
+                status = Signature.Status.CURRENT,
+                signature = location.get('c')
+            )
+
+        item = Item.objects.create(
+                manifestation = self
+            )
+        item.signatures.add(signature)
+
+        # 852$d vormalige signatur
+        # Verhältnis zu vormaligem Besitzer/Provenienz klären
+
+        self.manifestation_form = getattr(Manifestation.ManifestationForm, data.get('240').get('k').upper())
+
+        # beispiel für former owner: 1001340874
+        personal_names = data.get_fields('700')
+        corporate_names = data.get_fields('710')
+        comment = [
+                f"Widmungsträger:in (Person): {personal_name.get('a')}"
+                for personal_name
+                in personal_names
+                if personal_name.get('4') == 'dte'
+            ]
+        comment += [
+                f"Widmungsträger:in (Institution): {corporate_name.get('a')}"
+                for corporate_name
+                in corporate_names
+                if corporate_name.get('4') == 'dte'
+            ]
+        comment += [
+                f"Vormalige:r Besitzer:in (Person): {personal_name.get('a')}"
+                for personal_name
+                in personal_names
+                if personal_name.get('4') == 'fmo'
+            ]
+        comment += [
+                f"Vormalige:r Besitzer:in (Institution): {corporate_name.get('a')}"
+                for corporate_name
+                in corporate_names
+                if corporate_name.get('4') == 'fmo'
+            ]
+
+        # 031$d tempo
+        # 031$q metronom
+        # 031$t textincipit
+        # bsp 1001340874
+
+        # musical_incipits_information = data.get('031')
+        #self.tempo = musical_incipits_information.get('d')
+
+        # bsp?
+        # self.metronom = musical_incipits_information.get('q')
+
+        # bsp?
+        # self.textual_incipit = musical_incipits_information.get('t')
+
+        # diese informationen werden teil der expressions-charakteristika; heir muss erst abgewartet werden
+
+        # bsp 1001310759
+        language_code = data.get('041')
+        if language_code:
+            self.language = Language[lang_find(language_code.get('a'))['iso639_1']]
+
+        imprint = data.get_fields('260')
+        comment += [
+                f"Ort: {field.get('a')}"
+                for field
+                in imprint
+                if field.get('a')
+            ]
+
+        # bsp 1001340032
+        #breakpoint()
+        for host_item_entry in data.get_fields('773'):
+            target_rism_id = host_item_entry.get('w').replace('sources/', '')
+            target_manifestation = Manifestation.get_or_create(target_rism_id)
+            RelatedManifestation.objects.create(
+                    source_manifestation = self,
+                    target_manifestation = target_manifestation,
+                    label = RelatedManifestation.Label.PARENT
+                )
+
+        for electronic_location in data.get_fields('856'):
+            DigitalCopy.objects.create(
+                    manifestation = self,
+                    url = electronic_location.get('u'),
+                    link_type = electronic_location.get('x')
+                )
+
+        general_notes = data.get_fields('500')
+        self.extent = '\n'.join(
+                note.get('a').replace(EXTENT_MARKER, '')
+                for note
+                in general_notes
+                if note.get('a').startswith(EXTENT_MARKER)
+            )
+
+        self.paper = '\n'.join(
+                note.get('a').replace(PAPER_MARKER, '')
+                for note
+                in general_notes
+                if note.get('a').startswith(PAPER_MARKER)
+            )
+
+        comment += [
+                general_note.get('a')
+                for general_note
+                in general_notes
+                if general_note.get('a').startswith(HANDWRITING_MARKER)
+            ]
+
+        self.is_singleton = False
+        self.private_comment = '\n'.join(comment)
+        self.rism_id_unaligned = False
+        self.save()
+
+        return self
+
+    def get_or_create(rism_id):
+        return Manifestation.objects.filter(rism_id = rism_id).first() or \
+            Manifestation.objects.create(rism_id = rism_id).pull_rism_data()
+
+
 
 class ManifestationTitle(models.Model):
 
@@ -212,6 +371,10 @@ class ManifestationContributor(BaseContributor):
 
 
 class RelatedManifestation(RelatedEntity):
+    class Label(models.TextChoices):
+        PARENT = 'PA', _('Parent'),
+        RELATED = 'RE', _('Related')
+
     source_manifestation = models.ForeignKey(
             'Manifestation',
             on_delete=models.CASCADE,
@@ -221,4 +384,26 @@ class RelatedManifestation(RelatedEntity):
             'Manifestation',
             on_delete=models.CASCADE,
             related_name="target_manifestation_of"
+        )
+    label = models.CharField(
+            max_length=10,
+            choices=Label,
+            default=Label.PARENT
+        )
+
+
+class DigitalCopy(models.Model):
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE,
+            related_name = 'digital_copies'
+        )
+    url = models.URLField(
+            blank=True,
+            null=True
+        )
+    link_type = models.CharField(
+            max_length = 10,
+            null = True,
+            blank = True
         )

@@ -14,6 +14,7 @@ class ItemSearchView(EdwocaSearchView):
     model = Item
 
 
+"""
 class ItemTitleUpdateView(EntityMixin, TitleUpdateView):
     model = Item
     form_class = ItemTitleFormSet
@@ -21,6 +22,7 @@ class ItemTitleUpdateView(EntityMixin, TitleUpdateView):
 
     def get_success_url(self):
         return reverse_lazy('edwoca:item_title', kwargs = {'pk': self.object.id})
+"""
 
 
 class ItemUpdateView(EntityMixin, UpdateView):

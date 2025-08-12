@@ -1,0 +1,37 @@
+{% extends 'edwoca/base.html' %}
+
+{% block menu %}
+{% endblock %}
+
+{% block content %}
+
+    <div class="bg-white border border-base-300 p-5">
+	M-{{ object.id }} wird mit RISM abgeglichen.
+	<form method="post">
+	    {% csrf_token %}
+	    {{ form.as_daisy }}
+
+	    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+	</form>
+    </div>
+
+{% endblock %}
+
+{% block navbar_extras %}
+    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">M-{{ object.id }}</div>
+{% endblock %}
+
+{% block navbar_title %}
+    <h1 class="text-3xl font-bold"> {{object}} </h1>
+{% endblock %}
+
+{% block nav %}
+<div class="flex flex-col h-full">
+	<div class="flex-1">
+	</div>
+	<div class="flex-0">
+	    <a href="{% url 'dmrism:manifestation_reject_pull' %}" class="btn"> abbrechen </a>
+	    <a href="{% url 'dmrism:manifestation_confirm_pull' %}" class="btn btn-primary"> bestätigen </a>
+	</div>
+</div>
+{% endblock %}

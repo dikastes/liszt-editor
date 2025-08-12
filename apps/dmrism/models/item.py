@@ -4,7 +4,6 @@ from django.db import models
 from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from dmad_on_django.models import Status
 
 
 class Item(WemiBaseClass):
@@ -99,16 +98,12 @@ class Signature(models.Model):
             UniqueConstraint(
                 fields=['item'],
                 condition=Q(status='C'),
-                name='unique_current_signature'
+                name='unique_current_item_signature'
             )
         ]
 
     def __str__(self):
         return f"{self.library.siglum} {self.signature}"
-
-
-class ItemTitle(WemiTitle):
-    item = models.ForeignKey('Item', on_delete=models.CASCADE, related_name='titles')
 
 
 class RelatedItem(RelatedEntity):
@@ -132,7 +127,7 @@ class ItemContributor(BaseContributor):
     )
 
 
-class ProvenanceState(models.Model):
+class ProvenanceStation(models.Model):
     owner = models.ForeignKey(
             'dmad.Person',
             on_delete = models.CASCADE
@@ -146,19 +141,12 @@ class ProvenanceState(models.Model):
             null = True,
             blank = True
         )
-    start = models.ForeignKey(
+    period = models.ForeignKey(
             'dmad.Period',
             on_delete = models.SET_NULL,
             blank = True,
             null = True,
-            related_name = 'provenance_start'
-            )
-    end = models.ForeignKey(
-            'dmad.Period',
-            on_delete = models.SET_NULL,
-            blank = True,
-            null = True,
-            related_name = 'provenance_end'
+            related_name = 'provenance_stations'
             )
 
     def __str__(self):
