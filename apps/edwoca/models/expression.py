@@ -3,9 +3,10 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status
+from dmrism.models import BaseContributor, BaseBib, RelatedEntity
 
 
-class Expression(WemiBaseClass):
+class Expression(WeBaseClass):
     work_catalog_number = models.CharField(
             max_length=20,
             unique=True,
@@ -39,7 +40,7 @@ class Expression(WemiBaseClass):
             through='RelatedExpression'
         )
     manifestations = models.ManyToManyField(
-            'Manifestation'
+            'dmrism.Manifestation'
         )
 
     def __str__(self):
