@@ -9,6 +9,7 @@ from liszt_util.tools import RenderRawJSONMixin
 
 languages = { iso_data['iso639_1'].upper(): iso_data['name'] for iso_data in iso639_data }
 Language = {key: languages[key] for key in ['DE', 'FR', 'HU', 'EN']}
+max_trials = 3
 
 
 for key in languages:
