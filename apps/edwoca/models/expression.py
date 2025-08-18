@@ -40,7 +40,8 @@ class Expression(WeBaseClass):
             through='RelatedExpression'
         )
     manifestations = models.ManyToManyField(
-            'dmrism.Manifestation'
+            'Manifestation',
+            related_name = 'expressions'
         )
 
     def __str__(self):

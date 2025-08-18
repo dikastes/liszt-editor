@@ -1,4 +1,5 @@
 from .base import *
+from ..models import Manifestation as EdwocaManifestation
 from ..forms.manifestation import *
 from ..forms import ManifestationForm, SignatureFormSet
 from django.forms import inlineformset_factory
@@ -13,8 +14,7 @@ from bib.models import ZotItem
 
 
 class ManifestationListView(EdwocaListView):
-    model = Manifestation
-
+    model = EdwocaManifestation
 
 class ManifestationSearchView(EdwocaSearchView):
     model = Manifestation
