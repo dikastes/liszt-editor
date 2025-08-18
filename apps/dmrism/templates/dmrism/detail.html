@@ -5,15 +5,35 @@
 
 {% block content %}
 
-    <div class="bg-white border border-base-300 p-5">
-	{% if object.rism_unaligned' %}
-	<div class="bg-primary border border-base-300 p-5">
-	    <p>
-		Die RISM-ID dieser Manifestation wurde geändert, ohne dass die RISM-Daten abgeglichen wurden.
-	    </p>
+    <div class="tabs tabs-border">
+	<input class="tab" type="radio" aria-label="Ansicht" name="preview-toggle" checked="checked">
+	<div class="tab-content bg-white border border-base-300 gap-10">
+	    {% if object.rism_id_unaligned %}
+	    <div class="bg-primary border border-base-300 p-5">
+		<p>
+		    Die RISM-ID dieser Manifestation wurde geändert, ohne dass die RISM-Daten abgeglichen wurden.
+		</p>
+	    </div>
+	    {% endif %}
+	    <div class="prose p-5">
+		{% include 'dmrism/partials/preview.html' %}
+	    </div>
 	</div>
-	{% endif %}
-	{% include 'rism/partials/preview.html' %}
+	<input class="tab" type="radio" aria-label="Rohdaten" name="preview-toggle">
+	<div class="tab-content bg-white border border-base-300 gap-10">
+	    {% if object.rism_id_unaligned %}
+	    <div class="bg-primary border border-base-300 p-5">
+		<p>
+		    Die RISM-ID dieser Manifestation wurde geändert, ohne dass die RISM-Daten abgeglichen wurden.
+		</p>
+	    </div>
+	    {% endif %}
+	    <div class="prose p-5">
+		<pre class="whitespace-pre text-sm leading-snug bg-white text-black">
+		    <code>{{ object.render_raw|escape }}</code>
+		</pre>
+	    </div>
+	</div>
     </div>
 
 {% endblock %}
@@ -28,12 +48,20 @@
 
 {% block nav %}
 <div class="flex flex-col h-full">
-	<div class="flex-1">
-	</div>
-	<div class="flex-0">
-	    <a href="{% url 'dmrism:manifestation_update' %}" class="btn"> bearbeiten </a>
-	    <a href="{% url 'dmrism:manifestation_pull' %}" class="btn"> Datenabgleich </a>
-	    <a href="{% url 'dmrism:manifestation_delete' %}" class="btn btn-primary"> löschen </a>
-	</div>
+    <div class="flex-1">
+    </div>
+    <div class="flex-0">
+	<ul class="menu gap-5">
+	    <li>
+		<a href="{% url 'dmrism:manifestation_update' object.id %}" class="btn"> bearbeiten </a>
+	    </li>
+	    <li>
+		<a href="{% url 'dmrism:manifestation_pull' object.id %}" class="btn"> Datenabgleich </a>
+	    </li>
+	    <li>
+		<a href="{% url 'dmrism:manifestation_delete' object.id %}" class="btn btn-primary"> löschen </a>
+	    </li>
+	</ul>
+    </div>
 </div>
 {% endblock %}
