@@ -22,17 +22,17 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
     def parse_edition_type(csv_representation):
         match csv_representation:
             case 'Partitur':
-                return EditionType.SCORE
+                return Manifestation.EditionType.SCORE
             case 'Stimme':
-                return EditionType.PART
+                return Manifestation.EditionType.PART
             case 'Stimmen':
-                return EditionType.PARTS
+                return Manifestation.EditionType.PARTS
             case 'Particell':
-                return EditionType.PARTICELL
+                return Manifestation.EditionType.PARTICELL
             case 'Klavierauszug':
-                return EditionType.PIANO_REDUCTION
+                return Manifestation.EditionType.PIANO_REDUCTION
             case 'Chorpartitur':
-                return EditionType.CHOIR_SCORE
+                return Manifestation.EditionType.CHOIR_SCORE
 
     def __str__(self):
         if self.is_singleton:
@@ -97,12 +97,14 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         # J -> function
 
-        envelope_titles = raw_data[ENVELOPE_TITLE_KEY].split('$')
-        if len(envelope_titles) > 1:
-            ManifestationTitle.parse_from_csv(envelope_titles[0], TitleTypes.ENVELOPE, self).save()
-            ManifestationTitle.parse_from_csv(envelope_titles[1], TitleTypes.TITLE_PAGE, self).save()
-        if len(envelope_titles) == 1:
-            ManifestationTitle.parse_from_csv(envelope_titles[0], TitleTypes.TITLE_PAGE, self).save()
+        if ENVELOPE_TITLE_KEY in raw_data and\
+            raw_data[ENVELOPE_TITLE_KEY]:
+            envelope_titles = raw_data[ENVELOPE_TITLE_KEY].split('$')
+            if len(envelope_titles) > 1:
+                ManifestationTitle.parse_from_csv(envelope_titles[0], TitleTypes.ENVELOPE, self).save()
+                ManifestationTitle.parse_from_csv(envelope_titles[1], TitleTypes.TITLE_PAGE, self).save()
+            if len(envelope_titles) == 1:
+                ManifestationTitle.parse_from_csv(envelope_titles[0], TitleTypes.TITLE_PAGE, self).save()
         if raw_data[HEAD_TITLE_KEY]:
             ManifestationTitle.parse_from_csv(raw_data[HEAD_TITLE_KEY], TitleTypes.HEAD_TITLE, self).save()
 
