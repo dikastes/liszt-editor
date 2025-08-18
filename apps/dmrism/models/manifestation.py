@@ -7,6 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from .item import Item, Signature, Library
 from dmad_on_django.models import Language
 from iso639 import find as lang_find
+from liszt_util.tools import RenderRawJSONMixin
 
 
 class TitleTypes(models.TextChoices):
@@ -15,18 +16,19 @@ class TitleTypes(models.TextChoices):
     HEAD_TITLE = 'HT', _('Head Title')
 
 
-class Manifestation(WemiBaseClass):
+class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     class ManifestationForm(models.TextChoices):
         SKETCHES = 'SK', _('Sketches'),
         FRAGMENTS = 'FR', _('Fragments'),
         EXCERPTS = 'EX', _('Excerpts')
 
     class EditionType(models.TextChoices):
-        SCORE = 'SC', _('Score')
-        PARTS = 'PA', _('Parts')
-        PARTICELL = 'PC', _('Particell')
-        PIANO_REDUCTION = 'PR', _('Piano Reduction')
-        CHOIR_SCORE = 'CS', _('Choir Score')
+        SCORE = 'SCO', _('Score')
+        PART = 'PRT', _('Part')
+        PARTS = 'PTS', _('Parts')
+        PARTICELL = 'PTC', _('Particell')
+        PIANO_REDUCTION = 'PNR', _('Piano Reduction')
+        CHOIR_SCORE = 'CSC', _('Choir Score')
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
@@ -40,6 +42,7 @@ class Manifestation(WemiBaseClass):
             null = True,
             related_name = 'temporary_copy'
         )
+    # move to edwoca?
     plate_number = models.CharField(
             max_length = 10,
             null = True,
@@ -67,13 +70,15 @@ class Manifestation(WemiBaseClass):
         )
     manifestation_form = models.CharField(
             max_length=10,
-            choices=ManifestationForm,
-            default=ManifestationForm.SKETCHES
+            choices = ManifestationForm,
+            default = None,
+            null = True
         )
     edition_type = models.CharField(
-            max_length=10,
-            choices=EditionType,
-            default=EditionType.SCORE
+            max_length = 10,
+            choices = EditionType,
+            default = None,
+            null = True
         )
     state = models.CharField(
             max_length=10,
@@ -117,6 +122,7 @@ class Manifestation(WemiBaseClass):
         )
     is_singleton = models.BooleanField(default=False)
     missing_item = models.BooleanField(default=False)
+    # move to edwoca?
     numerus_currens = models.IntegerField(
             null = True,
             unique = True
@@ -126,9 +132,31 @@ class Manifestation(WemiBaseClass):
             null = True,
             blank = True
         )
+    raw_data = models.TextField(
+            blank = True,
+            null = True
+        )
+    handwriting = models.TextField(
+            blank = True,
+            null = True
+        )
+    extent = models.TextField(
+            blank = True,
+            null = True
+        )
+    paper = models.TextField(
+            blank = True,
+            null = True
+        )
+    #publisher = models.ForeignKey(
+            #'dmad.Corporation',
+            #related_name = 'publishers',
+            #null = True,
+            #on_delete = models.SET_NULL
+        #)
 
     def get_absolute_url(self):
-        return reverse('edwoca:manifestation_update', kwargs={'pk': self.id})
+        return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
 
     def get_pref_title(self):
         titles = self.titles.all()
@@ -148,7 +176,9 @@ class Manifestation(WemiBaseClass):
         return '<ohne Titel>'
 
     def __str__(self):
-        return self.get_pref_title()
+        if self.items.count():
+            return self.items.all()[0].__str__()
+        return '<Fehler: keine Items>'
 
     def save(self, *args, **kwargs):
         if self.is_singleton and self.items.count() > 1:
@@ -188,6 +218,7 @@ class Manifestation(WemiBaseClass):
         PAPER_MARKER = 'Papier: '
 
         data = get_rism_data(self.rism_id)
+        self.raw_data = data.as_json()
 
         location = data.get('852')
         siglum = location.get('a')
@@ -196,6 +227,8 @@ class Manifestation(WemiBaseClass):
                     siglum = siglum,
                     name = location.get('e')
                 )
+        if library.name == '':
+            library.name = location.get('e')
 
         signature = Signature.objects.create(
                 library = library,
@@ -211,12 +244,14 @@ class Manifestation(WemiBaseClass):
         # 852$d vormalige signatur
         # Verhältnis zu vormaligem Besitzer/Provenienz klären
 
-        self.manifestation_form = getattr(Manifestation.ManifestationForm, data.get('240').get('k').upper())
+        if data.get('240') and data.get('240').get('k'):
+            self.manifestation_form = getattr(Manifestation.ManifestationForm, data.get('240').get('k').upper())
 
         # beispiel für former owner: 1001340874
         personal_names = data.get_fields('700')
         corporate_names = data.get_fields('710')
-        comment = [
+        comment = [ self.private_comment or '' ]
+        comment += [
                 f"Widmungsträger:in (Person): {personal_name.get('a')}"
                 for personal_name
                 in personal_names
@@ -260,7 +295,7 @@ class Manifestation(WemiBaseClass):
         # bsp 1001310759
         language_code = data.get('041')
         if language_code:
-            self.language = Language[lang_find(language_code.get('a'))['iso639_1']]
+            self.language = Language[lang_find(language_code.get('a'))['iso639_1'].upper()]
 
         imprint = data.get_fields('260')
         comment += [
@@ -310,7 +345,7 @@ class Manifestation(WemiBaseClass):
                 if general_note.get('a').startswith(HANDWRITING_MARKER)
             ]
 
-        self.is_singleton = False
+        self.is_singleton = True
         self.private_comment = '\n'.join(comment)
         self.rism_id_unaligned = False
         self.save()

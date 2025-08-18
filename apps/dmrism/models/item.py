@@ -33,10 +33,10 @@ class Item(WemiBaseClass):
     def __str__(self):
         #title = self.get_pref_title() or '<ohne Titel>'
         #return f'{self.rism_id}: {title}'
-        return self.get_current_signature().__str__()
+        return self.get_current_signature()
 
     def get_current_signature(self):
-        return next(self.signatures.filter(status = Signature.Status.CURRENT).iterator(), 'ohne Signatur')
+        return next(self.signatures.filter(status = Signature.Status.CURRENT).iterator(), 'ohne Signatur').__str__()
 
     def save(self, *args, **kwargs):
         if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
