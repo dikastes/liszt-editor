@@ -6,176 +6,190 @@
 {% block content %}
 
     <div class="bg-white border border-base-300 p-5">
-	<div class="prose">
-	    <p>
-		<em> Kopf </em>
-		{% if object.items.all.0.get_current_signature.strip == compare_object.items.all.0.get_current_signature.strip %}
+	{% if unchanged %}
+	    Es gibt keine Änderungen am Datensatz.
+	{% else %}
+	    <div class="prose">
+		<p>
+		    <em> Kopf </em>
+		    {% if object.items.all.0.get_current_signature.strip == compare_object.items.all.0.get_current_signature.strip %}
+			<span class="badge"> keine Änderungen </span>
+		    {% else %}
+			{% if object.items.all.0.get_current_signature.strip %}
+			    {{ object.items.all.0 }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+			&rarr;
+			{% if compare_object.items.all.0.get_current_signature.strip %}
+			    {{ compare_object.items.all.0}}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+		    {% endif %}
+		</p>
+
+		<p>
+		    <em> Quellenart </em> 
+		    {% if object.manifestation_form.strip == compare_object.manifestation_form.strip %}
+			<span class="badge"> keine Änderungen </span>
+		    {% else %}
+			{% if object.manifestation_form.strip %}
+			    {{ object.manifestation_form }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+			&rarr;
+			{% if compare_object.manifestation_form.strip %}
+			    {{ compare_object.manifestation_form }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+		    {% endif %}
+		</p>
+
+		<p>
+		    <em> Widmung </em>
+		    {% if object.dedication.strip == compare_object.dedication.strip %}
+			<span class="badge"> keine Änderungen </span>
+		    {% else %}
+			{% if object.dedication.strip %}
+			    {{ object.dedication }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+			&rarr;
+			{% if compare_object.dedication.strip %}
+			    {{ compare_object.dedication }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+		    {% endif %}
+		</p>
+
+		<p>
+		    <em> Eckdaten Werk </em>
+		    {% if object.language.strip == compare_object.language.strip %}
+			<span class="badge"> keine Änderungen </span>
+		    {% else %}
+			{% if object.language.strip %}
+			    {{ object.language }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+			&rarr;
+			{% if compare_object.language.strip %}
+			    {{ compare_object.language }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+		    {% endif %}
+		</p>
+
+		<h3> Manuskriptspezifika </h3>
+
+		<h4> Schrift </h4>
+		<p>
+		    {% if object.handwriting.strip == compare_object.handwriting.strip %}
+			<span class="badge"> keine Änderungen </span>
+		    {% else %}
+			{% if object.handwriting.strip %}
+			    {{ object.handwriting }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+			&rarr;
+			{% if compare_object.handwriting.strip %}
+			    {{ compare_object.handwriting }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+		    {% endif %}
+		</p>
+
+		    <h4> Umfang </h4>
+
+		    {% if object.extent.strip == compare_object.extent.strip %}
+			<span class="badge"> keine Änderungen </span>
+		    {% else %}
+			{% if object.extent.strip %}
+			    {{ object.extent }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+			&rarr;
+			{% if compare_object.extent.strip %}
+			    {{ compare_object.extent }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+		    {% endif %}
+		</p>
+
+		<h4> Papier </h4>
+		<p>
+		    {% if object.paper.strip == compare_object.paper.strip %}
+			<span class="badge"> keine Änderungen </span>
+		    {% else %}
+			{% if object.paper.strip %}
+			    {{ object.paper }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+			&rarr;
+			{% if compare_object.paper.strip %}
+			    {{ compare_object.paper }}
+			{% else %}
+			    <span class="badge"> keine Angabe </span>
+			{% endif %}
+		    {% endif %}
+		</p>
+
+		<h3> Kommentar </h3>
+		<p>
+		    {% if object.private_comment.strip == compare_object.private_comment.strip %}
+			<span class="badge"> keine Änderungen </span>
+		    {% else %}
+			<h4> vorher </h4>
+			{{ object.private_comment|linebreaks }}
+			<h4> nachher </h4>
+			{{ compare_object.private_comment|linebreaks }}
+		    {% endif %}
+		</p>
+
+		<h3> Bezüge </h3>
+
+		{% if unchanged_relations %}
 		    <span class="badge"> keine Änderungen </span>
 		{% else %}
-		    {% if object.items.all.0.get_current_signature.strip %}
-			{{ object.items.all.0 }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		    &rarr;
-		    {% if compare_object.items.all.0.get_current_signature.strip %}
-			{{ compare_object.items.all.0}}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		{% endif %}
-	    </p>
+		    <h4> vorher </h4>
+		    <p>
+			{% for manifestation_relation in object.source_manifestation_of.all %}
+			    {{ manifestation_relation.target_manifestation.items.all.0 }} ({{ manifestation_relation.label }})
+			{% empty %}
+			    <span class="badge"> keine ausgehenden Bezüge </span>
+			{% endfor %}
+		    </p>
 
-	    <p>
-		<em> Quellenart </em> 
-		{% if object.manifestation_form.strip == compare_object.manifestation_form.strip %}
-		    <span class="badge"> keine Änderungen </span>
-		{% else %}
-		    {% if object.manifestation_form.strip %}
-			{{ object.manifestation_form }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		    &rarr;
-		    {% if compare_object.manifestation_form.strip %}
-			{{ compare_object.manifestation_form }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		{% endif %}
-	    </p>
-
-	    <p>
-		<em> Bezüge </em>
-
-		{% if object.source_manifestation_of == compare_object.source_manifestation_of %}
-		    <span class="badge"> keine Änderungen </span>
-		{% else %}
-		    {% comment %}
-			iterate over both!
-		    {% endcomment %}
-		    {% for manifestation_relation in object.source_manifestation_of.all %}
-			{{ manifestation_relation.target_manifestation.items.all.0 }} ({{ manifestation_relation.label }})
-		    {% empty %}
-			<span class="badge"> keine ausgehenden Bezüge </span>
-		    {% endfor %}
-		{% endif %}
-	    </p>
-
-	    <p>
-		<em> Widmung </em>
-		{% if object.dedication.strip == compare_object.dedication.strip %}
-		    <span class="badge"> keine Änderungen </span>
-		{% else %}
-		    {% if object.dedication.strip %}
-			{{ object.dedication }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		    &rarr;
-		    {% if compare_object.dedication.strip %}
-			{{ compare_object.dedication }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		{% endif %}
-	    </p>
-
-	    <p>
-		<em> Eckdaten Werk </em>
-		{% if object.language.strip == compare_object.language.strip %}
-		    <span class="badge"> keine Änderungen </span>
-		{% else %}
-		    {% if object.language.strip %}
-			{{ object.language }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		    &rarr;
-		    {% if compare_object.language.strip %}
-			{{ compare_object.language }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		{% endif %}
-	    </p>
-
-	    <h4> Manuskriptspezifika </h4>
-
-		<h5> Schrift </h5>
-
-		{% if object.handwriting.strip == compare_object.handwriting.strip %}
-		    <span class="badge"> keine Änderungen </span>
-		{% else %}
-		    {% if object.handwriting.strip %}
-			{{ object.handwriting }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		    &rarr;
-		    {% if compare_object.handwriting.strip %}
-			{{ compare_object.handwriting }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
+		    <h4> nachher </h4>
+		    <p>
+			{% for manifestation_relation in compare_object.source_manifestation_of.all %}
+			    {{ manifestation_relation.target_manifestation.items.all.0 }} ({{ manifestation_relation.label }})
+			{% empty %}
+			    <span class="badge"> keine ausgehenden Bezüge </span>
+			{% endfor %}
+		    </p>
 		{% endif %}
 
-		<h5> Umfang </h5>
+	    </div>
 
-		{% if object.extent.strip == compare_object.extent.strip %}
-		    <span class="badge"> keine Änderungen </span>
-		{% else %}
-		    {% if object.extent.strip %}
-			{{ object.extent }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		    &rarr;
-		    {% if compare_object.extent.strip %}
-			{{ compare_object.extent }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		{% endif %}
+	    <form method="post">
+		{% csrf_token %}
+		{{ form.as_daisy }}
 
-		<h5> Papier </h5>
-
-		{% if object.paper.strip == compare_object.paper.strip %}
-		    <span class="badge"> keine Änderungen </span>
-		{% else %}
-		    {% if object.paper.strip %}
-			{{ object.paper }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		    &rarr;
-		    {% if compare_object.paper.strip %}
-			{{ compare_object.paper }}
-		    {% else %}
-			<span class="badge"> keine Angabe </span>
-		    {% endif %}
-		{% endif %}
-	    </p>
-
-	    <h4> Kommentar </h4>
-	    <p>
-		{% if object.private_comment.strip == compare_object.private_comment.strip %}
-		    <span class="badge"> keine Änderungen </span>
-		{% else %}
-		    <h5> vorher </h5>
-		    {{ object.private_comment|linebreaks }}
-		    <h5> nachher </h5>
-		    {{ compare_object.private_comment|linebreaks }}
-		{% endif %}
-	    </p>
-	</div>
-
-	<form method="post">
-	    {% csrf_token %}
-	    {{ form.as_daisy }}
-
-	    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
-	</form>
+		<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+	    </form>
+	{% endif %}
     </div>
 
 {% endblock %}
@@ -194,12 +208,18 @@
 	</div>
 	<div class="flex-0">
 	    <ul class="menu gap-5">
-		<li>
-		    <a href="{% url 'dmrism:manifestation_reject_pull' object.id %}" class="btn"> abbrechen </a>
-		</li>
-		<li>
-		    <a href="{% url 'dmrism:manifestation_confirm_pull' object.id %}" class="btn btn-primary"> bestätigen </a>
-		</li>
+		{% if unchanged %}
+		    <li>
+			<a href="{% url 'dmrism:manifestation_detail' object.id %}" class="btn"> bestätigen </a>
+		    </li>
+		{% else %}
+		    <li>
+			<a href="{% url 'dmrism:manifestation_reject_pull' object.id %}" class="btn"> abbrechen </a>
+		    </li>
+		    <li>
+			<a href="{% url 'dmrism:manifestation_confirm_pull' object.id %}" class="btn btn-primary"> bestätigen </a>
+		    </li>
+		{% endif %}
 	    </ul>
 	</div>
 </div>
