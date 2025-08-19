@@ -1,6 +1,5 @@
 from ..forms import ManifestationForm
 from ..models.manifestation import Manifestation
-from copy import deepcopy as clone
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, DeleteView, DetailView
@@ -85,32 +84,70 @@ def manifestation_pull(request, pk):
     temporary_manifestation.temporary_target = manifestation
     temporary_manifestation.save()
 
-    # do we need the temp flag on items as well?
+    unchanged_fields = True
+    for field in _field_list:
+        old_value = getattr(manifestation, field)
+        new_value = getattr(temporary_manifestation, field)
+        if old_value != new_value:
+            unchanged_fields = False
+            break
+
+    unchanged_relations = True
+    if manifestation.related_manifestations.count() != temporary_manifestation.related_manifestations.count():
+        unchanged_relations = False
+    else:
+        for related_manifestation in manifestation.related_manifestations.all():
+            if temporary_manifestation.related_manifestations.all().filter(id = related_manifestation.id).count() == 0:
+                unchanged_relations = False
+
+    if manifestation.items.all()[0].__str__() == temporary_manifestation.items.all()[0].__str__():
+        unchanged_items = True
+    else:
+        unchanged_items = False
+
     context = {}
     context['object'] = manifestation
-    context['compare_object'] = temporary_manifestation
+    context['unchanged_relations'] = unchanged_relations
+
+    if unchanged_fields and unchanged_relations and unchanged_items:
+        temporary_manifestation.delete()
+        context['unchanged'] = True
+    else:
+        context['unchanged'] = False
+        context['compare_object'] = temporary_manifestation
 
     return render(request, 'dmrism/confirm_pull.html', context)
+
+
+_field_list = [
+        'manifestation_form',
+        'dedication',
+        'handwriting',
+        'extent',
+        'paper',
+        'private_comment'
+    ]
+
+_foreign_key_list = [
+        'items',
+        'related_manifestations'
+        ]
 
 
 def manifestation_confirm_pull(request, pk):
     temporary_manifestation = Manifestation.objects.get(temporary_target = pk)
     manifestation = Manifestation.objects.get(id = pk)
 
-    manifestation.items.all().delete()
-    for item in temporary_manifestation.items.all():
-        manifestation.items.add(item)
+    for foreign_key in _foreign_key_list:
+        getattr(manifestation, foreign_key).all().delete()
+        for target in getattr(temporary_manifestation, foreign_key).all():
+            getattr(manifestation, foreign_key).add(target)
 
-    manifestation.related_manifestations.all().delete()
-    for manifestation_relation in temporary_manifestation.related_manifestations.all():
-        manifestation.related_manifestations.add(manifestation_relation)
+    for field in _field_list:
+        value = getattr(temporary_manifestation, field)
+        setattr(manifestation, field, value)
 
-    manifestation.manifestation_form = temporary_manifestation.manifestation_form
-    manifestation.dedication = temporary_manifestation.dedication
-    manifestation.handwriting = temporary_manifestation.handwriting
-    manifestation.extent = temporary_manifestation.extent
-    manifestation.paper = temporary_manifestation.paper
-    manifestation.private_comment = temporary_manifestation.private_comment
+    manifestation.rism_id_unaligned = False
 
     manifestation.save()
     temporary_manifestation.delete()
@@ -120,7 +157,6 @@ def manifestation_confirm_pull(request, pk):
 
 def manifestation_reject_pull(request, pk):
     temporary_manifestation = Manifestation.objects.get(temporary_target = pk)
-    manifestation = Manifestation.objects.get(id = pk)
     temporary_manifestation.delete()
 
     return redirect('dmrism:manifestation_detail', pk = pk)
