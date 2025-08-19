@@ -159,21 +159,22 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
 
     def get_pref_title(self):
-        titles = self.titles.all()
+        #titles = self.titles.all()
 
-        envelope_title = next((t.title for t in titles if t.title_type == TitleTypes.ENVELOPE), None)
-        if envelope_title:
-            return envelope_title
+        #envelope_title = next((t.title for t in titles if t.title_type == TitleTypes.ENVELOPE), None)
+        #if envelope_title:
+            #return envelope_title
 
-        title_page_title = next((t.title for t in titles if t.title_type == TitleTypes.TITLE_PAGE), None)
-        if title_page_title:
-            return title_page_title
+        #title_page_title = next((t.title for t in titles if t.title_type == TitleTypes.TITLE_PAGE), None)
+        #if title_page_title:
+            #return title_page_title
 
-        head_title = next((t.title for t in titles if t.title_type == TitleTypes.HEAD_TITLE), None)
-        if head_title:
-            return head_title
+        #head_title = next((t.title for t in titles if t.title_type == TitleTypes.HEAD_TITLE), None)
+        #if head_title:
+            #return head_title
 
-        return '<ohne Titel>'
+        #return '<ohne Titel>'
+        return self.__str__()
 
     def __str__(self):
         if self.items.count():
@@ -230,16 +231,16 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         if library.name == '':
             library.name = location.get('e')
 
-        signature = Signature.objects.create(
-                library = library,
-                status = Signature.Status.CURRENT,
-                signature = location.get('c')
-            )
-
-        item = Item.objects.create(
-                manifestation = self
-            )
-        item.signatures.add(signature)
+        if self.items.count() == 0:
+            signature = Signature.objects.create(
+                    library = library,
+                    status = Signature.Status.CURRENT,
+                    signature = location.get('c')
+                )
+            item = Item.objects.create(
+                    manifestation = self
+                )
+            item.signatures.add(signature)
 
         # 852$d vormalige signatur
         # Verhältnis zu vormaligem Besitzer/Provenienz klären
