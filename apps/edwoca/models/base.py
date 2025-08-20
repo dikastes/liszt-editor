@@ -70,11 +70,14 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         MACHINE_READABLE_DATE_KEY = 'Datierung (maschinenlesbar)'
         RELATED_PRINT_PUBLISHER_KEY = 'Verlag (normiert)'
         RELATED_PRINT_PLATE_NUMBER_KEY = 'Bezug zu Druck: Plattennr.'
+        TITLE_KEY = 'Titel (normiert, nach MGG)'
 
         # add stitch template flag to manifestation?
 
         self.private_comment = raw_data[IDENTIFICATION_KEY]
         self.is_singleton = True
+        self.titles.all().delete()
+
 
         if self.RISM_ID_KEY in raw_data and\
             raw_data[self.RISM_ID_KEY] and\
@@ -92,6 +95,13 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             single_item.signatures.add(signature)
             # former signature logic here
 
+        if raw_data[TITLE_KEY]:
+            ManifestationTitle.objects.create(
+                    title = raw_data[TITLE_KEY],
+                    status = Status.TEMPORARY,
+                    manifestation = self
+                )
+
         if EDITION_TYPE_KEY in raw_data:
             self.edition_type = Manifestation.parse_edition_type(raw_data[EDITION_TYPE_KEY])
 
@@ -107,7 +117,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 ManifestationTitle.parse_from_csv(envelope_titles[0], TitleTypes.TITLE_PAGE, self).save()
         if raw_data[HEAD_TITLE_KEY]:
             ManifestationTitle.parse_from_csv(raw_data[HEAD_TITLE_KEY], TitleTypes.HEAD_TITLE, self).save()
-
 
         # remodel!! manifestationtitle needs the fields written_by_composer and writing_material
         # O/Q -> writing_material

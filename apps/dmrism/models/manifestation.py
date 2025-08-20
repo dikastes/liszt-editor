@@ -5,7 +5,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, Signature, Library
-from dmad_on_django.models import Language
+from dmad_on_django.models import Language, Status
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
 
@@ -177,8 +177,14 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         return self.__str__()
 
     def __str__(self):
+        if self.titles.filter(status = Status.TEMPORARY).first():
+            temporary_title = f", {self.titles.filter(status = Status.TEMPORARY).first().title}"
+        else:
+            temporary_title = ''
+
         if self.items.count():
-            return self.items.all()[0].__str__()
+            return self.items.all()[0].__str__() + temporary_title
+
         return '<Fehler: keine Items>'
 
     def save(self, *args, **kwargs):
@@ -367,9 +373,10 @@ class ManifestationTitle(models.Model):
             blank=True
         )
     title_type = models.CharField(
-            max_length=2,
-            choices=TitleTypes,
-            default=TitleTypes.ENVELOPE
+            max_length = 2,
+            choices = TitleTypes,
+            default = None,
+            null = True
         )
     writer = models.ForeignKey(
             'dmad.Person',
@@ -377,6 +384,11 @@ class ManifestationTitle(models.Model):
             related_name='written_manifestation_titles',
             blank=True,
             null=True
+        )
+    status = models.CharField(
+            max_length=10,
+            choices=Status,
+            default=Status.PRIMARY
         )
     medium = models.CharField(
             max_length=100,
