@@ -1,14 +1,15 @@
 from django import forms
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView, DeleteView
 from haystack.generic_views import SearchView
 from json import dumps
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseRedirect
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm, Corporation
 from dmad_on_django.forms import formWidgets
 from dmad_on_django.tools import camel_to_snake_case, snake_to_camel_case
+from pylobid.pylobid import GNDNotFoundError
 
 
 def search_gnd(request, search_string, entity_type):
@@ -102,7 +103,11 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
         response = super().post(request, *args, **kwargs)
         try:
             if self.object.gnd_id:
-                self.object.fetch_raw()
+                try:
+                    self.object.fetch_raw()
+                except GNDNotFoundError:
+                    self.object.delete()
+                    return HttpResponseRedirect(reverse("dmad_on_django:corporation_list"))
                 self.object.update_from_raw()
                 self.object.save()
         except AttributeError:

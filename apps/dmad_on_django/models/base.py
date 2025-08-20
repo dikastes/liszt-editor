@@ -109,7 +109,6 @@ class DisplayableModel(models.Model):
     def get_table(self):
         raise NotImplementedError("Please override get_table")
 
-    
     class Meta:
         abstract = True
         

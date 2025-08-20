@@ -1,5 +1,6 @@
 from django.db import models
-from django.urls import reverse
+from django.shortcuts import redirect
+from django.urls import reverse, reverse_lazy
 from json import dumps, loads
 import requests
 
@@ -8,7 +9,7 @@ from .place import Place
 from .geographicareacodes import CorporationGeographicAreaCode
 from .subjectterm import SubjectTerm
 from .period import Period
-from pylobid.pylobid import PyLobidOrg, GNDAPIError
+from pylobid.pylobid import PyLobidOrg, GNDAPIError, GNDNotFoundError
 
 class CorporationName(models.Model):
     name = models.CharField(max_length=50)
