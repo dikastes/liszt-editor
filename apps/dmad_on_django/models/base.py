@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
+from django.utils.safestring import mark_safe
 from iso639 import data as iso639_data
 from dominate.tags import div, table, tr, td
 from dominate.util import raw
@@ -98,7 +99,7 @@ class DisplayableModel(models.Model):
                     else:
                       tr(td(label), td(str(value) or "—"))
 
-        return str(doc)
+        return mark_safe(str(doc))
 
     
     def get_table(self):
