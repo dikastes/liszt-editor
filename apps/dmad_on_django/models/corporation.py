@@ -159,18 +159,6 @@ class Corporation(DisplayableModel):
     def __str__(self):
         return f'{self.gnd_id}: {self.get_default_name()}'
 
-    @staticmethod
-    def map_date(date_string):
-        date_list = date_string.split('-')
-        if len(date_list) > 3:
-            raise Exception(f'Unknown date format: {date_string}')
-        year = date_list[0] if date_list[0].isnumeric() else None
-        month = date_list[1] if len(date_list) > 1 and date_list[1].isnumeric() else '1'
-        day = date_list[2] if len(date_list) > 2 and date_list[2].isnumeric() else '1'
-        if not year:
-            return None
-        return '-'.join([year, month, day])
-
     def get_model(self):
         return self
 
