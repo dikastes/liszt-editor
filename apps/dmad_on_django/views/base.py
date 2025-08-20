@@ -103,15 +103,16 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
         response = super().post(request, *args, **kwargs)
         try:
             if self.object.gnd_id:
-                try:
-                    self.object.fetch_raw()
-                except GNDNotFoundError:
-                    self.object.delete()
-                    return HttpResponseRedirect(reverse("dmad_on_django:corporation_list"))
+                self.object.fetch_raw()
                 self.object.update_from_raw()
                 self.object.save()
         except AttributeError:
             pass
+
+        except GNDNotFoundError:
+                    self.object.delete()
+                    return HttpResponseRedirect(reverse("dmad_on_django:corporation_list"))
+        
         return response
 
 
