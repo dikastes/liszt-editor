@@ -108,11 +108,6 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
                 self.object.save()
         except AttributeError:
             pass
-
-        except GNDNotFoundError:
-                    self.object.delete()
-                    return HttpResponseRedirect(reverse("dmad_on_django:corporation_list"))
-        
         return response
 
 
