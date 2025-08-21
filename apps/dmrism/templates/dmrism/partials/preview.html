@@ -1,10 +1,6 @@
 <p>
     <em> Kopf </em>
-    {% if object.items.all.0 %}
-	{{ object.items.all.0 }}
-    {% else %}
-	<span class="badge badge-primary"> keine Kopfinformationen </span>
-    {% endif %}
+    {{ object.items.all.0.signature_with_former }}
 </p>
 
 <p>

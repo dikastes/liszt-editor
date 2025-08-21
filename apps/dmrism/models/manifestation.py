@@ -248,8 +248,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 )
             item.signatures.add(signature)
 
-        # 852$d vormalige signatur
-        # Verhältnis zu vormaligem Besitzer/Provenienz klären
+        if location.get('d'):
+            signature = Signature.objects.create(
+                    library = library,
+                    status = Signature.Status.FORMER,
+                    signature = location.get('d')
+                )
+            item.signatures.add(signature)
 
         if data.get('240') and data.get('240').get('k'):
             self.manifestation_form = getattr(Manifestation.ManifestationForm, data.get('240').get('k').upper())

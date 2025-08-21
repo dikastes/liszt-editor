@@ -35,6 +35,16 @@ class Item(WemiBaseClass):
         #return f'{self.rism_id}: {title}'
         return self.get_current_signature()
 
+    def signature_with_former(self):
+        former_string = ''
+        if self.signatures.filter(status = Signature.Status.FORMER):
+            former_string = ', '.join(
+                    former_signature.__str__() for 
+                    former_signature in
+                    self.signatures.filter(status = Signature.Status.FORMER)
+                )
+        return self.get_current_signature() + ', vormalig ' + former_string
+
     def get_current_signature(self):
         return next(self.signatures.filter(status = Signature.Status.CURRENT).iterator(), 'ohne Signatur').__str__()
 
