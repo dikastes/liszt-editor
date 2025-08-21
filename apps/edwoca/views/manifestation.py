@@ -1,4 +1,5 @@
 from .base import *
+from ..models import Manifestation as EdwocaManifestation
 from ..forms.manifestation import *
 from ..forms import ManifestationForm, SignatureFormSet
 from django.forms import inlineformset_factory
@@ -7,14 +8,13 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from dmad_on_django.models import Place
-from ..models.manifestation import ManifestationBib
-from ..models.item import Signature
+from dmrism.models.manifestation import ManifestationBib
+from dmrism.models.item import Signature
 from bib.models import ZotItem
 
 
 class ManifestationListView(EdwocaListView):
-    model = Manifestation
-
+    model = EdwocaManifestation
 
 class ManifestationSearchView(EdwocaSearchView):
     model = Manifestation

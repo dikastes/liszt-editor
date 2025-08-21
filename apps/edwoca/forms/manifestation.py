@@ -1,5 +1,5 @@
 from .base import *
-from ..models.manifestation import *
+from dmrism.models.manifestation import *
 from dominate.tags import div, label, span
 from dominate.util import raw
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
@@ -253,12 +253,12 @@ class ManifestationClassificationForm(ModelForm):
     class Meta:
         model = Manifestation
         fields = [
-                'manifestation_type',
+                'manifestation_form',
                 'edition_type',
                 'state'
             ]
         widgets = {
-                'manifestation_type': Select( attrs = {
+                'manifestation_form': Select( attrs = {
                         'class': 'select w-full select-bordered'
                     }),
                 'edition_type': Select( attrs = {
@@ -272,12 +272,12 @@ class ManifestationClassificationForm(ModelForm):
     def as_daisy(self):
         form = div(cls='mb-10')
 
-        manifestation_type_field = self['manifestation_type']
+        manifestation_form_field = self['manifestation_form']
         edition_type_field = self['edition_type']
         state_field = self['state']
 
-        manifestation_type_label = label(manifestation_type_field.label, cls='flex-1')
-        manifestation_type_label.add(raw(str(manifestation_type_field)))
+        manifestation_form_label = label(manifestation_form_field.label, cls='flex-1')
+        manifestation_form_label.add(raw(str(manifestation_form_field)))
 
         edition_type_label = label(edition_type_field.label, cls='flex-1')
         edition_type_label.add(raw(str(edition_type_field)))
@@ -286,7 +286,7 @@ class ManifestationClassificationForm(ModelForm):
         state_type_label.add(raw(str(state_field)))
 
         palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette.add(manifestation_type_label)
+        palette.add(manifestation_form_label)
         palette.add(edition_type_label)
         palette.add(state_type_label)
 
