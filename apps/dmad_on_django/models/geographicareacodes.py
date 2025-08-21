@@ -52,6 +52,13 @@ class PersonGeographicAreaCode(GeographicAreaCode):
         null=True
     )
 
+class CorporationGeographicAreaCode(GeographicAreaCode):
+    corporation = models.ForeignKey(
+        'Corporation',
+        on_delete=models.CASCADE,
+        related_name='geographic_area_codes',
+        null=True
+    )
 class WorkGeographicAreaCode(GeographicAreaCode):
     work = models.ForeignKey(
         'Work',

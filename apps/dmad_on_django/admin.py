@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import Person, PersonName, Place, PlaceName, SubjectTerm, SubjectTermName, Status, GNDSubjectCategory, Work, WorkName
+from .models import (Person, PersonName, Place, PlaceName,
+                      SubjectTerm, SubjectTermName,
+                        Status, GNDSubjectCategory, Work, WorkName,
+                        Corporation, CorporationName)                        
 # Register your models here.
 class PlaceNameInline(admin.TabularInline):
     model = PlaceName
@@ -49,6 +52,13 @@ class WorkAdmin(admin.ModelAdmin):
     inlines = [WorkInline]
     actions = [update_from_gnd]
 
-    
+
+class CorporationInline(admin.TabularInline):
+    model = CorporationName
+
+@admin.register(Corporation)
+class CorporationAdmin(admin.ModelAdmin):
+    inlines = [CorporationInline]
+    actions = [update_from_gnd]
 
     

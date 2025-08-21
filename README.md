@@ -21,7 +21,8 @@ Alternatively run:
 ```{bash}
 # source venv/bin/activate
 # python3 manage.py runserver
-``` 
+```
+The install script also provides the full command to activate the venv
 
 ## Maintainer
 

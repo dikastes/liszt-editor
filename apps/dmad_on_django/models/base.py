@@ -27,33 +27,41 @@ class GNDSubjectCategory(models.Model):
     label = models.CharField(max_length=50)
 
     @staticmethod
-    def create_or_link(json):
+    def create_or_link(entity):
 
         try:
-            category = json['gndSubjectCategory'][0]
-
+            category = loads(entity.raw_data)['gndSubjectCategory']
         except KeyError:
-            return None
+            return
 
-        try:
-            return GNDSubjectCategory.objects.get(link=category['id'])
-        except GNDSubjectCategory.DoesNotExist:
-            subjectcategory = GNDSubjectCategory()
-            subjectcategory.link = category['id']
-            subjectcategory.label = category['label']
-            subjectcategory.save()
-            return subjectcategory
+        for c in category:
+            try:
+                subject_category = GNDSubjectCategory.objects.get(link=c['id'])
+            except GNDSubjectCategory.DoesNotExist:
+                subject_category = GNDSubjectCategory()
+                subject_category.link = c['id']
+                subject_category.label = c['label']
+                subject_category.save()
+
+            entity.gnd_subject_category.add(subject_category)
 
     def get_subject_category_table(entity):
 
-        try:
-            link = entity.link
-            label = entity.label
-        except AttributeError:
-            return []
+        table = []
 
-        return [("GND Sachgruppe",
-                  f'<a href="{link}"target = "_blank" class = "link link-primary">{label}</a>')]
+        for category in entity.gnd_subject_category.all():
+
+            try:
+                link = category.link
+                label = category.label
+
+            except AttributeError:
+                return []
+
+            table.append(("GND Sachgruppe",
+                  f'<a href="{link}"target = "_blank" class = "link link-primary">{label}</a>'))
+
+        return table
 
     def __str__(self):
         return self.label
@@ -72,11 +80,7 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
         null=True,
         blank=True
     )
-    gnd_subject_category = models.ForeignKey(
-        GNDSubjectCategory,
-        on_delete=models.SET_NULL,
-        null=True
-    )
+    gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
 
     def get_alt_names(self):
         return self.names.filter(status=Status.ALTERNATIVE)
@@ -97,4 +101,7 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
         return str(doc)
 
     def get_table(self):
-        raise NotImplemented("Please override get_table")
+        raise NotImplementedError("Please override get_table")
+
+    class Meta:
+        abstract = True
