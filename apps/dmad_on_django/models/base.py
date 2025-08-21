@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from dominate.tags import div, table, tr, td
 from dominate.util import raw
 from iso639 import data as iso639_data
+from json import loads
 from liszt_util.tools import RenderRawJSONMixin
 
 
