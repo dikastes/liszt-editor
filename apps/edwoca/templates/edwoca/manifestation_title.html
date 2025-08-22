@@ -1,27 +1,73 @@
 {% extends 'edwoca/base.html' %}
 
+{% block modals %}
+    {% for title_form in title_forms %}
+        <div class="modal" role="dialog" id="title-modal-{{ title_form.instance.id }}">
+            <div class="modal-box w-11/12 max-w-5xl">
+                <h3 class="text-lg font-bold">Titel bearbeiten</h3>
+                <form method="post" class="mt-5">
+                    {% csrf_token %}
+                    {{ title_form.management_form }}
 
+                    {{ title_form.as_daisy }}
 
-{% block content %}
+                    <div class="flex gap-5 mt-5">
+                        <div class="flex-1"></div>
+                        <input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
+                        <div class="modal-action flex-0 m-0">
+                            <a href="#" class="btn">X</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    {% endfor %}
 
-<div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> Titel bearbeiten </h2>
+    <div class="modal" role="dialog" id="title-modal-new">
+        <div class="modal-box w-11/12 max-w-5xl">
+            <h3 class="text-lg font-bold">Titel anlegen</h3>
+            <form method="post" class="mt-5">
+                {% csrf_token %}
+                {{ new_title_form.management_form }}
+                {{ new_title_form.as_daisy }}
 
-	<form method="post">
-		{{ form.management_form }}
-		{% csrf_token %}
-		{% for title_form in form %}
-			{{ title_form.as_daisy }}
-		{% endfor %}
-
-		<input  value="Titel hinzufügen" type="submit" name="add-form" class="btn" />
-		<input type="submit" name="save" id="submit-form" class="hidden" />
-	</form>
-
-</div>
-
+                <div class="flex gap-5 mt-5">
+                    <div class="flex-1"></div>
+                    <input type="submit" name="save_new_title" value="Speichern" class="flex-0 btn btn-primary">
+                    <div class="modal-action flex-0 m-0">
+                        <a href="#" class="btn">X</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 {% endblock %}
 
+{% block content %}
+<div class="bg-white border border-base-300 p-5">
+    <h2 class="card-title mt-0 flex-1"> Titel </h2>
 
+    <div class="mt-5">
+    {% for title in object.titles.all %}
+        <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
+            <div class="flex-1 m-0">
+                <p class="font-bold">{{ title.title }}</p>
+                <p class="text-sm">{{ title.get_title_type_display }}</p>
+            </div>
+            <a href="#title-modal-{{ title.id }}" class="btn flex-0"> bearbeiten </a>
+            <form action="{% url 'edwoca:manifestation_title_delete' title.id %}" method="post" class="flex-0 m-0">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary btn-sm" value="löschen"/>
+            </form>
+        </div>
+    {% empty %}
+        <p> keine Titel </p>
+    {% endfor %}
+    </div>
+    <div class="flex items-center">
+        <div class="flex-1"></div>
+        <a href="#title-modal-new" class="btn flex-0"> Titel hinzufügen </a>
+    </div>
 
-
+</div>
+{% endblock %}

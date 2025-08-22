@@ -24,13 +24,10 @@
 		Bezüge
 	    </a>
 	</li>
-	<li class="disabled">
-		{% comment %}
+	<li>
 	    <a href="{% url 'edwoca:manifestation_title' object.id %}"
 		{% if 'title' in request.path %}class="active"{% endif %}
 		>
-		{% endcomment %}
-	    <a href="#">
 		Titelei und Widmung
 	    </a>
 	</li>
