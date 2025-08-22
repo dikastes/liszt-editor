@@ -145,6 +145,9 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     class Meta:
         proxy = True
 
+    def get_manifestation_url(self):
+        return reverse(f'edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
+
 
 class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):
     class Meta:

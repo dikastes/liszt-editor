@@ -58,7 +58,7 @@ class ManifestationForm(ModelForm):
 class ManifestationTitleForm(ModelForm):
     class Meta(TitleForm.Meta):
         model = ManifestationTitle
-        fields = ['title', 'title_type', 'medium']
+        fields = ['title', 'title_type', 'status', 'medium', 'manifestation']
         widgets = {
                 'title': TextInput( attrs = {
                         'class': 'grow w-full'
@@ -66,49 +66,51 @@ class ManifestationTitleForm(ModelForm):
                 'title_type': Select( attrs = {
                         'class': 'autocomplete-select select select-bordered w-full'
                     }),
+                'status': Select( attrs = {
+                        'class': 'autocomplete-select select select-bordered w-full'
+                    }),
                 'medium': TextInput( attrs = {
                         'class': 'grow w-full'
                     }),
-                'DELETE': CheckboxInput( attrs = {
-                        'class': 'flex-0'
-                    })
+                'manifestation': HiddenInput()
                 }
 
     def as_daisy(self):
         class_name = self.Meta.model.__name__.lower().replace('title', '')
         form = div(cls='mb-10')
 
-        if self.instance.pk:
-           form.add(raw(str(self['id'])))
-        form.add(raw(str(self[class_name])))
+        #if self.instance.pk:
+           #form.add(raw(str(self['id'])))
+        #form.add(raw(str(self[class_name])))
 
         title_field = self['title']
         type_field = self['title_type']
+        status_field = self['status']
         medium_field = self['medium']
 
-        title_field_label = label(title_field.label, cls='input input-bordered flex items-center gap-2 my-5')
+        title_field_label = label(title_field.label, cls='input input-bordered flex-1 flex items-center gap-2')
         title_field_label.add(raw(str(title_field)))
 
         type_container = div(cls='flex-1')
         type_container.add(raw(str(type_field)))
 
-        medium_field_label = label(title_field.label, cls='input input-bordered flex items-center gap-2 my-5')
+        status_container = div(cls='flex-1')
+        status_container.add(raw(str(status_field)))
+
+        medium_field_label = label(medium_field.label, cls='input input-bordered flex-1 flex items-center gap-2')
         medium_field_label.add(raw(str(medium_field)))
 
-        palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette.add(title_field_label)
-        palette.add(type_container)
-        palette.add(medium_field_label)
+        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette1.add(title_field_label)
+        palette1.add(type_container)
 
-        # checken ob das form initialisiert ist, sonst kein delete-button
-        if 'DELETE' in self.fields and self.instance.pk:
-            del_field = self['DELETE']
-            del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
-            del_field_label.add(raw(str(del_field)))
-            palette.add(del_field_label)
+        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette2.add(medium_field_label)
+        palette2.add(status_container)
 
-        form.add(title_field_label)
-        form.add(palette)
+        form.add(palette1)
+        form.add(palette2)
+        form.add(raw(str(self['manifestation'])))
 
         return mark_safe(str(form))
 
@@ -304,9 +306,3 @@ ManifestationTitleFormSet = inlineformset_factory(
         max_num = 100,
         can_delete = True
     )
-
-
-
-
-
-

@@ -1,7 +1,9 @@
 from .base import *
 from ..models import Manifestation as EdwocaManifestation
 from ..forms.manifestation import *
-from ..forms import ManifestationForm, SignatureFormSet
+from ..forms import ManifestationForm, SignatureFormSet, ItemForm, ManifestationTitleForm
+from ..models import ManifestationTitle
+from ..models import ManifestationTitle
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
@@ -100,11 +102,17 @@ def manifestation_update(request, pk):
                 if signature_formset.is_valid():
                     signature_formset.save()
 
-            new_item_form = ManifestationForm(request.POST, prefix='new_item')
-            if new_item_form.is_valid() and new_item_form.has_changed():
-                new_item = new_item_form.save(commit=False)
+            new_item_form = ItemForm(request.POST, prefix='new_item')
+            new_signature_formset = SignatureFormSet(request.POST, prefix='new_signatures') # No instance here yet
+
+            # Check if a new item should be created based on signature formset data
+            if new_signature_formset.is_valid() and new_signature_formset.has_changed():
+                # Create new_item instance
+                new_item = new_item_form.save(commit=False) # Save new_item_form if it has data, otherwise it will be an empty item
                 new_item.manifestation = manifestation
                 new_item.save()
+
+                # Associate the signature formset with the newly created item
                 new_signature_formset = SignatureFormSet(request.POST, instance=new_item, prefix='new_signatures')
                 if new_signature_formset.is_valid():
                     new_signature_formset.save()
@@ -164,19 +172,58 @@ def manifestation_unset_missing(request, pk):
     return redirect('edwoca:manifestation_update', pk = pk)
 
 
+def manifestation_title_update(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    context = {
+        'object': manifestation,
+        'entity_type': 'manifestation'
+    }
+
+    if request.method == 'POST':
+        # Handle existing title forms
+        for title_obj in manifestation.titles.all():
+            prefix = f'title_{title_obj.id}'
+            title_form = ManifestationTitleForm(request.POST, instance=title_obj, prefix=prefix)
+            if title_form.is_valid():
+                title_form.save()
+
+        # Handle new title form
+        new_title_form = ManifestationTitleForm(request.POST, prefix='new_title')
+        if new_title_form.is_valid() and new_title_form.has_changed():
+            new_title = new_title_form.save(commit=False)
+            new_title.manifestation = manifestation
+            new_title.save()
+
+        return redirect('edwoca:manifestation_title', pk=pk)
+    else:
+        # Initialize forms for existing titles
+        title_forms = []
+        for title_obj in manifestation.titles.all():
+            prefix = f'title_{title_obj.id}'
+            title_forms.append(ManifestationTitleForm(instance=title_obj, prefix=prefix))
+        context['title_forms'] = title_forms
+
+        # Initialize form for new title
+        new_title_form = ManifestationTitleForm(prefix='new_title', initial = {'manifestation': manifestation})
+        context['new_title_form'] = new_title_form
+
+    return render(request, 'edwoca/manifestation_title.html', context)
+
+
 class ManifestationDeleteView(EntityMixin, DeleteView):
-    model = Manifestation
+    model = EdwocaManifestation
     success_url = reverse_lazy('edwoca:manifestation_list')
     template_name = 'edwoca/simple_form.html'
 
 
-class ManifestationTitleUpdateView(EntityMixin, TitleUpdateView):
-    model = Manifestation
-    form_class = ManifestationTitleFormSet
-    formset_property = 'titles'
+
+
+
+class ManifestationTitleDeleteView(DeleteView):
+    model = ManifestationTitle
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_title', kwargs = {'pk': self.object.id})
+        return reverse_lazy('edwoca:manifestation_title', kwargs = {'pk': self.object.manifestation.id})
 
 
 class RelatedManifestationAddView(RelatedEntityAddView):
