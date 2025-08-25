@@ -94,10 +94,11 @@ class Corporation(DisplayableModel):
 
         self.period = Period.create_single_period_from_json(json_data=loads(self.raw_data))
 
-        for c in pl_org.category:
+        if hasattr(pl_org, 'category'):
+            for c in pl_org.category:
 
-            cat = SubjectTerm.fetch_or_get(c['id'])
-            self.category.add(cat)
+                cat = SubjectTerm.fetch_or_get(c['id'])
+                self.category.add(cat)
 
         self.save()
 
@@ -106,7 +107,7 @@ class Corporation(DisplayableModel):
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
         while trials:
             try:
-                pl_corporation = PyLobidOrg(url, fetch_related=True)
+                pl_corporation = PyLobidOrg(url, fetch_related=False)
             except GNDAPIError:
                 trials -= 1
                 continue

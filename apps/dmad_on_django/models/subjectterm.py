@@ -60,7 +60,7 @@ class SubjectTerm(DisplayableModel):
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
         while trials:
             try:
-                pl_subjectterm = PyLobidClient(url, fetch_related=True)
+                pl_subjectterm = PyLobidClient(url, fetch_related=False)
             except GNDAPIError:
                 trials -= 1
                 continue
