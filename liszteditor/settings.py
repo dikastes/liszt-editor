@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django_htmx',
     'bib',
     'django.forms',
+    'dmrism',
     'edwoca',
     'dmad_on_django'
 ]
@@ -157,6 +158,8 @@ Z_ID = "5080468"
 Z_LIBRARY_TYPE = 'group'
 Z_API_KEY = os.environ['ZOTERO_API_KEY']
 
+RISM_API_KEY = os.environ['RISM_API_KEY']
+
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'
 HAYSTACK_CONNECTIONS = {
@@ -183,8 +186,8 @@ GLOBAL_NAVIGATION = {
                 'label': 'musiconn',
                 'href': None
             },
-        'rism': {
+        'dmrism': {
                 'label': 'RISM',
-                'href': None
+                'href': reverse_lazy('dmrism:index')
             }
     }

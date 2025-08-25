@@ -1,4 +1,3 @@
-from ..models.expression import Expression
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe

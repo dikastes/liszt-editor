@@ -1,0 +1,80 @@
+<p>
+    <em> Kopf </em>
+    {{ object.items.all.0.signature_with_former }}
+</p>
+
+<p>
+    <em> Quellenart </em> 
+    {% if object.manifestation_form %}
+	{{ object.manifestation_form }}
+    {% else %}
+	<span class="badge"> keine Information zur Unterteilung nach der Form </span>
+    {% endif %}
+</p>
+
+<p>
+    <em> Bezüge </em>
+
+    ausgehend:
+    {% for manifestation_relation in object.source_manifestation_of.all %}
+	{{ manifestation_relation.target_manifestation.items.all.0 }} ({{ manifestation_relation.label }})
+    {% empty %}
+	<span class="badge"> keine ausgehenden Bezüge </span>
+    {% endfor %}
+
+    eingehend:
+    {% for manifestation_relation in object.target_manifestation_of.all %}
+	{{ manifestation_relation.source_manifestation.items.all.0 }} ({{ manifestation_relation.label }})
+    {% empty %}
+	<span class="badge"> keine eingehenden Bezüge </span>
+    {% endfor %}
+</p>
+
+<p>
+    <em> Widmung </em>
+    {% if object.dedication %}
+	{{ object.dedication }}
+    {% else %}
+	<span class="badge"> keine diplomatische Widmung </span>
+    {% endif %}
+</p>
+
+<p>
+    <em> Eckdaten Werk </em>
+    {% if object.language %}
+	{{ object.language }}
+    {% else %}
+	<span class="badge"> kein Sprachcode </span>
+    {% endif %}
+</p>
+
+<p>
+    <em> Manuskriptspezifika </em>
+
+    {% if object.handwriting %}
+	{{ object.handwriting }}
+    {% else %}
+	<span class="badge"> keine Angaben zur Schrift </span>
+    {% endif %}
+
+    {% if object.extent %}
+	{{ object.extent }}
+    {% else %}
+	<span class="badge"> keine Angaben zum Umfang</span>
+    {% endif %}
+
+    {% if object.paper %}
+	{{ object.paper }}
+    {% else %}
+	<span class="badge"> keine Angaben zum Papier </span>
+    {% endif %}
+</p>
+
+<h4> Kommentar </h4>
+<p>
+    {% if object.private_comment %}
+	{{ object.private_comment|linebreaks }}
+    {% else %}
+	<span class="badge"> kein interner Kommentar </span>
+    {% endif %}
+</p>

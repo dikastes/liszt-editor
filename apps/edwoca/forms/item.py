@@ -1,5 +1,5 @@
 from .base import *
-from ..models.item import *
+from dmrism.models.item import *
 from dominate.tags import div, label, span
 from dominate.util import raw
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea
@@ -92,11 +92,13 @@ SignatureFormSet = inlineformset_factory(
     )
 
 
+"""
 class ItemTitleForm(TitleForm):
     class Meta(TitleForm.Meta):
         model = ItemTitle
         fields = TitleForm.Meta.fields + ['item']
         widgets = dict(TitleForm.Meta.widgets, **{ 'item': HiddenInput() })
+"""
 
 
 class ItemLocationForm(ModelForm, SimpleFormMixin):
@@ -147,6 +149,7 @@ class RelatedItemForm(ModelForm):
         return mark_safe(str(form))
 
 
+"""
 ItemTitleFormSet = inlineformset_factory(
         Item,
         ItemTitle,
@@ -156,6 +159,7 @@ ItemTitleFormSet = inlineformset_factory(
         max_num = 100,
         can_delete = True
     )
+"""
 
 
 class ProvenanceForm(ModelForm):
