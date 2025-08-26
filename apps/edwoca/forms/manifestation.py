@@ -55,6 +55,17 @@ class ManifestationForm(ModelForm):
 """
 
 
+class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['dedication']
+        widgets = {
+                'dedication': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            }
+
+
 class ManifestationTitleForm(ModelForm):
     class Meta(TitleForm.Meta):
         model = ManifestationTitle

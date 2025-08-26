@@ -93,13 +93,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             'bib.ZotItem',
             through = 'ManifestationBib'
         )
-    dedicatee = models.ForeignKey(
-            'dmad.Person',
-            on_delete=models.SET_NULL,
-            related_name='dedicated_manifestations',
-            blank=True,
-            null=True
-        )
+    
     language = models.CharField(
             max_length=15,
             choices=Language,
@@ -107,7 +101,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null=True
         )
     dedication = models.TextField(
-            max_length=100,
             blank=True,
             null=True
         )

@@ -11,14 +11,41 @@
 
                     {{ title_form.as_daisy }}
 
-                    <div class="flex gap-5 mt-5">
-                        <div class="flex-1"></div>
-                        <input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
-                        <div class="modal-action flex-0 m-0">
-                            <a href="#" class="btn">X</a>
-                        </div>
-                    </div>
+                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-{{ title_form.instance.id }}">
                 </form>
+
+                <div class="mt-5">
+                    {% if title_form.instance.writer %}
+                        <div class="flex gap-5">
+                            <label class="flex-1 input input-bordered flex items-center gap-2">
+                                Verfasser
+                                <input type="text" class="grow" disabled value="{{ title_form.instance.writer }}" />
+                            </label>
+                            <a class="flex-0 btn" href="{% url 'edwoca:manifestation_writer_remove' object.id title_form.instance.id %}"> löschen </a>
+                        </div>
+                    {% else %}
+                        <form action="{% url 'edwoca:manifestation_title' object.id %}#title-modal-{{ title_form.instance.id }}" method="get" class="flex-1">
+                            {{ search_form.q }}
+                            <input type="hidden" name="title_id" value="{{ title_form.instance.id }}">
+                            <input type="submit" id="submit-form-{{ title_form.instance.id }}" class="btn" value="Verfasser suchen"/>
+                        </form>
+                        {% if query and request.GET.title_id|add:"0" == title_form.instance.id %}
+                            <ul>
+                            {% for person in found_persons %}
+                                <li>
+                                    <a href="{% url 'edwoca:manifestation_writer_add' object.id title_form.instance.id person.object.id %}">{{ person.object }}</a>
+                                </li>
+                            {% empty %}
+                                <li> keine Suchergebnisse </li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                <div class="modal-action flex-0 m-0">
+                    <label for="save-button-{{ title_form.instance.id }}" class="btn btn-primary">Speichern</label>
+                    <a href="#" class="btn">Schließen</a>
+                </div>
             </div>
         </div>
     {% endfor %}
@@ -52,7 +79,20 @@
         <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
             <div class="flex-1 m-0">
                 <p class="font-bold">{{ title.title }}</p>
-                <p class="text-sm">{{ title.get_title_type_display }}</p>
+                <p class="text-sm">
+                {% if title.get_title_type_display %}
+                    {{ title.get_title_type_display }}
+                {% endif %}
+                {% if title.writer %}
+                    {{ title.writer }}
+                {% endif %}
+                {% if title.status == 'T' %}
+                    (temporär)
+                {% endif %}
+                {% if title.medium %}
+                    {{ title.medium }}
+                {% endif %}
+                </p>
             </div>
             <a href="#title-modal-{{ title.id }}" class="btn flex-0"> bearbeiten </a>
             <form action="{% url 'edwoca:manifestation_title_delete' title.id %}" method="post" class="flex-0 m-0">
@@ -69,5 +109,44 @@
         <a href="#title-modal-new" class="btn flex-0"> Titel hinzufügen </a>
     </div>
 
+</div>
+
+<div class="bg-white border border-base-300 p-5 mt-5">
+    <h2 class="card-title mt-0"> Widmung </h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ dedication_form.as_daisy }}
+        <input type="submit" value="Speichern" class="btn btn-primary mt-5">
+    </form>
+
+    <div class="mt-5">
+        <h3 class="text-lg font-bold">Widmungsträger</h3>
+        <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex-1">
+            {{ search_form.q }}
+            <input type="submit" id="submit-form-dedicatee" class="btn" value="Widmungsträger suchen"/>
+        </form>
+        {% if query %}
+            <ul>
+            {% for person in found_persons %}
+                <li>
+                    <a href="{% url 'edwoca:manifestation_add_dedicatee' object.id person.object.id %}">{{ person.object }}</a>
+                </li>
+            {% empty %}
+                <li> keine Suchergebnisse </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        <ul class="mt-5">
+        {% for contributor in object.contributor_relations.all %}
+            {% if contributor.role == 'DD' %}
+                <li class="flex items-center">
+                    <p class="flex-1">{{ contributor.person }}</p>
+                    <a href="{% url 'edwoca:manifestation_remove_dedicatee' object.id contributor.id %}" class="btn btn-sm">Löschen</a>
+                </li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+    </div>
 </div>
 {% endblock %}

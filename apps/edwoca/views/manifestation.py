@@ -1,16 +1,17 @@
 from .base import *
 from ..models import Manifestation as EdwocaManifestation
 from ..forms.manifestation import *
-from ..forms import ManifestationForm, SignatureFormSet, ItemForm, ManifestationTitleForm
+from ..forms import ManifestationForm, SignatureFormSet, ItemForm, ManifestationTitleForm, ManifestationDedicationForm
+from dmad_on_django.forms import SearchForm
 from ..models import ManifestationTitle
-from ..models import ManifestationTitle
+from dmad_on_django.models.person import Person
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from dmad_on_django.models import Place
-from dmrism.models.manifestation import ManifestationBib
+from dmrism.models.manifestation import ManifestationBib, ManifestationContributor
 from dmrism.models.item import Signature
 from bib.models import ZotItem
 
@@ -194,6 +195,10 @@ def manifestation_title_update(request, pk):
             new_title.manifestation = manifestation
             new_title.save()
 
+        dedication_form = ManifestationDedicationForm(request.POST, instance=manifestation)
+        if dedication_form.is_valid():
+            dedication_form.save()
+
         return redirect('edwoca:manifestation_title', pk=pk)
     else:
         # Initialize forms for existing titles
@@ -207,7 +212,41 @@ def manifestation_title_update(request, pk):
         new_title_form = ManifestationTitleForm(prefix='new_title', initial = {'manifestation': manifestation})
         context['new_title_form'] = new_title_form
 
+        context['dedication_form'] = ManifestationDedicationForm(instance=manifestation)
+
+    search_form = SearchForm(request.GET or None)
+    context['search_form'] = search_form
+
+    if search_form.is_valid() and search_form.cleaned_data.get('q'):
+        context['query'] = search_form.cleaned_data.get('q')
+        context[f"found_persons"] = search_form.search().models(Person)
+
     return render(request, 'edwoca/manifestation_title.html', context)
+
+
+def manifestation_writer_add(request, pk, title_id, writer_id):
+    title = get_object_or_404(ManifestationTitle, pk=title_id)
+    writer = get_object_or_404(Person, pk=writer_id)
+    title.writer = writer
+    title.save()
+    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_id}')
+
+def manifestation_writer_remove(request, pk, title_id):
+    title = get_object_or_404(ManifestationTitle, pk=title_id)
+    title.writer = None
+    title.save()
+    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_id}')
+
+def manifestation_add_dedicatee(request, pk, person_id):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    person = get_object_or_404(Person, pk=person_id)
+    ManifestationContributor.objects.create(manifestation=manifestation, person=person, role='DD')
+    return redirect('edwoca:manifestation_title', pk=pk)
+
+def manifestation_remove_dedicatee(request, pk, contributor_id):
+    contributor = get_object_or_404(ManifestationContributor, pk=contributor_id)
+    contributor.delete()
+    return redirect('edwoca:manifestation_title', pk=pk)
 
 
 class ManifestationDeleteView(EntityMixin, DeleteView):
@@ -302,7 +341,7 @@ def manifestation_remove_place_view(request, pk):
 
 class ManifestationBibAddView(FormView):
     def post(self, request, *args, **kwargs):
-        manifestation_id = self.kwargs['pk']
+        manifestation_.id = self.kwargs['pk']
         zotitem_key = self.kwargs['zotitem_key']
         manifestation = Manifestation.objects.get(pk=manifestation_id)
         zotitem = ZotItem.objects.get(zot_key=zotitem_key)
