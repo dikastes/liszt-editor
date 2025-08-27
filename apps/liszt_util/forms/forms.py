@@ -1,7 +1,7 @@
 from .layouts import Layouts
 
 from django.utils.safestring import mark_safe
-from django.forms import HiddenInput, Textarea
+from django.forms import HiddenInput, Textarea, CheckboxInput
 
 from dominate.tags import div, label, span
 from dominate.util import raw
@@ -54,4 +54,38 @@ class GenericAsDaisyMixin():
         return root.render()
     
     def _outside_layout(self):
-        pass
+        root = div(cls="flex flex-col gap-5")
+
+        for field in self.visible_fields():
+            if isinstance(field.field.widget, HiddenInput):
+                root.add(raw(field.as_widget()))
+                continue
+
+            widget = field.field.widget
+            wrap = label(cls="form-control w-full")
+
+            top = div(cls="label")
+            top.add(span((field.label or field.name), cls="label-text"))
+            if field.help_text:
+                top.add(span(field.help_text, cls="label-text-alt"))
+            wrap.add(top)
+
+            if isinstance(widget, CheckboxInput):
+                wrap = label(cls="label cursor-pointer justify-start gap-3")
+                wrap.add(span(field.label or field.name, cls="label-text flex-1"))
+                wrap.add(raw(field.as_widget(attrs={"class":"toggle toggle-primary flex-0"})))
+                root.add(wrap)
+                continue
+
+            if isinstance(widget, Textarea):
+                cls = "textarea textarea-bordered w-full"
+    
+            else:
+                cls = "input input-bordered w-full"
+               
+            wrap.add(raw(field.as_widget(attrs={"class" : cls})))
+
+            root.add(wrap)
+
+        return root.render()
+        

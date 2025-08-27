@@ -18,8 +18,6 @@ formWidgets = {
 
 class SearchForm(SearchForm):
 
-    layout = Layouts.LABEL_INSIDE
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['q'].widget.attrs.update({
@@ -29,5 +27,4 @@ class SearchForm(SearchForm):
         self.fields['q'].label = ''
 
 class AsDaisyModelForm(GenericAsDaisyMixin, ModelForm):
-    layout = Layouts.LABEL_INSIDE
-
+    layout = Layouts.LABEL_OUTSIDE
