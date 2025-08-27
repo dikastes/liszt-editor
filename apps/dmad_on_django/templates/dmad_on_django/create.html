@@ -21,7 +21,7 @@
 	    <h3> Informationen </h3>
 	    <form method="post">
 		{% csrf_token %}
-		{{ form }}
+		{{ form.as_daisy }}
 		<input type="submit" id="submit-form" class="hidden" value="{{ button_label }}" class="btn btn-primary my-5">
 	    </form>
 	</div>

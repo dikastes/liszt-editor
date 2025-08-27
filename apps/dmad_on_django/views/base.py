@@ -7,8 +7,11 @@ from json import dumps
 from django.http import JsonResponse
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm
-from dmad_on_django.forms import formWidgets
+from dmad_on_django.forms import formWidgets, AsDaisyModelForm
 from dmad_on_django.tools import camel_to_snake_case, snake_to_camel_case
+
+from liszt_util.forms.forms import GenericAsDaisyMixin
+from liszt_util.forms.layouts import Layouts
 
 
 def search_gnd(request, search_string, entity_type):
@@ -80,13 +83,14 @@ class DmadBaseViewMixin:
                kwargs={'pk': self.object.id})
 
 
-class DmadCreateView(DmadBaseViewMixin, CreateView):
+class DmadCreateView(GenericAsDaisyMixin,DmadBaseViewMixin, CreateView):
     template_name = 'dmad_on_django/create.html'
     fields = ['interim_designator', 'gnd_id', 'comment']
 
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
+            form=AsDaisyModelForm,
             fields=self.fields,
             widgets=formWidgets
         )
@@ -114,6 +118,7 @@ class DmadUpdateView(DmadBaseViewMixin, NavbarContextMixin, UpdateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
+            form=AsDaisyModelForm,
             fields=self.get_form_fields(),
             widgets=formWidgets
         )
@@ -140,6 +145,7 @@ class LinkView(DmadBaseViewMixin, UpdateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
+            form=AsDaisyModelForm,
             fields=self.fields,
             widgets=formWidgets
         )

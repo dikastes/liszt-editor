@@ -21,7 +21,7 @@
 		<h4> Anpassen </h4>
 		<form method="post">
 		    {% csrf_token %}
-		    {{ form }}
+		    {{ form.as_daisy }}
 		    <input type="submit" id="submit-form" class="hidden">
 		</form>
 	    </div>
@@ -66,7 +66,7 @@
 	<div class="prose">
 	    <form method="post">
 		{% csrf_token %}
-		{{ form }}
+		{{ form.as_daisy }}
 		<input type="submit" id="submit-form" class="hidden">
 	    </form>
 	</div>
