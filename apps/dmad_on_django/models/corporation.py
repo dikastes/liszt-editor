@@ -119,7 +119,7 @@ class Corporation(DisplayableModel):
         try:
             return Corporation.objects.get(gnd_id=shortened_gnd_id)
         except Corporation.DoesNotExist:
-            corporation = Corporation()
+            corporation = Corporation.objects.create(gnd_id = shortened_gnd_id)
             corporation.gnd_id = shortened_gnd_id
             corporation.fetch_raw()
             corporation.update_from_raw()
