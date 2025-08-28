@@ -158,7 +158,7 @@ class Person(DisplayableModel):
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
         while trials:
             try:
-                pl_person = PyLobidPerson(url, fetch_related=True)
+                pl_person = PyLobidPerson(url, fetch_related=False)
             except GNDAPIError:
                 trials -= 1
                 continue

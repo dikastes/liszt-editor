@@ -86,7 +86,7 @@ class Place(DisplayableModel):
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
         while trials:
             try:
-                pl_place = PyLobidPlace(url, fetch_related=True)
+                pl_place = PyLobidPlace(url, fetch_related=False)
             except GNDAPIError:
                 trials -= 1
                 continue
@@ -99,8 +99,7 @@ class Place(DisplayableModel):
         try:
             return Place.objects.get(gnd_id=shortened_gnd_id)
         except Place.DoesNotExist:
-            place = Place()
-            place.gnd_id = shortened_gnd_id
+            place = Place.objects.create(gnd_id = shortened_gnd_id)
             place.fetch_raw()
             place.update_from_raw()
             return place
