@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
-from dmad_on_django.models import Place
+from dmad_on_django.models import Place, Corporation
 from dmrism.models.manifestation import ManifestationBib, ManifestationContributor
 from dmrism.models.item import Signature
 from bib.models import ZotItem
@@ -324,19 +324,35 @@ def manifestation_add_place_view(request, pk, place_id):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     place = get_object_or_404(Place, pk=place_id)
 
-    manifestation.place = place
-    manifestation.save()
+    manifestation.places.add(place)
 
     return redirect('edwoca:manifestation_history', pk=pk)
 
 
-def manifestation_remove_place_view(request, pk):
+def manifestation_remove_place_view(request, pk, place_id):
     manifestation = get_object_or_404(Manifestation, pk=pk)
+    place = get_object_or_404(Place, pk=place_id)
 
-    manifestation.place = None
-    manifestation.save()
+    manifestation.places.remove(place)
 
     return redirect('edwoca:manifestation_history', pk=pk)
+
+
+def manifestation_add_publisher(request, pk, publisher_id):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    publisher = get_object_or_404(Corporation, pk=publisher_id)
+
+    manifestation.publisher = publisher
+    manifestation.save()
+
+    return redirect('edwoca:manifestation_print', pk=pk)
+
+
+def manifestation_remove_publisher(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    manifestation.publisher = None
+    manifestation.save()
+    return redirect('edwoca:manifestation_print', pk=pk)
 
 
 class ManifestationBibAddView(FormView):
@@ -382,12 +398,38 @@ class ManifestationCommentUpdateView(SimpleFormView):
     property = 'comment'
 
 
-class ManifestationPrintUpdateView(EntityMixin, UpdateView):
-    pass
+#class ManifestationPrintUpdateView(EntityMixin, UpdateView):
+    #pass
     #model = Manifestation
     #property = 'print'
 
+class ManifestationPrintUpdateView(SimpleFormView):
+    model = Manifestation
+    property = 'print'
+    template_name = 'edwoca/manifestation_print.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        manifestation = self.get_object()
+
+        if manifestation.publisher:
+            context['linked_publisher'] = manifestation.publisher
+        else:
+            search_form = SearchForm(self.request.GET or None)
+            context['searchform'] = search_form
+            context['show_search_form'] = True
+
+            if search_form.is_valid() and search_form.cleaned_data.get('q'):
+                context['query'] = search_form.cleaned_data.get('q')
+                context[f"found_publishers"] = search_form.search().models(Corporation)
+
+        return context
 
 class ManifestationClassificationUpdateView(SimpleFormView):
     model = Manifestation
     property = 'classification'
+
+
+class ManifestationManuscriptUpdateView(SimpleFormView):
+    model = Manifestation
+    property = 'manuscript'
