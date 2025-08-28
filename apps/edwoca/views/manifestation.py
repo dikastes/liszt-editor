@@ -303,6 +303,7 @@ class ManifestationHistoryUpdateView(SimpleFormView):
     model = Manifestation
     property = 'history'
     template_name = 'edwoca/manifestation_history.html'
+    form_class = ManifestationHistoryForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

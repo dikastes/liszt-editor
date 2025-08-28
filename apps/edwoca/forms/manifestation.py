@@ -154,9 +154,12 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
 
     class Meta:
         model = Manifestation
-        fields = ['history', 'id']
+        fields = ['history', 'id', 'date_diplomatic']
         widgets = {
                 'history': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'date_diplomatic': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     })
             }
@@ -220,6 +223,14 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
 
+        date_diplomatic_field = self['date_diplomatic']
+        date_diplomatic_wrap = label(cls='form-control')
+        date_diplomatic_label = div(cls='label')
+        date_diplomatic_span = span(date_diplomatic_field.label, cls='label-text')
+        date_diplomatic_label.add(date_diplomatic_span)
+        date_diplomatic_wrap.add(date_diplomatic_label)
+        date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
+
         #history_wrap = label(cls='form-control')
         #history_label = div(cls='label')
         #history_span = span(history_field.label, cls='label-text')
@@ -234,6 +245,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
 
         form.add(period_palette)
         form.add(display_container)
+        form.add(date_diplomatic_wrap)
         #form.add(history_wrap)
 
         return mark_safe(str(form))
