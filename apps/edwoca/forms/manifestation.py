@@ -317,3 +317,135 @@ ManifestationTitleFormSet = inlineformset_factory(
         max_num = 100,
         can_delete = True
     )
+
+
+class ManifestationPrintForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['plate_number']
+        widgets = {
+                'plate_number': TextInput( attrs = {
+                        'class': 'grow'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        plate_number_field = self['plate_number']
+
+        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
+        plate_number_label.add(raw(str(plate_number_field)))
+
+        form.add(plate_number_label)
+
+        return mark_safe(str(form))
+
+
+class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['paper', 'extent', 'measure']
+        widgets = {
+                'paper': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'extent': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'measure': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            }
+
+
+class ManifestationPrintForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['plate_number']
+        widgets = {
+                'plate_number': TextInput( attrs = {
+                        'class': 'grow'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        plate_number_field = self['plate_number']
+
+        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
+        plate_number_label.add(raw(str(plate_number_field)))
+
+        form.add(plate_number_label)
+
+        return mark_safe(str(form))
+
+
+class ManifestationPrintForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['plate_number']
+        widgets = {
+                'plate_number': TextInput( attrs = {
+                        'class': 'grow'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        plate_number_field = self['plate_number']
+
+        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
+        plate_number_label.add(raw(str(plate_number_field)))
+
+        form.add(plate_number_label)
+
+        return mark_safe(str(form))
+
+
+class ManifestationPrintForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['plate_number']
+        widgets = {
+                'plate_number': TextInput( attrs = {
+                        'class': 'grow'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        plate_number_field = self['plate_number']
+
+        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
+        plate_number_label.add(raw(str(plate_number_field)))
+
+        form.add(plate_number_label)
+
+        return mark_safe(str(form))
+
+
+class ManifestationPrintForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['plate_number']
+        widgets = {
+                'plate_number': TextInput( attrs = {
+                        'class': 'grow'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        plate_number_field = self['plate_number']
+
+        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
+        plate_number_label.add(raw(str(plate_number_field)))
+
+        form.add(plate_number_label)
+
+        return mark_safe(str(form))

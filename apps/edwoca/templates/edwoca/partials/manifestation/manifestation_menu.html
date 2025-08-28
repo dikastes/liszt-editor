@@ -7,13 +7,10 @@
 		Kopf
 	    </a>
 	</li>
-	<li class="disabled">
-		{% comment %}
+	<li>
 	    <a href="{% url 'edwoca:manifestation_classification' object.id %}"
 		{% if 'classification' in request.path %}class="active"{% endif %}
 		>
-		{% endcomment %}
-	    <a href="#">
 		Quellenart
 	    </a>
 	</li>
@@ -41,6 +38,20 @@
 		{% if 'history' in request.path %}class="active"{% endif %}
 		>
 		Datierung und Ort
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_print' object.id %}"
+		{% if 'print' in request.path %}class="active"{% endif %}
+		>
+		Verlag und Druckspezifika
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_manuscript' object.id %}"
+		{% if 'manuscript' in request.path %}class="active"{% endif %}
+		>
+		Manuskriptspezifika
 	    </a>
 	</li>
 	<li>
