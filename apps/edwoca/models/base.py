@@ -166,7 +166,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             dedications = self.dedication.split('|')
             for dedication in dedications:
                 if gnd_id := Manifestation.extract_gnd_id(dedication):
-                    dedicatee = Person.fetch_or_get(id)
+                    dedicatee = Person.fetch_or_get(gnd_id)
                     ManifestationContributor.objects.create(
                             person = dedicatee,
                             role = ManifestationContributor.Role.DEDICATEE,
