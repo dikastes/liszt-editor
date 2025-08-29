@@ -431,6 +431,62 @@ class ManifestationClassificationUpdateView(SimpleFormView):
     property = 'classification'
 
 
-class ManifestationManuscriptUpdateView(SimpleFormView):
-    model = Manifestation
-    property = 'manuscript'
+def manifestation_manuscript_update(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    context = {
+        'object': manifestation,
+        'entity_type': 'manifestation'
+    }
+
+    if request.method == 'POST':
+        if 'save_changes' in request.POST:
+            form = ManifestationManuscriptForm(request.POST, instance=manifestation)
+            if form.is_valid():
+                form.save()
+
+            for handwriting in manifestation.manifestationhandwriting_set.all():
+                prefix = f'handwriting_{handwriting.id}'
+                handwriting_form = ManifestationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                if handwriting_form.is_valid():
+                    handwriting_form.save()
+
+        if 'add_handwriting' in request.POST:
+            ManifestationHandwriting.objects.create(manifestation=manifestation)
+
+        return redirect('edwoca:manifestation_manuscript', pk=pk)
+
+    else:
+        form = ManifestationManuscriptForm(instance=manifestation)
+        handwriting_forms = []
+        for handwriting in manifestation.manifestationhandwriting_set.all():
+            prefix = f'handwriting_{handwriting.id}'
+            handwriting_forms.append(ManifestationHandwritingForm(instance=handwriting, prefix=prefix))
+        context['handwriting_forms'] = handwriting_forms
+
+    context['form'] = form
+    search_form = SearchForm(request.GET or None)
+    context['search_form'] = search_form
+
+    if search_form.is_valid() and search_form.cleaned_data.get('q'):
+        context['query'] = search_form.cleaned_data.get('q')
+        context[f"found_persons"] = search_form.search().models(Person)
+
+    if request.GET.get('handwriting_id'):
+        context['handwriting_id'] = int(request.GET.get('handwriting_id'))
+
+    return render(request, 'edwoca/manifestation_manuscript.html', context)
+
+
+def manifestation_add_handwriting_writer(request, pk, handwriting_pk, person_pk):
+    handwriting = get_object_or_404(ManifestationHandwriting, pk=handwriting_pk)
+    person = get_object_or_404(Person, pk=person_pk)
+    handwriting.writer = person
+    handwriting.save()
+    return redirect('edwoca:manifestation_manuscript', pk=pk)
+
+
+def manifestation_remove_handwriting_writer(request, pk, handwriting_pk):
+    handwriting = get_object_or_404(ManifestationHandwriting, pk=handwriting_pk)
+    handwriting.writer = None
+    handwriting.save()
+    return redirect('edwoca:manifestation_manuscript', pk=pk)

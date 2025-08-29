@@ -16,6 +16,7 @@ class EdwocaUpdateUrlMixin:
 
 class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
     RISM_ID_KEY = 'RISM ID no.'
+    CURRENT_SIGNATURE_KEY = 'Signatur, neu'
 
     class Meta:
         proxy = True
@@ -58,7 +59,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
     def extract_gnd_id(dedicatee):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
         id_pattern = compile(ID_PATTERN)
-        match = id_pattern.match(dedicatee)
+        match = id_pattern.search(dedicatee)
         if match:
             return dedicatee[match.start():match.end()].replace(']', '').strip()
         return None
@@ -66,7 +67,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
     def extract_medium(medium_string):
         MEDIUM_PATTERN = '\(\w*\)'
         medium_pattern= compile(MEDIUM_PATTERN)
-        match = medium_pattern.match(medium_string)
+        match = medium_pattern.search(medium_string)
         if match:
             return medium_string[match.start():match.end()].\
                 replace('(', '').\
@@ -75,7 +76,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
     def parse_csv(self, raw_data):
         INSTITUTION_KEY = 'Bestandeshaltende Institution'
-        CURRENT_SIGNATURE_KEY = 'Signatur, neu'
         FORMER_SIGNATURE_KEY = 'Signatur, vormalig'
         IDENTIFICATION_KEY = 'WVZ-Nr.'
         EDITION_TYPE_KEY = 'Ausgabeform (Typ)'
@@ -126,7 +126,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         signature = Signature.objects.create(
                 library = library,
                 status = Signature.Status.CURRENT,
-                signature = raw_data[CURRENT_SIGNATURE_KEY]
+                signature = raw_data[Manifestation.CURRENT_SIGNATURE_KEY]
             )
         single_item = Item.objects.create(manifestation = self)
         single_item.signatures.add(signature)
@@ -153,23 +153,23 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if EDITION_TYPE_KEY in raw_data:
             self.edition_type = Manifestation.parse_edition_type(raw_data[EDITION_TYPE_KEY])
+        self.function = raw_data[FUNCTION_KEY]
 
         self.dedication = raw_data[DEDICATION_KEY]
-        dedicatee_ids = [ 
-                gnd_id for
-                dedicatee in
-                raw_data[DEDICATION_KEY].split('|')
-                if (gnd_id := Manifestation.extract_gnd_id(dedicatee)) is not None
-            ]
-        for id in dedicatee_ids:
-            dedicatee = Person.fetch_or_get(id)
-            ManifestationContributor.create(
-                    person = dedicatee,
-                    role = ManifestationContributor.Role.DEDICATEE,
-                    manifestation = self
-                )
-
-        self.function = raw_data[FUNCTION_KEY]
+        if self.dedication:
+            dedicatee_ids = [
+                    gnd_id for
+                    dedicatee in
+                    self.dedication.split('|')
+                    if (gnd_id := Manifestation.extract_gnd_id(dedicatee)) is not None
+                ]
+            for id in dedicatee_ids:
+                dedicatee = Person.fetch_or_get(id)
+                ManifestationContributor.objects.create(
+                        person = dedicatee,
+                        role = ManifestationContributor.Role.DEDICATEE,
+                        manifestation = self
+                    )
 
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY].replace(' | ', '\n')
 
@@ -178,23 +178,31 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         self.plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
         # machine readable key abklären
 
-        if raw_data[AUTOGRAPH_HANDWRITING_KEY]:
+        if AUTOGRAPH_HANDWRITING_KEY in raw_data and \
+            raw_data[AUTOGRAPH_HANDWRITING_KEY]:
             ManifestationHandwriting.objects.create(
                     writer = liszt,
                     manifestation = self,
                     medium = raw_data[AUTOGRAPH_HANDWRITING_KEY]
                 )
 
-        if FOREIGN_HANDWRITING_KEY in raw_data:
+        if FOREIGN_HANDWRITING_KEY in raw_data\
+            and raw_data[FOREIGN_HANDWRITING_KEY]:
             for entry in raw_data[FOREIGN_HANDWRITING_KEY].split('),'):
                 writer_gnd_id = Manifestation.extract_gnd_id(entry)
-                writer = Person.fetch_or_get(writer_gnd_id)
                 medium = Manifestation.extract_medium(entry)
-                ManifestationHandwriting.objects.create(
-                        writer = writer,
-                        manifestation = self,
-                        medium = medium
-                    )
+                if writer_gnd_id:
+                    writer = Person.fetch_or_get(writer_gnd_id)
+                    ManifestationHandwriting.objects.create(
+                            writer = writer,
+                            manifestation = self,
+                            medium = medium
+                        )
+                else:
+                    ManifestationHandwriting.objects.create(
+                            manifestation = self,
+                            medium = medium
+                        )
 
         if ENVELOPE_TITLE_KEY in raw_data and\
             raw_data[ENVELOPE_TITLE_KEY]:

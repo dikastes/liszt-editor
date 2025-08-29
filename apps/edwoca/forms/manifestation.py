@@ -27,34 +27,6 @@ class ManifestationForm(ModelForm):
         return mark_safe(str(form))
 
 
-"""
-class ManifestationForm(ModelForm):
-    class Meta:
-        model = Manifestation
-        fields = [
-                #'rism_id',
-                'plate_number'
-            ]
-        widgets = {
-                #'rism_id': TextInput( attrs = {
-                        #'class': 'grow'
-                    #}),
-                'plate_number': TextInput( attrs = {
-                        'class': 'grow'
-                    })
-            }
-
-    def as_daisy(self):
-        form = div()
-        for field in self.visible_fields():
-            field_label = label(field.label, _for=field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-            field_label.add(raw(str(field)))
-            form.add(field_label)
-
-        return mark_safe(str(form))
-"""
-
-
 class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
@@ -280,7 +252,7 @@ class ManifestationClassificationForm(ModelForm):
         fields = [
                 'manifestation_form',
                 'edition_type',
-                'state'
+                'function'
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
@@ -289,7 +261,7 @@ class ManifestationClassificationForm(ModelForm):
                 'edition_type': Select( attrs = {
                         'class': 'select w-full select-bordered'
                     }),
-                'state': Select( attrs = {
+                'function': Select( attrs = {
                         'class': 'select w-full select-bordered'
                     }),
             }
@@ -299,7 +271,7 @@ class ManifestationClassificationForm(ModelForm):
 
         manifestation_form_field = self['manifestation_form']
         edition_type_field = self['edition_type']
-        state_field = self['state']
+        function_field = self['function']
 
         manifestation_form_label = label(manifestation_form_field.label, cls='flex-1')
         manifestation_form_label.add(raw(str(manifestation_form_field)))
@@ -307,13 +279,13 @@ class ManifestationClassificationForm(ModelForm):
         edition_type_label = label(edition_type_field.label, cls='flex-1')
         edition_type_label.add(raw(str(edition_type_field)))
 
-        state_type_label = label(state_field.label, cls='flex-1')
-        state_type_label.add(raw(str(state_field)))
+        function_type_label = label(function_field.label, cls='flex-1')
+        function_type_label.add(raw(str(function_field)))
 
         palette = div(cls='flex flex-rows w-full gap-10 my-5')
         palette.add(manifestation_form_label)
         palette.add(edition_type_label)
-        palette.add(state_type_label)
+        palette.add(function_type_label)
 
         form.add(palette)
 
@@ -371,93 +343,31 @@ class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
             }
 
 
-class ManifestationPrintForm(ModelForm, SimpleFormMixin):
+class ManifestationHandwritingForm(ModelForm, SimpleFormMixin):
     class Meta:
-        model = Manifestation
-        fields = ['plate_number']
+        model = ManifestationHandwriting
+        fields = ['medium']
         widgets = {
-                'plate_number': TextInput( attrs = {
+                'medium': TextInput( attrs = {
                         'class': 'grow'
-                    })
+                    }),
             }
 
     def as_daisy(self):
-        form = div(cls='mb-10')
+        form = div()
+        medium_field = self['medium']
 
-        plate_number_field = self['plate_number']
-
-        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
-        plate_number_label.add(raw(str(plate_number_field)))
-
-        form.add(plate_number_label)
+        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2')
+        medium_label.add(raw(str(medium_field)))
+        form.add(medium_label)
 
         return mark_safe(str(form))
 
 
-class ManifestationPrintForm(ModelForm, SimpleFormMixin):
-    class Meta:
-        model = Manifestation
-        fields = ['plate_number']
-        widgets = {
-                'plate_number': TextInput( attrs = {
-                        'class': 'grow'
-                    })
-            }
-
-    def as_daisy(self):
-        form = div(cls='mb-10')
-
-        plate_number_field = self['plate_number']
-
-        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
-        plate_number_label.add(raw(str(plate_number_field)))
-
-        form.add(plate_number_label)
-
-        return mark_safe(str(form))
-
-
-class ManifestationPrintForm(ModelForm, SimpleFormMixin):
-    class Meta:
-        model = Manifestation
-        fields = ['plate_number']
-        widgets = {
-                'plate_number': TextInput( attrs = {
-                        'class': 'grow'
-                    })
-            }
-
-    def as_daisy(self):
-        form = div(cls='mb-10')
-
-        plate_number_field = self['plate_number']
-
-        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
-        plate_number_label.add(raw(str(plate_number_field)))
-
-        form.add(plate_number_label)
-
-        return mark_safe(str(form))
-
-
-class ManifestationPrintForm(ModelForm, SimpleFormMixin):
-    class Meta:
-        model = Manifestation
-        fields = ['plate_number']
-        widgets = {
-                'plate_number': TextInput( attrs = {
-                        'class': 'grow'
-                    })
-            }
-
-    def as_daisy(self):
-        form = div(cls='mb-10')
-
-        plate_number_field = self['plate_number']
-
-        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
-        plate_number_label.add(raw(str(plate_number_field)))
-
-        form.add(plate_number_label)
-
-        return mark_safe(str(form))
+ManifestationHandwritingFormSet = inlineformset_factory(
+        Manifestation,
+        ManifestationHandwriting,
+        form = ManifestationHandwritingForm,
+        extra = 0,
+        can_delete = True
+    )
