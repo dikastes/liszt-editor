@@ -1,11 +1,12 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from dmad_on_django.models import Status, Language
-from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature
+from dmad_on_django.models import Status, Language, Person, Corporation, Place
+from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, ManifestationHandwriting, ManifestationContributor, ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
+from re import compile
 
 class EdwocaUpdateUrlMixin:
     def get_absolute_url(self):
@@ -15,6 +16,7 @@ class EdwocaUpdateUrlMixin:
 
 class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
     RISM_ID_KEY = 'RISM ID no.'
+    CURRENT_SIGNATURE_KEY = 'Signatur, neu'
 
     class Meta:
         proxy = True
@@ -54,25 +56,66 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         #return f"{catalog_number}, {self.publisher} {self.publisher_addition}"
         return f"{catalog_number}, <<Verlag>> {publisher_addition}"
 
+    def extract_gnd_id(dedicatee):
+        ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
+        id_pattern = compile(ID_PATTERN)
+        match = id_pattern.search(dedicatee)
+        if match:
+            return dedicatee[match.start():match.end()].replace(']', '').strip()
+        return None
+
+    def extract_medium(medium_string):
+        MEDIUM_PATTERN = '\(\w*\)'
+        medium_pattern= compile(MEDIUM_PATTERN)
+        match = medium_pattern.search(medium_string)
+        if match:
+            return medium_string[match.start():match.end()].\
+                replace('(', '').\
+                replace(')', '').\
+                strip()
+
     def parse_csv(self, raw_data):
         INSTITUTION_KEY = 'Bestandeshaltende Institution'
-        SIGNATURE_KEY = 'Signatur, neu'
         FORMER_SIGNATURE_KEY = 'Signatur, vormalig'
         IDENTIFICATION_KEY = 'WVZ-Nr.'
         EDITION_TYPE_KEY = 'Ausgabeform (Typ)'
         FUNCTION_KEY = 'Funktion'
         ENVELOPE_TITLE_KEY = 'Titelei Umschlag oder Titelblatt'
         HEAD_TITLE_KEY = 'Kopftitel'
-        AUTHOR_TITLE_KEY = 'Autor Titelei (Liszt egh.)'
-        FOREIGN_TITLE_KEY = 'Autor Kopftitel (Liszt egh.)'
+        TITLE_WRITER_KEY = 'Schreiber Titelei' # Schreiber Umschlag/Titelblatt Bezug zu O
+        TITLE_MEDIUM_KEY = 'Autor Titelei (Liszt egh.)'
+        FOREIGN_TITLE_MEDIUM_KEY = 'Autor Kopftitel (Liszt egh.)'
+        DEDICATION_KEY = 'Widmung (diplomatisch)'
         MEDIUM_OF_PERFORMANCE_KEY = 'Besetzung (normiert)'
+        TEMPO_KEY = 'Tempoangabe (normiert)'
+        METRONOM_KEY = 'Metronomangabe'
+        TEXT_INCIPIT_KEY = 'Text-Incipit (diplomatisch)'
+        LOCATION_KEY = 'GND-Nr. Ort'
         DIPLOMATIC_DATE_KEY = 'Datierung (diplomatisch)'
         MACHINE_READABLE_DATE_KEY = 'Datierung (maschinenlesbar)'
-        RELATED_PRINT_PUBLISHER_KEY = 'Verlag (normiert)'
+        RELATED_PRINT_PUBLISHER_KEY = 'Bezug zu Druck: Verlags-GND-Nr.'
         RELATED_PRINT_PLATE_NUMBER_KEY = 'Bezug zu Druck: Plattennr.'
         TITLE_KEY = 'Titel (normiert, nach MGG)'
 
+        AUTOGRAPH_HANDWRITING_KEY = 'Schrift (Liszt egh.)'
+        FOREIGN_HANDWRITING_KEY = 'Schrift (fremder Hand)'
+        WRITING_KEY = 'Schreiber zu AB gehörig bitte mit Information in AC kombinieren'
+
+        EXTENT_KEY = 'Umfang'
+        MEASURE_KEY = 'Papiermaß'
+
+        DIGITAL_COPY_KEY = 'Digitalisat'
+
+        LISZT_GND_ID = '118573527'
+
+        ANONYMOUS_WRITERS = ['zS', 'Dr']
+
+        for writer in ANONYMOUS_WRITERS:
+            if Person.objects.filter(interim_designator = writer).count() == 0:
+                Person.objects.create(interim_designator = writer)
+
         # add stitch template flag to manifestation?
+        liszt = Person.fetch_or_get(LISZT_GND_ID)
 
         self.private_comment = raw_data[IDENTIFICATION_KEY]
         self.is_singleton = True
@@ -83,17 +126,29 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             raw_data[self.RISM_ID_KEY] and\
             raw_data[self.RISM_ID_KEY].isnumeric():
             self.rism_id = raw_data[self.RISM_ID_KEY]
-        else:
-            library = Library.objects.filter(siglum = raw_data[INSTITUTION_KEY]).first() or \
-                Library.objects.create(siglum = raw_data[INSTITUTION_KEY])
-            signature = Signature.objects.create(
+
+        library = Library.objects.filter(siglum = raw_data[INSTITUTION_KEY]).first() or \
+            Library.objects.create(siglum = raw_data[INSTITUTION_KEY])
+        signature = Signature.objects.create(
+                library = library,
+                status = Signature.Status.CURRENT,
+                signature = raw_data[Manifestation.CURRENT_SIGNATURE_KEY]
+            )
+        single_item = Item.objects.create(manifestation = self)
+        single_item.signatures.add(signature)
+
+        if raw_data[FORMER_SIGNATURE_KEY]:
+            former_signature = Signature.objects.create(
                     library = library,
-                    status = Signature.Status.CURRENT,
-                    signature = raw_data[SIGNATURE_KEY]
+                    status = Signature.Status.FORMER,
+                    signature = raw_data[FORMER_SIGNATURE_KEY]
                 )
-            single_item = Item.objects.create(manifestation = self)
-            single_item.signatures.add(signature)
-            # former signature logic here
+            single_item.signatures.add(former_signature)
+
+        if raw_data[LOCATION_KEY]:
+            for gnd_id in raw_data[LOCATION_KEY].split('|'):
+                place = Place.fetch_or_get(gnd_id.strip())
+                self.places.add(place)
 
         if raw_data[TITLE_KEY]:
             ManifestationTitle.objects.create(
@@ -104,8 +159,74 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if EDITION_TYPE_KEY in raw_data:
             self.edition_type = Manifestation.parse_edition_type(raw_data[EDITION_TYPE_KEY])
+        self.function = raw_data[FUNCTION_KEY]
 
-        # J -> function
+        self.dedication = raw_data[DEDICATION_KEY]
+        if self.dedication:
+            dedications = self.dedication.split('|')
+            for dedication in dedications:
+                if gnd_id := Manifestation.extract_gnd_id(dedication):
+                    dedicatee = Person.fetch_or_get(id)
+                    ManifestationContributor.objects.create(
+                            person = dedicatee,
+                            role = ManifestationContributor.Role.DEDICATEE,
+                            manifestation = self
+                        )
+                else:
+                    for writer in ANONYMOUS_WRITERS:
+                        if writer in dedication:
+                            dedicatee = Person.objects.get(interim_designator = writer)
+                            ManifestationContributor.objects.create(
+                                    person = dedicatee,
+                                    role = ManifestationContributor.Role.DEDICATEE,
+                                    manifestation = self
+                                )
+                            break
+
+        self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY].replace(' | ', '\n')
+
+        if raw_data[RELATED_PRINT_PUBLISHER_KEY]:
+            self.publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY])
+        self.plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
+        # machine readable key abklären
+
+        if AUTOGRAPH_HANDWRITING_KEY in raw_data and \
+            raw_data[AUTOGRAPH_HANDWRITING_KEY]:
+            ManifestationHandwriting.objects.create(
+                    writer = liszt,
+                    manifestation = self,
+                    medium = raw_data[AUTOGRAPH_HANDWRITING_KEY]
+                )
+
+        if FOREIGN_HANDWRITING_KEY in raw_data\
+            and raw_data[FOREIGN_HANDWRITING_KEY]:
+            for entry in raw_data[FOREIGN_HANDWRITING_KEY].split('),'):
+                writer_gnd_id = Manifestation.extract_gnd_id(entry)
+                medium = Manifestation.extract_medium(entry)
+                if writer_gnd_id:
+                    writer = Person.fetch_or_get(writer_gnd_id)
+                    ManifestationHandwriting.objects.create(
+                            writer = writer,
+                            manifestation = self,
+                            medium = medium
+                        )
+                else:
+                    anonymous_writer_found = False
+                    for designator in ANONYMOUS_WRITERS:
+                        if designator in entry:
+                            writer = Person.objects.get(interim_designator = designator)
+                            ManifestationHandwriting.objects.create(
+                                    writer = writer,
+                                    manifestation = self,
+                                    medium = medium
+                                )
+                            anonymous_writer_found = True
+                            break
+                    if not anonymous_writer_found:
+                        ManifestationHandwriting.objects.create(
+                                manifestation = self,
+                                medium = medium
+                            )
 
         if ENVELOPE_TITLE_KEY in raw_data and\
             raw_data[ENVELOPE_TITLE_KEY]:
@@ -118,17 +239,20 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if raw_data[HEAD_TITLE_KEY]:
             ManifestationTitle.parse_from_csv(raw_data[HEAD_TITLE_KEY], TitleTypes.HEAD_TITLE, self).save()
 
-        # remodel!! manifestationtitle needs the fields written_by_composer and writing_material
-        # O/Q -> writing_material
-        # if O/Q != '' -> written_by_composer = True
+        self.extent = raw_data[EXTENT_KEY]
+        self.measure = raw_data[MEASURE_KEY]
+
+        if raw_data[DIGITAL_COPY_KEY]:
+            DigitalCopy.objects.create(
+                    item = self.items.all()[0],
+                    url = raw_data[DIGITAL_COPY_KEY]
+                )
 
         # R -> medium of performance (leave open)
 
         # X/Y -> period
 
-        # AG -> publisher
-
-        # AI -> plate_number
+        # add handwriting model with writer/medium
 
 class ManifestationTitle(DmRismManifestationTitle):
     class Meta:
@@ -144,6 +268,9 @@ class ManifestationTitle(DmRismManifestationTitle):
 class Item (EdwocaUpdateUrlMixin, DmRismItem):
     class Meta:
         proxy = True
+
+    def get_manifestation_url(self):
+        return reverse(f'edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
 
 
 class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):

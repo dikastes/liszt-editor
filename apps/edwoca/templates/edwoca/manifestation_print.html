@@ -1,0 +1,60 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5">
+    <h2 class="card-title mt-0"> {{ view_title }} </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_daisy }}
+
+        <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+    </form>
+
+    <div class="mt-5">
+        <h3 class="text-lg font-bold">Verlag</h3>
+        {% if object.publisher %}
+            <div class="flex gap-5">
+                <label class="flex-1 input input-bordered flex items-center gap-2">
+                    Verlag
+                    <input type="text" class="grow" disabled value="{{ object.publisher }}" />
+                </label>
+                <a class="flex-0 btn" href="{% url 'edwoca:manifestation_remove_publisher' object.id %}"> löschen </a>
+            </div>
+        {% else %}
+            <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1">
+                {{ searchform.q }}
+                <input type="submit" id="submit-form-publisher" class="btn" value="Verlag suchen"/>
+            </form>
+            {% if query %}
+                <ul>
+                {% for publisher in found_publishers %}
+                    <li>
+                        <a href="{% url 'edwoca:manifestation_add_publisher' object.id publisher.object.id %}">{{ publisher.object }}</a>
+                    </li>
+                {% empty %}
+                    <li> keine Suchergebnisse </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+
+<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
+	<p class="prose">
+		{% include 'edwoca/partials/classification_preview.html' %}
+	</p>
+	<p class="prose">
+		{% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
+	</p>
+	<p class="prose">
+		{% include 'edwoca/partials/contributors_preview.html' %}
+	</p>
+	<p class="prose">
+		{% include 'edwoca/partials/bib_preview.html' %}
+	</p>
+</div>
+
+{% endblock %}

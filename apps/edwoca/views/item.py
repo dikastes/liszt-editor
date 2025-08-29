@@ -139,7 +139,7 @@ class ItemDeleteView(EntityMixin, DeleteView):
     model = EdwocaItem
 
     def get_success_url(self):
-        return self.object.manifestation.get_absolute_url()
+        return self.object.get_manifestation_url()
 
 
 class LibraryListView(EdwocaListView):

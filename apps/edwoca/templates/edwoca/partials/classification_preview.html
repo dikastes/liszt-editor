@@ -1,0 +1,10 @@
+<em>Quellenart</em>:
+{% if object.function %}
+    {{ object.function }}
+{% endif %}
+{% if object.edition_type %}
+    ({{ object.get_edition_type_display }})
+{% endif %}
+{% if not object.function and not object.edition_type %}
+    <span class="badge badge-primary">keine Angabe</span>
+{% endif %}

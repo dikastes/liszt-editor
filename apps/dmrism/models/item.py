@@ -161,3 +161,17 @@ class ProvenanceStation(models.Model):
 
     def __str__(self):
         return f"{ self.owner } (von { self.start } bis { self.end })"
+
+
+class DigitalCopy(models.Model):
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE,
+            related_name = 'digital_copies'
+        )
+    url = models.URLField()
+    link_type = models.TextField(
+            max_length = 20,
+            null = True,
+            blank = True
+        )

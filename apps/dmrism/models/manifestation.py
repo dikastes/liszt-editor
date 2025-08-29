@@ -1,5 +1,6 @@
 from .base import *
 from ..rism_tools import get_rism_data
+from .item import DigitalCopy
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -54,11 +55,8 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-    place = models.ForeignKey(
-            'dmad.Place',
-            on_delete = models.SET_NULL,
-            blank = True,
-            null = True
+    places = models.ManyToManyField(
+            'dmad.Place'
         )
     contributors = models.ManyToManyField(
             'dmad.Person',
@@ -93,13 +91,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             'bib.ZotItem',
             through = 'ManifestationBib'
         )
-    dedicatee = models.ForeignKey(
-            'dmad.Person',
-            on_delete=models.SET_NULL,
-            related_name='dedicated_manifestations',
-            blank=True,
-            null=True
-        )
     language = models.CharField(
             max_length=15,
             choices=Language,
@@ -107,7 +98,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null=True
         )
     dedication = models.TextField(
-            max_length=100,
             blank=True,
             null=True
         )
@@ -144,16 +134,29 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
+    measure = models.TextField(
+            blank = True,
+            null = True
+        )
     paper = models.TextField(
             blank = True,
             null = True
         )
-    #publisher = models.ForeignKey(
-            #'dmad.Corporation',
-            #related_name = 'publishers',
-            #null = True,
-            #on_delete = models.SET_NULL
-        #)
+    date_diplomatic = models.TextField(
+            blank = True,
+            null = True
+        )
+    function = models.CharField(
+            max_length=50,
+            null = True,
+            blank = True
+        )
+    publisher = models.ForeignKey(
+            'dmad.Corporation',
+            related_name = 'publishers',
+            null = True,
+            on_delete = models.SET_NULL
+        )
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -248,13 +251,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 )
             item.signatures.add(signature)
 
-        if location.get('d'):
-            signature = Signature.objects.create(
-                    library = library,
-                    status = Signature.Status.FORMER,
-                    signature = location.get('d')
-                )
-            item.signatures.add(signature)
+            if location.get('d'):
+                signature = Signature.objects.create(
+                        library = library,
+                        status = Signature.Status.FORMER,
+                        signature = location.get('d')
+                    )
+                item.signatures.add(signature)
 
         if data.get('240') and data.get('240').get('k'):
             self.manifestation_form = getattr(Manifestation.ManifestationForm, data.get('240').get('k').upper())
@@ -330,7 +333,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
         for electronic_location in data.get_fields('856'):
             DigitalCopy.objects.create(
-                    manifestation = self,
+                    item = self.items.all()[0],
                     url = electronic_location.get('u'),
                     link_type = electronic_location.get('x')
                 )
@@ -445,18 +448,33 @@ class RelatedManifestation(RelatedEntity):
         )
 
 
-class DigitalCopy(models.Model):
-    manifestation = models.ForeignKey(
-            'Manifestation',
-            on_delete = models.CASCADE,
-            related_name = 'digital_copies'
+class BaseHandwriting(models.Model):
+    class Meta:
+        abstract = True
+
+    writer = models.ForeignKey(
+            'dmad.Person',
+            on_delete = models.SET_NULL,
+            null = True
         )
-    url = models.URLField(
-            blank=True,
-            null=True
-        )
-    link_type = models.CharField(
-            max_length = 10,
+    medium = models.CharField(
+            max_length = 100,
             null = True,
             blank = True
         )
+
+
+class ManifestationHandwriting(BaseHandwriting):
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE
+        )
+
+
+class ManifestationTitleHandwriting(BaseHandwriting):
+    manifestation_title = models.ForeignKey(
+            'ManifestationTitle',
+            on_delete = models.CASCADE
+        )
+
+

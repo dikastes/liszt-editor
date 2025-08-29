@@ -1,0 +1,16 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5">
+	<h2 class="card-title mt-0"> Diplomatische Datierung </h2>
+
+	<form method="post">
+	    {% csrf_token %}
+	    {{ form.as_daisy }}
+
+	    <input type="submit" value="Speichern" id="submit-form" class="hidden">
+	</form>
+</div>
+
+{% endblock %}

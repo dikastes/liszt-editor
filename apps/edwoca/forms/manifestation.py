@@ -27,38 +27,21 @@ class ManifestationForm(ModelForm):
         return mark_safe(str(form))
 
 
-"""
-class ManifestationForm(ModelForm):
+class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
-        fields = [
-                #'rism_id',
-                'plate_number'
-            ]
+        fields = ['dedication']
         widgets = {
-                #'rism_id': TextInput( attrs = {
-                        #'class': 'grow'
-                    #}),
-                'plate_number': TextInput( attrs = {
-                        'class': 'grow'
+                'dedication': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
                     })
             }
-
-    def as_daisy(self):
-        form = div()
-        for field in self.visible_fields():
-            field_label = label(field.label, _for=field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-            field_label.add(raw(str(field)))
-            form.add(field_label)
-
-        return mark_safe(str(form))
-"""
 
 
 class ManifestationTitleForm(ModelForm):
     class Meta(TitleForm.Meta):
         model = ManifestationTitle
-        fields = ['title', 'title_type', 'medium']
+        fields = ['title', 'title_type', 'status', 'medium', 'manifestation']
         widgets = {
                 'title': TextInput( attrs = {
                         'class': 'grow w-full'
@@ -66,49 +49,51 @@ class ManifestationTitleForm(ModelForm):
                 'title_type': Select( attrs = {
                         'class': 'autocomplete-select select select-bordered w-full'
                     }),
+                'status': Select( attrs = {
+                        'class': 'autocomplete-select select select-bordered w-full'
+                    }),
                 'medium': TextInput( attrs = {
                         'class': 'grow w-full'
                     }),
-                'DELETE': CheckboxInput( attrs = {
-                        'class': 'flex-0'
-                    })
+                'manifestation': HiddenInput()
                 }
 
     def as_daisy(self):
         class_name = self.Meta.model.__name__.lower().replace('title', '')
         form = div(cls='mb-10')
 
-        if self.instance.pk:
-           form.add(raw(str(self['id'])))
-        form.add(raw(str(self[class_name])))
+        #if self.instance.pk:
+           #form.add(raw(str(self['id'])))
+        #form.add(raw(str(self[class_name])))
 
         title_field = self['title']
         type_field = self['title_type']
+        status_field = self['status']
         medium_field = self['medium']
 
-        title_field_label = label(title_field.label, cls='input input-bordered flex items-center gap-2 my-5')
+        title_field_label = label(title_field.label, cls='input input-bordered flex-1 flex items-center gap-2')
         title_field_label.add(raw(str(title_field)))
 
         type_container = div(cls='flex-1')
         type_container.add(raw(str(type_field)))
 
-        medium_field_label = label(title_field.label, cls='input input-bordered flex items-center gap-2 my-5')
+        status_container = div(cls='flex-1')
+        status_container.add(raw(str(status_field)))
+
+        medium_field_label = label(medium_field.label, cls='input input-bordered flex-1 flex items-center gap-2')
         medium_field_label.add(raw(str(medium_field)))
 
-        palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette.add(title_field_label)
-        palette.add(type_container)
-        palette.add(medium_field_label)
+        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette1.add(title_field_label)
+        palette1.add(type_container)
 
-        # checken ob das form initialisiert ist, sonst kein delete-button
-        if 'DELETE' in self.fields and self.instance.pk:
-            del_field = self['DELETE']
-            del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
-            del_field_label.add(raw(str(del_field)))
-            palette.add(del_field_label)
+        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette2.add(medium_field_label)
+        palette2.add(status_container)
 
-        form.add(title_field_label)
-        form.add(palette)
+        form.add(palette1)
+        form.add(palette2)
+        form.add(raw(str(self['manifestation'])))
 
         return mark_safe(str(form))
 
@@ -141,9 +126,12 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
 
     class Meta:
         model = Manifestation
-        fields = ['history', 'id']
+        fields = ['history', 'id', 'date_diplomatic']
         widgets = {
                 'history': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'date_diplomatic': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     })
             }
@@ -207,6 +195,14 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
 
+        date_diplomatic_field = self['date_diplomatic']
+        date_diplomatic_wrap = label(cls='form-control')
+        date_diplomatic_label = div(cls='label')
+        date_diplomatic_span = span(date_diplomatic_field.label, cls='label-text')
+        date_diplomatic_label.add(date_diplomatic_span)
+        date_diplomatic_wrap.add(date_diplomatic_label)
+        date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
+
         #history_wrap = label(cls='form-control')
         #history_label = div(cls='label')
         #history_span = span(history_field.label, cls='label-text')
@@ -221,6 +217,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
 
         form.add(period_palette)
         form.add(display_container)
+        form.add(date_diplomatic_wrap)
         #form.add(history_wrap)
 
         return mark_safe(str(form))
@@ -255,7 +252,7 @@ class ManifestationClassificationForm(ModelForm):
         fields = [
                 'manifestation_form',
                 'edition_type',
-                'state'
+                'function'
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
@@ -264,7 +261,7 @@ class ManifestationClassificationForm(ModelForm):
                 'edition_type': Select( attrs = {
                         'class': 'select w-full select-bordered'
                     }),
-                'state': Select( attrs = {
+                'function': Select( attrs = {
                         'class': 'select w-full select-bordered'
                     }),
             }
@@ -274,7 +271,7 @@ class ManifestationClassificationForm(ModelForm):
 
         manifestation_form_field = self['manifestation_form']
         edition_type_field = self['edition_type']
-        state_field = self['state']
+        function_field = self['function']
 
         manifestation_form_label = label(manifestation_form_field.label, cls='flex-1')
         manifestation_form_label.add(raw(str(manifestation_form_field)))
@@ -282,13 +279,13 @@ class ManifestationClassificationForm(ModelForm):
         edition_type_label = label(edition_type_field.label, cls='flex-1')
         edition_type_label.add(raw(str(edition_type_field)))
 
-        state_type_label = label(state_field.label, cls='flex-1')
-        state_type_label.add(raw(str(state_field)))
+        function_type_label = label(function_field.label, cls='flex-1')
+        function_type_label.add(raw(str(function_field)))
 
         palette = div(cls='flex flex-rows w-full gap-10 my-5')
         palette.add(manifestation_form_label)
         palette.add(edition_type_label)
-        palette.add(state_type_label)
+        palette.add(function_type_label)
 
         form.add(palette)
 
@@ -306,7 +303,71 @@ ManifestationTitleFormSet = inlineformset_factory(
     )
 
 
+class ManifestationPrintForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['plate_number']
+        widgets = {
+                'plate_number': TextInput( attrs = {
+                        'class': 'grow'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        plate_number_field = self['plate_number']
+
+        plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
+        plate_number_label.add(raw(str(plate_number_field)))
+
+        form.add(plate_number_label)
+
+        return mark_safe(str(form))
 
 
+class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['paper', 'extent', 'measure']
+        widgets = {
+                'paper': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'extent': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'measure': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            }
 
 
+class ManifestationHandwritingForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = ManifestationHandwriting
+        fields = ['medium']
+        widgets = {
+                'medium': TextInput( attrs = {
+                        'class': 'grow'
+                    }),
+            }
+
+    def as_daisy(self):
+        form = div()
+        medium_field = self['medium']
+
+        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2')
+        medium_label.add(raw(str(medium_field)))
+        form.add(medium_label)
+
+        return mark_safe(str(form))
+
+
+ManifestationHandwritingFormSet = inlineformset_factory(
+        Manifestation,
+        ManifestationHandwriting,
+        form = ManifestationHandwritingForm,
+        extra = 0,
+        can_delete = True
+    )
