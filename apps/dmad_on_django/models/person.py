@@ -216,7 +216,9 @@ class Person(DisplayableModel):
         return lobid_response.json()
 
     def __str__(self):
-        return f'{self.gnd_id}: {self.get_default_name()}'
+        if self.gnd_id:
+            return f'{self.gnd_id}: {self.get_default_name()}'
+        return self.interim_designator
 
     @staticmethod
     def map_gender(gnd_gender):

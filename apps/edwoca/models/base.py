@@ -108,6 +108,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         LISZT_GND_ID = '118573527'
 
+        ANONYMOUS_WRITERS = ['zS', 'Dr']
+
+        for writer in ANONYMOUS_WRITERS:
+            if Person.objects.filter(interim_designator = writer).count() == 0:
+                Person.objects.create(interim_designator = writer)
+
         # add stitch template flag to manifestation?
         liszt = Person.fetch_or_get(LISZT_GND_ID)
 
@@ -157,19 +163,25 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         self.dedication = raw_data[DEDICATION_KEY]
         if self.dedication:
-            dedicatee_ids = [
-                    gnd_id for
-                    dedicatee in
-                    self.dedication.split('|')
-                    if (gnd_id := Manifestation.extract_gnd_id(dedicatee)) is not None
-                ]
-            for id in dedicatee_ids:
-                dedicatee = Person.fetch_or_get(id)
-                ManifestationContributor.objects.create(
-                        person = dedicatee,
-                        role = ManifestationContributor.Role.DEDICATEE,
-                        manifestation = self
-                    )
+            dedications = self.dedication.split('|')
+            for dedication in dedications:
+                if gnd_id := Manifestation.extract_gnd_id(dedication):
+                    dedicatee = Person.fetch_or_get(id)
+                    ManifestationContributor.objects.create(
+                            person = dedicatee,
+                            role = ManifestationContributor.Role.DEDICATEE,
+                            manifestation = self
+                        )
+                else:
+                    for writer in ANONYMOUS_WRITERS:
+                        if writer in dedication:
+                            dedicatee = Person.objects.get(interim_designator = writer)
+                            ManifestationContributor.objects.create(
+                                    person = dedicatee,
+                                    role = ManifestationContributor.Role.DEDICATEE,
+                                    manifestation = self
+                                )
+                            break
 
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY].replace(' | ', '\n')
 
@@ -199,10 +211,22 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             medium = medium
                         )
                 else:
-                    ManifestationHandwriting.objects.create(
-                            manifestation = self,
-                            medium = medium
-                        )
+                    anonymous_writer_found = False
+                    for designator in ANONYMOUS_WRITERS:
+                        if designator in entry:
+                            writer = Person.objects.get(interim_designator = designator)
+                            ManifestationHandwriting.objects.create(
+                                    writer = writer,
+                                    manifestation = self,
+                                    medium = medium
+                                )
+                            anonymous_writer_found = True
+                            break
+                    if not anonymous_writer_found:
+                        ManifestationHandwriting.objects.create(
+                                manifestation = self,
+                                medium = medium
+                            )
 
         if ENVELOPE_TITLE_KEY in raw_data and\
             raw_data[ENVELOPE_TITLE_KEY]:

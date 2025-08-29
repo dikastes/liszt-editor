@@ -12,6 +12,7 @@ from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from dmad_on_django.models import Place, Corporation
 from dmrism.models.manifestation import ManifestationBib, ManifestationContributor
+from dmrism.models.manifestation import Manifestation as DmrismManifestation
 from dmrism.models.item import Signature
 from bib.models import ZotItem
 
@@ -20,7 +21,7 @@ class ManifestationListView(EdwocaListView):
     model = EdwocaManifestation
 
 class ManifestationSearchView(EdwocaSearchView):
-    model = Manifestation
+    model = DmrismManifestation
 
 
 class ManifestationCreateView(CreateView):
