@@ -41,7 +41,7 @@ class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
 class ManifestationTitleForm(ModelForm):
     class Meta(TitleForm.Meta):
         model = ManifestationTitle
-        fields = ['title', 'title_type', 'status', 'medium', 'manifestation']
+        fields = ['title', 'title_type', 'status', 'manifestation']
         widgets = {
                 'title': TextInput( attrs = {
                         'class': 'grow w-full'
@@ -51,9 +51,6 @@ class ManifestationTitleForm(ModelForm):
                     }),
                 'status': Select( attrs = {
                         'class': 'autocomplete-select select select-bordered w-full'
-                    }),
-                'medium': TextInput( attrs = {
-                        'class': 'grow w-full'
                     }),
                 'manifestation': HiddenInput()
                 }

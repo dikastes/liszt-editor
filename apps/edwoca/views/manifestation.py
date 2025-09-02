@@ -1,9 +1,9 @@
 from .base import *
 from ..models import Manifestation as EdwocaManifestation
 from ..forms.manifestation import *
-from ..forms import ManifestationForm, SignatureFormSet, ItemForm, ManifestationTitleForm, ManifestationDedicationForm
+from ..forms import ManifestationForm, SignatureFormSet, ItemForm, ManifestationTitleForm, ManifestationDedicationForm, ManifestationTitleHandwritingForm
 from dmad_on_django.forms import SearchForm
-from ..models import ManifestationTitle
+from ..models import ManifestationTitle, ManifestationTitleHandwriting
 from dmad_on_django.models.person import Person
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
@@ -21,7 +21,7 @@ class ManifestationListView(EdwocaListView):
     model = EdwocaManifestation
 
 class ManifestationSearchView(EdwocaSearchView):
-    model = DmrismManifestation
+    model = EdwocaManifestation
 
 
 class ManifestationCreateView(CreateView):
@@ -189,12 +189,26 @@ def manifestation_title_update(request, pk):
             if title_form.is_valid():
                 title_form.save()
 
+            # Handle existing ManifestationTitleHandwriting forms for this title
+            for handwriting_obj in title_obj.handwritings.all():
+                handwriting_prefix = f'title_handwriting_{handwriting_obj.id}'
+                handwriting_form = ManifestationTitleHandwritingForm(request.POST, instance=handwriting_obj, prefix=handwriting_prefix)
+                if handwriting_form.is_valid():
+                    handwriting_form.save()
+
         # Handle new title form
         new_title_form = ManifestationTitleForm(request.POST, prefix='new_title')
         if new_title_form.is_valid() and new_title_form.has_changed():
             new_title = new_title_form.save(commit=False)
             new_title.manifestation = manifestation
             new_title.save()
+
+        # Handle adding new ManifestationTitleHandwriting
+        if 'add_title_handwriting' in request.POST:
+            title_id_to_add_handwriting = request.POST.get('add_title_handwriting_to_title_id')
+            if title_id_to_add_handwriting:
+                title_obj = get_object_or_404(ManifestationTitle, pk=title_id_to_add_handwriting)
+                ManifestationTitleHandwriting.objects.create(manifestation_title=title_obj)
 
         dedication_form = ManifestationDedicationForm(request.POST, instance=manifestation)
         if dedication_form.is_valid():
@@ -206,7 +220,17 @@ def manifestation_title_update(request, pk):
         title_forms = []
         for title_obj in manifestation.titles.all():
             prefix = f'title_{title_obj.id}'
-            title_forms.append(ManifestationTitleForm(instance=title_obj, prefix=prefix))
+            title_form = ManifestationTitleForm(instance=title_obj, prefix=prefix) # Get the form instance
+
+            # Initialize forms for existing ManifestationTitleHandwriting for this title
+            handwriting_forms = []
+            for handwriting_obj in title_obj.handwritings.all():
+                handwriting_prefix = f'title_handwriting_{handwriting_obj.id}'
+                handwriting_forms.append(ManifestationTitleHandwritingForm(instance=handwriting_obj, prefix=handwriting_prefix))
+            title_form.handwriting_forms = handwriting_forms # Attach to the form instance
+
+            title_forms.append(title_form) # Append the form instance to the list
+
         context['title_forms'] = title_forms
 
         # Initialize form for new title
@@ -238,6 +262,22 @@ def manifestation_writer_remove(request, pk, title_id):
     title.save()
     return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_id}')
 
+
+def manifestation_title_add_handwriting_writer(request, pk, title_handwriting_pk, person_pk):
+    title_handwriting = get_object_or_404(ManifestationTitleHandwriting, pk=title_handwriting_pk)
+    person = get_object_or_404(Person, pk=person_pk)
+    title_handwriting.writer = person
+    title_handwriting.save()
+    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_handwriting.manifestation_title.id}')
+
+
+def manifestation_title_remove_handwriting_writer(request, pk, title_handwriting_pk):
+    title_handwriting = get_object_or_404(ManifestationTitleHandwriting, pk=title_handwriting_pk)
+    title_handwriting.writer = None
+    title_handwriting.save()
+    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_handwriting.manifestation_title.id}')
+
+
 def manifestation_add_dedicatee(request, pk, person_id):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     person = get_object_or_404(Person, pk=person_id)
@@ -264,6 +304,20 @@ class ManifestationTitleDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('edwoca:manifestation_title', kwargs = {'pk': self.object.manifestation.id})
+
+
+class ManifestationHandwritingDeleteView(DeleteView):
+    model = ManifestationHandwriting
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_manuscript', kwargs={'pk': self.object.manifestation.id})
+
+
+class ManifestationTitleHandwritingDeleteView(DeleteView):
+    model = ManifestationTitleHandwriting
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_title', kwargs={'pk': self.object.manifestation_title.manifestation.id})
 
 
 class RelatedManifestationAddView(RelatedEntityAddView):
@@ -459,7 +513,7 @@ def manifestation_manuscript_update(request, pk):
     else:
         form = ManifestationManuscriptForm(instance=manifestation)
         handwriting_forms = []
-        for handwriting in manifestation.manifestationhandwriting_set.all():
+        for handwriting in manifestation.handwritings.all():
             prefix = f'handwriting_{handwriting.id}'
             handwriting_forms.append(ManifestationHandwritingForm(instance=handwriting, prefix=prefix))
         context['handwriting_forms'] = handwriting_forms

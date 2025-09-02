@@ -15,6 +15,7 @@ class Command(BaseCommand):
             for row in reader:
                 print(row[Manifestation.RISM_ID_KEY])
                 print(row[Manifestation.CURRENT_SIGNATURE_KEY])
+                # reactivate when RISM IDs are unique
                 #if Manifestation.RISM_ID_KEY in row and \
                     #row[Manifestation.RISM_ID_KEY] and \
                     #Manifestation.objects.filter(rism_id = row[Manifestation.RISM_ID_KEY]).first():
@@ -29,6 +30,7 @@ class Command(BaseCommand):
                     print(f"GND Error in {row[Manifestation.RISM_ID_KEY]}, {row[Manifestation.CURRENT_SIGNATURE_KEY]}")
                     print(e)
                     continue
-                if manifestation.rism_id:
-                    manifestation.pull_rism_data()
+                # reactivate when RISM IDs are unique
+                #if manifestation.rism_id:
+                    #manifestation.pull_rism_data()
                 manifestation.save()

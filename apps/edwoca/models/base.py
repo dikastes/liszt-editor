@@ -6,7 +6,7 @@ from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, Manifes
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
-from re import compile
+from re import compile, split
 
 class EdwocaUpdateUrlMixin:
     def get_absolute_url(self):
@@ -65,7 +65,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         return None
 
     def extract_medium(medium_string):
-        MEDIUM_PATTERN = '\(\w*\)'
+        MEDIUM_PATTERN = '\([\w ,]*\)?'
         medium_pattern= compile(MEDIUM_PATTERN)
         match = medium_pattern.search(medium_string)
         if match:
@@ -80,11 +80,15 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         IDENTIFICATION_KEY = 'WVZ-Nr.'
         EDITION_TYPE_KEY = 'Ausgabeform (Typ)'
         FUNCTION_KEY = 'Funktion'
+
         ENVELOPE_TITLE_KEY = 'Titelei Umschlag oder Titelblatt'
+        ENVELOPE_TITLE_WRITER_KEY = 'Schreiber Titelei' # Schreiber Umschlag/Titelblatt Bezug zu O
+        ENVELOPE_TITLE_MEDIUM_KEY = 'Autor Titelei (Liszt egh.)'
+
         HEAD_TITLE_KEY = 'Kopftitel'
-        TITLE_WRITER_KEY = 'Schreiber Titelei' # Schreiber Umschlag/Titelblatt Bezug zu O
-        TITLE_MEDIUM_KEY = 'Autor Titelei (Liszt egh.)'
-        FOREIGN_TITLE_MEDIUM_KEY = 'Autor Kopftitel (Liszt egh.)'
+        HEAD_TITLE_WRITER_KEY = 'Schreiber Kopftitel' # Schreiber Umschlag/Titelblatt Bezug zu O
+        HEAD_TITLE_MEDIUM_KEY = 'Autor Kopftitel (Liszt egh.)'
+
         DEDICATION_KEY = 'Widmung (diplomatisch)'
         MEDIUM_OF_PERFORMANCE_KEY = 'Besetzung (normiert)'
         TEMPO_KEY = 'Tempoangabe (normiert)'
@@ -200,7 +204,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if FOREIGN_HANDWRITING_KEY in raw_data\
             and raw_data[FOREIGN_HANDWRITING_KEY]:
-            for entry in raw_data[FOREIGN_HANDWRITING_KEY].split('),'):
+            for entry in raw_data[FOREIGN_HANDWRITING_KEY].split('$'):
                 writer_gnd_id = Manifestation.extract_gnd_id(entry)
                 medium = Manifestation.extract_medium(entry)
                 if writer_gnd_id:
@@ -211,33 +215,169 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             medium = medium
                         )
                 else:
-                    anonymous_writer_found = False
-                    for designator in ANONYMOUS_WRITERS:
-                        if designator in entry:
-                            writer = Person.objects.get(interim_designator = designator)
-                            ManifestationHandwriting.objects.create(
-                                    writer = writer,
-                                    manifestation = self,
-                                    medium = medium
-                                )
-                            anonymous_writer_found = True
-                            break
-                    if not anonymous_writer_found:
+                    if 'Liszt' in entry:
                         ManifestationHandwriting.objects.create(
+                                writer = liszt,
                                 manifestation = self,
                                 medium = medium
                             )
+                    else:
+                        anonymous_writer_found = False
+                        for designator in ANONYMOUS_WRITERS:
+                            if designator in entry:
+                                writer = Person.objects.get(interim_designator = designator)
+                                ManifestationHandwriting.objects.create(
+                                        writer = writer,
+                                        manifestation = self,
+                                        medium = medium
+                                    )
+                                anonymous_writer_found = True
+                                break
+                        if not anonymous_writer_found:
+                            ManifestationHandwriting.objects.create(
+                                    manifestation = self,
+                                    medium = medium
+                                )
 
         if ENVELOPE_TITLE_KEY in raw_data and\
             raw_data[ENVELOPE_TITLE_KEY]:
-            envelope_titles = raw_data[ENVELOPE_TITLE_KEY].split('$')
-            if len(envelope_titles) > 1:
-                ManifestationTitle.parse_from_csv(envelope_titles[0], TitleTypes.ENVELOPE, self).save()
-                ManifestationTitle.parse_from_csv(envelope_titles[1], TitleTypes.TITLE_PAGE, self).save()
-            if len(envelope_titles) == 1:
-                ManifestationTitle.parse_from_csv(envelope_titles[0], TitleTypes.TITLE_PAGE, self).save()
-        if raw_data[HEAD_TITLE_KEY]:
-            ManifestationTitle.parse_from_csv(raw_data[HEAD_TITLE_KEY], TitleTypes.HEAD_TITLE, self).save()
+            writer_medium_list = []
+            if ENVELOPE_TITLE_WRITER_KEY in raw_data:
+                for entry in split('\$|\),', raw_data[ENVELOPE_TITLE_WRITER_KEY]):
+                    writer_gnd_id = Manifestation.extract_gnd_id(entry)
+                    if writer_gnd_id:
+                        writer_medium_list += [{ 'writer': Person.fetch_or_get(writer_gnd_id), 'medium': Manifestation.extract_medium(entry) }]
+                    else:
+                        if 'Liszt' in entry:
+                            writer_medium_list += [{ 'writer': liszt, 'medium': Manifestation.extract_medium(entry) }]
+                        else:
+                            anonymous_writer_found = False
+                            for anonymous_writer in ANONYMOUS_WRITERS:
+                                if anonymous_writer in entry:
+                                    writer_medium_list += [{ 'writer': Person.objects.get(interim_designator = anonymous_writer), 'medium': Manifestation.extract_medium(entry) }]
+                                    anonymous_writer_found = True
+                                    break
+                            if not anonymous_writer_found:
+                                print(f"no writer found for envelope title")
+
+            if ENVELOPE_TITLE_MEDIUM_KEY in raw_data:
+                writer_medium_list += [{ 'writer': liszt, 'medium': raw_data[ENVELOPE_TITLE_MEDIUM_KEY] }]
+
+            manifestation_title_list = []
+            for i, title in enumerate(raw_data[ENVELOPE_TITLE_KEY].split('$')):
+                manifestation_title_list += [ ManifestationTitle.objects.create(
+                        title = '\n'.join(title_line.strip() for title_line in title.split('|')),
+                        title_type = TitleTypes.ENVELOPE_OR_TITLE_PAGE,
+                        manifestation = self
+                    ) ]
+                #manifestation_title_list += [ ManifestationTitle.parse_from_csv(
+                        #title = title.strip(),
+                        #title_type = TitleTypes.ENVELOPE_OR_TITLE_PAGE,
+                        #manifestation = self
+                    #).save() ]
+
+            if len(manifestation_title_list) == 1 and len(writer_medium_list) == 1:
+                ManifestationTitleHandwriting.objects.create(
+                        writer = writer_medium_list[0]['writer'],
+                        medium = writer_medium_list[0]['medium'],
+                        manifestation_title = manifestation_title_list[0]
+                    )
+
+            if len(manifestation_title_list) == 1 and len(writer_medium_list) > 1:
+                for writer_medium in writer_medium_list:
+                    ManifestationTitleHandwriting.objects.create(
+                            writer = writer_medium['writer'],
+                            medium = writer_medium['medium'],
+                            manifestation_title = manifestation_title_list[0]
+                        )
+
+            if len(manifestation_title_list) > 1 and len(writer_medium_list) == 1:
+                for manifestation_title in manifestation_title_list:
+                    ManifestationTitleHandwriting.objects.create(
+                            writer = writer_medium_list[0]['writer'],
+                            medium = writer_medium_list[0]['medium'],
+                            manifestation_title = manifestation_title
+                        )
+
+            if len(manifestation_title_list) > 1 and len(writer_medium_list) > 1:
+                if len(manifestation_title_list) != len(writer_medium_list):
+                    print('length of manifestation title list and writer medium list differ')
+                for i, writer_medium in enumerate(writer_medium_list):
+                    ManifestationTitleHandwriting.objects.create(
+                            writer = writer_medium['writer'],
+                            medium = writer_medium['medium'],
+                            manifestation_title = manifestation_title_list[i]
+                        )
+
+        if HEAD_TITLE_KEY in raw_data and\
+            raw_data[HEAD_TITLE_KEY]:
+            writer_medium_list = []
+            if HEAD_TITLE_WRITER_KEY in raw_data:
+                for entry in split('\$|\),', raw_data[HEAD_TITLE_WRITER_KEY]):
+                    writer_gnd_id = Manifestation.extract_gnd_id(entry)
+                    if writer_gnd_id:
+                        writer_medium_list += [{ 'writer': Person.fetch_or_get(writer_gnd_id), 'medium': Manifestation.extract_medium(entry) }]
+                    else:
+                        if 'Liszt' in entry:
+                            writer_medium_list += [{ 'writer': liszt, 'medium': Manifestation.extract_medium(entry) }]
+                        else:
+                            anonymous_writer_found = False
+                            for anonymous_writer in ANONYMOUS_WRITERS:
+                                if anonymous_writer in entry:
+                                    writer_medium_list += [{ 'writer': Person.objects.get(interim_designator = anonymous_writer), 'medium': Manifestation.extract_medium(entry) }]
+                                    anonymous_writer_found = True
+                                    break
+                            if not anonymous_writer_found:
+                                print(f"no writer found for envelope title")
+
+            if HEAD_TITLE_MEDIUM_KEY in raw_data:
+                writer_medium_list += [{ 'writer': liszt, 'medium': raw_data[HEAD_TITLE_MEDIUM_KEY] }]
+
+            manifestation_title_list = []
+            for i, title in enumerate(raw_data[HEAD_TITLE_KEY].split('$')):
+                manifestation_title_list += [ ManifestationTitle.objects.create(
+                        title = '\n'.join(title_line.strip() for title_line in title.split('|')),
+                        title_type = TitleTypes.HEAD_TITLE,
+                        manifestation = self
+                    ) ]
+                #manifestation_title_list += [ ManifestationTitle.parse_from_csv(
+                        #title = title.strip(),
+                        #title_type = TitleTypes.HEAD_TITLE,
+                        #manifestation = self
+                    #).save() ]
+
+            if len(manifestation_title_list) == 1 and len(writer_medium_list) == 1:
+                ManifestationTitleHandwriting.objects.create(
+                        writer = writer_medium_list[0]['writer'],
+                        medium = writer_medium_list[0]['medium'],
+                        manifestation_title = manifestation_title_list[0]
+                    )
+
+            if len(manifestation_title_list) == 1 and len(writer_medium_list) > 1:
+                for writer_medium in writer_medium_list:
+                    ManifestationTitleHandwriting.objects.create(
+                            writer = writer_medium['writer'],
+                            medium = writer_medium['medium'],
+                            manifestation_title = manifestation_title_list[0]
+                        )
+
+            if len(manifestation_title_list) > 1 and len(writer_medium_list) == 1:
+                for manifestation_title in manifestation_title_list:
+                    ManifestationTitleHandwriting.objects.create(
+                            writer = writer_medium_list[0]['writer'],
+                            medium = writer_medium_list[0]['medium'],
+                            manifestation_title = manifestation_title
+                        )
+
+            if len(manifestation_title_list) > 1 and len(writer_medium_list) > 1:
+                if len(manifestation_title_list) != len(writer_medium_list):
+                    print('length of manifestation title list and writer medium list differ')
+                for i, writer_medium in enumerate(writer_medium_list):
+                    ManifestationTitleHandwriting.objects.create(
+                            writer = writer_medium['writer'],
+                            medium = writer_medium['medium'],
+                            manifestation_title = manifestation_title_list[i]
+                        )
 
         self.extent = raw_data[EXTENT_KEY]
         self.measure = raw_data[MEASURE_KEY]
@@ -258,8 +398,13 @@ class ManifestationTitle(DmRismManifestationTitle):
     class Meta:
         proxy = True
 
-    def parse_from_csv(title, title_type, manifestation):
-        manifestation_title = ManifestationTitle.objects.create( title_type = title_type, manifestation = manifestation )
+    def parse_from_csv(title, title_type, manifestation, writer = None, medium = None):
+        manifestation_title = ManifestationTitle.objects.create(
+                title_type = title_type,
+                manifestation = manifestation,
+                writer = writer,
+                medium = medium
+            )
         manifestation_title.title = title.replace('|', '\n')
 
         return manifestation_title

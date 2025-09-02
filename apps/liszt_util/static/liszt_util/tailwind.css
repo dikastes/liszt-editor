@@ -17,3 +17,7 @@ p.CaptionCont {
 p.CaptionCont label i {
     background-image: none;
 }
+
+div.modal-box {
+    max-width: 64rem;
+}

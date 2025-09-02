@@ -3230,6 +3230,14 @@ details.collapse summary::-webkit-details-marker {
   border-top-width: 4px;
 }
 
+.btn-sm {
+  height: 2rem;
+  min-height: 2rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  font-size: 0.875rem;
+}
+
 .btn-lg {
   height: 4rem;
   min-height: 4rem;
@@ -3238,9 +3246,22 @@ details.collapse summary::-webkit-details-marker {
   font-size: 1.125rem;
 }
 
+.btn-square:where(.btn-sm) {
+  height: 2rem;
+  width: 2rem;
+  padding: 0px;
+}
+
 .btn-square:where(.btn-lg) {
   height: 4rem;
   width: 4rem;
+  padding: 0px;
+}
+
+.btn-circle:where(.btn-sm) {
+  height: 2rem;
+  width: 2rem;
+  border-radius: 9999px;
   padding: 0px;
 }
 
@@ -3504,6 +3525,14 @@ details.collapse summary::-webkit-details-marker {
   margin-bottom: 2.5rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
+.mb-3 {
+  margin-bottom: 0.75rem;
+}
+
 .mb-5 {
   margin-bottom: 1.25rem;
 }
@@ -3512,12 +3541,20 @@ details.collapse summary::-webkit-details-marker {
   margin-top: 0px;
 }
 
+.mt-1 {
+  margin-top: 0.25rem;
+}
+
 .mt-10 {
   margin-top: 2.5rem;
 }
 
 .mt-2 {
   margin-top: 0.5rem;
+}
+
+.mt-3 {
+  margin-top: 0.75rem;
 }
 
 .mt-4 {
@@ -3576,6 +3613,10 @@ details.collapse summary::-webkit-details-marker {
   min-height: 100vh;
 }
 
+.w-11\/12 {
+  width: 91.666667%;
+}
+
 .w-52 {
   width: 13rem;
 }
@@ -3590,6 +3631,10 @@ details.collapse summary::-webkit-details-marker {
 
 .min-w-0 {
   min-width: 0px;
+}
+
+.max-w-5xl {
+  max-width: 64rem;
 }
 
 .max-w-7xl {
@@ -3660,12 +3705,20 @@ details.collapse summary::-webkit-details-marker {
   white-space: pre;
 }
 
+.rounded {
+  border-radius: 0.25rem;
+}
+
 .rounded-box {
   border-radius: var(--rounded-box, 1rem);
 }
 
 .rounded-btn {
   border-radius: var(--rounded-btn, 0.5rem);
+}
+
+.rounded-lg {
+  border-radius: 0.5rem;
 }
 
 .rounded-none {
@@ -3708,6 +3761,10 @@ details.collapse summary::-webkit-details-marker {
   padding: 0.5rem;
 }
 
+.p-3 {
+  padding: 0.75rem;
+}
+
 .p-5 {
   padding: 1.25rem;
 }
@@ -3741,6 +3798,10 @@ details.collapse summary::-webkit-details-marker {
   font-weight: 700;
 }
 
+.font-medium {
+  font-weight: 500;
+}
+
 .leading-snug {
   line-height: 1.375;
 }
@@ -3758,6 +3819,11 @@ details.collapse summary::-webkit-details-marker {
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity, 1));
+}
+
+.text-gray-700 {
+  --tw-text-opacity: 1;
+  color: rgb(55 65 81 / var(--tw-text-opacity, 1));
 }
 
 .text-primary {
@@ -3788,4 +3854,8 @@ p.CaptionCont {
 
 p.CaptionCont label i {
   background-image: none;
+}
+
+div.modal-box {
+  max-width: 64rem;
 }

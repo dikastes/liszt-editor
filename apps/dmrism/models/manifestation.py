@@ -14,6 +14,7 @@ from liszt_util.tools import RenderRawJSONMixin
 class TitleTypes(models.TextChoices):
     ENVELOPE = 'EN', _('Envelope')
     TITLE_PAGE = 'TP', _('Title Page')
+    ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
     HEAD_TITLE = 'HT', _('Head Title')
 
 
@@ -157,6 +158,9 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null = True,
             on_delete = models.SET_NULL
         )
+
+    def render_handwritings(self):
+        return ', '.join(handwriting.__str__() for handwriting in self.handwritings)
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -322,6 +326,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
         # bsp 1001340032
         #breakpoint()
+        # - ascertain order from rism
         for host_item_entry in data.get_fields('773'):
             target_rism_id = host_item_entry.get('w').replace('sources/', '')
             target_manifestation = Manifestation.get_or_create(target_rism_id)
@@ -375,8 +380,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
 class ManifestationTitle(models.Model):
 
-    title = models.CharField(
-            max_length=100,
+    title = models.TextField(
             null=True,
             blank=True
         )
@@ -386,28 +390,33 @@ class ManifestationTitle(models.Model):
             default = None,
             null = True
         )
-    writer = models.ForeignKey(
-            'dmad.Person',
-            on_delete=models.SET_NULL,
-            related_name='written_manifestation_titles',
-            blank=True,
-            null=True
-        )
     status = models.CharField(
             max_length=10,
             choices=Status,
             default=Status.PRIMARY
-        )
-    medium = models.CharField(
-            max_length=100,
-            null=True,
-            blank=True
         )
     manifestation = models.ForeignKey(
             'Manifestation',
             on_delete=models.CASCADE,
             related_name='titles',
         )
+
+    def render_handwritings(self):
+        return ', '.join(handwriting.__str__() for handwriting in self.handwritings.all())
+
+    def render_summary(self):
+        if self.status == Status.TEMPORARY:
+            return 'temporär'
+
+        result = ''
+        if self.title_type:
+            result += self.title_type
+            if self.handwritings.count():
+                result += ', '
+        if self.handwritings.count():
+            result += self.render_handwritings()
+
+        return result
 
 
 class ManifestationBib(BaseBib):
@@ -446,6 +455,9 @@ class RelatedManifestation(RelatedEntity):
             choices=Label,
             default=Label.PARENT
         )
+    order = models.IntegerField(
+            default = 0
+        )
 
 
 class BaseHandwriting(models.Model):
@@ -463,10 +475,14 @@ class BaseHandwriting(models.Model):
             blank = True
         )
 
+    def __str__(self):
+        return f"{self.writer.__str__()} ({self.medium})"
+
 
 class ManifestationHandwriting(BaseHandwriting):
     manifestation = models.ForeignKey(
             'Manifestation',
+            related_name = 'handwritings',
             on_delete = models.CASCADE
         )
 
@@ -474,6 +490,7 @@ class ManifestationHandwriting(BaseHandwriting):
 class ManifestationTitleHandwriting(BaseHandwriting):
     manifestation_title = models.ForeignKey(
             'ManifestationTitle',
+            related_name = 'handwritings',
             on_delete = models.CASCADE
         )
 
