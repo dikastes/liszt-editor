@@ -59,9 +59,8 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     places = models.ManyToManyField(
             'dmad.Place'
         )
-    contributors = models.ManyToManyField(
-            'dmad.Person',
-            through = 'ManifestationContributor'
+    dedicatees = models.ManyToManyField(
+            'dmad.Person'
         )
     related_manifestations = models.ManyToManyField(
             'Manifestation',
@@ -424,14 +423,6 @@ class ManifestationBib(BaseBib):
         'Manifestation',
         on_delete=models.CASCADE,
         related_name='bib_set'
-    )
-
-
-class ManifestationContributor(BaseContributor):
-    manifestation = models.ForeignKey(
-        'Manifestation',
-        on_delete=models.CASCADE,
-        related_name='contributor_relations'
     )
 
 

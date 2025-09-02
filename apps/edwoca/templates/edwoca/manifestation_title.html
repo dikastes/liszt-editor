@@ -159,13 +159,11 @@
         {% endif %}
 
         <ul class="mt-5">
-        {% for contributor in object.contributor_relations.all %}
-            {% if contributor.role == 'DD' %}
-                <li class="flex items-center">
-                    <p class="flex-1">{{ contributor.person }}</p>
-                    <a href="{% url 'edwoca:manifestation_remove_dedicatee' object.id contributor.id %}" class="btn">Löschen</a>
-                </li>
-            {% endif %}
+        {% for dedicatee in object.dedicatees.all %}
+            <li class="flex items-center">
+                <p class="flex-1">{{ dedicatee }}</p>
+                <a href="{% url 'edwoca:manifestation_remove_dedicatee' object.id dedicatee.id %}" class="btn">Löschen</a>
+            </li>
         {% endfor %}
         </ul>
     </div>
@@ -176,9 +174,6 @@
 	</p>
 	<p class="prose">
 		{% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
-	</p>
-	<p class="prose">
-		{% include 'edwoca/partials/contributors_preview.html' %}
 	</p>
 	<p class="prose">
 		{% include 'edwoca/partials/bib_preview.html' %}

@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place
-from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, ManifestationHandwriting, ManifestationContributor, ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
+from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, ManifestationHandwriting, ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -56,12 +56,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         #return f"{catalog_number}, {self.publisher} {self.publisher_addition}"
         return f"{catalog_number}, <<Verlag>> {publisher_addition}"
 
-    def extract_gnd_id(dedicatee):
+    def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
         id_pattern = compile(ID_PATTERN)
-        match = id_pattern.search(dedicatee)
+        match = id_pattern.search(string)
         if match:
-            return dedicatee[match.start():match.end()].replace(']', '').strip()
+            return string[match.start():match.end()].replace(']', '').strip()
         return None
 
     def extract_medium(medium_string):
@@ -171,20 +171,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             for dedication in dedications:
                 if gnd_id := Manifestation.extract_gnd_id(dedication):
                     dedicatee = Person.fetch_or_get(gnd_id)
-                    ManifestationContributor.objects.create(
-                            person = dedicatee,
-                            role = ManifestationContributor.Role.DEDICATEE,
-                            manifestation = self
-                        )
+                    self.dedicatees.add(dedicatee)
                 else:
                     for writer in ANONYMOUS_WRITERS:
                         if writer in dedication:
                             dedicatee = Person.objects.get(interim_designator = writer)
-                            ManifestationContributor.objects.create(
-                                    person = dedicatee,
-                                    role = ManifestationContributor.Role.DEDICATEE,
-                                    manifestation = self
-                                )
+                            self.dedicatees.add(dedicatee)
                             break
 
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY].replace(' | ', '\n')

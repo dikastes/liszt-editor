@@ -109,13 +109,6 @@ class ManifestationBibForm(BaseBibForm):
         widgets = dict(BaseBibForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
 
 
-class ManifestationContributorForm(ContributorForm):
-    class Meta(ContributorForm.Meta):
-        model = ManifestationContributor
-        fields = ContributorForm.Meta.fields + [ 'manifestation' ]
-        widgets = dict(ContributorForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
-
-
 class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
     not_before = DateTimeField(widget = SelectDateWidget( attrs = {'class':'select select-bordered'}))
     not_after = DateTimeField(widget = SelectDateWidget( attrs = {'class':'select select-bordered'}))

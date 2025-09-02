@@ -11,7 +11,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from dmad_on_django.models import Place, Corporation
-from dmrism.models.manifestation import ManifestationBib, ManifestationContributor
+from dmrism.models.manifestation import ManifestationBib
 from dmrism.models.manifestation import Manifestation as DmrismManifestation
 from dmrism.models.item import Signature
 from bib.models import ZotItem
@@ -281,12 +281,14 @@ def manifestation_title_remove_handwriting_writer(request, pk, title_handwriting
 def manifestation_add_dedicatee(request, pk, person_id):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     person = get_object_or_404(Person, pk=person_id)
-    ManifestationContributor.objects.create(manifestation=manifestation, person=person, role='DD')
+    manifestation.dedicatees.add(person)
     return redirect('edwoca:manifestation_title', pk=pk)
 
-def manifestation_remove_dedicatee(request, pk, contributor_id):
-    contributor = get_object_or_404(ManifestationContributor, pk=contributor_id)
-    contributor.delete()
+
+def manifestation_remove_dedicatee(request, pk, dedicatee_id):
+    dedicatee = get_object_or_404(Person, pk=dedicatee_id)
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    manifestation.dedicatees.remove(dedicatee)
     return redirect('edwoca:manifestation_title', pk=pk)
 
 
@@ -294,9 +296,6 @@ class ManifestationDeleteView(EntityMixin, DeleteView):
     model = EdwocaManifestation
     success_url = reverse_lazy('edwoca:manifestation_list')
     template_name = 'edwoca/simple_form.html'
-
-
-
 
 
 class ManifestationTitleDeleteView(DeleteView):
@@ -330,22 +329,6 @@ class RelatedManifestationRemoveView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_work.id})
-
-
-class ManifestationContributorsUpdateView(EntityMixin, ContributorsUpdateView):
-    model = Manifestation
-    form_class = ManifestationContributorForm
-
-
-class ManifestationContributorAddView(ContributorAddView):
-    model = ManifestationContributor
-
-
-class ManifestationContributorRemoveView(DeleteView):
-    model = ManifestationContributor
-
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_contributors', kwargs={'pk': self.object.manifestation.id})
 
 
 class ManifestationRelationsUpdateView(EntityMixin, RelationsUpdateView):

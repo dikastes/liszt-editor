@@ -55,13 +55,6 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:manifestation_contributors' object.id %}"
-		{% if 'contributors' in request.path %}class="active"{% endif %}
-		>
-		Beteiligte
-	    </a>
-	</li>
-	<li>
 	    <a href="{% url 'edwoca:manifestation_bibliography' object.id %}"
 		{% if 'bibliography' in request.path %}class="active"{% endif %}
 		>
