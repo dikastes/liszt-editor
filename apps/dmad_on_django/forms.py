@@ -31,9 +31,5 @@ class SearchForm(SearchForm):
 class DmadUpdateForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
 
-    def __init__(self,*args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['rework_in_gnd'].label = 'Nachbearbeiten'
-
 class DmadCreateForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
