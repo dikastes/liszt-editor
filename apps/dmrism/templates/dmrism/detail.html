@@ -44,6 +44,9 @@
 
 {% block navbar_title %}
     <h1 class="text-3xl font-bold"> {{object}} </h1>
+    {% if object.private_title_comment %}
+        <p class="text-lg text-gray-600">{{ object.private_title_comment }}</p>
+    {% endif %}
 {% endblock %}
 
 {% block nav %}

@@ -1,4 +1,4 @@
-from ..forms import ManifestationForm
+from ..forms import ManifestationEditForm
 from ..models.manifestation import Manifestation
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
@@ -41,7 +41,7 @@ class ManifestationSearchView(SearchView):
 class ManifestationCreateView(CreateView):
     model = Manifestation
     template_name = 'dmrism/form.html'
-    form_class = ManifestationForm
+    form_class = ManifestationEditForm
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -49,14 +49,32 @@ class ManifestationCreateView(CreateView):
         return response
 
 
+from edwoca.forms.manifestation import ManifestationRelationsCommentForm
+
 class ManifestationDetailView(DetailView):
     model = Manifestation
     template_name = 'dmrism/detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        relations_comment_form = ManifestationRelationsCommentForm(request.POST, instance=self.object)
+        if relations_comment_form.is_valid():
+            relations_comment_form.save()
+            return redirect(self.object.get_absolute_url())
+        else:
+            context = self.get_context_data(**kwargs)
+            context['relations_comment_form'] = relations_comment_form
+            return self.render_to_response(context)
+
 
 class ManifestationUpdateView(UpdateView):
     model = Manifestation
-    form_class = ManifestationForm
+    form_class = ManifestationEditForm
     template_name = 'dmrism/form.html'
 
     def form_valid(self, form):

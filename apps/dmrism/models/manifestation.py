@@ -157,6 +157,34 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null = True,
             on_delete = models.SET_NULL
         )
+    private_head_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_relations_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_title_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_history_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_manuscript_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_provenance_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    taken_information = models.TextField(
+            blank = True,
+            null = True
+        )
 
     def render_handwritings(self):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings)

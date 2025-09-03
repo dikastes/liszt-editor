@@ -53,7 +53,7 @@
 		{% if query %}
 			{% for found_manifestation in found_manifestations %}
 				<li>
-					<a href="{% url 'edwoca:related_manifestation_add' object.id found_manifestation.object.id %}">
+					<a href="{% url 'edwoca:related_manifestation_add' object.id found_manifestation.object.id %}" class="flex-1">
 						{{ found_manifestation.object }}
 					</a>
 				</li>
@@ -80,6 +80,17 @@
 		<a href="{% url 'edwoca:manifestation_create' %}" class="btn btn-primary"> neue Quelle anlegen </a>
 		{% endcomment %}
 	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mt-5">
+    <div class="prose">
+        <h2> Privater Kommentar zu Bezügen </h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ relations_comment_form.as_daisy }}
+            <input type="submit" value="Speichern" class="btn btn-primary mt-5">
+        </form>
+    </div>
 </div>
 
 <div class="bg-white border border-base-300 p-5">
@@ -115,7 +126,3 @@
 	</p>
 </div>
 {% endblock %}
-
-
-
-

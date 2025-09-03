@@ -30,6 +30,12 @@
     {% endfor %}
 </p>
 
+<form method="post">
+    {% csrf_token %}
+    {{ relations_comment_form.as_daisy }}
+    <input type="submit" value="Speichern" class="btn btn-primary mt-5">
+</form>
+
 <p>
     <em> Widmung </em>
     {% if object.dedication %}

@@ -40,10 +40,13 @@
 
 		{% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get">
-			{{ searchform.q }}
+		<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get" class="flex gap-5">
+            <label class="input input-bordered flex items-center gap-2 flex-1">
+                Ort
+                {{ searchform.q }}
+            </label>
 			<input type="hidden" name="target_model" value="manifestation" />
-			<input type="submit" id="submit-form" class="btn" />
+			<input type="submit" id="submit-form" class="btn" value="Suchen"/>
 		</form>
 		
 		<ul>

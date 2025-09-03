@@ -11,10 +11,13 @@ from dmad_on_django.models import Period
 class ManifestationForm(ModelForm):
     class Meta:
         model = Manifestation
-        fields = ['rism_id']
+        fields = ['rism_id', 'private_head_comment']
         widgets = {
                 'rism_id': TextInput( attrs = {
                         'class': 'grow h-full'
+                    }),
+                'private_head_comment': Textarea( attrs = {
+                        'class': 'textarea textarea-bordered w-full'
                     })
             }
 
@@ -24,15 +27,23 @@ class ManifestationForm(ModelForm):
         rism_id_label.add(raw(str(self['rism_id'])))
         form.add(rism_id_label)
 
+        private_head_comment_label = label(cls='form-control', _for=self['private_head_comment'].id_for_label)
+        private_head_comment_label.add(span(self['private_head_comment'].label, cls='label-text'))
+        private_head_comment_label.add(raw(str(self['private_head_comment'])))
+        form.add(private_head_comment_label)
+
         return mark_safe(str(form))
 
 
 class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
-        fields = ['dedication']
+        fields = ['dedication', 'private_title_comment']
         widgets = {
                 'dedication': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'private_title_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     })
             }
@@ -98,8 +109,12 @@ class ManifestationTitleForm(ModelForm):
 class ManifestationCommentForm(CommentForm):
     class Meta:
         model = Manifestation
-        fields = CommentForm.Meta.fields
-        widgets = CommentForm.Meta.widgets
+        fields = CommentForm.Meta.fields + ['taken_information']
+        widgets = dict(CommentForm.Meta.widgets, **{
+                'taken_information': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            })
 
 
 class ManifestationBibForm(BaseBibForm):
@@ -116,12 +131,15 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
 
     class Meta:
         model = Manifestation
-        fields = ['history', 'id', 'date_diplomatic']
+        fields = ['history', 'id', 'date_diplomatic', 'private_history_comment']
         widgets = {
                 'history': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     }),
                 'date_diplomatic': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'private_history_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     })
             }
@@ -208,7 +226,15 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         form.add(period_palette)
         form.add(display_container)
         form.add(date_diplomatic_wrap)
-        #form.add(history_wrap)
+
+        private_history_comment_field = self['private_history_comment']
+        private_history_comment_wrap = label(cls='form-control')
+        private_history_comment_label = div(cls='label')
+        private_history_comment_span = span(private_history_comment_field.label, cls='label-text')
+        private_history_comment_label.add(private_history_comment_span)
+        private_history_comment_wrap.add(private_history_comment_label)
+        private_history_comment_wrap.add(raw(str(private_history_comment_field)))
+        form.add(private_history_comment_wrap)
 
         return mark_safe(str(form))
 
@@ -319,7 +345,7 @@ class ManifestationPrintForm(ModelForm, SimpleFormMixin):
 class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
-        fields = ['paper', 'extent', 'measure']
+        fields = ['paper', 'extent', 'measure', 'private_manuscript_comment']
         widgets = {
                 'paper': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
@@ -328,6 +354,9 @@ class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
                         'class': SimpleFormMixin.text_area_classes
                     }),
                 'measure': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'private_manuscript_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     })
             }
@@ -347,11 +376,11 @@ class ManifestationHandwritingForm(ModelForm, SimpleFormMixin):
             }
 
     def as_daisy(self):
-        form = div()
+        form = div(cls='flex gap-5') # Add flex and gap classes to the main form div
         medium_field = self['medium']
         dubious_writer_field = self['dubious_writer']
 
-        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2')
+        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2 flex-1') # Add flex-1 to medium label
         medium_label.add(raw(str(medium_field)))
 
         dubious_writer_label = label(_for=dubious_writer_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')
@@ -371,3 +400,13 @@ ManifestationHandwritingFormSet = inlineformset_factory(
         extra = 0,
         can_delete = True
     )
+
+class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['private_relations_comment']
+        widgets = {
+                'private_relations_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            }

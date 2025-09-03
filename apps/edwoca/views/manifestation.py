@@ -331,10 +331,45 @@ class RelatedManifestationRemoveView(DeleteView):
         return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_work.id})
 
 
+from .base import *
+from ..models import Manifestation as EdwocaManifestation
+from ..forms.manifestation import *
+from ..forms import ManifestationForm, SignatureFormSet, ItemForm, ManifestationTitleForm, ManifestationDedicationForm, ManifestationTitleHandwritingForm, ManifestationRelationsCommentForm
+from dmad_on_django.forms import SearchForm
+from ..models import ManifestationTitle, ManifestationTitleHandwriting
+from dmad_on_django.models.person import Person
+from django.forms import inlineformset_factory
+from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse_lazy, reverse
+from django.views.generic import DeleteView, FormView
+from django.views.generic.edit import CreateView, UpdateView
+from dmad_on_django.models import Place, Corporation
+from dmrism.models.manifestation import ManifestationBib
+from dmrism.models.manifestation import Manifestation as DmrismManifestation
+from dmrism.models.item import Signature
+from bib.models import ZotItem
+
+
 class ManifestationRelationsUpdateView(EntityMixin, RelationsUpdateView):
     template_name = 'edwoca/manifestation_relations.html'
     model = Manifestation
     form_class = RelatedManifestationForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        relations_comment_form = ManifestationRelationsCommentForm(request.POST, instance=self.object)
+        if relations_comment_form.is_valid():
+            relations_comment_form.save()
+            return redirect(self.object.get_absolute_url())
+        else:
+            context = self.get_context_data(**kwargs)
+            context['relations_comment_form'] = relations_comment_form
+            return self.render_to_response(context)
 
 
 class ManifestationHistoryUpdateView(SimpleFormView):
