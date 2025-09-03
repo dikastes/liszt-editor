@@ -29,7 +29,7 @@ class SearchForm(SearchForm):
 
 
 class DmadUpdateForm(GenericAsDaisyMixin, ModelForm):
-    layout = Layouts.LABEL_INSIDE
+    layout = Layouts.LABEL_OUTSIDE
 
     def __init__(self,*args, **kwargs):
         super().__init__(*args, **kwargs)
