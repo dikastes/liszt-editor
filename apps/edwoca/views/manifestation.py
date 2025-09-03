@@ -24,39 +24,39 @@ class ManifestationSearchView(EdwocaSearchView):
     model = EdwocaManifestation
 
 
-class ManifestationCreateView(CreateView):
-    model = Manifestation
-    form_class = ManifestationForm
-    template_name = 'edwoca/create.html'
+from ..forms.manifestation_create import ManifestationCreateForm
+from dmrism.models.item import Item, Library
+from dmad_on_django.models import Status
 
-    def get_success_url(self):
-        return self.object.get_absolute_url()
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'title_formset' not in context:
-            if self.request.POST:
-                context['title_formset'] = ManifestationTitleFormSet(self.request.POST, self.request.FILES)
-            else:
-                ManifestationTitleFormSet.can_delete = False
-                context['title_form_set'] = ManifestationTitleFormSet()
-        return context
+def manifestation_create(request):
+    if request.method == 'POST':
+        form = ManifestationCreateForm(request.POST)
+        if form.is_valid():
+            manifestation = EdwocaManifestation.objects.create()
+            if form.cleaned_data['temporary_title']:
+                ManifestationTitle.objects.create(
+                    manifestation=manifestation,
+                    title=form.cleaned_data['temporary_title'],
+                    status=Status.TEMPORARY
+                )
+            
+            item = Item.objects.create(manifestation=manifestation)
 
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        title_formset = ManifestationTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            library = form.cleaned_data['library']
+            signature = Signature.objects.create(
+                library=library,
+                signature=form.cleaned_data['signature']
+            )
+            item.signatures.add(signature)
+            
+            return redirect('edwoca:manifestation_update', pk=manifestation.pk)
+    else:
+        form = ManifestationCreateForm()
 
-        if title_formset.is_valid():
-            self.object.save()
-            title_formset.save()
-            return redirect(self.get_success_url())
-        else:
-            self.object = None
-            return self.form_invalid(form, title_formset=title_formset)
-
-    def form_invalid(self, form, title_formset=None):
-        context = self.get_context_data(form=form, title_formset=title_formset)
-        return self.render_to_response(context)
+    return render(request, 'edwoca/create.html', {
+        'form': form,
+    })
 
 
 #class ManifestationUpdateView(EntityMixin, UpdateView):
