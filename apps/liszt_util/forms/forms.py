@@ -42,6 +42,10 @@ class GenericAsDaisyMixin():
                 cls = f'textarea textarea-bordered'
                 root.add(raw(field.as_widget(attrs={"class": cls, "placeholder" : field.label})))
                 continue
+            
+            if isinstance(widget, CheckboxInput):
+                root.add(self._render_checkbox(field))
+                continue
 
             wrapper.add(raw(field.as_widget(attrs={"class": cls})))
 
@@ -71,10 +75,7 @@ class GenericAsDaisyMixin():
             wrap.add(top)
 
             if isinstance(widget, CheckboxInput):
-                wrap = label(cls="label cursor-pointer justify-start gap-3")
-                wrap.add(span(field.label or field.name, cls="label-text flex-1"))
-                wrap.add(raw(field.as_widget(attrs={"class":"toggle toggle-primary flex-0"})))
-                root.add(wrap)
+                root.add(self._render_checkbox(field))
                 continue
 
             if isinstance(widget, Textarea):
@@ -88,4 +89,11 @@ class GenericAsDaisyMixin():
             root.add(wrap)
 
         return root.render()
+    
+    def _render_checkbox(self, field):
+        wrap = label(cls="label cursor-pointer justify-start gap-3")
+        wrap.add(span(field.label or field.name, cls="label-text flex-1"))
+        wrap.add(raw(field.as_widget(attrs={"class":"toggle toggle-primary flex-0"})))
+            
+        return wrap
         
