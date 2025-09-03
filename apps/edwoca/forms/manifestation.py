@@ -336,20 +336,30 @@ class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
 class ManifestationHandwritingForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = ManifestationHandwriting
-        fields = ['medium']
+        fields = ['medium', 'dubious_writer']
         widgets = {
                 'medium': TextInput( attrs = {
                         'class': 'grow'
+                    }),
+                'dubious_writer': CheckboxInput( attrs = {
+                        'class': 'toggle'
                     }),
             }
 
     def as_daisy(self):
         form = div()
         medium_field = self['medium']
+        dubious_writer_field = self['dubious_writer']
 
         medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2')
         medium_label.add(raw(str(medium_field)))
+
+        dubious_writer_label = label(_for=dubious_writer_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')
+        dubious_writer_label.add(span(dubious_writer_field.label, cls='label-text'))
+        dubious_writer_label.add(raw(str(dubious_writer_field)))
+
         form.add(medium_label)
+        form.add(dubious_writer_label)
 
         return mark_safe(str(form))
 

@@ -189,7 +189,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             temporary_title = ''
 
         if self.items.count():
-            return self.items.all()[0].__str__() + temporary_title
+            return self.items.all()[0].get_current_signature() + temporary_title
 
         return '<Fehler: keine Items>'
 
@@ -465,8 +465,11 @@ class BaseHandwriting(models.Model):
             null = True,
             blank = True
         )
+    dubious_writer = models.BooleanField(default = False)
 
     def __str__(self):
+        if self.dubious_writer:
+            return f"[{self.writer.__str__()}] ({self.medium})"
         return f"{self.writer.__str__()} ({self.medium})"
 
 

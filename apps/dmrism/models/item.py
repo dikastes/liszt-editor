@@ -33,6 +33,8 @@ class Item(WemiBaseClass):
     def __str__(self):
         #title = self.get_pref_title() or '<ohne Titel>'
         #return f'{self.rism_id}: {title}'
+        if self.manifestation.is_singleton:
+            return self.manifestation.__str__()
         return self.get_current_signature()
 
     def signature_with_former(self):
