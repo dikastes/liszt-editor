@@ -1,11 +1,15 @@
 from .base import *
-from dmrism.models.manifestation import *
-from dominate.tags import div, label, span
-from dominate.util import raw
+from bib.models import ZotItem
+from django import forms
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 from dmad_on_django.models import Period
+from dmrism.models.item import PersonProvenanceStation, CorporationProvenanceStation, Library
+from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationHandwriting, ManifestationTitleHandwriting
+from dominate.tags import div, label, span
+from dominate.util import raw
+
 
 
 class ManifestationForm(ModelForm):
@@ -50,58 +54,32 @@ class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
 
 
 class ManifestationTitleForm(ModelForm):
-    class Meta(TitleForm.Meta):
+    class Meta:
         model = ManifestationTitle
         fields = ['title', 'title_type', 'status', 'manifestation']
         widgets = {
-                'title': TextInput( attrs = {
-                        'class': 'grow w-full'
-                    }),
-                'title_type': Select( attrs = {
-                        'class': 'autocomplete-select select select-bordered w-full'
-                    }),
-                'status': Select( attrs = {
-                        'class': 'autocomplete-select select select-bordered w-full'
-                    }),
-                'manifestation': HiddenInput()
-                }
+            'title': Textarea(attrs={'class': 'textarea textarea-bordered h-64'}),
+            'title_type': Select(attrs={'class': 'select select-bordered w-full'}),
+            'status': Select(attrs={'class': 'select select-bordered w-full'}),
+            'manifestation': HiddenInput(),
+        }
 
     def as_daisy(self):
-        class_name = self.Meta.model.__name__.lower().replace('title', '')
-        form = div(cls='mb-10')
+        form = div(cls='flex flex-col gap-5')
 
-        #if self.instance.pk:
-           #form.add(raw(str(self['id'])))
-        #form.add(raw(str(self[class_name])))
+        # Title field (textarea)
+        title_label = label(self['title'].label, _for=self['title'].id_for_label, cls='form-control w-full')
+        title_label.add(raw(str(self['title'])))
+        form.add(title_label)
 
-        title_field = self['title']
-        type_field = self['title_type']
-        status_field = self['status']
-        medium_field = self['medium']
-
-        title_field_label = label(title_field.label, cls='input input-bordered flex-1 flex items-center gap-2')
-        title_field_label.add(raw(str(title_field)))
-
-        type_container = div(cls='flex-1')
-        type_container.add(raw(str(type_field)))
-
-        status_container = div(cls='flex-1')
-        status_container.add(raw(str(status_field)))
-
-        medium_field_label = label(medium_field.label, cls='input input-bordered flex-1 flex items-center gap-2')
-        medium_field_label.add(raw(str(medium_field)))
-
-        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette1.add(title_field_label)
-        palette1.add(type_container)
-
-        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette2.add(medium_field_label)
-        palette2.add(status_container)
-
-        form.add(palette1)
-        form.add(palette2)
-        form.add(raw(str(self['manifestation'])))
+        # Remaining properties on a palette with flex-1
+        palette = div(cls='flex flex-wrap gap-5')
+        for field_name in ['title_type', 'status']:
+            field = self[field_name]
+            field_label = label(field.label, _for=field.id_for_label, cls='form-control flex-1 min-w-[200px]')
+            field_label.add(raw(str(field)))
+            palette.add(field_label)
+        form.add(palette)
 
         return mark_safe(str(form))
 
@@ -268,7 +246,8 @@ class ManifestationClassificationForm(ModelForm):
         fields = [
                 'manifestation_form',
                 'edition_type',
-                'function'
+                'function',
+                'source_type'
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
@@ -280,6 +259,9 @@ class ManifestationClassificationForm(ModelForm):
                 'function': Select( attrs = {
                         'class': 'select w-full select-bordered'
                     }),
+                'source_type': Select( attrs = {
+                        'class': 'select w-full select-bordered'
+                    }),
             }
 
     def as_daisy(self):
@@ -288,6 +270,7 @@ class ManifestationClassificationForm(ModelForm):
         manifestation_form_field = self['manifestation_form']
         edition_type_field = self['edition_type']
         function_field = self['function']
+        source_type_field = self['source_type']
 
         manifestation_form_label = label(manifestation_form_field.label, cls='flex-1')
         manifestation_form_label.add(raw(str(manifestation_form_field)))
@@ -295,15 +278,22 @@ class ManifestationClassificationForm(ModelForm):
         edition_type_label = label(edition_type_field.label, cls='flex-1')
         edition_type_label.add(raw(str(edition_type_field)))
 
-        function_type_label = label(function_field.label, cls='flex-1')
-        function_type_label.add(raw(str(function_field)))
+        function_label = label(function_field.label, cls='flex-1')
+        function_label.add(raw(str(function_field)))
 
-        palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette.add(manifestation_form_label)
-        palette.add(edition_type_label)
-        palette.add(function_type_label)
+        source_type_label = label(source_type_field.label, cls='flex-1')
+        source_type_label.add(raw(str(source_type_field)))
 
-        form.add(palette)
+        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette1.add(manifestation_form_label)
+        palette1.add(edition_type_label)
+
+        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette2.add(function_label)
+        palette2.add(source_type_label)
+
+        form.add(palette1)
+        form.add(palette2)
 
         return mark_safe(str(form))
 
@@ -410,3 +400,118 @@ class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
                         'class': SimpleFormMixin.text_area_classes
                     })
             }
+
+
+class PersonProvenanceStationForm(ModelForm):
+    class Meta:
+        model = PersonProvenanceStation
+        fields = ['item', 'bib', 'period', 'owner']
+        widgets = {
+            'item': HiddenInput(),
+        }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        bib_field = self['bib']
+        period_field = self['period']
+        owner_field = self['owner']
+
+        bib_label = label(bib_field.label, _for=bib_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        bib_label.add(raw(str(bib_field)))
+        form.add(bib_label)
+
+        period_label = label(period_field.label, _for=period_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        period_label.add(raw(str(period_field)))
+        form.add(period_label)
+
+        owner_label = label(owner_field.label, _for=owner_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        owner_label.add(raw(str(owner_field)))
+        form.add(owner_label)
+
+        form.add(raw(str(self['item'])))
+
+        return mark_safe(str(form))
+
+
+class CorporationProvenanceStationForm(ModelForm):
+    class Meta:
+        model = CorporationProvenanceStation
+        fields = ['item', 'bib', 'period', 'owner']
+        widgets = {
+            'item': HiddenInput(),
+        }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        bib_field = self['bib']
+        period_field = self['period']
+        owner_field = self['owner']
+
+        bib_label = label(bib_field.label, _for=bib_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        bib_label.add(raw(str(bib_field)))
+        form.add(bib_label)
+
+        period_label = label(period_field.label, _for=period_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        period_label.add(raw(str(period_field)))
+        form.add(period_label)
+
+        owner_label = label(owner_field.label, _for=owner_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        owner_label.add(raw(str(owner_field)))
+        form.add(owner_label)
+
+        form.add(raw(str(self['item'])))
+
+        return mark_safe(str(form))
+
+
+class ManifestationProvenanceCommentForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['public_provenance_comment', 'private_provenance_comment']
+        widgets = {
+            'public_provenance_comment': Textarea(attrs={
+                'class': SimpleFormMixin.text_area_classes
+            }),
+            'private_provenance_comment': Textarea(attrs={
+                'class': SimpleFormMixin.text_area_classes
+            })
+        }
+
+class ManifestationCreateForm(forms.Form):
+    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False)
+    signature = forms.CharField(label='Signatur', max_length=255)
+    library = forms.ModelChoiceField(queryset=Library.objects.all(), label='Bibliothek', empty_label="Bibliothek auswählen", widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+
+class ManifestationTitleHandwritingForm(ModelForm):
+    class Meta:
+        model = ManifestationTitleHandwriting
+        fields = ['medium', 'manifestation_title', 'dubious_writer']
+        widgets = {
+            'medium': TextInput(attrs={'class': 'w-full'}),
+            'manifestation_title': HiddenInput(),
+            'dubious_writer': CheckboxInput(attrs={'class': 'toggle'}),
+        }
+
+    def as_daisy(self):
+        form = div(cls='flex flex-col gap-5')
+
+        # Fields for the palette
+        palette = div(cls='flex flex-wrap gap-5')
+
+        medium_field = self['medium']
+        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2 flex-1')
+        medium_label.add(raw(str(medium_field)))
+        palette.add(medium_label)
+
+        dubious_writer_field = self['dubious_writer']
+        dubious_writer_label = label(_for=dubious_writer_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')
+        dubious_writer_label.add(span(dubious_writer_field.label, cls='label-text'))
+        dubious_writer_label.add(raw(str(dubious_writer_field)))
+        palette.add(dubious_writer_label)
+
+        form.add(palette)
+        form.add(raw(str(self['manifestation_title'])))
+
+        return mark_safe(str(form))

@@ -1,28 +1,26 @@
 {% extends 'edwoca/base.html' %}
 
+
+
 {% block content %}
-<div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0">Neue Manifestation anlegen</h2>
 
-    <form method="post" class="mt-5">
-        {% csrf_token %}
-        <label class="input input-bordered flex items-center gap-2">
-            {{ form.temporary_title.label }}
-            <input type="text" name="{{ form.temporary_title.name }}" id="{{ form.temporary_title.id_for_label }}" class="grow" placeholder="{{ form.temporary_title.label }}">
-        </label>
+<div class="bg-white p-5 border border-base-300">
+	<h2> {{ view_title }} </h2>
 
-        <div class="flex gap-5 mt-5">
-            <div class="form-control flex-1">
-                {{ form.library }}
-            </div>
-            <label class="input input-bordered flex items-center gap-2 flex-1">
-                {{ form.signature.label }}
-                <input type="text" name="{{ form.signature.name }}" id="{{ form.signature.id_for_label }}" class="grow" placeholder="{{ form.signature.label }}">
-            </label>
-        </div>
+	<form method="post">
+		{% csrf_token %}
+		{{ title_form_set.management_form }}
+		{% for form in title_form_set %}
+			{{ form.as_daisy }}
+		{% endfor %}
+		{{ form.as_daisy }}
 
-        <input type="submit" id="submit-form" value="Speichern" class="hidden">
-    </form>
-
+		<input type="submit" id="submit-form" value="{{ button_label }}" class="hidden">
+	</form>
 </div>
+
 {% endblock %}
+
+
+
+
