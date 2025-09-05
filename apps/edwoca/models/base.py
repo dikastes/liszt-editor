@@ -76,10 +76,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 replace(')', '').\
                 strip()
 
-    def parse_csv(self, raw_data):
+    def parse_csv(self, raw_data, source_type):
         INSTITUTION_KEY = 'Bestandeshaltende Institution'
         FORMER_SIGNATURE_KEY = 'Signatur, vormalig'
         IDENTIFICATION_KEY = 'WVZ-Nr.'
+        TITLE_KEY = 'Titel (normiert, nach MGG)'
         EDITION_TYPE_KEY = 'Ausgabeform (Typ)'
         FUNCTION_KEY = 'Funktion'
 
@@ -95,13 +96,13 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         MEDIUM_OF_PERFORMANCE_KEY = 'Besetzung (normiert)'
         TEMPO_KEY = 'Tempoangabe (normiert)'
         METRONOM_KEY = 'Metronomangabe'
+        LANGUAGE_KEY = 'Sprachcode'
         TEXT_INCIPIT_KEY = 'Text-Incipit (diplomatisch)'
         LOCATION_KEY = 'GND-Nr. Ort'
         DIPLOMATIC_DATE_KEY = 'Datierung (diplomatisch)'
         MACHINE_READABLE_DATE_KEY = 'Datierung (maschinenlesbar)'
         RELATED_PRINT_PUBLISHER_KEY = 'Bezug zu Druck: Verlags-GND-Nr.'
         RELATED_PRINT_PLATE_NUMBER_KEY = 'Bezug zu Druck: Plattennr.'
-        TITLE_KEY = 'Titel (normiert, nach MGG)'
 
         AUTOGRAPH_HANDWRITING_KEY = 'Schrift (Liszt egh.)'
         FOREIGN_HANDWRITING_KEY = 'Schrift (fremder Hand)'
@@ -116,6 +117,23 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         ANONYMOUS_WRITERS = ['zS', 'Dr']
 
+        FUNCTION_KEY = 'Funktion'
+
+        DEDUCED_PLACE_NAME_KEY = 'Ort ermittelt (normiert)'
+        DEDUCED_PLACE_ID_KEY = 'Ort ermittelt GND-Nr.'
+
+        PROVENANCE_KEY1 = 'Provenienz Station 1'
+        PROVENANCE_KEY2 = 'Provenienz Station 2'
+        PROVENANCE_KEY3 = 'Provenienz Station 3'
+        PROVENANCE_KEY4 = 'Provenienz Station 4'
+
+        self.private_provenance_comment = '\n'.join(
+                provenance_string for
+                provenance_key in
+                [ PROVENANCE_KEY1, PROVENANCE_KEY2, PROVENANCE_KEY3, PROVENANCE_KEY4 ]
+                if (provenance_string := raw_data[provenance_key])
+            )
+
         for writer in ANONYMOUS_WRITERS:
             if Person.objects.filter(interim_designator = writer).count() == 0:
                 Person.objects.create(interim_designator = writer)
@@ -123,10 +141,27 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         # add stitch template flag to manifestation?
         liszt = Person.fetch_or_get(LISZT_GND_ID)
 
-        self.private_comment = raw_data[IDENTIFICATION_KEY]
+        if not getattr(Manifestation.SourceType, source_type):
+            raise Exception(f'Unknown source type {source_type}')
+
+        self.source_type = getattr(Manifestation.SourceType, source_type)
+
         self.is_singleton = True
         self.titles.all().delete()
 
+        self.private_head_comment = '\n'.join([
+                raw_data[IDENTIFICATION_KEY],
+                raw_data[MEDIUM_OF_PERFORMANCE_KEY],
+                raw_data[TEMPO_KEY],
+                raw_data[METRONOM_KEY],
+                raw_data[LANGUAGE_KEY],
+                raw_data[TEXT_INCIPIT_KEY]
+            ])
+
+        if raw_data[DEDUCED_PLACE_NAME_KEY]:
+            self.private_history_comment = f"Ort ermittelt: {raw_data[DEDUCED_PLACE_NAME_KEY]}, {raw_data[DEDUCED_PLACE_ID_KEY]}"
+
+        self.function = Manifestation.Function.parse_from_german(raw_data[FUNCTION_KEY])
 
         if self.RISM_ID_KEY in raw_data and\
             raw_data[self.RISM_ID_KEY] and\
@@ -165,7 +200,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if EDITION_TYPE_KEY in raw_data:
             self.edition_type = Manifestation.parse_edition_type(raw_data[EDITION_TYPE_KEY])
-        self.function = raw_data[FUNCTION_KEY]
 
         self.dedication = raw_data[DEDICATION_KEY]
         if self.dedication:

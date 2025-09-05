@@ -139,17 +139,21 @@ class ItemContributor(BaseContributor):
     )
 
 
-class ProvenanceStation(models.Model):
-    owner = models.ForeignKey(
-            'dmad.Person',
-            on_delete = models.CASCADE
-        )
+class PersonProvenanceStation(models.Model):
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE,
-            related_name = 'provenance'
+            related_name = 'person_provenance_stations'
         )
-    comment = models.TextField(
+    owner = models.ForeignKey(
+            'dmad.Person',
+            on_delete = models.CASCADE,
+            related_name = 'provenance_stations'
+        )
+    bib = models.ForeignKey(
+            'bib.ZotItem',
+            on_delete = models.SET_NULL,
+            related_name = 'person_provenance_stations',
             null = True,
             blank = True
         )
@@ -158,11 +162,35 @@ class ProvenanceStation(models.Model):
             on_delete = models.SET_NULL,
             blank = True,
             null = True,
-            related_name = 'provenance_stations'
+            related_name = 'person_provenance_stations'
             )
 
-    def __str__(self):
-        return f"{ self.owner } (von { self.start } bis { self.end })"
+
+class CorporationProvenanceStation(models.Model):
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE,
+            related_name = 'corporation_provenance_stations'
+        )
+    owner = models.ForeignKey(
+            'dmad.Corporation',
+            on_delete = models.CASCADE,
+            related_name = 'provenance_stations'
+        )
+    bib = models.ForeignKey(
+            'bib.ZotItem',
+            on_delete = models.SET_NULL,
+            related_name = 'corporation_provenance_stations',
+            null = True,
+            blank = True
+        )
+    period = models.ForeignKey(
+            'dmad.Period',
+            on_delete = models.SET_NULL,
+            blank = True,
+            null = True,
+            related_name = 'corporation_provenance_stations'
+            )
 
 
 class DigitalCopy(models.Model):

@@ -84,7 +84,7 @@ SignatureFormSet = inlineformset_factory(
         Item,
         Signature,
         form = SignatureForm,
-        extra = 1,
+        extra = 0,
         max_num = 100,
         can_delete = True
     )
