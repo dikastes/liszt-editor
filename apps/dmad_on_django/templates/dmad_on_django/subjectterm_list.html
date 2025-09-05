@@ -53,18 +53,7 @@
 
 {% block navbar_extras %}
     {% if not type %}
-    <form
-        method="get"
-        action="{% url 'dmad_on_django:subject_term_list' %}"
-        class="m-0"
-        hx-get="{% url 'dmad_on_django:subject_term_list' %}"
-        hx-target="#search-results"
-        hx-trigger="input"
-        hx-push-url="true"
-    >
-        {{ form.q }}
-        <input class="btn" type="submit" value="Suchen" />
-    </form>
+    {% include 'dmad_on_django/partials/search_form.html' with action_url=request.path hx_get=request.path %}
     {% endif %}
     <a href="{% url 'dmad_on_django:subject_term_create' %}" class="btn btn-primary"> Datensatz anlegen </a>
 {% endblock %}

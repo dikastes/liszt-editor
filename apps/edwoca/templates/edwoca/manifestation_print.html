@@ -23,9 +23,12 @@
                 <a class="flex-0 btn" href="{% url 'edwoca:manifestation_remove_publisher' object.id %}"> löschen </a>
             </div>
         {% else %}
-            <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1">
-                {{ searchform.q }}
-                <input type="submit" id="submit-form-publisher" class="btn" value="Verlag suchen"/>
+            <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1 flex gap-5">
+                <label class="input input-bordered flex items-center gap-2 flex-1">
+                    Verlag
+                    {{ searchform.q }}
+                </label>
+                <input type="submit" id="submit-form-publisher" class="btn" value="Suchen"/>
             </form>
             {% if query %}
                 <ul>
