@@ -1,13 +1,22 @@
+from calendar import monthrange
 from django.db import models
 import re
 from datetime import date, datetime
 
 
-
 class Period(models.Model):
-    not_before = models.DateField(null=True, blank=True)
-    not_after = models.DateField(null=True, blank=True)
-    display = models.TextField(null=True, blank=True)
+    not_before = models.DateField(
+            null=True,
+            blank=True
+        )
+    not_after = models.DateField(
+            null=True,
+            blank=True
+        )
+    display = models.TextField(
+            null=True,
+            blank=True
+        )
 
     def render_detailed(self):
         if self.not_before == self.not_after:
@@ -16,7 +25,7 @@ class Period(models.Model):
 
     def __str__(self):
         return self.display
-    
+
     @staticmethod
     def parse_date_with_fallback(datestr: str, fallback_month=1, fallback_day=1):
         """
@@ -65,4 +74,58 @@ class Period(models.Model):
             display=display
         )
 
+    def parse(string):
+        components = string.split('-')
+        is_range = True if len(components) > 3 else False
+
+        not_before = date(1811, 10, 22)
+        not_after = date(1886, 7, 31)
+
+        not_before_year = components[0]
+        not_before_month = components[1]
+        not_before_day = components[2]
+
+        if not_before_year.isnumeric():
+            not_before = not_before.replace(year = int(not_before_year))
+            if not_before_month.isnumeric():
+                not_before = not_before.replace(day = 1, month = int(not_before_month))
+                if not is_range:
+                    not_after = not_after.replace(day = 1, month = int(not_before_month))
+                if not_before_day.isnumeric():
+                    not_before = not_before.replace(day = int(not_before_day))
+                    if not is_range:
+                        not_after = not_after.replace(day = int(not_before_day))
+                else:
+                    not_before = not_before.replace(day = 1)
+                    if not is_range:
+                        not_after = not_after.replace(day = monthrange(int(not_before_year), int(not_before_month))[1])
+            else:
+                not_before = not_before.replace(month = 1)
+                not_before = not_before.replace(day = 1)
+                if not is_range:
+                    not_after = not_after.replace(month = 12)
+            if not is_range:
+                not_after = not_after.replace(year = int(not_before.year))
+
+        if len(components) > 3:
+            not_after_year = components[3]
+            not_after_month = components[4]
+            not_after_day = components[5]
+
+            if not_after_year.isnumeric():
+                not_after = not_after.replace(year = int(not_after_year))
+                if not_after_month.isnumeric():
+                    not_after = not_after.replace(day = 1, month = int(not_after_month))
+                    if not_after_day.isnumeric():
+                        not_after = not_after.replace(day = int(not_after_day))
+                    else:
+                        not_after = not_after.replace(day = monthrange(int(not_after_year), int(not_after_month))[1])
+                else:
+                    not_after = not_after.replace(month = 12)
+
+        return Period.objects.create(
+                not_before = not_before,
+                not_after = not_after,
+                display = string
+            )
 

@@ -1,10 +1,10 @@
-from .base import *
-from ..forms import ManifestationForm, SignatureFormSet, ItemForm, ManifestationTitleForm, ManifestationDedicationForm, ManifestationTitleHandwritingForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ManifestationProvenanceCommentForm, ManifestationCreateForm
+from ..forms.manifestation import *
+from ..forms.item import SignatureFormSet, ItemForm
 from ..forms.manifestation import *
 from ..models import Manifestation as EdwocaManifestation
 from ..models import ManifestationTitle, ManifestationTitleHandwriting
+from .base import *
 from bib.models import ZotItem
-from dmrism.models.item import PersonProvenanceStation, CorporationProvenanceStation, Item
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
@@ -22,8 +22,6 @@ class ManifestationListView(EdwocaListView):
 
 class ManifestationSearchView(EdwocaSearchView):
     model = EdwocaManifestation
-
-
 
 
 def manifestation_create(request):
@@ -325,26 +323,7 @@ class RelatedManifestationRemoveView(DeleteView):
     model = RelatedManifestation
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_work.id})
-
-
-from .base import *
-from ..models import Manifestation as EdwocaManifestation
-from ..forms.manifestation import *
-
-from dmad_on_django.forms import SearchForm
-from ..models import ManifestationTitle, ManifestationTitleHandwriting
-from dmad_on_django.models.person import Person
-from django.forms import inlineformset_factory
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse_lazy, reverse
-from django.views.generic import DeleteView, FormView
-from django.views.generic.edit import CreateView, UpdateView
-from dmad_on_django.models import Place, Corporation
-from dmrism.models.manifestation import ManifestationBib
-from dmrism.models.manifestation import Manifestation as DmrismManifestation
-from dmrism.models.item import Signature
-from bib.models import ZotItem
+        return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_manifestation.id})
 
 
 class ManifestationRelationsUpdateView(EntityMixin, RelationsUpdateView):
@@ -496,6 +475,7 @@ class ManifestationPrintUpdateView(SimpleFormView):
 
         return context
 
+
 class ManifestationClassificationUpdateView(SimpleFormView):
     model = Manifestation
     property = 'classification'
@@ -583,6 +563,7 @@ def manifestation_provenance(request, pk):
         context['found_bibs'] = search_form.search().models(Bib) # Use Bib instead of ZotItem
 
     return render(request, 'edwoca/manifestation_provenance.html', context)
+
 
 def manifestation_manuscript_update(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)

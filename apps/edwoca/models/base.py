@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from dmad_on_django.models import Status, Language, Person, Corporation, Place
+from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
 from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, ManifestationHandwriting, ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
@@ -216,6 +216,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             break
 
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY].replace(' | ', '\n')
+        if raw_data[MACHINE_READABLE_DATE_KEY]:
+            self.period = Period.parse(raw_data[MACHINE_READABLE_DATE_KEY])
 
         if raw_data[RELATED_PRINT_PUBLISHER_KEY]:
             self.publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY])
