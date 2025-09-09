@@ -13,9 +13,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         with open(options['file_name'][0]) as file:
             reader = DictReader(file)
-            for row in reader:
-                print(row[Manifestation.RISM_ID_KEY])
-                print(row[Manifestation.CURRENT_SIGNATURE_KEY])
+            total = len(reader)
+            for i, row in enumerate(reader):
+                print(f'{i} von {total}')
+                print(f'{row[Manifestation.CURRENT_SIGNATURE_KEY]}, {row[Manifestation.RISM_ID_KEY]})
                 # reactivate when RISM IDs are unique
                 #if Manifestation.RISM_ID_KEY in row and \
                     #row[Manifestation.RISM_ID_KEY] and \

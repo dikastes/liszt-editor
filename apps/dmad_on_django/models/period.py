@@ -76,15 +76,23 @@ class Period(models.Model):
         )
 
     def parse(string):
-        components = split('-|–', string)
-        is_range = True if len(components) > 3 else False
+        components = split('-|–|\$|\|', string)
+        is_range = True if len(components) > 5 else False
 
         not_before = date(1811, 10, 22)
         not_after = date(1886, 7, 31)
 
-        not_before_year = components[0]
-        not_before_month = components[1]
-        not_before_day = components[2]
+        not_before_year = components[0].strip()
+
+        if len(components) > 1:
+            not_before_month = components[1].strip()
+        else:
+            not_before_month = 'xx'
+
+        if len(components) > 2:
+            not_before_day = components[2].strip()
+        else:
+            not_before_day = 'xx'
 
         if not_before_year.isnumeric():
             not_before = not_before.replace(year = int(not_before_year))
@@ -108,10 +116,10 @@ class Period(models.Model):
                 if not is_range:
                     not_after = not_after.replace(month = 12)
 
-        if len(components) > 3:
-            not_after_year = components[3]
-            not_after_month = components[4]
-            not_after_day = components[5]
+        if is_range:
+            not_after_year = components[3].strip()
+            not_after_month = components[4].strip()
+            not_after_day = components[5].strip()
 
             if not_after_year.isnumeric():
                 not_after = not_after.replace(year = int(not_after_year))
@@ -125,9 +133,15 @@ class Period(models.Model):
                     not_after = not_after.replace(month = 12)
 
         if is_range:
-            display = f'{not_before_day}.{not_before_month}.{not_before_year}–{not_before_day}.{not_before_month}.{not_before_year}'
+            if '$' in string or '|' in string:
+                display = f'{not_before_day}.{not_before_month}.{not_before_year}, {not_after_day}.{not_after_month}.{not_after_year}'
+            else:
+                display = f'{not_before_day}.{not_before_month}.{not_before_year}–{not_after_day}.{not_after_month}.{not_after_year}'
         else:
             display = f'{not_before_day}.{not_before_month}.{not_before_year}'
+
+        if not_before > not_after:
+            not_before, not_after = not_after, not_before
 
         return Period.objects.create(
                 not_before = not_before,
