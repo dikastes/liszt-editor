@@ -11,7 +11,6 @@ from dominate.tags import div, label, span
 from dominate.util import raw
 
 
-
 class ManifestationForm(ModelForm):
     class Meta:
         model = Manifestation
@@ -103,8 +102,14 @@ class ManifestationBibForm(BaseBibForm):
 
 
 class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
-    not_before = DateTimeField(widget = SelectDateWidget( attrs = {'class':'select select-bordered'}))
-    not_after = DateTimeField(widget = SelectDateWidget( attrs = {'class':'select select-bordered'}))
+    kwargs = {
+            'years': range(1811, 1900),
+            'attrs': {
+                'class': 'select select-bordered'
+            }
+        }
+    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
