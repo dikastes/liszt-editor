@@ -52,7 +52,7 @@
                         <ul>
                         {% for person in found_persons %}
                             <li>
-                                <a href="{% url 'edwoca:manifestation_add_handwriting_writer' object.id form.instance.id person.object.id %}">{{ person.object }}</a>
+                                <a href="{% url 'edwoca:manifestation_add_handwriting_writer' object.id form.instance.id person.pk %}">{{ person.object }}</a>
                             </li>
                         {% empty %}
                             <li>Keine Suchergebnisse</li>
