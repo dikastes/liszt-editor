@@ -12,7 +12,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         with open(options['file_name'][0]) as file:
-            reader = DictReader(file)
+            reader = list(DictReader(file))
             total = len(reader)
             for i, row in enumerate(reader):
                 print(f'{i} von {total}')
