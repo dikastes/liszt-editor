@@ -10,6 +10,8 @@
                     {{ title_form.management_form }}
 
                     {{ title_form.as_daisy }}
+                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-{{ title_form.instance.id }}">
+                </form>
 
                 <div class="mt-5">
                     <h4 class="text-lg font-bold mb-5">Handschriften zum Titel</h4>
@@ -51,7 +53,7 @@
                                     <ul>
                                     {% for person in found_persons %}
                                         <li>
-                                            <a href="{% url 'edwoca:manifestation_title_add_handwriting_writer' object.id handwriting_form.instance.id person.object.id %}">{{ person.object }}</a>
+                                            <a href="{% url 'edwoca:manifestation_title_add_handwriting_writer' object.id handwriting_form.instance.id person.pk %}">{{ person.object }}</a>
                                         </li>
                                     {% empty %}
                                         <li>Keine Suchergebnisse</li>
@@ -67,9 +69,6 @@
                         <input type="submit" name="add_title_handwriting" value="Handschrift hinzufügen" class="btn btn-secondary mt-3">
                     </form>
                 </div>
-
-                <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-{{ title_form.instance.id }}">
-                </form>
 
                 <div class="modal-action flex-0 m-0">
                     <label for="save-button-{{ title_form.instance.id }}" class="btn btn-primary">Speichern</label>
@@ -150,7 +149,7 @@
             <ul>
             {% for person in found_persons %}
                 <li>
-                    <a href="{% url 'edwoca:manifestation_add_dedicatee' object.id person.object.id %}">{{ person.object }}</a>
+                    <a href="{% url 'edwoca:manifestation_add_dedicatee' object.id person.pk %}">{{ person.object }}</a>
                 </li>
             {% empty %}
                 <li> keine Suchergebnisse </li>

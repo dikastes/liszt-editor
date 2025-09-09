@@ -79,6 +79,7 @@ class ManifestationTitleForm(ModelForm):
             field_label.add(raw(str(field)))
             palette.add(field_label)
         form.add(palette)
+        form.add(raw(str(self['manifestation'])))
 
         return mark_safe(str(form))
 

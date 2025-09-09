@@ -578,7 +578,7 @@ def manifestation_manuscript_update(request, pk):
             if form.is_valid():
                 form.save()
 
-            for handwriting in manifestation.manifestationhandwriting_set.all():
+            for handwriting in manifestation.handwritings.all():
                 prefix = f'handwriting_{handwriting.id}'
                 handwriting_form = ManifestationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
                 if handwriting_form.is_valid():
