@@ -3,9 +3,10 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status
+from dmrism.models import BaseContributor, BaseBib, RelatedEntity
 
 
-class Work(WemiBaseClass):
+class Work(WeBaseClass):
     class Meta:
         ordering = ['work_catalog_number']
 

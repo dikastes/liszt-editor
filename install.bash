@@ -81,9 +81,6 @@ fi
 # === UPGRADE PIP ===
 run "$VENV_DIR/bin/pip" install --upgrade pip
 
-# === INSTALL NPM DEPS ROOT ===
-yellow "Installing root npm dependencies..."
-run "npm install --prefix \"$SCRIPT_DIR\""
 
 # === INSTALL NPM & BUILD TAILWIND IN APPS ===
 for APP in edwoca bib dmad_on_django liszt_util; do

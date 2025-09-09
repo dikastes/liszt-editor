@@ -3,6 +3,9 @@
 {% elif entity_type == 'manifestation' %}
 <div class="border border-base-300 bg-base-200 p-5 w-full mb-5">
     <p class="prose">
+	{% include 'edwoca/partials/classification_preview.html' %}
+    </p>
+    <p class="prose">
 	{% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
     </p>
     <p class="prose">

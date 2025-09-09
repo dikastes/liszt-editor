@@ -67,7 +67,7 @@ class Work(DisplayableModel):
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
         while trials:
             try:
-                pl_work = PyLobidWork(url, fetch_related=True)
+                pl_work = PyLobidWork(url, fetch_related=False)
 
             except GNDAPIError:
                 trials -= 1
@@ -117,7 +117,7 @@ class Work(DisplayableModel):
         if pl_work.form_of_work:
             self.form_of_work = SubjectTerm.fetch_or_get(pl_work.form_of_work[0]['id'])
         
-        self.gnd_subject_category = GNDSubjectCategory.create_or_link(loads(self.raw_data))
+        GNDSubjectCategory.create_or_link(self)
 
         if pl_work.opus:
             self.opus = pl_work.opus
@@ -174,7 +174,7 @@ class Work(DisplayableModel):
             for term in self.broader_terms.all():
                 table.append(("Oberbegriffe", f'<a href="{term.get_absolute_url()}"class="link link-primary">{term}</a>'))
 
-        table += GNDSubjectCategory.get_subject_category_table(self.gnd_subject_category) +\
+        table += GNDSubjectCategory.get_subject_category_table(self) +\
                 WorkGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
         
 

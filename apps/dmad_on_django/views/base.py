@@ -1,14 +1,15 @@
 from django import forms
 from django.shortcuts import redirect, render
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView, DeleteView
+from django.http import JsonResponse, HttpResponseRedirect
+import dmad_on_django.models as dmad_models
+from dmad_on_django.models import Person, Work, Place, SubjectTerm, Corporation
 from haystack.generic_views import SearchView
 from json import dumps
-from django.http import JsonResponse
-import dmad_on_django.models as dmad_models
-from dmad_on_django.models import Person, Work, Place, SubjectTerm
 from dmad_on_django.forms import formWidgets, DmadCreateForm, DmadUpdateForm
-from dmad_on_django.tools import camel_to_snake_case, snake_to_camel_case
+from liszt_util.tools import camel_to_snake_case, snake_to_camel_case
+from pylobid.pylobid import GNDNotFoundError
 
 def search_gnd(request, search_string, entity_type):
     response = getattr(dmad_models, snake_to_camel_case(entity_type)).search(search_string)
@@ -31,6 +32,7 @@ def json_search(request, entity_type, hash=''):
         'person_count': Person.objects.count(),
         'work_count': Work.objects.count(),
         'place_count': Place.objects.count(),
+        'corporation_count' : Corporation.objects.count()
     }
     return JsonResponse(context)
 
@@ -60,7 +62,8 @@ class NavbarContextMixin:
             'person_count': Person.objects.count(),
             'work_count': Work.objects.count(),
             'place_count': Place.objects.count(),
-            'subjectterm_count': SubjectTerm.objects.count()
+            'subjectterm_count': SubjectTerm.objects.count(),
+            'corporation_count': Corporation.objects.count()
         })
         return context
 

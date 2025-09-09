@@ -7,13 +7,10 @@
 		Kopf
 	    </a>
 	</li>
-	<li class="disabled">
-		{% comment %}
+	<li>
 	    <a href="{% url 'edwoca:manifestation_classification' object.id %}"
 		{% if 'classification' in request.path %}class="active"{% endif %}
 		>
-		{% endcomment %}
-	    <a href="#">
 		Quellenart
 	    </a>
 	</li>
@@ -24,19 +21,11 @@
 		Bezüge
 	    </a>
 	</li>
-	<li class="disabled">
-		{% comment %}
+	<li>
 	    <a href="{% url 'edwoca:manifestation_title' object.id %}"
 		{% if 'title' in request.path %}class="active"{% endif %}
 		>
-		{% endcomment %}
-	    <a href="#">
 		Titelei und Widmung
-	    </a>
-	</li>
-	<li class="disabled">
-	    <a href="#">
-		Eckdaten Werk
 	    </a>
 	</li>
 	<li>
@@ -47,10 +36,24 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:manifestation_contributors' object.id %}"
-		{% if 'contributors' in request.path %}class="active"{% endif %}
+	    <a href="{% url 'edwoca:manifestation_provenance' object.id %}"
+		{% if 'provenance' in request.path %}class="active"{% endif %}
 		>
-		Beteiligte
+		Provenienz
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_print' object.id %}"
+		{% if 'print' in request.path %}class="active"{% endif %}
+		>
+		Verlag und Druckspezifika
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_manuscript' object.id %}"
+		{% if 'manuscript' in request.path %}class="active"{% endif %}
+		>
+		Manuskriptspezifika
 	    </a>
 	</li>
 	<li>

@@ -1,23 +1,21 @@
 from django.db import models
-from django.utils.translation import gettext_lazy as _
 from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
-from iso639 import data as iso639_data
+from django.utils.translation import gettext_lazy as _
 from dominate.tags import div, table, tr, td
 from dominate.util import raw
-from json import dumps, loads
-
-
-max_trials = 3
+from iso639 import data as iso639_data
+from json import loads
+from liszt_util.tools import RenderRawJSONMixin
 
 
 languages = { iso_data['iso639_1'].upper(): iso_data['name'] for iso_data in iso639_data }
-
 Language = {key: languages[key] for key in ['DE', 'FR', 'HU', 'EN']}
+max_trials = 3
+
 
 for key in languages:
     Language[key] = languages[key]
-
 
 
 class Status(models.TextChoices):
@@ -31,40 +29,50 @@ class GNDSubjectCategory(models.Model):
     label = models.CharField(max_length=50)
 
     @staticmethod
-    def create_or_link(json):
+    def create_or_link(entity):
 
         try:
-            category = json['gndSubjectCategory'][0]
-
+            category = loads(entity.raw_data)['gndSubjectCategory']
         except KeyError:
-            return None
-        
+            return
 
-        try:
-            return GNDSubjectCategory.objects.get(link=category['id'])
-        except GNDSubjectCategory.DoesNotExist:
-            subjectcategory = GNDSubjectCategory()
-            subjectcategory.link = category['id']
-            subjectcategory.label = category['label']
-            subjectcategory.save()
-            return subjectcategory
+        for c in category:
+            try:
+                subject_category = GNDSubjectCategory.objects.get(link=c['id'])
+            except GNDSubjectCategory.DoesNotExist:
+                subject_category = GNDSubjectCategory()
+                subject_category.link = c['id']
+                subject_category.label = c['label']
+                subject_category.save()
+
+            entity.gnd_subject_category.add(subject_category)
 
     def get_subject_category_table(entity):
 
-        try:
-            link = entity.link
-            label = entity.label
-        except AttributeError:
-            return []
-        
-        return [("GND Sachgruppe",
-                  f'<a href="{link}"target = "_blank" class = "link link-primary">{label}</a>')]
+        table = []
+
+        for category in entity.gnd_subject_category.all():
+
+            try:
+                link = category.link
+                label = category.label
+
+            except AttributeError:
+                return []
+
+            table.append(("GND Sachgruppe",
+                  f'<a href="{link}"target = "_blank" class = "link link-primary">{label}</a>'))
+
+        return table
 
     def __str__(self):
         return self.label
-    
-class DisplayableModel(models.Model):
-    
+
+
+class DisplayableModel(RenderRawJSONMixin, models.Model):
+    class Meta:
+        abstract = True
+
     raw_data = models.TextField(null=True)
     rework_in_gnd = models.BooleanField(default=False)
     gnd_id = models.CharField(max_length=20, null=True, blank=True, unique=True)
@@ -74,14 +82,7 @@ class DisplayableModel(models.Model):
         null=True,
         blank=True
     )
-    gnd_subject_category = models.ForeignKey(
-        GNDSubjectCategory,
-        on_delete=models.SET_NULL,
-        null=True
-    )
-
-    def render_raw(self):
-        return dumps(loads(self.raw_data), indent=2, ensure_ascii=False)
+    gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
 
     def get_alt_names(self):
         return self.names.filter(status=Status.ALTERNATIVE)
@@ -101,11 +102,8 @@ class DisplayableModel(models.Model):
 
         return mark_safe(str(doc))
 
-    
     def get_table(self):
-        raise NotImplemented("Please override get_table")
+        raise NotImplementedError("Please override get_table")
 
-    
     class Meta:
         abstract = True
-        

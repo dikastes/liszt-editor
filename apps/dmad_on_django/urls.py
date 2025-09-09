@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .tools import snake_to_camel_case
+from liszt_util.tools import snake_to_camel_case
 
 from . import views
 
@@ -10,7 +10,8 @@ entities = [
         #'org',
         'place',
         'work',
-        'subject_term'
+        'subject_term',
+        'corporation'
     ]
 id_bearing_actions = [ 
         'update', 

@@ -3,11 +3,12 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, FormView
 from django.db.models import Case, When
-from dmad_on_django.forms import SearchForm
+from liszt_util.forms import SearchForm
 from dmad_on_django.models import Person, Status
-from dmad_on_django.tools import snake_to_camel_case, camel_to_snake_case
+from liszt_util.tools import snake_to_camel_case, camel_to_snake_case
 from haystack.generic_views import SearchView
-from ..models import Work, Manifestation, Expression, Item, Library
+from ..models import Work, Expression, Manifestation, Item
+from dmrism.models import Library
 from edwoca import forms as edwoca_forms
 from edwoca import models as edwoca_models
 
@@ -23,11 +24,11 @@ class EdwocaListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['form'] = SearchForm()
-        context['work_count'] = Work.objects.all().count()
-        context['expression_count'] = Expression.objects.all().count()
-        context['manifestation_count'] = Manifestation.objects.all().count()
-        context['item_count'] = Item.objects.all().count()
-        context['library_count'] = Library.objects.all().count()
+        context['work_count'] = Work.objects.count()
+        context['expression_count'] = Expression.objects.count()
+        context['manifestation_count'] = Manifestation.objects.count()
+        context['item_count'] = Item.objects.count()
+        context['library_count'] = Library.objects.count()
         context['list_entity_type'] = self.model.__name__.lower()
         return context
 
@@ -63,12 +64,12 @@ class EdwocaSearchView(SearchView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        context['work_count'] = Work.objects.all().count()
-        context['expression_count'] = Expression.objects.all().count()
-        context['manifestation_count'] = Manifestation.objects.all().count()
-        context['item_count'] = Item.objects.all().count()
-        context['library_count'] = Library.objects.all().count()
-        context['object_list'] = [ result.object for result in context['object_list'] ]
+        context['work_count'] = Work.objects.count()
+        context['expression_count'] = Expression.objects.count()
+        context['manifestation_count'] = Manifestation.objects.count()
+        context['item_count'] = Item.objects.count()
+        context['library_count'] = Library.objects.count()
+        context['object_list'] = [ result.object for result in SearchForm(self.request.GET).search().models(self.model) ]
         context['list_entity_type'] = self.get_model_name().lower()
 
         return context

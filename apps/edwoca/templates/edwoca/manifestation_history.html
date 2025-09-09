@@ -14,23 +14,39 @@
 		<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
 	</form>
 
-	{% if object.place %}
-		<div class="flex gap-5">
-			<label class="flex-1 input input-bordered flex items-center gap-2">
-				Ort
-				<input type="text" class="grow" disabled value="{{ object.place }}" />
-			</label>
-			<a class="flex-0 btn" href="{% url 'edwoca:manifestation_remove_place' object.id %}"> löschen </a>
-		</div>
-	{% else %}
-		<h3> Ort verknüpfen </h3>
+	<div class="prose">
+		<h2> Orte </h2>
+
+		<ul>
+		{% for place in object.places.all %}
+			<li>
+				<div class="flex">
+					<a href="{% url 'dmad_on_django:place_update' place.id %}" class="flex-1">
+						{{ place }}
+					</a>
+					<form method="post" action="{% url 'edwoca:manifestation_remove_place' object.id place.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Orte verknüpft </em> </li>
+		{% endfor %}
+		</ul>
+
+		<h3> neuen Ort verknüpfen </h3>
+	</div>
 
 		{% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get">
-			{{ searchform.q }}
+		<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get" class="flex gap-5">
+            <label class="input input-bordered flex items-center gap-2 flex-1">
+                Ort
+                {{ searchform.q }}
+            </label>
 			<input type="hidden" name="target_model" value="manifestation" />
-			<input type="submit" id="submit-form" class="btn" />
+			<input type="submit" id="submit-form" class="btn" value="Suchen"/>
 		</form>
 		
 		<ul>
@@ -59,10 +75,12 @@
 		</form>
 
 		{% endif %}
-	{% endif %}
 </div>
 
 <div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
+	<p class="prose">
+		{% include 'edwoca/partials/classification_preview.html' %}
+	</p>
 	<p class="prose">
 		{% include 'edwoca/partials/contributors_preview.html' %}
 	</p>

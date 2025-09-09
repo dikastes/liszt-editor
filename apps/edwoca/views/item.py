@@ -4,16 +4,18 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
+from ..models import Item as EdwocaItem
 
 
 class ItemListView(EdwocaListView):
-    model = Item
+    model = EdwocaItem
 
 
 class ItemSearchView(EdwocaSearchView):
-    model = Item
+    model = EdwocaItem
 
 
+"""
 class ItemTitleUpdateView(EntityMixin, TitleUpdateView):
     model = Item
     form_class = ItemTitleFormSet
@@ -21,16 +23,17 @@ class ItemTitleUpdateView(EntityMixin, TitleUpdateView):
 
     def get_success_url(self):
         return reverse_lazy('edwoca:item_title', kwargs = {'pk': self.object.id})
+"""
 
 
 class ItemUpdateView(EntityMixin, UpdateView):
-    model = Item
+    model = EdwocaItem
     #form_class = ItemForm
     template_name = 'edwoca/item_update.html'
 
 
 class ItemCreateView(EntityMixin, CreateView):
-    model = Item
+    model = EdwocaItem
     #form_class = ItemForm
     template_name = 'edwoca/create.html'
 
@@ -70,13 +73,13 @@ class ItemCreateView(EntityMixin, CreateView):
 
 
 class ItemLocationUpdateView(SimpleFormView):
-    model = Item
+    model = EdwocaItem
     property = 'location'
 
 
 class ItemRelationsUpdateView(EntityMixin, RelationsUpdateView):
     template_name = 'edwoca/item_relations.html'
-    model = Item
+    model = EdwocaItem
     form_class = RelatedItemForm
 
 
@@ -93,7 +96,7 @@ class RelatedItemRemoveView(DeleteView):
 
 
 class ItemContributorsUpdateView(EntityMixin, ContributorsUpdateView):
-    model = Item
+    model = EdwocaItem
     form_class = ItemContributorForm
 
 
@@ -113,30 +116,30 @@ class ItemProvenanceUpdateView(EntityMixin, UpdateView):
 
 
 class ItemDetailsUpdateView(SimpleFormView):
-    model = Item
+    model = EdwocaItem
     property = 'details'
 
 
 class ItemDescriptionUpdateView(SimpleFormView):
-    model = Item
+    model = EdwocaItem
     property = 'description'
 
 
 class ItemDigcopyUpdateView(SimpleFormView):
-    model = Item
+    model = EdwocaItem
     property = 'digcopy'
 
 
 class ItemCommentUpdateView(SimpleFormView):
-    model = Item
+    model = EdwocaItem
     property = 'comment'
 
 
 class ItemDeleteView(EntityMixin, DeleteView):
-    model = Item
+    model = EdwocaItem
 
     def get_success_url(self):
-        return self.object.manifestation.get_absolute_url()
+        return self.object.get_manifestation_url()
 
 
 class LibraryListView(EdwocaListView):
