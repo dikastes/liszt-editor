@@ -6,7 +6,8 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, Signature, Library
-from dmad_on_django.models import Language, Status
+from dmad_on_django.models import Language, Status, Period, Person, Corporation
+from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
 
@@ -31,6 +32,35 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         PARTICELL = 'PTC', _('Particell')
         PIANO_REDUCTION = 'PNR', _('Piano Reduction')
         CHOIR_SCORE = 'CSC', _('Choir Score')
+
+    class Function(models.TextChoices):
+        COPY = 'CP', _('Copy')
+        ALBUM_PAGE = 'AP', _('Album Page')
+        PART_EXCERPT = 'PE', _('Part Excerpt')
+        DEDICATION_ITEM = 'DI', _('Dedication Item')
+        STITCH_TEMPLATE = 'ST', _('Stitch Template')
+        CORRECTED_STITCH_TEMPLATE = 'CS', _('Corrected Stitch Template')
+
+        def parse_from_german(german_string):
+            match german_string:
+                case 'Abschrift': return Manifestation.Function.COPY
+                case 'Albumblatt': return Manifestation.Function.ALBUM_PAGE
+                case 'Chorstimmenauszug': return Manifestation.Function.PART_EXCERPT
+                case 'Dedikationsexemplar': return Manifestation.Function.DEDICATION_ITEM
+                case 'Stichvorlage': return Manifestation.Function.STITCH_TEMPLATE
+                case 'korrigierte Stichvorlage': return Manifestation.Function.CORRECTED_STITCH_TEMPLATE
+
+    class SourceType(models.TextChoices):
+        AUTOGRAPH = 'AUT', _('Autograph')
+        COPY = 'CPY', _('Abschrift')
+        CORRECTED_COPY = 'CCP', _('Korrigierte Abschrift')
+        PRINT = 'PRT', _('Print')
+        CORRECTED_PRINT = 'CPR', _('Corrected Print')
+
+        def parse_from_rism(rism_string):
+            match rism_string:
+                case 'Autograph manuscript': return AUTOGRAPH
+                case 'Manuscript copy': return COPY
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
@@ -68,15 +98,31 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         )
     manifestation_form = models.CharField(
             max_length=10,
-            choices = ManifestationForm,
+            choices = ManifestationForm.choices,
             default = None,
-            null = True
+            null = True,
+            blank = True
         )
     edition_type = models.CharField(
             max_length = 10,
-            choices = EditionType,
+            choices = EditionType.choices,
             default = None,
-            null = True
+            null = True,
+            blank = True
+        )
+    source_type = models.CharField(
+            max_length = 5,
+            choices = SourceType.choices,
+            default = None,
+            null = True,
+            blank = True
+        )
+    function = models.CharField(
+            max_length = 5,
+            choices = Function.choices,
+            default = None,
+            null = True,
+            blank = True
         )
     state = models.CharField(
             max_length=10,
@@ -146,16 +192,43 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-    function = models.CharField(
-            max_length=50,
-            null = True,
-            blank = True
-        )
     publisher = models.ForeignKey(
             'dmad.Corporation',
             related_name = 'publishers',
             null = True,
             on_delete = models.SET_NULL
+        )
+    private_head_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_relations_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_title_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_history_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_manuscript_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_provenance_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    public_provenance_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    taken_information = models.TextField(
+            blank = True,
+            null = True
         )
 
     def render_handwritings(self):
@@ -189,7 +262,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             temporary_title = ''
 
         if self.items.count():
-            return self.items.all()[0].__str__() + temporary_title
+            return self.items.all()[0].get_current_signature() + temporary_title
 
         return '<Fehler: keine Items>'
 
@@ -371,6 +444,14 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
         return self
 
+    def save(self, **kwargs):
+        old_manifestation = Manifestation.objects.filter(id = self.id).first()
+        if old_manifestation:
+            old_rism_id = old_manifestation.rism_id
+            if old_rism_id != self.rism_id:
+                self.rism_id_unaligned = True
+        super().save(**kwargs)
+
     def get_or_create(rism_id):
         return Manifestation.objects.filter(rism_id = rism_id).first() or \
             Manifestation.objects.create(rism_id = rism_id).pull_rism_data()
@@ -465,8 +546,11 @@ class BaseHandwriting(models.Model):
             null = True,
             blank = True
         )
+    dubious_writer = models.BooleanField(default = False)
 
     def __str__(self):
+        if self.dubious_writer:
+            return f"[{self.writer.__str__()}] ({self.medium})"
         return f"{self.writer.__str__()} ({self.medium})"
 
 
@@ -484,5 +568,7 @@ class ManifestationTitleHandwriting(BaseHandwriting):
             related_name = 'handwritings',
             on_delete = models.CASCADE
         )
+
+
 
 

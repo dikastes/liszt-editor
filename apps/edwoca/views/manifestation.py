@@ -1,20 +1,20 @@
-from .base import *
-from ..models import Manifestation as EdwocaManifestation
 from ..forms.manifestation import *
-from ..forms import ManifestationForm, SignatureFormSet, ItemForm, ManifestationTitleForm, ManifestationDedicationForm, ManifestationTitleHandwritingForm
-from dmad_on_django.forms import SearchForm
+from ..forms.item import SignatureFormSet, ItemForm
+from ..forms.manifestation import *
+from ..models import Manifestation as EdwocaManifestation
 from ..models import ManifestationTitle, ManifestationTitleHandwriting
-from dmad_on_django.models.person import Person
+from .base import *
+from bib.models import ZotItem
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
-from dmad_on_django.models import Place, Corporation
-from dmrism.models.manifestation import ManifestationBib
+from dmad_on_django.forms import SearchForm
+from dmad_on_django.models import Place, Corporation, Status, Person
+from dmrism.models.item import Signature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library
 from dmrism.models.manifestation import Manifestation as DmrismManifestation
-from dmrism.models.item import Signature
-from bib.models import ZotItem
+from dmrism.models.manifestation import ManifestationBib
 
 
 class ManifestationListView(EdwocaListView):
@@ -24,39 +24,34 @@ class ManifestationSearchView(EdwocaSearchView):
     model = EdwocaManifestation
 
 
-class ManifestationCreateView(CreateView):
-    model = Manifestation
-    form_class = ManifestationForm
-    template_name = 'edwoca/create.html'
+def manifestation_create(request):
+    if request.method == 'POST':
+        form = ManifestationCreateForm(request.POST)
+        if form.is_valid():
+            manifestation = EdwocaManifestation.objects.create()
+            if form.cleaned_data['temporary_title']:
+                ManifestationTitle.objects.create(
+                    manifestation=manifestation,
+                    title=form.cleaned_data['temporary_title'],
+                    status=Status.TEMPORARY
+                )
 
-    def get_success_url(self):
-        return self.object.get_absolute_url()
+            item = Item.objects.create(manifestation=manifestation)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'title_formset' not in context:
-            if self.request.POST:
-                context['title_formset'] = ManifestationTitleFormSet(self.request.POST, self.request.FILES)
-            else:
-                ManifestationTitleFormSet.can_delete = False
-                context['title_form_set'] = ManifestationTitleFormSet()
-        return context
+            library = form.cleaned_data['library']
+            signature = Signature.objects.create(
+                library=library,
+                signature=form.cleaned_data['signature']
+            )
+            item.signatures.add(signature)
 
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        title_formset = ManifestationTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
+            return redirect('edwoca:manifestation_update', pk=manifestation.pk)
+    else:
+        form = ManifestationCreateForm()
 
-        if title_formset.is_valid():
-            self.object.save()
-            title_formset.save()
-            return redirect(self.get_success_url())
-        else:
-            self.object = None
-            return self.form_invalid(form, title_formset=title_formset)
-
-    def form_invalid(self, form, title_formset=None):
-        context = self.get_context_data(form=form, title_formset=title_formset)
-        return self.render_to_response(context)
+    return render(request, 'edwoca/create_manifestation.html', {
+        'form': form,
+    })
 
 
 #class ManifestationUpdateView(EntityMixin, UpdateView):
@@ -328,13 +323,29 @@ class RelatedManifestationRemoveView(DeleteView):
     model = RelatedManifestation
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_work.id})
+        return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_manifestation.id})
 
 
 class ManifestationRelationsUpdateView(EntityMixin, RelationsUpdateView):
     template_name = 'edwoca/manifestation_relations.html'
     model = Manifestation
     form_class = RelatedManifestationForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        relations_comment_form = ManifestationRelationsCommentForm(request.POST, instance=self.object)
+        if relations_comment_form.is_valid():
+            relations_comment_form.save()
+            return redirect(self.object.get_absolute_url())
+        else:
+            context = self.get_context_data(**kwargs)
+            context['relations_comment_form'] = relations_comment_form
+            return self.render_to_response(context)
 
 
 class ManifestationHistoryUpdateView(SimpleFormView):
@@ -464,9 +475,94 @@ class ManifestationPrintUpdateView(SimpleFormView):
 
         return context
 
+
 class ManifestationClassificationUpdateView(SimpleFormView):
     model = Manifestation
     property = 'classification'
+
+
+def manifestation_provenance(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    item = manifestation.items.first() # Assuming provenance is for the first item
+
+    context = {
+        'object': manifestation,
+        'entity_type': 'manifestation',
+        'item': item, # Pass item to context
+    }
+
+    if request.method == 'POST':
+        # Handle existing PersonProvenanceStation forms
+        for pps_obj in item.person_provenance_stations.all():
+            prefix = f'person_provenance_{pps_obj.id}'
+            pps_form = PersonProvenanceStationForm(request.POST, instance=pps_obj, prefix=prefix)
+            if pps_form.is_valid():
+                pps_form.save()
+
+        # Handle new PersonProvenanceStation form
+        new_pps_form = PersonProvenanceStationForm(request.POST, prefix='new_person_provenance')
+        if new_pps_form.is_valid() and new_pps_form.has_changed():
+            new_pps = new_pps_form.save(commit=False)
+            new_pps.item = item
+            new_pps.save()
+
+        # Handle existing CorporationProvenanceStation forms
+        for cps_obj in item.corporation_provenance_stations.all():
+            prefix = f'corporation_provenance_{cps_obj.id}'
+            cps_form = CorporationProvenanceStationForm(request.POST, instance=cps_obj, prefix=prefix)
+            if cps_form.is_valid():
+                cps_form.save()
+
+        # Handle new CorporationProvenanceStation form
+        new_cps_form = CorporationProvenanceStationForm(request.POST, prefix='new_corporation_provenance')
+        if new_cps_form.is_valid() and new_cps_form.has_changed():
+            new_cps = new_cps_form.save(commit=False)
+            new_cps.item = item
+            new_cps.save()
+
+        # Handle private_provenance_comment form
+        provenance_comment_form = ManifestationProvenanceCommentForm(request.POST, instance=manifestation)
+        if provenance_comment_form.is_valid():
+            provenance_comment_form.save()
+
+        return redirect('edwoca:manifestation_provenance', pk=pk)
+    else:
+        # Initialize forms for existing PersonProvenanceStation
+        person_provenance_forms = []
+        for pps_obj in item.person_provenance_stations.all():
+            prefix = f'person_provenance_{pps_obj.id}'
+            person_provenance_forms.append(PersonProvenanceStationForm(instance=pps_obj, prefix=prefix))
+        context['person_provenance_forms'] = person_provenance_forms
+
+        # Initialize form for new PersonProvenanceStation
+        new_person_provenance_form = PersonProvenanceStationForm(prefix='new_person_provenance', initial={'item': item})
+        context['new_person_provenance_form'] = new_person_provenance_form
+
+        # Initialize forms for existing CorporationProvenanceStation
+        corporation_provenance_forms = []
+        for cps_obj in item.corporation_provenance_stations.all():
+            prefix = f'corporation_provenance_{cps_obj.id}'
+            corporation_provenance_forms.append(CorporationProvenanceStationForm(instance=cps_obj, prefix=prefix))
+        context['corporation_provenance_forms'] = corporation_provenance_forms
+
+        # Initialize form for new CorporationProvenanceStation
+        new_corporation_provenance_form = CorporationProvenanceStationForm(prefix='new_corporation_provenance', initial={'item': item})
+        context['new_corporation_provenance_form'] = new_corporation_provenance_form
+
+        # Initialize private_provenance_comment form
+        provenance_comment_form = ManifestationProvenanceCommentForm(instance=manifestation)
+        context['provenance_comment_form'] = provenance_comment_form
+
+    search_form = SearchForm(request.GET or None)
+    context['search_form'] = search_form
+
+    if search_form.is_valid() and search_form.cleaned_data.get('q'):
+        context['query'] = search_form.cleaned_data.get('q')
+        context['found_persons'] = search_form.search().models(Person)
+        context['found_corporations'] = search_form.search().models(Corporation)
+        context['found_bibs'] = search_form.search().models(Bib) # Use Bib instead of ZotItem
+
+    return render(request, 'edwoca/manifestation_provenance.html', context)
 
 
 def manifestation_manuscript_update(request, pk):

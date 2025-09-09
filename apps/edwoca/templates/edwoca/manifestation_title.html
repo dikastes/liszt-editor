@@ -134,11 +134,11 @@
     <form method="post">
         {% csrf_token %}
         {{ dedication_form.as_daisy }}
-        <input type="submit" value="Speichern" class="btn btn-primary mt-5">
+        <input id="submit-form" type="submit" value="Speichern" class="hidden">
     </form>
 
     <div class="mt-5">
-        <h3 class="text-lg font-bold">Widmungsträger</h3>
+        <h3 class="text-lg font-bold mb-5">Widmungsträger</h3>
         <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex-1 flex gap-5">
             <label class="input input-bordered flex items-center gap-2 flex-1">
                 Widmungsträger

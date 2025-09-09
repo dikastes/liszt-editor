@@ -1,7 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from dmad_on_django.models import Status, Language, Person, Corporation, Place
+from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
 from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, ManifestationHandwriting, ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
@@ -11,6 +11,8 @@ from re import compile, split
 class EdwocaUpdateUrlMixin:
     def get_absolute_url(self):
         model = self.__class__.__name__.lower()
+        if model == 'item' and self.manifestation.is_singleton:
+            return reverse('edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
         return reverse(f'edwoca:{model}_update', kwargs={'pk': self.id})
 
 
@@ -65,7 +67,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         return None
 
     def extract_medium(medium_string):
-        MEDIUM_PATTERN = '\([\w ,]*\)?'
+        MEDIUM_PATTERN = '\([\w ,]+\)?'
         medium_pattern= compile(MEDIUM_PATTERN)
         match = medium_pattern.search(medium_string)
         if match:
@@ -74,10 +76,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 replace(')', '').\
                 strip()
 
-    def parse_csv(self, raw_data):
+    def parse_csv(self, raw_data, source_type):
         INSTITUTION_KEY = 'Bestandeshaltende Institution'
         FORMER_SIGNATURE_KEY = 'Signatur, vormalig'
         IDENTIFICATION_KEY = 'WVZ-Nr.'
+        TITLE_KEY = 'Titel (normiert, nach MGG)'
         EDITION_TYPE_KEY = 'Ausgabeform (Typ)'
         FUNCTION_KEY = 'Funktion'
 
@@ -93,13 +96,13 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         MEDIUM_OF_PERFORMANCE_KEY = 'Besetzung (normiert)'
         TEMPO_KEY = 'Tempoangabe (normiert)'
         METRONOM_KEY = 'Metronomangabe'
+        LANGUAGE_KEY = 'Sprachcode'
         TEXT_INCIPIT_KEY = 'Text-Incipit (diplomatisch)'
         LOCATION_KEY = 'GND-Nr. Ort'
         DIPLOMATIC_DATE_KEY = 'Datierung (diplomatisch)'
         MACHINE_READABLE_DATE_KEY = 'Datierung (maschinenlesbar)'
         RELATED_PRINT_PUBLISHER_KEY = 'Bezug zu Druck: Verlags-GND-Nr.'
         RELATED_PRINT_PLATE_NUMBER_KEY = 'Bezug zu Druck: Plattennr.'
-        TITLE_KEY = 'Titel (normiert, nach MGG)'
 
         AUTOGRAPH_HANDWRITING_KEY = 'Schrift (Liszt egh.)'
         FOREIGN_HANDWRITING_KEY = 'Schrift (fremder Hand)'
@@ -114,6 +117,23 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         ANONYMOUS_WRITERS = ['zS', 'Dr']
 
+        FUNCTION_KEY = 'Funktion'
+
+        DEDUCED_PLACE_NAME_KEY = 'Ort ermittelt (normiert)'
+        DEDUCED_PLACE_ID_KEY = 'Ort ermittelt GND-Nr.'
+
+        PROVENANCE_KEY1 = 'Provenienz Station 1'
+        PROVENANCE_KEY2 = 'Provenienz Station 2'
+        PROVENANCE_KEY3 = 'Provenienz Station 3'
+        PROVENANCE_KEY4 = 'Provenienz Station 4'
+
+        self.private_provenance_comment = '\n'.join(
+                provenance_string for
+                provenance_key in
+                [ PROVENANCE_KEY1, PROVENANCE_KEY2, PROVENANCE_KEY3, PROVENANCE_KEY4 ]
+                if (provenance_string := raw_data[provenance_key])
+            )
+
         for writer in ANONYMOUS_WRITERS:
             if Person.objects.filter(interim_designator = writer).count() == 0:
                 Person.objects.create(interim_designator = writer)
@@ -121,10 +141,27 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         # add stitch template flag to manifestation?
         liszt = Person.fetch_or_get(LISZT_GND_ID)
 
-        self.private_comment = raw_data[IDENTIFICATION_KEY]
+        if not getattr(Manifestation.SourceType, source_type):
+            raise Exception(f'Unknown source type {source_type}')
+
+        self.source_type = getattr(Manifestation.SourceType, source_type)
+
         self.is_singleton = True
         self.titles.all().delete()
 
+        self.private_head_comment = '\n'.join([
+                raw_data[IDENTIFICATION_KEY],
+                raw_data[MEDIUM_OF_PERFORMANCE_KEY],
+                raw_data[TEMPO_KEY],
+                raw_data[METRONOM_KEY],
+                raw_data[LANGUAGE_KEY],
+                raw_data[TEXT_INCIPIT_KEY]
+            ])
+
+        if raw_data[DEDUCED_PLACE_NAME_KEY]:
+            self.private_history_comment = f"Ort ermittelt: {raw_data[DEDUCED_PLACE_NAME_KEY]}, {raw_data[DEDUCED_PLACE_ID_KEY]}"
+
+        self.function = Manifestation.Function.parse_from_german(raw_data[FUNCTION_KEY])
 
         if self.RISM_ID_KEY in raw_data and\
             raw_data[self.RISM_ID_KEY] and\
@@ -163,7 +200,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if EDITION_TYPE_KEY in raw_data:
             self.edition_type = Manifestation.parse_edition_type(raw_data[EDITION_TYPE_KEY])
-        self.function = raw_data[FUNCTION_KEY]
 
         self.dedication = raw_data[DEDICATION_KEY]
         if self.dedication:
@@ -180,6 +216,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             break
 
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY].replace(' | ', '\n')
+        if raw_data[MACHINE_READABLE_DATE_KEY]:
+            self.period = Period.parse(raw_data[MACHINE_READABLE_DATE_KEY])
 
         if raw_data[RELATED_PRINT_PUBLISHER_KEY]:
             self.publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY])
@@ -197,6 +235,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if FOREIGN_HANDWRITING_KEY in raw_data\
             and raw_data[FOREIGN_HANDWRITING_KEY]:
             for entry in raw_data[FOREIGN_HANDWRITING_KEY].split('$'):
+                dubious_writer = False
+                if '?' in entry:
+                    dubious_writer = True
                 writer_gnd_id = Manifestation.extract_gnd_id(entry)
                 medium = Manifestation.extract_medium(entry)
                 if writer_gnd_id:
@@ -204,14 +245,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     ManifestationHandwriting.objects.create(
                             writer = writer,
                             manifestation = self,
-                            medium = medium
+                            medium = medium,
+                            dubious_writer = dubious_writer
                         )
                 else:
                     if 'Liszt' in entry:
                         ManifestationHandwriting.objects.create(
                                 writer = liszt,
                                 manifestation = self,
-                                medium = medium
+                                medium = medium,
+                                dubious_writer = dubious_writer
                             )
                     else:
                         anonymous_writer_found = False
@@ -221,14 +264,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 ManifestationHandwriting.objects.create(
                                         writer = writer,
                                         manifestation = self,
-                                        medium = medium
+                                        medium = medium,
+                                        dubious_writer = dubious_writer
                                     )
                                 anonymous_writer_found = True
                                 break
                         if not anonymous_writer_found:
                             ManifestationHandwriting.objects.create(
                                     manifestation = self,
-                                    medium = medium
+                                    medium = medium,
+                                    dubious_writer = dubious_writer
                                 )
 
         if ENVELOPE_TITLE_KEY in raw_data and\
@@ -238,22 +283,38 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 for entry in split('\$|\),', raw_data[ENVELOPE_TITLE_WRITER_KEY]):
                     writer_gnd_id = Manifestation.extract_gnd_id(entry)
                     if writer_gnd_id:
-                        writer_medium_list += [{ 'writer': Person.fetch_or_get(writer_gnd_id), 'medium': Manifestation.extract_medium(entry) }]
+                        writer_medium_list += [{
+                                'writer': Person.fetch_or_get(writer_gnd_id),
+                                'medium': Manifestation.extract_medium(entry),
+                                'dubious_writer': True if '?' in entry else False
+                            }]
                     else:
                         if 'Liszt' in entry:
-                            writer_medium_list += [{ 'writer': liszt, 'medium': Manifestation.extract_medium(entry) }]
+                            writer_medium_list += [{
+                                    'writer': liszt,
+                                    'medium': Manifestation.extract_medium(entry),
+                                    'dubious_writer': True if '?' in entry else False
+                                }]
                         else:
                             anonymous_writer_found = False
                             for anonymous_writer in ANONYMOUS_WRITERS:
                                 if anonymous_writer in entry:
-                                    writer_medium_list += [{ 'writer': Person.objects.get(interim_designator = anonymous_writer), 'medium': Manifestation.extract_medium(entry) }]
+                                    writer_medium_list += [{
+                                            'writer': Person.objects.get(interim_designator = anonymous_writer),
+                                            'medium': Manifestation.extract_medium(entry),
+                                            'dubious_writer': True if '?' in entry else False
+                                        }]
                                     anonymous_writer_found = True
                                     break
                             if not anonymous_writer_found:
                                 print(f"no writer found for envelope title")
 
             if ENVELOPE_TITLE_MEDIUM_KEY in raw_data:
-                writer_medium_list += [{ 'writer': liszt, 'medium': raw_data[ENVELOPE_TITLE_MEDIUM_KEY] }]
+                writer_medium_list += [{
+                        'writer': liszt,
+                        'medium': raw_data[HEAD_TITLE_MEDIUM_KEY],
+                        'dubious_writer': False
+                    }]
 
             manifestation_title_list = []
             for i, title in enumerate(raw_data[ENVELOPE_TITLE_KEY].split('$')):
@@ -272,6 +333,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 ManifestationTitleHandwriting.objects.create(
                         writer = writer_medium_list[0]['writer'],
                         medium = writer_medium_list[0]['medium'],
+                        dubious_writer = writer_medium_list[0]['dubious_writer'],
                         manifestation_title = manifestation_title_list[0]
                     )
 
@@ -280,7 +342,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     ManifestationTitleHandwriting.objects.create(
                             writer = writer_medium['writer'],
                             medium = writer_medium['medium'],
-                            manifestation_title = manifestation_title_list[0]
+                            dubious_writer = writer_medium['dubious_writer'],
+                            manifestation_title = manifestation_title_list[0],
                         )
 
             if len(manifestation_title_list) > 1 and len(writer_medium_list) == 1:
@@ -288,7 +351,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     ManifestationTitleHandwriting.objects.create(
                             writer = writer_medium_list[0]['writer'],
                             medium = writer_medium_list[0]['medium'],
-                            manifestation_title = manifestation_title
+                            dubious_writer = writer_medium_list[0]['dubious_writer'],
+                            manifestation_title = manifestation_title,
                         )
 
             if len(manifestation_title_list) > 1 and len(writer_medium_list) > 1:
@@ -298,7 +362,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     ManifestationTitleHandwriting.objects.create(
                             writer = writer_medium['writer'],
                             medium = writer_medium['medium'],
-                            manifestation_title = manifestation_title_list[i]
+                            dubious_writer = writer_medium['dubious_writer'],
+                            manifestation_title = manifestation_title_list[i],
                         )
 
         if HEAD_TITLE_KEY in raw_data and\
@@ -308,22 +373,38 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 for entry in split('\$|\),', raw_data[HEAD_TITLE_WRITER_KEY]):
                     writer_gnd_id = Manifestation.extract_gnd_id(entry)
                     if writer_gnd_id:
-                        writer_medium_list += [{ 'writer': Person.fetch_or_get(writer_gnd_id), 'medium': Manifestation.extract_medium(entry) }]
+                        writer_medium_list += [{
+                                'writer': Person.fetch_or_get(writer_gnd_id),
+                                'medium': Manifestation.extract_medium(entry),
+                                'dubious_writer': True if '?' in entry else False
+                            }]
                     else:
                         if 'Liszt' in entry:
-                            writer_medium_list += [{ 'writer': liszt, 'medium': Manifestation.extract_medium(entry) }]
+                            writer_medium_list += [{
+                                    'writer': liszt,
+                                    'medium': Manifestation.extract_medium(entry),
+                                    'dubious_writer': True if '?' in entry else False
+                                }]
                         else:
                             anonymous_writer_found = False
                             for anonymous_writer in ANONYMOUS_WRITERS:
                                 if anonymous_writer in entry:
-                                    writer_medium_list += [{ 'writer': Person.objects.get(interim_designator = anonymous_writer), 'medium': Manifestation.extract_medium(entry) }]
+                                    writer_medium_list += [{
+                                            'writer': Person.objects.get(interim_designator = anonymous_writer),
+                                            'medium': Manifestation.extract_medium(entry),
+                                            'dubious_writer': True if '?' in entry else False
+                                        }]
                                     anonymous_writer_found = True
                                     break
                             if not anonymous_writer_found:
                                 print(f"no writer found for envelope title")
 
             if HEAD_TITLE_MEDIUM_KEY in raw_data:
-                writer_medium_list += [{ 'writer': liszt, 'medium': raw_data[HEAD_TITLE_MEDIUM_KEY] }]
+                writer_medium_list += [{
+                        'writer': liszt,
+                        'medium': raw_data[HEAD_TITLE_MEDIUM_KEY],
+                        'dubious_writer': False
+                    }]
 
             manifestation_title_list = []
             for i, title in enumerate(raw_data[HEAD_TITLE_KEY].split('$')):
@@ -342,6 +423,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 ManifestationTitleHandwriting.objects.create(
                         writer = writer_medium_list[0]['writer'],
                         medium = writer_medium_list[0]['medium'],
+                        dubious_writer = writer_medium_list[0]['dubious_writer'],
                         manifestation_title = manifestation_title_list[0]
                     )
 
@@ -350,6 +432,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     ManifestationTitleHandwriting.objects.create(
                             writer = writer_medium['writer'],
                             medium = writer_medium['medium'],
+                            dubious_writer = writer_medium['dubious_writer'],
                             manifestation_title = manifestation_title_list[0]
                         )
 
@@ -358,6 +441,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     ManifestationTitleHandwriting.objects.create(
                             writer = writer_medium_list[0]['writer'],
                             medium = writer_medium_list[0]['medium'],
+                            dubious_writer = writer_medium_list[0]['dubious_writer'],
                             manifestation_title = manifestation_title
                         )
 
@@ -368,6 +452,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     ManifestationTitleHandwriting.objects.create(
                             writer = writer_medium['writer'],
                             medium = writer_medium['medium'],
+                            dubious_writer = writer_medium['dubious_writer'],
                             manifestation_title = manifestation_title_list[i]
                         )
 

@@ -28,16 +28,18 @@
 		Titelei und Widmung
 	    </a>
 	</li>
-	<li class="disabled">
-	    <a href="#">
-		Eckdaten Werk
-	    </a>
-	</li>
 	<li>
 	    <a href="{% url 'edwoca:manifestation_history' object.id %}"
 		{% if 'history' in request.path %}class="active"{% endif %}
 		>
 		Datierung und Ort
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:manifestation_provenance' object.id %}"
+		{% if 'provenance' in request.path %}class="active"{% endif %}
+		>
+		Provenienz
 	    </a>
 	</li>
 	<li>

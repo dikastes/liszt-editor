@@ -1,11 +1,11 @@
 from .models import Manifestation
-from django.forms import ModelForm, TextInput
+from django.forms import ModelForm, TextInput, Textarea
 from dominate.tags import div, label, span
 from dominate.util import raw
 from django.utils.safestring import mark_safe
 
 
-class ManifestationForm(ModelForm):
+class ManifestationEditForm(ModelForm):
     class Meta:
         model = Manifestation
         fields = ['rism_id']

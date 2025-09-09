@@ -1,4 +1,4 @@
-from ..forms import ManifestationForm
+from ..forms import ManifestationEditForm
 from ..models.manifestation import Manifestation
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
@@ -41,13 +41,15 @@ class ManifestationSearchView(SearchView):
 class ManifestationCreateView(CreateView):
     model = Manifestation
     template_name = 'dmrism/form.html'
-    form_class = ManifestationForm
+    form_class = ManifestationEditForm
 
     def form_valid(self, form):
         response = super().form_valid(form)
         self.object.pull_rism_data()
         return response
 
+
+from edwoca.forms.manifestation import ManifestationRelationsCommentForm
 
 class ManifestationDetailView(DetailView):
     model = Manifestation
@@ -56,14 +58,8 @@ class ManifestationDetailView(DetailView):
 
 class ManifestationUpdateView(UpdateView):
     model = Manifestation
-    form_class = ManifestationForm
+    form_class = ManifestationEditForm
     template_name = 'dmrism/form.html'
-
-    def form_valid(self, form):
-        old_manifestation = Manifestation.objects.get(id = self.object.id)
-        if old_manifestation.rism_id != self.object.rism_id:
-            self.object.rism_id_unaligned = True
-        return super().form_valid(form)
 
 
 class ManifestationDeleteView(DeleteView):
@@ -100,7 +96,7 @@ def manifestation_pull(request, pk):
             if temporary_manifestation.related_manifestations.all().filter(id = related_manifestation.id).count() == 0:
                 unchanged_relations = False
 
-    if manifestation.items.all()[0].__str__() == temporary_manifestation.items.all()[0].__str__():
+    if manifestation.items.count() and manifestation.items.all()[0].get_current_signature() == temporary_manifestation.items.all()[0].get_current_signature():
         unchanged_items = True
     else:
         unchanged_items = False
@@ -111,6 +107,8 @@ def manifestation_pull(request, pk):
 
     if unchanged_fields and unchanged_relations and unchanged_items:
         temporary_manifestation.delete()
+        manifestation.rism_id_unaligned = False
+        manifestation.save()
         context['unchanged'] = True
     else:
         context['unchanged'] = False

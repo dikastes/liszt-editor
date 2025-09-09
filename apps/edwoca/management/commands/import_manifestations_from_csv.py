@@ -8,13 +8,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('file_name', nargs=1, type=str)
+        parser.add_argument('source_type', nargs=1, type=str)
 
     def handle(self, *args, **options):
         with open(options['file_name'][0]) as file:
             reader = DictReader(file)
-            for row in reader:
-                print(row[Manifestation.RISM_ID_KEY])
-                print(row[Manifestation.CURRENT_SIGNATURE_KEY])
+            total = len(reader)
+            for i, row in enumerate(reader):
+                print(f'{i} von {total}')
+                print(f'{row[Manifestation.CURRENT_SIGNATURE_KEY]}, {row[Manifestation.RISM_ID_KEY]})
                 # reactivate when RISM IDs are unique
                 #if Manifestation.RISM_ID_KEY in row and \
                     #row[Manifestation.RISM_ID_KEY] and \
@@ -24,7 +26,7 @@ class Command(BaseCommand):
                 manifestation = Manifestation.objects.create()
 
                 try:
-                    manifestation.parse_csv(row)
+                    manifestation.parse_csv(row, options['source_type'][0])
                 except (GNDNotFoundError, GNDIdError) as e:
                     manifestation.delete()
                     print(f"GND Error in {row[Manifestation.RISM_ID_KEY]}, {row[Manifestation.CURRENT_SIGNATURE_KEY]}")
