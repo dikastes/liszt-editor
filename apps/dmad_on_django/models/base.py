@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse_lazy
+from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from dominate.tags import div, table, tr, td
 from dominate.util import raw
@@ -99,7 +100,7 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
                     else:
                       tr(td(label), td(str(value) or "—"))
 
-        return str(doc)
+        return mark_safe(str(doc))
 
     def get_table(self):
         raise NotImplementedError("Please override get_table")

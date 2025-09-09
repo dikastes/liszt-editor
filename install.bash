@@ -83,7 +83,7 @@ run "$VENV_DIR/bin/pip" install --upgrade pip
 
 
 # === INSTALL NPM & BUILD TAILWIND IN APPS ===
-for APP in edwoca bib dmad_on_django; do
+for APP in edwoca bib dmad_on_django liszt_util; do
   (
     cd "$SCRIPT_DIR/apps/$APP" || { red "App directory not found: $APP"; exit 1; }
     yellow "[$APP] Installing npm packages..."

@@ -5,12 +5,11 @@ from django.views.generic import CreateView, UpdateView, DeleteView
 from django.http import JsonResponse, HttpResponseRedirect
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm, Corporation
-from dmad_on_django.forms import formWidgets
 from haystack.generic_views import SearchView
 from json import dumps
+from dmad_on_django.forms import formWidgets, DmadCreateForm, DmadUpdateForm
 from liszt_util.tools import camel_to_snake_case, snake_to_camel_case
 from pylobid.pylobid import GNDNotFoundError
-
 
 def search_gnd(request, search_string, entity_type):
     response = getattr(dmad_models, snake_to_camel_case(entity_type)).search(search_string)
@@ -90,6 +89,7 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
+            form=DmadCreateForm,
             fields=self.fields,
             widgets=formWidgets
         )
@@ -117,6 +117,7 @@ class DmadUpdateView(DmadBaseViewMixin, NavbarContextMixin, UpdateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
+            form=DmadCreateForm,
             fields=self.get_form_fields(),
             widgets=formWidgets
         )
@@ -143,6 +144,7 @@ class LinkView(DmadBaseViewMixin, UpdateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
+            form=AsDaisyModelForm,
             fields=self.fields,
             widgets=formWidgets
         )

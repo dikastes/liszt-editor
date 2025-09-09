@@ -2842,10 +2842,13 @@ details.collapse summary::-webkit-details-marker {
   margin-bottom: 2.5rem;
 }
 
+<<<<<<< HEAD
+=======
 .mb-2 {
   margin-bottom: 0.5rem;
 }
 
+>>>>>>> main
 .mb-5 {
   margin-bottom: 1.25rem;
 }
@@ -2858,10 +2861,13 @@ details.collapse summary::-webkit-details-marker {
   margin-top: 0.5rem;
 }
 
+<<<<<<< HEAD
+=======
 .mt-3 {
   margin-top: 0.75rem;
 }
 
+>>>>>>> main
 .mt-4 {
   margin-top: 1rem;
 }
@@ -2894,10 +2900,13 @@ details.collapse summary::-webkit-details-marker {
   height: 100%;
 }
 
+<<<<<<< HEAD
+=======
 .w-11\/12 {
   width: 91.666667%;
 }
 
+>>>>>>> main
 .w-52 {
   width: 13rem;
 }
@@ -2910,10 +2919,13 @@ details.collapse summary::-webkit-details-marker {
   min-width: 0px;
 }
 
+<<<<<<< HEAD
+=======
 .max-w-5xl {
   max-width: 64rem;
 }
 
+>>>>>>> main
 .max-w-xs {
   max-width: 20rem;
 }
@@ -2958,10 +2970,13 @@ details.collapse summary::-webkit-details-marker {
   border-radius: var(--rounded-btn, 0.5rem);
 }
 
+<<<<<<< HEAD
+=======
 .rounded-lg {
   border-radius: 0.5rem;
 }
 
+>>>>>>> main
 .rounded-none {
   border-radius: 0px;
 }
@@ -3007,11 +3022,14 @@ details.collapse summary::-webkit-details-marker {
   line-height: 1.75rem;
 }
 
+<<<<<<< HEAD
+=======
 .text-sm {
   font-size: 0.875rem;
   line-height: 1.25rem;
 }
 
+>>>>>>> main
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;

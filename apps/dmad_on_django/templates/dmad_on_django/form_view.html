@@ -21,7 +21,7 @@
 		<h4> Anpassen </h4>
 		<form method="post">
 		    {% csrf_token %}
-		    {{ form }}
+		    {{ form.as_daisy }}
 		    <input type="submit" id="submit-form" class="hidden">
 		</form>
 	    </div>
@@ -53,7 +53,7 @@
 	    <div class="collapse collapse-plus">
 	        <input type="checkbox"/>
 	        <div class="collapse-title">{{object.get_overview_title}}</div>
-			{{object.as_daisy|safe}}
+			{{object.as_daisy}}
 	    </div>
 	</div>
 	<input type="radio" class="tab" aria-label="Rohdaten" name="data-raw-toggle" >
@@ -66,7 +66,7 @@
 	<div class="prose">
 	    <form method="post">
 		{% csrf_token %}
-		{{ form }}
+		{{ form.as_daisy }}
 		<input type="submit" id="submit-form" class="hidden">
 	    </form>
 	</div>

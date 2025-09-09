@@ -1,6 +1,8 @@
 from haystack.forms import SearchForm
-from django.forms import TextInput, Textarea
+from django.forms import TextInput, Textarea, ModelForm
 from .models import Person
+from liszt_util.forms.forms import GenericAsDaisyMixin
+from liszt_util.forms.layouts import Layouts
 
 formWidgets = {
         "interim_designator": TextInput(attrs={
@@ -24,3 +26,10 @@ class SearchForm(SearchForm):
             })
         self.fields['q'].label = ''
 
+
+
+class DmadUpdateForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
+class DmadCreateForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
