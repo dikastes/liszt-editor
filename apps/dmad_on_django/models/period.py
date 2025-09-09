@@ -1,6 +1,7 @@
 from calendar import monthrange
 from django.db import models
 import re
+from re import split
 from datetime import date, datetime
 
 
@@ -75,7 +76,7 @@ class Period(models.Model):
         )
 
     def parse(string):
-        components = string.split('-')
+        components = split('-|–', string)
         is_range = True if len(components) > 3 else False
 
         not_before = date(1811, 10, 22)
@@ -87,6 +88,8 @@ class Period(models.Model):
 
         if not_before_year.isnumeric():
             not_before = not_before.replace(year = int(not_before_year))
+            if not is_range:
+                not_after = not_after.replace(year = int(not_before.year))
             if not_before_month.isnumeric():
                 not_before = not_before.replace(day = 1, month = int(not_before_month))
                 if not is_range:
@@ -104,8 +107,6 @@ class Period(models.Model):
                 not_before = not_before.replace(day = 1)
                 if not is_range:
                     not_after = not_after.replace(month = 12)
-            if not is_range:
-                not_after = not_after.replace(year = int(not_before.year))
 
         if len(components) > 3:
             not_after_year = components[3]
@@ -123,9 +124,14 @@ class Period(models.Model):
                 else:
                     not_after = not_after.replace(month = 12)
 
+        if is_range:
+            display = f'{not_before_day}.{not_before_month}.{not_before_year}–{not_before_day}.{not_before_month}.{not_before_year}'
+        else:
+            display = f'{not_before_day}.{not_before_month}.{not_before_year}'
+
         return Period.objects.create(
                 not_before = not_before,
                 not_after = not_after,
-                display = string
+                display = display
             )
 
