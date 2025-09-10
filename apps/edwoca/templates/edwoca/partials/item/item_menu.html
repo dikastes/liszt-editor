@@ -1,17 +1,9 @@
 <ul class="menu menu-lg">
 	<li>
-	    <a
-		href="{% url 'edwoca:item_title' object.id %}"
-		{% if 'title' in request.path %}class="active"{% endif %}
-		>
-		Titel
-	    </a>
-	</li>
-	<li>
 	    <a href="{% url 'edwoca:item_update' object.id %}"
 		{% if 'update' in request.path %}class="active"{% endif %}
 		>
-		Identifikation
+		Kopf
 	    </a>
 	</li>
 	<li>
@@ -22,56 +14,23 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:item_location' object.id %}"
-		{% if 'location' in request.path %}class="active"{% endif %}
+	    <a href="{% url 'edwoca:item_dedication' object.id %}"
+		{% if 'dedication' in request.path %}class="active"{% endif %}
 		>
-		Verortung
+		Widmung
 	    </a>
 	</li>
-	<li class="disabled">
-		{% comment %}
+	<li>
 	    <a href="{% url 'edwoca:item_provenance' object.id %}"
 		{% if 'provenance' in request.path %}class="active"{% endif %}
 		>
-		{% endcomment %}
-	    <a href="#">
 		Provenienz
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:item_contributors' object.id %}"
-		{% if 'contributors' in request.path %}class="active"{% endif %}
-		>
-		Beteiligte
-	    </a>
-	</li>
-	<li class="disabled">
-		{% comment %}
-	    <a href="{% url 'edwoca:item_details' object.id %}"
-		{% if 'details' in request.path %}class="active"{% endif %}
-		>
-		{% endcomment %}
-	    <a href="#">
-		Papier, Schrift, Umfang
-	    </a>
-	</li>
-	<li class="disabled">
-		{% comment %}
-	    <a href="{% url 'edwoca:item_description' object.id %}"
-		{% if 'description' in request.path %}class="active"{% endif %}
-		>
-		{% endcomment %}
-	    <a href="#">
-		Beschreibung
-	    </a>
-	</li>
-	<li class="disabled">
-		{% comment %}
 	    <a href="{% url 'edwoca:item_digcopy' object.id %}"
 		{% if 'digcopy' in request.path %}class="active"{% endif %}
 		>
-		{% endcomment %}
-	    <a href="#">
 		Digitalisat
 	    </a>
 	</li>
