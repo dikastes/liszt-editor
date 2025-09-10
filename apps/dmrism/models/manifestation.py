@@ -412,7 +412,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             DigitalCopy.objects.create(
                     item = self.items.all()[0],
                     url = electronic_location.get('u'),
-                    link_type = electronic_location.get('x')
+                    link_type = DigitalCopy.LinkType.parse(electronic_location.get('x'))
                 )
 
         general_notes = data.get_fields('500')

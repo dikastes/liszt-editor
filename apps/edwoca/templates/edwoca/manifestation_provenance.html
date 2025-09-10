@@ -13,7 +13,7 @@
                             Literatur
                             <input type="text" class="grow" disabled value="{{ pps_form.instance.bib }}" />
                         </label>
-                        <a class="btn" href="{% url 'edwoca:person_provenance_remove_bib' object.id pps_form.instance.id %}">Entfernen</a>
+                        <a class="btn" href="{% url 'edwoca:person_provenance_remove_bib' item.id pps_form.instance.id %}">Entfernen</a>
                     </div>
                 {% else %}
                     <form method="get" class="flex-1 flex gap-5">
@@ -28,7 +28,7 @@
                         <ul>
                         {% for bib in found_bibs %}
                             <li>
-                                <a href="{% url 'edwoca:person_provenance_add_bib' object.id pps_form.instance.id bib.pk %}">{{ bib.object }}</a>
+                                <a href="{% url 'edwoca:person_provenance_add_bib' item.id pps_form.instance.id bib.pk %}">{{ bib.object }}</a>
                             </li>
                         {% empty %}
                             <li>Keine Bib-Datensätze gefunden</li>
@@ -43,7 +43,7 @@
                             Owner
                             <input type="text" class="grow" disabled value="{{ pps_form.instance.owner }}" />
                         </label>
-                        <a class="btn" href="{% url 'edwoca:person_provenance_remove_owner' object.id pps_form.instance.id %}">Entfernen</a>
+                        <a class="btn" href="{% url 'edwoca:person_provenance_remove_owner' item.id pps_form.instance.id %}">Entfernen</a>
                     </div>
                 {% else %}
                     <form method="get" class="flex-1 flex gap-5 mt-5">
@@ -58,7 +58,7 @@
                         <ul>
                         {% for person in found_persons %}
                             <li>
-                                <a href="{% url 'edwoca:person_provenance_add_owner' object.id pps_form.instance.id person.pk %}">{{ person.object }}</a>
+                                <a href="{% url 'edwoca:person_provenance_add_owner' item.id pps_form.instance.id person.pk %}">{{ person.object }}</a>
                             </li>
                         {% empty %}
                             <li>Keine Personen gefunden</li>
@@ -96,7 +96,7 @@
                             Literatur
                             <input type="text" class="grow" disabled value="{{ cps_form.instance.bib }}" />
                         </label>
-                        <a class="btn" href="{% url 'edwoca:corporation_provenance_remove_bib' object.id cps_form.instance.id %}">Entfernen</a>
+                        <a class="btn" href="{% url 'edwoca:corporation_provenance_remove_bib' item.id cps_form.instance.id %}">Entfernen</a>
                     </div>
                 {% else %}
                     <form method="get" class="flex-1 flex gap-5">
@@ -111,7 +111,7 @@
                         <ul>
                         {% for bib in found_bibs %}
                             <li>
-                                <a href="{% url 'edwoca:corporation_provenance_add_bib' object.id cps_form.instance.id bib.pk %}">{{ bib.object }}</a>
+                                <a href="{% url 'edwoca:corporation_provenance_add_bib' item.id cps_form.instance.id bib.pk %}">{{ bib.object }}</a>
                             </li>
                         {% empty %}
                             <li>Keine Bib-Datensätze gefunden</li>
@@ -126,7 +126,7 @@
                             Owner
                             <input type="text" class="grow" disabled value="{{ cps_form.instance.owner }}" />
                         </label>
-                        <a class="btn" href="{% url 'edwoca:corporation_provenance_remove_owner' object.id cps_form.instance.id %}">Entfernen</a>
+                        <a class="btn" href="{% url 'edwoca:corporation_provenance_remove_owner' item.id cps_form.instance.id %}">Entfernen</a>
                     </div>
                 {% else %}
                     <form method="get" class="flex-1 flex gap-5 mt-5">
@@ -141,7 +141,7 @@
                         <ul>
                         {% for corporation in found_corporations %}
                             <li>
-                                <a href="{% url 'edwoca:corporation_provenance_add_owner' object.id cps_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
+                                <a href="{% url 'edwoca:corporation_provenance_add_owner' item.id cps_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
                             </li>
                         {% empty %}
                             <li>Keine Körperschaften gefunden</li>

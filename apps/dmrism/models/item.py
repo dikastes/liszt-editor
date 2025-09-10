@@ -201,6 +201,17 @@ class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
 
 
 class DigitalCopy(models.Model):
+    class LinkType(models.TextChoices):
+        DIGITIZED = 'Dig', _('Digitized')
+        IIIF_MANIFEST = 'IIIF', _('IIIF Manifest')
+
+        def parse(string):
+            if 'iiif' in string:
+                return DigitalCopy.LinkType.IIIF_MANIFEST
+            if 'digitized' in string:
+                return DigitalCopy.LinkType.DIGITIZED
+            return None
+
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE,
@@ -210,5 +221,8 @@ class DigitalCopy(models.Model):
     link_type = models.TextField(
             max_length = 20,
             null = True,
-            blank = True
+            blank = True,
+            choices=LinkType,
+            default=LinkType.DIGITIZED
         )
+

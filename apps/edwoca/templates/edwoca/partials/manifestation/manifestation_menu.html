@@ -64,6 +64,13 @@
 	    </a>
 	</li>
 	<li>
+	    <a href="{% url 'edwoca:manifestation_digcopy' object.id %}"
+		{% if 'digcopy' in request.path %}class="active"{% endif %}
+		>
+		Digitalisat
+	    </a>
+	</li>
+	<li>
 	    <a href="{% url 'edwoca:manifestation_comment' object.id %}"
 		{% if 'comment' in request.path %}class="active"{% endif %}
 		>
