@@ -481,9 +481,10 @@ class ManifestationClassificationUpdateView(SimpleFormView):
     property = 'classification'
 
 
+
 def manifestation_provenance(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
-    item = manifestation.items.first() # Assuming provenance is for the first item
+    item = manifestation.items.all()[0]
 
     context = {
         'object': manifestation,
@@ -499,26 +500,12 @@ def manifestation_provenance(request, pk):
             if pps_form.is_valid():
                 pps_form.save()
 
-        # Handle new PersonProvenanceStation form
-        new_pps_form = PersonProvenanceStationForm(request.POST, prefix='new_person_provenance')
-        if new_pps_form.is_valid() and new_pps_form.has_changed():
-            new_pps = new_pps_form.save(commit=False)
-            new_pps.item = item
-            new_pps.save()
-
         # Handle existing CorporationProvenanceStation forms
         for cps_obj in item.corporation_provenance_stations.all():
             prefix = f'corporation_provenance_{cps_obj.id}'
             cps_form = CorporationProvenanceStationForm(request.POST, instance=cps_obj, prefix=prefix)
             if cps_form.is_valid():
                 cps_form.save()
-
-        # Handle new CorporationProvenanceStation form
-        new_cps_form = CorporationProvenanceStationForm(request.POST, prefix='new_corporation_provenance')
-        if new_cps_form.is_valid() and new_cps_form.has_changed():
-            new_cps = new_cps_form.save(commit=False)
-            new_cps.item = item
-            new_cps.save()
 
         # Handle private_provenance_comment form
         provenance_comment_form = ManifestationProvenanceCommentForm(request.POST, instance=manifestation)
@@ -534,10 +521,6 @@ def manifestation_provenance(request, pk):
             person_provenance_forms.append(PersonProvenanceStationForm(instance=pps_obj, prefix=prefix))
         context['person_provenance_forms'] = person_provenance_forms
 
-        # Initialize form for new PersonProvenanceStation
-        new_person_provenance_form = PersonProvenanceStationForm(prefix='new_person_provenance', initial={'item': item})
-        context['new_person_provenance_form'] = new_person_provenance_form
-
         # Initialize forms for existing CorporationProvenanceStation
         corporation_provenance_forms = []
         for cps_obj in item.corporation_provenance_stations.all():
@@ -545,24 +528,57 @@ def manifestation_provenance(request, pk):
             corporation_provenance_forms.append(CorporationProvenanceStationForm(instance=cps_obj, prefix=prefix))
         context['corporation_provenance_forms'] = corporation_provenance_forms
 
-        # Initialize form for new CorporationProvenanceStation
-        new_corporation_provenance_form = CorporationProvenanceStationForm(prefix='new_corporation_provenance', initial={'item': item})
-        context['new_corporation_provenance_form'] = new_corporation_provenance_form
-
         # Initialize private_provenance_comment form
         provenance_comment_form = ManifestationProvenanceCommentForm(instance=manifestation)
         context['provenance_comment_form'] = provenance_comment_form
 
-    search_form = SearchForm(request.GET or None)
-    context['search_form'] = search_form
+    q_bib = request.GET.get('bib-q')
+    q_owner = request.GET.get('owner-q')
 
-    if search_form.is_valid() and search_form.cleaned_data.get('q'):
-        context['query'] = search_form.cleaned_data.get('q')
-        context['found_persons'] = search_form.search().models(Person)
-        context['found_corporations'] = search_form.search().models(Corporation)
-        context['found_bibs'] = search_form.search().models(Bib) # Use Bib instead of ZotItem
+    if q_bib:
+        bib_search_form = SearchForm(request.GET, prefix='bib')
+        if bib_search_form.is_valid():
+            context['query_bib'] = bib_search_form.cleaned_data.get('q')
+            context['found_bibs'] = bib_search_form.search().models(ZotItem)
+    else:
+        bib_search_form = SearchForm(prefix='bib')
+
+    if q_owner:
+        owner_search_form = SearchForm(request.GET, prefix='owner')
+        if owner_search_form.is_valid():
+            context['query_owner'] = owner_search_form.cleaned_data.get('q')
+            context['found_persons'] = owner_search_form.search().models(Person)
+            context['found_corporations'] = owner_search_form.search().models(Corporation)
+    else:
+        owner_search_form = SearchForm(prefix='owner')
+
+    context['bib_search_form'] = bib_search_form
+    context['owner_search_form'] = owner_search_form
 
     return render(request, 'edwoca/manifestation_provenance.html', context)
+
+def person_provenance_add(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    PersonProvenanceStation.objects.create(item=item)
+    return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+
+def corporation_provenance_add(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    CorporationProvenanceStation.objects.create(item=item)
+    return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+
+class PersonProvenanceStationDeleteView(DeleteView):
+    model = PersonProvenanceStation
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_provenance', kwargs={'pk': self.object.item.manifestation.id})
+
+class CorporationProvenanceStationDeleteView(DeleteView):
+    model = CorporationProvenanceStation
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_provenance', kwargs={'pk': self.object.item.manifestation.id})
+
 
 
 def manifestation_manuscript_update(request, pk):
@@ -624,3 +640,57 @@ def manifestation_remove_handwriting_writer(request, pk, handwriting_pk):
     handwriting.writer = None
     handwriting.save()
     return redirect('edwoca:manifestation_manuscript', pk=pk)
+
+def person_provenance_add_owner(request, pk, pps_id, person_id):
+    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    person = get_object_or_404(Person, pk=person_id)
+    pps.owner = person
+    pps.save()
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+def person_provenance_add_bib(request, pk, pps_id, bib_id):
+    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    bib = get_object_or_404(ZotItem, pk=bib_id)
+    pps.bib = bib
+    pps.save()
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+def corporation_provenance_add_owner(request, pk, cps_id, corporation_id):
+    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    corporation = get_object_or_404(Corporation, pk=corporation_id)
+    cps.owner = corporation
+    cps.save()
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+def corporation_provenance_add_bib(request, pk, cps_id, bib_id):
+    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    bib = get_object_or_404(ZotItem, pk=bib_id)
+    cps.bib = bib
+    cps.save()
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+def person_provenance_remove_owner(request, pk, pps_id):
+    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    pps.owner = None
+    pps.save()
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+def person_provenance_remove_bib(request, pk, pps_id):
+    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    pps.bib = None
+    pps.save()
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+def corporation_provenance_remove_owner(request, pk, cps_id):
+    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    cps.owner = None
+    cps.save()
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+def corporation_provenance_remove_bib(request, pk, cps_id):
+    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    cps.bib = None
+    cps.save()
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+

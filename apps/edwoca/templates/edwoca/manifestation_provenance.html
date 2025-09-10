@@ -6,6 +6,67 @@
         <div class="modal" role="dialog" id="person-provenance-modal-{{ pps_form.instance.id }}">
             <div class="modal-box w-11/12 max-w-5xl">
                 <h3 class="text-lg font-bold">Personen-Provenienz bearbeiten</h3>
+
+                {% if pps_form.instance.bib %}
+                    <div class="flex gap-5 items-center">
+                        <label class="input input-bordered flex-1 flex items-center gap-2">
+                            Literatur
+                            <input type="text" class="grow" disabled value="{{ pps_form.instance.bib }}" />
+                        </label>
+                        <a class="btn" href="{% url 'edwoca:person_provenance_remove_bib' object.id pps_form.instance.id %}">Entfernen</a>
+                    </div>
+                {% else %}
+                    <form method="get" class="flex-1 flex gap-5">
+                        <label class="input input-bordered flex items-center gap-2 flex-1">
+                            Literatur-Suche
+                            {{ bib_search_form.q }}
+                        </label>
+                        <input type="submit" class="btn" value="Suchen"/>
+                    </form>
+                    {% if found_bibs %}
+                        <h3 class="text-lg font-bold mt-5">Bib-Datensätze</h3>
+                        <ul>
+                        {% for bib in found_bibs %}
+                            <li>
+                                <a href="{% url 'edwoca:person_provenance_add_bib' object.id pps_form.instance.id bib.pk %}">{{ bib.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Bib-Datensätze gefunden</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+
+                {% if pps_form.instance.owner %}
+                    <div class="flex gap-5 items-center mt-5">
+                        <label class="input input-bordered flex-1 flex items-center gap-2">
+                            Owner
+                            <input type="text" class="grow" disabled value="{{ pps_form.instance.owner }}" />
+                        </label>
+                        <a class="btn" href="{% url 'edwoca:person_provenance_remove_owner' object.id pps_form.instance.id %}">Entfernen</a>
+                    </div>
+                {% else %}
+                    <form method="get" class="flex-1 flex gap-5 mt-5">
+                        <label class="input input-bordered flex items-center gap-2 flex-1">
+                            Owner-Suche
+                            {{ owner_search_form.q }}
+                        </label>
+                        <input type="submit" class="btn" value="Suchen"/>
+                    </form>
+                    {% if found_persons %}
+                        <h3 class="text-lg font-bold mt-5">Personen</h3>
+                        <ul>
+                        {% for person in found_persons %}
+                            <li>
+                                <a href="{% url 'edwoca:person_provenance_add_owner' object.id pps_form.instance.id person.pk %}">{{ person.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Personen gefunden</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+
                 <form method="post" class="mt-5">
                     {% csrf_token %}
                     {{ pps_form.management_form }}
@@ -28,6 +89,67 @@
         <div class="modal" role="dialog" id="corporation-provenance-modal-{{ cps_form.instance.id }}">
             <div class="modal-box w-11/12 max-w-5xl">
                 <h3 class="text-lg font-bold">Körperschafts-Provenienz bearbeiten</h3>
+
+                {% if cps_form.instance.bib %}
+                    <div class="flex gap-5 items-center">
+                        <label class="input input-bordered flex-1 flex items-center gap-2">
+                            Literatur
+                            <input type="text" class="grow" disabled value="{{ cps_form.instance.bib }}" />
+                        </label>
+                        <a class="btn" href="{% url 'edwoca:corporation_provenance_remove_bib' object.id cps_form.instance.id %}">Entfernen</a>
+                    </div>
+                {% else %}
+                    <form method="get" class="flex-1 flex gap-5">
+                        <label class="input input-bordered flex items-center gap-2 flex-1">
+                            Literatur-Suche
+                            {{ bib_search_form.q }}
+                        </label>
+                        <input type="submit" class="btn" value="Suchen"/>
+                    </form>
+                    {% if found_bibs %}
+                        <h3 class="text-lg font-bold mt-5">Bib-Datensätze</h3>
+                        <ul>
+                        {% for bib in found_bibs %}
+                            <li>
+                                <a href="{% url 'edwoca:corporation_provenance_add_bib' object.id cps_form.instance.id bib.pk %}">{{ bib.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Bib-Datensätze gefunden</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+
+                {% if cps_form.instance.owner %}
+                    <div class="flex gap-5 items-center mt-5">
+                        <label class="input input-bordered flex-1 flex items-center gap-2">
+                            Owner
+                            <input type="text" class="grow" disabled value="{{ cps_form.instance.owner }}" />
+                        </label>
+                        <a class="btn" href="{% url 'edwoca:corporation_provenance_remove_owner' object.id cps_form.instance.id %}">Entfernen</a>
+                    </div>
+                {% else %}
+                    <form method="get" class="flex-1 flex gap-5 mt-5">
+                        <label class="input input-bordered flex items-center gap-2 flex-1">
+                            Owner-Suche
+                            {{ owner_search_form.q }}
+                        </label>
+                        <input type="submit" class="btn" value="Suchen"/>
+                    </form>
+                    {% if found_corporations %}
+                        <h3 class="text-lg font-bold mt-5">Körperschaften</h3>
+                        <ul>
+                        {% for corporation in found_corporations %}
+                            <li>
+                                <a href="{% url 'edwoca:corporation_provenance_add_owner' object.id cps_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Körperschaften gefunden</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+
                 <form method="post" class="mt-5">
                     {% csrf_token %}
                     {{ cps_form.management_form }}
@@ -44,46 +166,6 @@
             </div>
         </div>
     {% endfor %}
-
-    {# Modal for new PersonProvenanceStation #}
-    <div class="modal" role="dialog" id="person-provenance-modal-new">
-        <div class="modal-box w-11/12 max-w-5xl">
-            <h3 class="text-lg font-bold">Personen-Provenienz anlegen</h3>
-            <form method="post" class="mt-5">
-                {% csrf_token %}
-                {{ new_person_provenance_form.management_form }}
-                {{ new_person_provenance_form.as_daisy }}
-
-                <div class="flex gap-5 mt-5">
-                    <div class="flex-1"></div>
-                    <input type="submit" name="save_new_person_provenance" value="Speichern" class="flex-0 btn btn-primary">
-                    <div class="modal-action flex-0 m-0">
-                        <a href="#" class="btn">X</a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    {# Modal for new CorporationProvenanceStation #}
-    <div class="modal" role="dialog" id="corporation-provenance-modal-new">
-        <div class="modal-box w-11/12 max-w-5xl">
-            <h3 class="text-lg font-bold">Körperschafts-Provenienz anlegen</h3>
-            <form method="post" class="mt-5">
-                {% csrf_token %}
-                {{ new_corporation_provenance_form.management_form }}
-                {{ new_corporation_provenance_form.as_daisy }}
-
-                <div class="flex gap-5 mt-5">
-                    <div class="flex-1"></div>
-                    <input type="submit" name="save_new_corporation_provenance" value="Speichern" class="flex-0 btn btn-primary">
-                    <div class="modal-action flex-0 m-0">
-                        <a href="#" class="btn">X</a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
 {% endblock %}
 
 {% block content %}
@@ -91,13 +173,16 @@
     <h2 class="card-title mt-0 flex-1"> Provenienz (Personen) </h2>
 
     <div class="mt-5">
-    {% for pps in item.personprovenancestation_set.all %}
+    {% for pps in item.person_provenance_stations.all %}
         <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
             <div class="flex-1 m-0">
                 <p class="font-bold">{{ pps }}</p>
             </div>
             <a href="#person-provenance-modal-{{ pps.id }}" class="btn flex-0"> bearbeiten </a>
-            {# Add delete form here if needed #}
+            <form action="{% url 'edwoca:person_provenance_delete' pps.id %}" method="post" class="flex-0 m-0">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary" value="löschen"/>
+            </form>
         </div>
     {% empty %}
         <p> keine Personen-Provenienz-Einträge </p>
@@ -105,19 +190,22 @@
     </div>
     <div class="flex items-center">
         <div class="flex-1"></div>
-        <a href="#person-provenance-modal-new" class="btn flex-0"> Personen-Provenienz hinzufügen </a>
+        <a href="{% url 'edwoca:person_provenance_add' item.id %}" class="btn flex-0"> Personen-Provenienz hinzufügen </a>
     </div>
 
     <h2 class="card-title mt-5 flex-1"> Provenienz (Körperschaften) </h2>
 
     <div class="mt-5">
-    {% for cps in item.corporationprovenancestation_set.all %}
+    {% for cps in item.corporation_provenance_stations.all %}
         <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
             <div class="flex-1 m-0">
                 <p class="font-bold">{{ cps }}</p>
             </div>
             <a href="#corporation-provenance-modal-{{ cps.id }}" class="btn flex-0"> bearbeiten </a>
-            {# Add delete form here if needed #}
+            <form action="{% url 'edwoca:corporation_provenance_delete' cps.id %}" method="post" class="flex-0 m-0">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary" value="löschen"/>
+            </form>
         </div>
     {% empty %}
         <p> keine Körperschafts-Provenienz-Einträge </p>
@@ -125,7 +213,7 @@
     </div>
     <div class="flex items-center">
         <div class="flex-1"></div>
-        <a href="#corporation-provenance-modal-new" class="btn flex-0"> Körperschafts-Provenienz hinzufügen </a>
+        <a href="{% url 'edwoca:corporation_provenance_add' item.id %}" class="btn flex-0"> Körperschafts-Provenienz hinzufügen </a>
     </div>
 
 </div>
@@ -139,50 +227,7 @@
     </form>
 </div>
 
-<div class="bg-white border border-base-300 p-5 mt-5">
-    <h2 class="card-title mt-0"> Suche </h2>
-    <form action="{% url 'edwoca:manifestation_provenance' object.id %}" method="get" class="flex-1 flex gap-5">
-        <label class="input input-bordered flex items-center gap-2 flex-1">
-            Suche
-            {{ search_form.q }}
-        </label>
-        <input type="submit" id="submit-form-search" class="btn" value="Suchen"/>
-    </form>
-    {% if query %}
-        <h3 class="text-lg font-bold mt-5">Personen</h3>
-        <ul>
-        {% for person in found_persons %}
-            <li>
-                <a href="#">{{ person.object }}</a> {# Link to add person to provenance #}
-            </li>
-        {% empty %}
-            <li>Keine Personen gefunden</li>
-        {% endfor %}
-        </ul>
 
-        <h3 class="text-lg font-bold mt-5">Körperschaften</h3>
-        <ul>
-        {% for corporation in found_corporations %}
-            <li>
-                <a href="#">{{ corporation.object }}</a> {# Link to add corporation to provenance #}
-            </li>
-        {% empty %}
-            <li>Keine Körperschaften gefunden</li>
-        {% endfor %}
-        </ul>
-
-        <h3 class="text-lg font-bold mt-5">Bib-Datensätze</h3>
-        <ul>
-        {% for bib in found_bibs %}
-            <li>
-                <a href="#">{{ bib.object }}</a> {# Link to add bib to provenance #}
-            </li>
-        {% empty %}
-            <li>Keine Bib-Datensätze gefunden</li>
-        {% endfor %}
-        </ul>
-    {% endif %}
-</div>
 
 <div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
     <p class="prose">
