@@ -139,7 +139,12 @@ class ItemContributor(BaseContributor):
     )
 
 
-class PersonProvenanceStation(models.Model):
+class ProvenanceStationRenderMixin:
+    def __str__(self):
+        return f'{self.owner} ({self.period})'
+
+
+class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE,
@@ -148,7 +153,8 @@ class PersonProvenanceStation(models.Model):
     owner = models.ForeignKey(
             'dmad.Person',
             on_delete = models.CASCADE,
-            related_name = 'provenance_stations'
+            related_name = 'provenance_stations',
+            null = True
         )
     bib = models.ForeignKey(
             'bib.ZotItem',
@@ -166,7 +172,7 @@ class PersonProvenanceStation(models.Model):
             )
 
 
-class CorporationProvenanceStation(models.Model):
+class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE,
@@ -175,7 +181,8 @@ class CorporationProvenanceStation(models.Model):
     owner = models.ForeignKey(
             'dmad.Corporation',
             on_delete = models.CASCADE,
-            related_name = 'provenance_stations'
+            related_name = 'provenance_stations',
+            null = True
         )
     bib = models.ForeignKey(
             'bib.ZotItem',
