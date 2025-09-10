@@ -81,7 +81,7 @@
     <div class="modal" role="dialog" id="title-modal-new">
         <div class="modal-box w-11/12 max-w-5xl">
             <h3 class="text-lg font-bold">Titel anlegen</h3>
-            <form method="post" class="mt-5">
+            <form method="post" action="{% url 'edwoca:manifestation_title' object.id %}" class="mt-5">
                 {% csrf_token %}
                 {{ new_title_form.management_form }}
                 {{ new_title_form.as_daisy }}
