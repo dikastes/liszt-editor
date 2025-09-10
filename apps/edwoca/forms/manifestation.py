@@ -409,31 +409,87 @@ class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
 
 
 class PersonProvenanceStationForm(ModelForm):
+    kwargs = {
+            'years': range(1811, 1900),
+            'attrs': {
+                'class': 'select select-bordered'
+            }
+        }
+    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     class Meta:
         model = PersonProvenanceStation
-        fields = ['item', 'bib', 'period', 'owner']
+        fields = ['item']
         widgets = {
             'item': HiddenInput(),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.period:
+            self.fields['not_before'].initial = self.instance.period.not_before
+            self.fields['not_after'].initial = self.instance.period.not_after
+            self.fields['display'].initial = self.instance.period.display
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Ensure period exists or create it
+        if not instance.period:
+            instance.period = Period()
+
+        period_instance = instance.period
+        period_instance.not_before = self.cleaned_data['not_before']
+        period_instance.not_after = self.cleaned_data['not_after']
+        period_instance.display = self.cleaned_data['display']
+
+        if commit:
+            period_instance.save()
+            instance.period = period_instance
+            instance.save()
+        else:
+            self._pending_save_period = period_instance
+            self._pending_save_instance = instance
+
+        return instance
+
     def as_daisy(self):
         form = div(cls='mb-10')
 
-        bib_field = self['bib']
-        period_field = self['period']
-        owner_field = self['owner']
+        not_before_field = self['not_before']
+        not_after_field = self['not_after']
+        display_field = self['display']
 
-        bib_label = label(bib_field.label, _for=bib_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        bib_label.add(raw(str(bib_field)))
-        form.add(bib_label)
+        not_before_container = label(cls='form-control')
+        not_before_label = div(not_before_field.label, cls='label-text')
+        not_before_selects = div(cls='flex')
+        not_before_selects.add(raw(str(not_before_field)))
+        not_before_container.add(not_before_label)
+        not_before_container.add(not_before_selects)
+        if not_before_field.errors:
+            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        period_label = label(period_field.label, _for=period_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        period_label.add(raw(str(period_field)))
-        form.add(period_label)
+        not_after_container = label(cls='form-control')
+        not_after_label = div(not_after_field.label, cls='label-text')
+        not_after_selects = div(cls='flex')
+        not_after_selects.add(raw(str(not_after_field)))
+        not_after_container.add(not_after_label)
+        not_after_container.add(not_after_selects)
+        if not_after_field.errors:
+            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        owner_label = label(owner_field.label, _for=owner_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        owner_label.add(raw(str(owner_field)))
-        form.add(owner_label)
+        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container.add(raw(str(display_field)))
+        if display_field.errors:
+            display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
+            
+        period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        period_palette.add(not_before_container)
+        period_palette.add(not_after_container)
+
+        form.add(period_palette)
+        form.add(display_container)
 
         form.add(raw(str(self['item'])))
 
@@ -441,31 +497,87 @@ class PersonProvenanceStationForm(ModelForm):
 
 
 class CorporationProvenanceStationForm(ModelForm):
+    kwargs = {
+            'years': range(1811, 1900),
+            'attrs': {
+                'class': 'select select-bordered'
+            }
+        }
+    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     class Meta:
         model = CorporationProvenanceStation
-        fields = ['item', 'bib', 'period', 'owner']
+        fields = ['item']
         widgets = {
             'item': HiddenInput(),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.period:
+            self.fields['not_before'].initial = self.instance.period.not_before
+            self.fields['not_after'].initial = self.instance.period.not_after
+            self.fields['display'].initial = self.instance.period.display
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Ensure period exists or create it
+        if not instance.period:
+            instance.period = Period()
+
+        period_instance = instance.period
+        period_instance.not_before = self.cleaned_data['not_before']
+        period_instance.not_after = self.cleaned_data['not_after']
+        period_instance.display = self.cleaned_data['display']
+
+        if commit:
+            period_instance.save()
+            instance.period = period_instance
+            instance.save()
+        else:
+            self._pending_save_period = period_instance
+            self._pending_save_instance = instance
+
+        return instance
+
     def as_daisy(self):
         form = div(cls='mb-10')
 
-        bib_field = self['bib']
-        period_field = self['period']
-        owner_field = self['owner']
+        not_before_field = self['not_before']
+        not_after_field = self['not_after']
+        display_field = self['display']
 
-        bib_label = label(bib_field.label, _for=bib_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        bib_label.add(raw(str(bib_field)))
-        form.add(bib_label)
+        not_before_container = label(cls='form-control')
+        not_before_label = div(not_before_field.label, cls='label-text')
+        not_before_selects = div(cls='flex')
+        not_before_selects.add(raw(str(not_before_field)))
+        not_before_container.add(not_before_label)
+        not_before_container.add(not_before_selects)
+        if not_before_field.errors:
+            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        period_label = label(period_field.label, _for=period_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        period_label.add(raw(str(period_field)))
-        form.add(period_label)
+        not_after_container = label(cls='form-control')
+        not_after_label = div(not_after_field.label, cls='label-text')
+        not_after_selects = div(cls='flex')
+        not_after_selects.add(raw(str(not_after_field)))
+        not_after_container.add(not_after_label)
+        not_after_container.add(not_after_selects)
+        if not_after_field.errors:
+            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        owner_label = label(owner_field.label, _for=owner_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        owner_label.add(raw(str(owner_field)))
-        form.add(owner_label)
+        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container.add(raw(str(display_field)))
+        if display_field.errors:
+            display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
+            
+        period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        period_palette.add(not_before_container)
+        period_palette.add(not_after_container)
+
+        form.add(period_palette)
+        form.add(display_container)
 
         form.add(raw(str(self['item'])))
 
