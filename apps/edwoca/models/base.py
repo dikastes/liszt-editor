@@ -127,6 +127,18 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         PROVENANCE_KEY3 = 'Provenienz Station 3'
         PROVENANCE_KEY4 = 'Provenienz Station 4'
 
+        MANIFESTATION_NOTES_KEY = 'Notizen zur Quelle (vormals "Beschreibung", bleibt intern)'
+        MANIFESTATION_COMMENT_KEY = 'Kommentar zur Quelle (intern)'
+        COMMENT_QUESTION_KEY = 'Kommentar intern / Fragen (interne Kommunikation)'
+        FURTHER_INFORMATION_KEY = 'Weiterführende Informationen (Ausgaben, Permalinks etc.) (intern)'
+
+        self.taken_information = '\n'.join([
+                'Notizen zur Quelle: ' + raw_data[MANIFESTATION_NOTES_KEY],
+                'Kommentar zur Quelle: ' + raw_data[MANIFESTATION_COMMENT_KEY],
+                'Kommentar intern: ' + raw_data[COMMENT_QUESTION_KEY],
+                'Weiterführende Informationen: ' + raw_data[FURTHER_INFORMATION_KEY]
+            ])
+
         self.private_provenance_comment = '\n'.join(
                 provenance_string for
                 provenance_key in
@@ -150,12 +162,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         self.titles.all().delete()
 
         self.private_head_comment = '\n'.join([
-                raw_data[IDENTIFICATION_KEY],
-                raw_data[MEDIUM_OF_PERFORMANCE_KEY],
-                raw_data[TEMPO_KEY],
-                raw_data[METRONOM_KEY],
-                raw_data[LANGUAGE_KEY],
-                raw_data[TEXT_INCIPIT_KEY]
+                'Identifikation: ' + raw_data[IDENTIFICATION_KEY],
+                'Besetzung: ' + raw_data[MEDIUM_OF_PERFORMANCE_KEY],
+                'Tempo: ' + raw_data[TEMPO_KEY],
+                'Metronom:' + raw_data[METRONOM_KEY],
+                'Sprache: ' + raw_data[LANGUAGE_KEY],
+                'Textincipit: ' + raw_data[TEXT_INCIPIT_KEY]
             ])
 
         if raw_data[DEDUCED_PLACE_NAME_KEY]:
