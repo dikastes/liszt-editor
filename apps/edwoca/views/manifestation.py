@@ -1,5 +1,5 @@
 from ..forms.manifestation import *
-from ..forms.item import SignatureFormSet, ItemForm
+from ..forms.item import SignatureFormSet, ItemForm, ItemDigitizedCopyForm
 from ..forms.manifestation import *
 from ..models import Manifestation as EdwocaManifestation
 from ..models import ManifestationTitle, ManifestationTitleHandwriting
@@ -19,6 +19,7 @@ from dmrism.models.manifestation import ManifestationBib
 
 class ManifestationListView(EdwocaListView):
     model = EdwocaManifestation
+
 
 class ManifestationSearchView(EdwocaSearchView):
     model = EdwocaManifestation
@@ -251,6 +252,7 @@ def manifestation_writer_add(request, pk, title_id, writer_id):
     title.save()
     return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_id}')
 
+
 def manifestation_writer_remove(request, pk, title_id):
     title = get_object_or_404(ManifestationTitle, pk=title_id)
     title.writer = None
@@ -481,7 +483,6 @@ class ManifestationClassificationUpdateView(SimpleFormView):
     property = 'classification'
 
 
-
 def manifestation_provenance(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     item = manifestation.items.all()[0]
@@ -557,28 +558,31 @@ def manifestation_provenance(request, pk):
 
     return render(request, 'edwoca/manifestation_provenance.html', context)
 
+
 def person_provenance_add(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
     PersonProvenanceStation.objects.create(item=item)
-    return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+
 
 def corporation_provenance_add(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
     CorporationProvenanceStation.objects.create(item=item)
-    return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+
 
 class PersonProvenanceStationDeleteView(DeleteView):
     model = PersonProvenanceStation
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_provenance', kwargs={'pk': self.object.item.manifestation.id})
+        return reverse_lazy('edwoca:manifestation_provenance', kwargs={'item_id': self.object.item.id})
+
 
 class CorporationProvenanceStationDeleteView(DeleteView):
     model = CorporationProvenanceStation
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_provenance', kwargs={'pk': self.object.item.manifestation.id})
-
+        return reverse_lazy('edwoca:manifestation_provenance', kwargs={'item_id': self.object.item.id})
 
 
 def manifestation_manuscript_update(request, pk):
@@ -641,56 +645,85 @@ def manifestation_remove_handwriting_writer(request, pk, handwriting_pk):
     handwriting.save()
     return redirect('edwoca:manifestation_manuscript', pk=pk)
 
-def person_provenance_add_owner(request, pk, pps_id, person_id):
+
+def person_provenance_add_owner(request, item_id, pps_id, person_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     person = get_object_or_404(Person, pk=person_id)
     pps.owner = person
     pps.save()
-    return redirect('edwoca:manifestation_provenance', pk=pk)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
 
-def person_provenance_add_bib(request, pk, pps_id, bib_id):
+
+def person_provenance_add_bib(request, item_id, pps_id, bib_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     bib = get_object_or_404(ZotItem, pk=bib_id)
     pps.bib = bib
     pps.save()
-    return redirect('edwoca:manifestation_provenance', pk=pk)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
 
-def corporation_provenance_add_owner(request, pk, cps_id, corporation_id):
+
+def corporation_provenance_add_owner(request, item_id, cps_id, corporation_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     corporation = get_object_or_404(Corporation, pk=corporation_id)
     cps.owner = corporation
     cps.save()
-    return redirect('edwoca:manifestation_provenance', pk=pk)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
 
-def corporation_provenance_add_bib(request, pk, cps_id, bib_id):
+
+def corporation_provenance_add_bib(request, item_id, cps_id, bib_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     bib = get_object_or_404(ZotItem, pk=bib_id)
     cps.bib = bib
     cps.save()
-    return redirect('edwoca:manifestation_provenance', pk=pk)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
 
-def person_provenance_remove_owner(request, pk, pps_id):
+
+def person_provenance_remove_owner(request, item_id, pps_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     pps.owner = None
     pps.save()
-    return redirect('edwoca:manifestation_provenance', pk=pk)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
 
-def person_provenance_remove_bib(request, pk, pps_id):
+
+def person_provenance_remove_bib(request, item_id, pps_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     pps.bib = None
     pps.save()
-    return redirect('edwoca:manifestation_provenance', pk=pk)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
 
-def corporation_provenance_remove_owner(request, pk, cps_id):
+
+def corporation_provenance_remove_owner(request, item_id, cps_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     cps.owner = None
     cps.save()
-    return redirect('edwoca:manifestation_provenance', pk=pk)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
 
-def corporation_provenance_remove_bib(request, pk, cps_id):
+
+def corporation_provenance_remove_bib(request, item_id, cps_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     cps.bib = None
     cps.save()
-    return redirect('edwoca:manifestation_provenance', pk=pk)
+    return redirect('edwoca:manifestation_provenance', item_id=item_id)
 
 
+class ManifestationDigitizedCopyView(SimpleFormView):
+    model = Manifestation
+    property = 'digitized_copy'
+    template_name = 'edwoca/manifestation_digitized_copy.html'
+
+    def get_form_class(self):
+        return ItemDigitizedCopyForm
+
+    def get_object(self):
+        manifestation = get_object_or_404(self.model, pk=self.kwargs['pk'])
+        return manifestation.items.first().digital_copies.first() or DigitalCopy(item=manifestation.items.first())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        manifestation = get_object_or_404(Manifestation, pk=self.kwargs['pk'])
+        context['object'] = manifestation
+        context['item'] = manifestation.items.first()
+        return context
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:manifestation_digitized_copy', kwargs={'pk': self.kwargs['pk']})

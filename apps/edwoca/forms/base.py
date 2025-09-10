@@ -7,6 +7,7 @@ from dominate.util import raw
 
 class SimpleFormMixin:
     text_area_classes = 'textarea textarea-bordered w-full'
+    text_input_classes = 'input input-bordered w-full'
 
     def as_daisy(self):
         form = div()

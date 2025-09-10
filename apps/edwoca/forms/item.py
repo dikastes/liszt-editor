@@ -198,3 +198,30 @@ class LibraryForm(ModelForm):
             form.add(field_label)
 
         return mark_safe(str(form))
+
+
+class ItemDigitizedCopyForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = DigitalCopy
+        fields = ['url', 'link_type', 'item']
+        widgets = {
+            'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes}),
+            'link_type': Select(attrs={'class': 'select select-bordered w-full'}),
+            'item': HiddenInput(),
+        }
+
+    def as_daisy(self):
+        form = div()
+        for field_name in self.Meta.fields:
+            if field_name == 'item':
+                form.add(raw(str(self[field_name]))) # Render hidden input directly
+            else:
+                field = self[field_name]
+                wrap = label(cls='form-control')
+                label_div = div(cls='label')
+                field_label = span(field.label, cls='label-text')
+                label_div.add(field_label)
+                wrap.add(label_div)
+                wrap.add(raw(str(field)))
+                form.add(wrap)
+        return mark_safe(str(form))

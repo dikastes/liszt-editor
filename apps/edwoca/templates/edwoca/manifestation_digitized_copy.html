@@ -1,0 +1,14 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+<div class="bg-white border border-base-300 p-5">
+    <h2 class="card-title mt-0"> Digitale Kopie für {{ object }} </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_daisy }}
+
+        <input type="submit" value="Speichern" class="btn btn-primary mt-5">
+    </form>
+</div>
+{% endblock %}

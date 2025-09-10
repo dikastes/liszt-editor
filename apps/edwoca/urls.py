@@ -105,6 +105,7 @@ urlpatterns = [
         path('manifestations/<int:pk>/classification', views.ManifestationClassificationUpdateView.as_view(), name = 'manifestation_classification'),
         path('manifestations/<int:pk>/print', views.ManifestationPrintUpdateView.as_view(), name = 'manifestation_print'),
         path('manifestations/<int:pk>/manuscript', views.manifestation_manuscript_update, name = 'manifestation_manuscript'),
+        path('manifestations/<int:pk>/digitized_copy/', views.ManifestationDigitizedCopyView.as_view(), name='manifestation_digcopy'),
         path('manifestations/<int:pk>/handwriting/<int:handwriting_pk>/add_writer/<int:person_pk>', views.manifestation_add_handwriting_writer, name = 'manifestation_add_handwriting_writer'),
         path('manifestations/<int:pk>/handwriting/<int:handwriting_pk>/remove_writer', views.manifestation_remove_handwriting_writer, name = 'manifestation_remove_handwriting_writer'),
         path('manifestations/handwriting/<int:pk>/delete', views.ManifestationHandwritingDeleteView.as_view(), name = 'manifestation_handwriting_delete'),
