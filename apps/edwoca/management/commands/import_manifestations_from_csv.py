@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 manifestation = Manifestation.objects.create()
 
                 try:
-                    manifestation.parse_csv(row, options['source_type'][0])
+                    manifestation.parse_csv(row, options['source_type'][0].upper())
                 except (GNDNotFoundError, GNDIdError) as e:
                     manifestation.delete()
                     print(f"GND Error in {row[Manifestation.RISM_ID_KEY]}, {row[Manifestation.CURRENT_SIGNATURE_KEY]}")
