@@ -10,20 +10,15 @@ from django.utils.safestring import mark_safe
 class ItemForm(ModelForm):
     class Meta:
         model = Item
-        fields = []
-        #widgets = {
-                #'rism_id': TextInput( attrs = {
-                        #'class': 'grow h-full'
-                    #})
-            #}
-
-    #def as_daisy(self):
-        #form = div()
-        #rism_id_label = label(self['rism_id'].label, _for=self['rism_id'].id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        #rism_id_label.add(raw(str(self['rism_id'])))
-        #form.add(rism_id_label)
-
-        #return mark_safe(str(form))
+        fields = ['cover', 'handwriting']
+        widgets = {
+                'cover': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'handwriting': TextInput( attrs = {
+                        'class': 'grow w-full'
+                    })
+            }
 
 
 class SignatureForm(ModelForm):
@@ -90,24 +85,21 @@ SignatureFormSet = inlineformset_factory(
     )
 
 
-"""
-class ItemTitleForm(TitleForm):
-    class Meta(TitleForm.Meta):
-        model = ItemTitle
-        fields = TitleForm.Meta.fields + ['item']
-        widgets = dict(TitleForm.Meta.widgets, **{ 'item': HiddenInput() })
-"""
-
-
-class ItemLocationForm(ModelForm, SimpleFormMixin):
+class ItemDedicationForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Item
-        fields = ['location']
+        fields = ['dedication', 'private_dedication_comment']
         widgets = {
-                'location': Textarea( attrs = {
+                'dedication': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'private_dedication_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     })
             }
+        labels = {
+            'private_dedication_comment': 'Interner Widmungskommentar',
+        }
 
 
 class ItemCommentForm(CommentForm):
@@ -147,33 +139,25 @@ class RelatedItemForm(ModelForm):
         return mark_safe(str(form))
 
 
-"""
-ItemTitleFormSet = inlineformset_factory(
-        Item,
-        ItemTitle,
-        form = ItemTitleForm,
-        formset = SkipEmptyTitleFormSet,
-        extra = 1,
-        max_num = 100,
-        can_delete = True
-    )
-"""
-
-
-class ProvenanceForm(ModelForm):
+class PersonProvenanceStationForm(ModelForm):
     class Meta:
-        fields = ['owner', 'item', 'comment']
+        model = PersonProvenanceStation
+        fields = ['period']
         widgets = {
-                'title': TextInput( attrs = {
-                        'class': 'grow w-full'
-                    }),
-                'language': Select( attrs = {
+                'period': Select( attrs = {
                         'class': 'autocomplete-select select select-bordered w-full'
-                    }),
-                'status': Select( attrs = {
-                        'class': 'select w-full select-bordered'
-                    }),
-                'id': HiddenInput()
+                    })
+            }
+
+
+class CorporationProvenanceStationForm(ModelForm):
+    class Meta:
+        model = CorporationProvenanceStation
+        fields = ['period']
+        widgets = {
+                'period': Select( attrs = {
+                        'class': 'autocomplete-select select select-bordered w-full'
+                    })
             }
 
 
@@ -225,3 +209,17 @@ class ItemDigitizedCopyForm(ModelForm, SimpleFormMixin):
                 wrap.add(raw(str(field)))
                 form.add(wrap)
         return mark_safe(str(form))
+
+
+class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Item
+        fields = ['public_provenance_comment', 'private_provenance_comment']
+        widgets = {
+            'public_provenance_comment': Textarea(attrs={
+                'class': SimpleFormMixin.text_area_classes
+            }),
+            'private_provenance_comment': Textarea(attrs={
+                'class': SimpleFormMixin.text_area_classes
+            })
+        }

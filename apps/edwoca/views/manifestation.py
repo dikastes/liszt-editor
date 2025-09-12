@@ -1,5 +1,5 @@
 from ..forms.manifestation import *
-from ..forms.item import SignatureFormSet, ItemForm, ItemDigitizedCopyForm
+from ..forms.item import SignatureFormSet, ItemForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm
 from ..forms.manifestation import *
 from ..models import Manifestation as EdwocaManifestation
 from ..models import ManifestationTitle, ManifestationTitleHandwriting
@@ -509,7 +509,7 @@ def manifestation_provenance(request, pk):
                 cps_form.save()
 
         # Handle private_provenance_comment form
-        provenance_comment_form = ManifestationProvenanceCommentForm(request.POST, instance=manifestation)
+        provenance_comment_form = ItemProvenanceCommentForm(request.POST, instance=item)
         if provenance_comment_form.is_valid():
             provenance_comment_form.save()
 
@@ -530,7 +530,7 @@ def manifestation_provenance(request, pk):
         context['corporation_provenance_forms'] = corporation_provenance_forms
 
         # Initialize private_provenance_comment form
-        provenance_comment_form = ManifestationProvenanceCommentForm(instance=manifestation)
+        provenance_comment_form = ItemProvenanceCommentForm(instance=item)
         context['provenance_comment_form'] = provenance_comment_form
 
     q_bib = request.GET.get('bib-q')
@@ -562,27 +562,37 @@ def manifestation_provenance(request, pk):
 def person_provenance_add(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
     PersonProvenanceStation.objects.create(item=item)
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    if item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+    return redirect('edwoca:item_provenance', pk=item_id)
 
 
 def corporation_provenance_add(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
     CorporationProvenanceStation.objects.create(item=item)
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    if item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+    return redirect('edwoca:item_provenance', pk=item_id)
 
 
 class PersonProvenanceStationDeleteView(DeleteView):
     model = PersonProvenanceStation
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_provenance', kwargs={'item_id': self.object.item.id})
+        item = self.object.item
+        if item.manifestation.is_singleton:
+            return reverse('edwoca:manifestation_provenance', kwargs={'pk': item.id})
+        return reverse('edwoca:item_provenance', kwargs={'pk': item.id})
 
 
 class CorporationProvenanceStationDeleteView(DeleteView):
     model = CorporationProvenanceStation
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_provenance', kwargs={'item_id': self.object.item.id})
+        item = self.object.item
+        if object.item.manifestation.is_singleton:
+            return reverse('edwoca:manifestation_provenance', kwargs={'pk': item.id})
+        return reverse('edwoca:item_provenance', kwargs={'pk': item.id})
 
 
 def manifestation_manuscript_update(request, pk):

@@ -29,6 +29,27 @@ class Item(WemiBaseClass):
             on_delete = models.CASCADE,
             related_name = 'items'
         )
+    dedication = models.TextField(
+            blank=True,
+            null=True
+        )
+    dedicatees = models.ManyToManyField(
+            'dmad.Person',
+            related_name='item_dedicatees'
+        )
+    private_dedication_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_provenance_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+    public_provenance_comment = models.TextField(
+            blank = True,
+            null = True
+        )
+
 
     def __str__(self):
         #title = self.get_pref_title() or '<ohne Titel>'
@@ -36,6 +57,9 @@ class Item(WemiBaseClass):
         if self.manifestation.is_singleton:
             return self.manifestation.__str__()
         return self.get_current_signature()
+
+    def get_pref_title(self):
+        return self.__str__()
 
     def signature_with_former(self):
         former_string = ''

@@ -218,14 +218,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-    private_provenance_comment = models.TextField(
-            blank = True,
-            null = True
-        )
-    public_provenance_comment = models.TextField(
-            blank = True,
-            null = True
-        )
+
     taken_information = models.TextField(
             blank = True,
             null = True
