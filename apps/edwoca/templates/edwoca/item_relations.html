@@ -23,7 +23,7 @@
 					<a href="{% url 'edwoca:item_update' item.id %}" class="flex-1">
 						{{ item_relation.item }}
 					</a>
-					<form method="post" action="{% url 'edwoca:item_relation_remove' item_relation.id %}" class="flex-0">
+					<form method="post" action="{% url 'edwoca:related_item_remove' item_relation.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>

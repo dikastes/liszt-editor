@@ -55,8 +55,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.plate_number:
             publisher_addition = self.plate_number
 
-        #return f"{catalog_number}, {self.publisher} {self.publisher_addition}"
-        return f"{catalog_number}, <<Verlag>> {publisher_addition}"
+        return f"{catalog_number}, {self.publisher.get_designator()} {publisher_addition}"
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'

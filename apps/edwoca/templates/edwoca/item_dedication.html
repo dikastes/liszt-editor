@@ -1,0 +1,43 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+<div class="bg-white border border-base-300 p-5 mt-5">
+    <h2 class="card-title mt-0"> Widmung </h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_daisy }}
+        <input id="submit-form" type="submit" value="Speichern" class="hidden" id="submit-form">
+    </form>
+
+    <div class="mt-5">
+        <h3 class="text-lg font-bold mb-5">Widmungsträger</h3>
+        <form method="get" class="flex-1 flex gap-5">
+            <label class="input input-bordered flex items-center gap-2 flex-1">
+                Widmungsträger
+                {{ searchform.q }}
+            </label>
+            <input type="submit" id="submit-form-dedicatee" class="btn" value="Suchen"/>
+        </form>
+        {% if query %}
+            <ul>
+            {% for person in found_persons %}
+                <li>
+                    <a href="{% url 'edwoca:item_add_dedicatee' object.id person.pk %}">{{ person.object }}</a>
+                </li>
+            {% empty %}
+                <li> keine Suchergebnisse </li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+
+        <ul class="mt-5">
+        {% for dedicatee in object.dedicatees.all %}
+            <li class="flex items-center">
+                <p class="flex-1">{{ dedicatee }}</p>
+                <a href="{% url 'edwoca:item_remove_dedicatee' object.id dedicatee.id %}" class="btn">Löschen</a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endblock %}
