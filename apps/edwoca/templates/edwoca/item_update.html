@@ -1,9 +1,6 @@
 {% extends 'edwoca/base.html' %}
 
-
-
 {% block content %}
-
 <div class="bg-white border border-base-300 p-5">
 	<h2 class="card-title mt-0"> {{ object }} bearbeiten </h2>
 
@@ -11,13 +8,21 @@
 		{% csrf_token %}
 		{{ form.as_daisy }}
 
-		<input id="submit-form" type="submit" value="{{ button_label }}" class="hidden">
+                <h3 class="text-lg font-bold mt-5">Signaturen</h3>
+                {{ signature_formset.management_form }}
+                {% for form in signature_formset %}
+                    {{ form.as_daisy }}
+                {% endfor %}
+
+                <div class="flex">
+                        <div class="flex-1"></div>
+                        <div class="flex-0">
+                                <input type="submit" name="add_signature" value="Signatur hinzufügen" class="btn btn-secondary mt-2">
+                                <input type="submit" value="Speichern" class="hidden" id="submit-form">
+                        </div>
+                </div>
 	</form>
 
 </div>
 
 {% endblock %}
-
-
-
-
