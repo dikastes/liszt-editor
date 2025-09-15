@@ -18,7 +18,7 @@ class Command(BaseCommand):
                 total = len(contents)
                 for i, row in enumerate(contents):
                     gnd_id = row[0]
-                    print(f"{i} von {total}: {gnd_id}")
+                    print(f"{str(i+1)} von {total}: {gnd_id}")
                     py_ent = PyLobidClient(f"http://d-nb.info/gnd/{gnd_id}").factory()
 
                     match py_ent.__class__.__name__:

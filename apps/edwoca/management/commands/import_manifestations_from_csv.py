@@ -9,13 +9,22 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('file_name', nargs=1, type=str)
         parser.add_argument('source_type', nargs=1, type=str)
+        parser.add_argument('--manifestation_form', nargs='?', type=str)
+        parser.add_argument('--function', nargs='?', type=str)
 
     def handle(self, *args, **options):
+        function = None
+        if (function_argument := options['function']):
+            function = Manifestation.Function.parse(function_argument)
+        manifestation_form = None
+        if (form_argument := options['manifestation_form']):
+            manifestation_form = Manifestation.ManifestationForm.parse(form_argument)
+
         with open(options['file_name'][0]) as file:
             reader = list(DictReader(file))
             total = len(reader)
             for i, row in enumerate(reader):
-                print(f'{i} von {total}')
+                print(f'{str(i+1)} von {total}')
                 print(f'{row[Manifestation.CURRENT_SIGNATURE_KEY]}, {row[Manifestation.RISM_ID_KEY]}')
                 # reactivate when RISM IDs are unique
                 #if Manifestation.RISM_ID_KEY in row and \
@@ -26,13 +35,12 @@ class Command(BaseCommand):
                 manifestation = Manifestation.objects.create()
 
                 try:
-                    manifestation.parse_csv(row, options['source_type'][0].upper())
+                    manifestation.parse_csv(row, options['source_type'][0].upper(), manifestation_form, function)
                 except (GNDNotFoundError, GNDIdError) as e:
                     manifestation.delete()
                     print(f"GND Error in {row[Manifestation.RISM_ID_KEY]}, {row[Manifestation.CURRENT_SIGNATURE_KEY]}")
                     print(e)
                     continue
-                # reactivate when RISM IDs are unique
-                #if manifestation.rism_id:
-                    #manifestation.pull_rism_data()
+                if manifestation.rism_id:
+                    manifestation.pull_rism_data()
                 manifestation.save()
