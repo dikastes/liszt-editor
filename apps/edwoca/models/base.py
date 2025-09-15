@@ -55,7 +55,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.plate_number:
             publisher_addition = self.plate_number
 
-        return f"{catalog_number}, {self.publisher.get_designator()} {publisher_addition}"
+        if self.publisher:
+            return f"{catalog_number}, {self.publisher.get_designator()} {publisher_addition}"
+        return f"{catalog_number}, << Verlag >> {publisher_addition}"
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
@@ -75,33 +77,50 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 replace(')', '').\
                 strip()
 
-    def parse_csv(self, raw_data, source_type):
+    def parse_csv(self, raw_data, source_type, manifestation_form = None, function = None):
+        # Head keys
+        IDENTIFICATION_KEY = 'WVZ-Nr.'
         INSTITUTION_KEY = 'Bestandeshaltende Institution'
         FORMER_SIGNATURE_KEY = 'Signatur, vormalig'
-        IDENTIFICATION_KEY = 'WVZ-Nr.'
         TITLE_KEY = 'Titel (normiert, nach MGG)'
+
         EDITION_TYPE_KEY = 'Ausgabeform (Typ)'
         FUNCTION_KEY = 'Funktion'
+        FORMER_TYPE_KEY = 'interne Sicherung vormaliger "Typ"-Einträge'
+        OWNER_NOTE_KEY = 'Besitzvermerk (intern)'
 
         ENVELOPE_TITLE_KEY = 'Titelei Umschlag oder Titelblatt'
         ENVELOPE_TITLE_WRITER_KEY = 'Schreiber Titelei' # Schreiber Umschlag/Titelblatt Bezug zu O
         ENVELOPE_TITLE_MEDIUM_KEY = 'Autor Titelei (Liszt egh.)'
+        ENVELOPE_TITLE_COMMENT_KEY = 'Kommentarfeld zu: Titel (der Quelle) Titelblatt | Umschlag'
 
         HEAD_TITLE_KEY = 'Kopftitel'
         HEAD_TITLE_WRITER_KEY = 'Schreiber Kopftitel' # Schreiber Umschlag/Titelblatt Bezug zu O
         HEAD_TITLE_MEDIUM_KEY = 'Autor Kopftitel (Liszt egh.)'
+        HEAD_TITLE_COMMENT_KEY = 'Kommentarfeld zu: Titel (der Quelle) Notentext'
 
         DEDICATION_KEY = 'Widmung (diplomatisch)'
+        DEDICATION_COMMENT_KEY = 'Kommentar zur Widmung'
+
         MEDIUM_OF_PERFORMANCE_KEY = 'Besetzung (normiert)'
         TEMPO_KEY = 'Tempoangabe (normiert)'
         METRONOM_KEY = 'Metronomangabe'
         LANGUAGE_KEY = 'Sprachcode'
         TEXT_INCIPIT_KEY = 'Text-Incipit (diplomatisch)'
+
         LOCATION_KEY = 'GND-Nr. Ort'
         DIPLOMATIC_DATE_KEY = 'Datierung (diplomatisch)'
         MACHINE_READABLE_DATE_KEY = 'Datierung (maschinenlesbar)'
+        DATE_COMMENT_KEY = 'Datierung Kommentar'
+
         RELATED_PRINT_PUBLISHER_KEY = 'Bezug zu Druck: Verlags-GND-Nr.'
         RELATED_PRINT_PLATE_NUMBER_KEY = 'Bezug zu Druck: Plattennr.'
+
+        PUBLISHER_KEY = 'Verlags GND-Nr.'
+        PLATE_NUMBER_KEY = 'Plattennummer'
+        STITCHER_KEY = 'Stecherei GND-Nr.'
+        FIGURE_KEY = 'Abbildung (figurativ)'
+        PRINT_TYPE_KEY = 'Drucktyp'
 
         AUTOGRAPH_HANDWRITING_KEY = 'Schrift (Liszt egh.)'
         FOREIGN_HANDWRITING_KEY = 'Schrift (fremder Hand)'
@@ -109,6 +128,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         EXTENT_KEY = 'Umfang'
         MEASURE_KEY = 'Papiermaß'
+        PHYSICAL_FEATURES_KEY = 'Beschreibung physischer Merkmale'
+        CONTENT_KEY = 'Inhalt'
 
         DIGITAL_COPY_KEY = 'Digitalisat'
 
@@ -121,29 +142,46 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         DEDUCED_PLACE_NAME_KEY = 'Ort ermittelt (normiert)'
         DEDUCED_PLACE_ID_KEY = 'Ort ermittelt GND-Nr.'
 
-        PROVENANCE_KEY1 = 'Provenienz Station 1'
-        PROVENANCE_KEY2 = 'Provenienz Station 2'
-        PROVENANCE_KEY3 = 'Provenienz Station 3'
-        PROVENANCE_KEY4 = 'Provenienz Station 4'
+        #PROVENANCE_KEY1 = 'Provenienz Station 1'
+        #PROVENANCE_KEY2 = 'Provenienz Station 2'
+        #PROVENANCE_KEY3 = 'Provenienz Station 3'
+        #PROVENANCE_KEY4 = 'Provenienz Station 4'
+        #PROVENANCE_SINGLE_KEY = 'Provenienz'
+
+        PROVENANCE_KEY = 'Provenienz'
+        PROVSTATION_SUFFIX = ' Station '
 
         MANIFESTATION_NOTES_KEY = 'Notizen zur Quelle (vormals "Beschreibung", bleibt intern)'
         MANIFESTATION_COMMENT_KEY = 'Kommentar zur Quelle (intern)'
         COMMENT_QUESTION_KEY = 'Kommentar intern / Fragen (interne Kommunikation)'
         FURTHER_INFORMATION_KEY = 'Weiterführende Informationen (Ausgaben, Permalinks etc.) (intern)'
 
-        self.taken_information = '\n'.join([
-                'Notizen zur Quelle: ' + raw_data[MANIFESTATION_NOTES_KEY],
-                'Kommentar zur Quelle: ' + raw_data[MANIFESTATION_COMMENT_KEY],
-                'Kommentar intern: ' + raw_data[COMMENT_QUESTION_KEY],
-                'Weiterführende Informationen: ' + raw_data[FURTHER_INFORMATION_KEY]
-            ])
+        self.manifestation_form = manifestation_form
+        self.function = function
 
-        self.private_provenance_comment = '\n'.join(
-                provenance_string for
-                provenance_key in
-                [ PROVENANCE_KEY1, PROVENANCE_KEY2, PROVENANCE_KEY3, PROVENANCE_KEY4 ]
-                if (provenance_string := raw_data[provenance_key])
-            )
+        taken_information = []
+        if MANIFESTATION_NOTES_KEY in raw_data and (manifestation_notes := raw_data[MANIFESTATION_NOTES_KEY]):
+            taken_information += [ 'Notizen zur Quelle: ' + manifestation_notes]
+        if MANIFESTATION_COMMENT_KEY in raw_data and (manifestation_comment := raw_data[MANIFESTATION_COMMENT_KEY]):
+            taken_information += [ 'Kommentar zur Quelle: ' + manifestation_comment]
+        if COMMENT_QUESTION_KEY in raw_data and (comment_question := raw_data[COMMENT_QUESTION_KEY]):
+            taken_information += [ 'Kommentar intern: ' + comment_question]
+        if FURTHER_INFORMATION_KEY in raw_data and (further_information := raw_data[FURTHER_INFORMATION_KEY]):
+            taken_information += [ 'Weiterführende Informationen: ' + further_information]
+        if FORMER_TYPE_KEY in raw_data and (former_type := raw_data[FORMER_TYPE_KEY]):
+            taken_information += [ 'Vormalige Typ-Einträge: ' + former_type ]
+        if CONTENT_KEY in raw_data and (content := raw_data[CONTENT_KEY]):
+            taken_information += [ 'Inhalt: ' + content ]
+
+        self.taken_information = '\n'.join(taken_information)
+
+        #if PROVENANCE_KEY1 in raw_data:
+            #self.private_provenance_comment = '\n'.join(
+                    #provenance_string for
+                    #provenance_key in
+                    #[ PROVENANCE_KEY1, PROVENANCE_KEY2, PROVENANCE_KEY3, PROVENANCE_KEY4 ]
+                    #if (provenance_string := raw_data[provenance_key])
+                #)
 
         for writer in ANONYMOUS_WRITERS:
             if Person.objects.filter(interim_designator = writer).count() == 0:
@@ -152,27 +190,37 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         # add stitch template flag to manifestation?
         liszt = Person.fetch_or_get(LISZT_GND_ID)
 
-        if not getattr(Manifestation.SourceType, source_type):
+        if not hasattr(Manifestation.SourceType, source_type):
             raise Exception(f'Unknown source type {source_type}')
 
         self.source_type = getattr(Manifestation.SourceType, source_type)
 
         self.is_singleton = True
-        self.titles.all().delete()
+        #only makes sense if doubles may be detected and overriding may be activated
+        #self.titles.all().delete()
 
-        self.private_head_comment = '\n'.join([
-                'Identifikation: ' + raw_data[IDENTIFICATION_KEY],
-                'Besetzung: ' + raw_data[MEDIUM_OF_PERFORMANCE_KEY],
-                'Tempo: ' + raw_data[TEMPO_KEY],
-                'Metronom:' + raw_data[METRONOM_KEY],
-                'Sprache: ' + raw_data[LANGUAGE_KEY],
-                'Textincipit: ' + raw_data[TEXT_INCIPIT_KEY]
-            ])
+        private_head_comment = []
+        if IDENTIFICATION_KEY in raw_data and (identification := raw_data[IDENTIFICATION_KEY]):
+            private_head_comment += [ 'Identifikation: ' + identification ]
+        if TEMPO_KEY in raw_data and (tempo := raw_data[TEMPO_KEY]):
+            private_head_comment += [ 'Tempo: ' + tempo ]
+        if LANGUAGE_KEY in raw_data and (language := raw_data[LANGUAGE_KEY]):
+            private_head_comment += [ 'Sprache: ' + language ]
+        if TEXT_INCIPIT_KEY in raw_data and (incipit := raw_data[TEXT_INCIPIT_KEY]):
+            private_head_comment += [ 'Text-Incipit: ' + incipit ]
+        if METRONOM_KEY in raw_data and (metronom := raw_data[METRONOM_KEY]):
+            private_head_comment += [ 'Metronom: ' + metronom ]
+        if MEDIUM_OF_PERFORMANCE_KEY in raw_data and (medium := raw_data[MEDIUM_OF_PERFORMANCE_KEY]):
+            private_head_comment += [ 'Besetzung: ' + medium ]
+        self.private_head_comment = '\n'.join(private_head_comment)
 
-        if raw_data[DEDUCED_PLACE_NAME_KEY]:
+        if DEDUCED_PLACE_NAME_KEY in raw_data and raw_data[DEDUCED_PLACE_NAME_KEY]:
             self.private_history_comment = f"Ort ermittelt: {raw_data[DEDUCED_PLACE_NAME_KEY]}, {raw_data[DEDUCED_PLACE_ID_KEY]}"
+        if DATE_COMMENT_KEY in raw_data and (comment := raw_data[DATE_COMMENT_KEY]):
+            self.private_history_comment = f"Datierung Kommentar: {comment}"
 
-        self.function = Manifestation.Function.parse_from_german(raw_data[FUNCTION_KEY])
+        if FUNCTION_KEY in raw_data:
+            self.function = Manifestation.Function.parse_from_german(raw_data[FUNCTION_KEY])
 
         if self.RISM_ID_KEY in raw_data and\
             raw_data[self.RISM_ID_KEY] and\
@@ -197,7 +245,30 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 )
             single_item.signatures.add(former_signature)
 
-        if raw_data[LOCATION_KEY]:
+        provenance_comment = []
+        if PROVENANCE_KEY + PROVSTATION_SUFFIX + '1' in raw_data:
+            provenance_comment = [
+                    provenance_string for
+                    station in
+                    range(3)
+                    if (
+                        provenance_string := \
+                        raw_data[PROVENANCE_KEY + PROVSTATION_SUFFIX + str(station + 1)]
+                    )
+                ]
+            if PROVENANCE_KEY + PROVSTATION_SUFFIX + '4' in raw_data:
+                provenance_comment += f'\n {raw_data[PROVENANCE_KEY + PROVSTATION_SUFFIX + "4"]}'
+
+        if PROVENANCE_KEY in raw_data and (provenance := raw_data[PROVENANCE_KEY]):
+            provenance_comment += [ provenance ]
+
+        if OWNER_NOTE_KEY in raw_data and (owner := raw_data[OWNER_NOTE_KEY]):
+            provenance_comment += [ f'Besitzvermerk: {owner}' ]
+
+        single_item.private_provenance_comment = '\n'.join(provenance_comment)
+        single_item.save()
+
+        if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY]:
             for gnd_id in raw_data[LOCATION_KEY].split('|'):
                 place = Place.fetch_or_get(gnd_id.strip())
                 self.places.add(place)
@@ -230,10 +301,23 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if raw_data[MACHINE_READABLE_DATE_KEY]:
             self.period = Period.parse(raw_data[MACHINE_READABLE_DATE_KEY])
 
-        if raw_data[RELATED_PRINT_PUBLISHER_KEY]:
-            self.publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY])
-        self.plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
-        # machine readable key abklären
+        if RELATED_PRINT_PUBLISHER_KEY in raw_data:
+            if raw_data[RELATED_PRINT_PUBLISHER_KEY]:
+                self.publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY])
+            self.plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
+
+        if PUBLISHER_KEY in raw_data:
+            if raw_data[PUBLISHER_KEY]:
+                self.publisher = Corporation.fetch_or_get(raw_data[PUBLISHER_KEY])
+            self.plate_number = raw_data[PLATE_NUMBER_KEY]
+        if STITCHER_KEY in raw_data and (stitcher := raw_data[STITCHER_KEY]):
+            self.stitcher = Corporation.fetch_or_get(stitcher)
+
+        if FIGURE_KEY in raw_data and raw_data[FIGURE_KEY]:
+            self.specific_figure = True
+
+        if PRINT_TYPE_KEY in raw_data and (print_type := raw_data[PRINT_TYPE_KEY]):
+            self.print_type = Manifestation.PrintType.parse(print_type)
 
         if AUTOGRAPH_HANDWRITING_KEY in raw_data and \
             raw_data[AUTOGRAPH_HANDWRITING_KEY]:
@@ -467,20 +551,28 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             manifestation_title = manifestation_title_list[i]
                         )
 
+        private_title_comments = []
+        if ENVELOPE_TITLE_COMMENT_KEY in raw_data and (comment := raw_data[ENVELOPE_TITLE_COMMENT_KEY]):
+            private_title_comments += ['Kommentar Umschlagstitel: ' + comment]
+        if HEAD_TITLE_COMMENT_KEY in raw_data and (comment := raw_data[HEAD_TITLE_COMMENT_KEY]):
+            private_title_comments += ['Kommentar Kopftitel: ' + comment]
+        if DEDICATION_COMMENT_KEY in raw_data and (comment := raw_data[DEDICATION_COMMENT_KEY]):
+            private_title_comments += ['Kommentar Widmung: ' + comment]
+
+        self.private_title_comment = '\n'.join(private_title_comments)
+
         self.extent = raw_data[EXTENT_KEY]
         self.measure = raw_data[MEASURE_KEY]
 
+        if PHYSICAL_FEATURES_KEY in raw_data and (phys_features := raw_data[PHYSICAL_FEATURES_KEY]):
+            self.private_manuscript_comment = f'Beschreiung physischer Merkmale: {phys_features}'
+
         if raw_data[DIGITAL_COPY_KEY]:
             DigitalCopy.objects.create(
-                    item = self.items.all()[0],
+                    item = single_item,
                     url = raw_data[DIGITAL_COPY_KEY]
                 )
 
-        # R -> medium of performance (leave open)
-
-        # X/Y -> period
-
-        # add handwriting model with writer/medium
 
 class ManifestationTitle(DmRismManifestationTitle):
     class Meta:

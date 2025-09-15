@@ -25,6 +25,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         FRAGMENTS = 'FR', _('Fragments'),
         EXCERPTS = 'EX', _('Excerpts')
 
+        def parse(string):
+            match string.lower():
+                case 'sketch' | 'sketches': return Manifestation.ManifestationForm.SKETCHES
+                case 'fragment' | 'fragments': return Manifestation.ManifestationForm.FRAGMENTS
+                case 'excerpt' | 'excerpts': return Manifestation.ManifestationForm.EXCERPTS
+
     class EditionType(models.TextChoices):
         SCORE = 'SCO', _('Score')
         PART = 'PRT', _('Part')
@@ -34,12 +40,23 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         CHOIR_SCORE = 'CSC', _('Choir Score')
 
     class Function(models.TextChoices):
-        COPY = 'CP', _('Copy')
-        ALBUM_PAGE = 'AP', _('Album Page')
-        PART_EXCERPT = 'PE', _('Part Excerpt')
-        DEDICATION_ITEM = 'DI', _('Dedication Item')
-        STITCH_TEMPLATE = 'ST', _('Stitch Template')
-        CORRECTED_STITCH_TEMPLATE = 'CS', _('Corrected Stitch Template')
+        COPY = 'COP', _('Copy')
+        ALBUM_PAGE = 'ABP', _('Album Page')
+        PART_EXCERPT = 'PTE', _('Part Excerpt')
+        DEDICATION_ITEM = 'DDI', _('Dedication Item')
+        STITCH_TEMPLATE = 'STT', _('Stitch Template')
+        CORRECTED_STITCH_TEMPLATE = 'CST', _('Corrected Stitch Template')
+        CORRECTION_SHEET = 'CRS', _('Correction Sheet')
+
+        def parse(string):
+            match string.lower():
+                case 'copy': return Manifestation.Function.COPY
+                case 'album' | 'albumpage': return Manifestation.Function.ALBUM_PAGE
+                case 'excerpt' | 'partexcerpt': return Manifestation.Function.PART_EXCERPT
+                case 'dedication' | 'dedicationitem': return Manifestation.Function.DEDICATION_ITEM
+                case 'template' | 'stitchtemplate': return Manifestation.Function.STITCH_TEMPLATE
+                case 'correctedtemplate' | 'correctedstitchtemplate': return Manifestation.Function.CORRECTED_STITCH_TEMPLATE
+                case 'correction' | 'correctionsheet': return Manifestation.Function.CORRECTION_SHEET
 
         def parse_from_german(german_string):
             match german_string:
@@ -49,6 +66,16 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 case 'Dedikationsexemplar': return Manifestation.Function.DEDICATION_ITEM
                 case 'Stichvorlage': return Manifestation.Function.STITCH_TEMPLATE
                 case 'korrigierte Stichvorlage': return Manifestation.Function.CORRECTED_STITCH_TEMPLATE
+                case 'Korrekturblatt': return Manifestation.Function.CORRECTION_SHEET
+
+    class PrintType(models.TextChoices):
+        PLATE_PRINTING = 'P', _('Plate Print')
+        LITHOGRAPH = 'L', _('Lithograph')
+
+        def parse_from_german(german_string):
+            match german_string.lower():
+                case 'plattendruck' | 'platte': return Manifestation.PrintType.PLATE_PRINTING
+                case 'lithographie': return Manifestation.PrintType.LITHOGRAPH
 
     class SourceType(models.TextChoices):
         AUTOGRAPH = 'AUT', _('Autograph')
@@ -124,6 +151,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null = True,
             blank = True
         )
+    print_type = models.CharField(
+            max_length = 10,
+            choices = PrintType,
+            default = None,
+            null = True,
+            blank = True
+        )
     state = models.CharField(
             max_length=10,
             choices=State,
@@ -194,7 +228,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         )
     publisher = models.ForeignKey(
             'dmad.Corporation',
-            related_name = 'publishers',
+            related_name = 'published_manifestations',
             null = True,
             on_delete = models.SET_NULL
         )
@@ -218,10 +252,22 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-
+    private_print_comment = models.TextField(
+            blank = True,
+            null = True
+        )
     taken_information = models.TextField(
             blank = True,
             null = True
+        )
+    stitcher = models.ForeignKey(
+            'dmad.Corporation',
+            related_name = 'stitched_manifestations',
+            null = True,
+            on_delete = models.SET_NULL
+        )
+    specific_figure = models.BooleanField(
+            default = False
         )
 
     def render_handwritings(self):
