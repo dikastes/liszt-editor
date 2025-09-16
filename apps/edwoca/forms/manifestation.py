@@ -321,10 +321,16 @@ ManifestationTitleFormSet = inlineformset_factory(
 class ManifestationPrintForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
-        fields = ['plate_number']
+        fields = ['plate_number', 'specific_figure', 'print_type']
         widgets = {
                 'plate_number': TextInput( attrs = {
                         'class': 'grow'
+                    }),
+                'specific_figure': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'print_type': Select( attrs = {
+                        'class': 'select select-bordered w-full'
                     })
             }
 
@@ -332,11 +338,25 @@ class ManifestationPrintForm(ModelForm, SimpleFormMixin):
         form = div(cls='mb-10')
 
         plate_number_field = self['plate_number']
+        specific_figure_field = self['specific_figure']
+        print_type_field = self['print_type']
 
         plate_number_label = label(plate_number_field.label, cls='input input-bordered flex items-center gap-2')
         plate_number_label.add(raw(str(plate_number_field)))
 
+        specific_figure_label = label(_for=specific_figure_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')
+        specific_figure_label.add(span(specific_figure_field.label, cls='label-text'))
+        specific_figure_label.add(raw(str(specific_figure_field)))
+
+        print_type_label = label(print_type_field.label, cls='flex-1')
+        print_type_label.add(raw(str(print_type_field)))
+
+        palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette.add(specific_figure_label)
+        palette.add(print_type_label)
+
         form.add(plate_number_label)
+        form.add(palette)
 
         return mark_safe(str(form))
 

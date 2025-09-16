@@ -472,6 +472,7 @@ class ManifestationPrintUpdateView(SimpleFormView):
     model = Manifestation
     property = 'print'
     template_name = 'edwoca/manifestation_print.html'
+    form_class = ManifestationPrintForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
