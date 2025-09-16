@@ -663,6 +663,17 @@ def manifestation_manuscript_update(request, pk):
     if request.GET.get('handwriting_id'):
         context['handwriting_id'] = int(request.GET.get('handwriting_id'))
 
+    if manifestation.stitcher:
+        context['linked_stitcher'] = manifestation.stitcher
+    else:
+        stitcher_search_form = SearchForm(request.GET or None, prefix='stitcher')
+        context['stitcher_searchform'] = stitcher_search_form
+        context['show_stitcher_search_form'] = True
+
+        if stitcher_search_form.is_valid() and stitcher_search_form.cleaned_data.get('q'):
+            context['stitcher_query'] = stitcher_search_form.cleaned_data.get('q')
+            context[f"found_stitchers"] = stitcher_search_form.search().models(Corporation)
+
     return render(request, 'edwoca/manifestation_manuscript.html', context)
 
 

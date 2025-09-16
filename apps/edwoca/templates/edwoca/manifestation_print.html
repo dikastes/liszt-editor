@@ -43,6 +43,7 @@
             {% endif %}
         {% endif %}
     </div>
+    {% if not object.is_singleton %}
     <div class="mt-5">
         <h3 class="text-lg font-bold">Stecher</h3>
         {% if object.stitcher %}
@@ -74,6 +75,7 @@
             {% endif %}
         {% endif %}
     </div>
+    {% endif %}
 </div>
 
 <div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
