@@ -26,15 +26,46 @@
             <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1 flex gap-5">
                 <label class="input input-bordered flex items-center gap-2 flex-1">
                     Verlag
-                    {{ searchform.q }}
+                    {{ publisher_searchform.q }}
                 </label>
                 <input type="submit" id="submit-form-publisher" class="btn" value="Suchen"/>
             </form>
-            {% if query %}
+            {% if publisher_query %}
                 <ul>
                 {% for publisher in found_publishers %}
                     <li>
                         <a href="{% url 'edwoca:manifestation_add_publisher' object.id publisher.object.id %}">{{ publisher.object.get_designator }}</a>
+                    </li>
+                {% empty %}
+                    <li> keine Suchergebnisse </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="mt-5">
+        <h3 class="text-lg font-bold">Stecher</h3>
+        {% if object.stitcher %}
+            <div class="flex gap-5">
+                <label class="flex-1 input input-bordered flex items-center gap-2">
+                    Stecher
+                    <input type="text" class="grow" disabled value="{{ object.stitcher.get_designator }}" />
+                </label>
+                <a class="flex-0 btn" href="{% url 'edwoca:manifestation_remove_stitcher' object.id %}"> löschen </a>
+            </div>
+        {% else %}
+            <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1 flex gap-5">
+                <label class="input input-bordered flex items-center gap-2 flex-1">
+                    Stecher
+                    {{ stitcher_searchform.q }}
+                </label>
+                <input type="submit" id="submit-form-stitcher" class="btn" value="Suchen"/>
+            </form>
+            {% if stitcher_query %}
+                <ul>
+                {% for stitcher in found_stitchers %}
+                    <li>
+                        <a href="{% url 'edwoca:manifestation_add_stitcher' object.id stitcher.object.id %}">{{ stitcher.object.get_designator }}</a>
                     </li>
                 {% empty %}
                     <li> keine Suchergebnisse </li>

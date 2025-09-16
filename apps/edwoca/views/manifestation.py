@@ -406,6 +406,19 @@ def manifestation_remove_publisher(request, pk):
     manifestation.save()
     return redirect('edwoca:manifestation_print', pk=pk)
 
+def manifestation_add_stitcher(request, pk, stitcher_id):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    stitcher = get_object_or_404(Corporation, pk=stitcher_id)
+    manifestation.stitcher = stitcher
+    manifestation.save()
+    return redirect('edwoca:manifestation_print', pk=pk)
+
+def manifestation_remove_stitcher(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    manifestation.stitcher = None
+    manifestation.save()
+    return redirect('edwoca:manifestation_print', pk=pk)
+
 
 class ManifestationBibAddView(FormView):
     def post(self, request, *args, **kwargs):
@@ -467,13 +480,25 @@ class ManifestationPrintUpdateView(SimpleFormView):
         if manifestation.publisher:
             context['linked_publisher'] = manifestation.publisher
         else:
-            search_form = SearchForm(self.request.GET or None)
-            context['searchform'] = search_form
-            context['show_search_form'] = True
+            search_form = SearchForm(self.request.GET or None, prefix='publisher')
+            context['publisher_searchform'] = search_form
+            context['show_publisher_search_form'] = True
 
             if search_form.is_valid() and search_form.cleaned_data.get('q'):
-                context['query'] = search_form.cleaned_data.get('q')
+                context['publisher_query'] = search_form.cleaned_data.get('q')
                 context[f"found_publishers"] = search_form.search().models(Corporation)
+
+        if manifestation.stitcher:
+            context['linked_stitcher'] = manifestation.stitcher
+        else:
+            search_form = SearchForm(self.request.GET or None, prefix='stitcher')
+            context['stitcher_searchform'] = search_form
+            context['show_stitcher_search_form'] = True
+
+            if search_form.is_valid() and search_form.cleaned_data.get('q'):
+                context['stitcher_query'] = search_form.cleaned_data.get('q')
+                context[f"found_stitchers"] = search_form.search().models(Corporation)
+
 
         return context
 
