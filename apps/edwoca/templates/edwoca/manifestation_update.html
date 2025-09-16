@@ -142,7 +142,13 @@
 				<div class="flex gap-5">
 					<p class="flex-1 m-0">
 						{{ item }}
+						{% if item.is_template %}
+							<span class="badge badge-primary">Vorlage</span>
+						{% endif %}
 					</p>
+						{% if not item.is_template %}
+							<a href="{% url 'edwoca:item_set_template' item.id %}" class="btn flex-0"> Vorlage </a>
+						{% endif %}
 					<a href="#item-modal-{{ item.id }}" class="btn flex-0"> bearbeiten </a>
 					<form action="{% url 'edwoca:item_delete' item.id %}" method="post" class="flex-0">
 						{% csrf_token %}

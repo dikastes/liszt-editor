@@ -11,6 +11,15 @@ from dmad_on_django.models import Person, Corporation
 from bib.models import ZotItem
 
 
+def item_set_template(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    manifestation = item.manifestation
+    manifestation.items.update(is_template=False)
+    item.is_template = True
+    item.save()
+    return redirect('edwoca:manifestation_update', pk=manifestation.pk)
+
+
 class ItemListView(EdwocaListView):
     model = EdwocaItem
 

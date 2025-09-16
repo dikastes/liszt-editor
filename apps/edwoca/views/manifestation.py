@@ -1,5 +1,5 @@
 from ..forms.manifestation import *
-from ..forms.item import SignatureFormSet, ItemForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm
+from ..forms.item import SignatureFormSet, ItemForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet
 from ..forms.manifestation import *
 from ..models import Manifestation as EdwocaManifestation
 from ..models import ManifestationTitle, ManifestationTitleHandwriting
@@ -134,7 +134,7 @@ def manifestation_update(request, pk):
                 'signature_formset': SignatureFormSet(signature_formset_data, instance=item, prefix=signature_prefix)
             })
 
-        new_signature_formset = SignatureFormSet(request.POST or None, prefix='new_signatures')
+        new_signature_formset = NewItemSignatureFormSet(request.POST or None, prefix='new_signatures')
 
         context['item_forms'] = item_forms
         context['new_signature_formset'] = new_signature_formset

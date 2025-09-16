@@ -57,20 +57,21 @@ class SignatureForm(ModelForm):
         status_container = div(cls='flex-0')
         status_container.add(raw(str(status_field)))
 
-        del_field = self['DELETE']
-        del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
-        del_field_label.add(raw(str(del_field)))
-
         upper_palette = div(cls='flex flex-rows w-full gap-10 my-5')
         lower_palette = div(cls='flex flex-rows w-full gap-10 my-5')
 
         upper_palette.add(library_container)
         upper_palette.add(status_container)
         lower_palette.add(signature_field_label)
-        lower_palette.add(del_field_label)
 
         form.add(upper_palette)
         form.add(lower_palette)
+
+        if 'DELETE' in self.fields:
+            del_field = self['DELETE']
+            del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
+            del_field_label.add(raw(str(del_field)))
+            lower_palette.add(del_field_label)
 
         return mark_safe(str(form))
 
@@ -82,6 +83,15 @@ SignatureFormSet = inlineformset_factory(
         extra = 0,
         max_num = 100,
         can_delete = True
+    )
+
+NewItemSignatureFormSet = inlineformset_factory(
+        Item,
+        Signature,
+        form = SignatureForm,
+        extra = 1,
+        max_num = 1,
+        can_delete = False
     )
 
 

@@ -119,6 +119,7 @@ urlpatterns = [
         path('items/<int:pk>', views.item_update, name = 'item_update'),
         path('items/<int:manifestation_id>/createitem', views.ItemCreateView.as_view(), name = 'item_create'),
         path('items/<int:pk>/delete', views.ItemDeleteView.as_view(), name = 'item_delete'),
+        path('items/<int:pk>/set_template', views.item_set_template, name = 'item_set_template'),
         #path('items/<int:pk>/title', views.ItemTitleUpdateView.as_view(), name = 'item_title'),
 
         path('items/<int:pk>/relations', views.ItemRelationsUpdateView.as_view(), name = 'item_relations'),

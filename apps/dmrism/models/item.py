@@ -49,6 +49,7 @@ class Item(WemiBaseClass):
             blank = True,
             null = True
         )
+    is_template = models.BooleanField(default=False)
 
 
     def __str__(self):
@@ -78,6 +79,15 @@ class Item(WemiBaseClass):
         if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
             raise ValidationError("Cannot add another item to a singleton manifestation.")
         super().save(*args, **kwargs)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['manifestation'],
+                condition=models.Q(is_template=True),
+                name='unique_template_item_per_manifestation'
+            )
+        ]
 
 
 class Library(models.Model):

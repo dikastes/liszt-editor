@@ -178,10 +178,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         self.source_type = source_type
 
-        self.is_singleton = False
-        if singleton:
-            self.is_singleton = True
-
         #only makes sense if doubles may be detected and overriding may be activated
         #self.titles.all().delete()
 
@@ -250,6 +246,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if OWNER_NOTE_KEY in raw_data and (owner := raw_data[OWNER_NOTE_KEY]):
             provenance_comment += [ f'Besitzvermerk: {owner}' ]
+
+        self.is_singleton = True
+        if not singleton:
+            self.is_singleton = False
+            single_item.is_template = True
 
         single_item.private_provenance_comment = '\n'.join(provenance_comment)
         single_item.save()
