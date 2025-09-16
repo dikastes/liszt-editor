@@ -352,8 +352,9 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                     siglum = siglum,
                     name = location.get('e')
                 )
-        if library.name == '':
+        if library.name == '' or not library.name:
             library.name = location.get('e')
+            library.save()
 
         if self.items.count() == 0:
             signature = Signature.objects.create(
