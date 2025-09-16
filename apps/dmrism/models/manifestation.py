@@ -86,8 +86,16 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
         def parse_from_rism(rism_string):
             match rism_string:
-                case 'Autograph manuscript': return AUTOGRAPH
-                case 'Manuscript copy': return COPY
+                case 'Autograph manuscript': return Manifestation.SourceType.AUTOGRAPH
+                case 'Manuscript copy': return Manifestation.SourceType.COPY
+
+        def parse(string):
+            match string.lower():
+                case 'autograph': return Manifestation.SourceType.AUTOGRAPH
+                case 'copy': return Manifestation.SourceType.COPY
+                case 'correctedcopy': return Manifestation.SourceType.CORRECTED_COPY
+                case 'print': return Manifestation.SourceType.PRINT
+                case 'correctedprint': return Manifestation.SourceType.CORRECTED_PRINT
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
@@ -337,7 +345,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         self.items.create()
         self.missing_item = False
 
-    def pull_rism_data(self):
+    def pull_rism_data(self, singleton):
         EXTENT_MARKER = 'Umfang: '
         HANDWRITING_MARKER = 'Schrift: '
         PAPER_MARKER = 'Papier: '
@@ -441,7 +449,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         # - ascertain order from rism
         for host_item_entry in data.get_fields('773'):
             target_rism_id = host_item_entry.get('w').replace('sources/', '')
-            target_manifestation = Manifestation.get_or_create(target_rism_id)
+            target_manifestation = Manifestation.get_or_create(target_rism_id, singleton)
             RelatedManifestation.objects.create(
                     source_manifestation = self,
                     target_manifestation = target_manifestation,
@@ -477,7 +485,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 if general_note.get('a').startswith(HANDWRITING_MARKER)
             ]
 
-        self.is_singleton = True
+        self.is_singleton = singleton
         self.private_comment = '\n'.join(comment)
         self.rism_id_unaligned = False
         self.save()
@@ -492,9 +500,9 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 self.rism_id_unaligned = True
         super().save(**kwargs)
 
-    def get_or_create(rism_id):
+    def get_or_create(rism_id, singleton):
         return Manifestation.objects.filter(rism_id = rism_id).first() or \
-            Manifestation.objects.create(rism_id = rism_id).pull_rism_data()
+            Manifestation.objects.create(rism_id = rism_id).pull_rism_data(singleton)
 
 
 

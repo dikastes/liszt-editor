@@ -77,7 +77,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 replace(')', '').\
                 strip()
 
-    def parse_csv(self, raw_data, source_type, manifestation_form = None, function = None):
+    def parse_csv(self, raw_data, source_type, manifestation_form = None, function = None, singleton = True):
         # Head keys
         IDENTIFICATION_KEY = 'WVZ-Nr.'
         INSTITUTION_KEY = 'Bestandeshaltende Institution'
@@ -142,12 +142,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         DEDUCED_PLACE_NAME_KEY = 'Ort ermittelt (normiert)'
         DEDUCED_PLACE_ID_KEY = 'Ort ermittelt GND-Nr.'
 
-        #PROVENANCE_KEY1 = 'Provenienz Station 1'
-        #PROVENANCE_KEY2 = 'Provenienz Station 2'
-        #PROVENANCE_KEY3 = 'Provenienz Station 3'
-        #PROVENANCE_KEY4 = 'Provenienz Station 4'
-        #PROVENANCE_SINGLE_KEY = 'Provenienz'
-
         PROVENANCE_KEY = 'Provenienz'
         PROVSTATION_SUFFIX = ' Station '
 
@@ -175,14 +169,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         self.taken_information = '\n'.join(taken_information)
 
-        #if PROVENANCE_KEY1 in raw_data:
-            #self.private_provenance_comment = '\n'.join(
-                    #provenance_string for
-                    #provenance_key in
-                    #[ PROVENANCE_KEY1, PROVENANCE_KEY2, PROVENANCE_KEY3, PROVENANCE_KEY4 ]
-                    #if (provenance_string := raw_data[provenance_key])
-                #)
-
         for writer in ANONYMOUS_WRITERS:
             if Person.objects.filter(interim_designator = writer).count() == 0:
                 Person.objects.create(interim_designator = writer)
@@ -190,12 +176,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         # add stitch template flag to manifestation?
         liszt = Person.fetch_or_get(LISZT_GND_ID)
 
-        if not hasattr(Manifestation.SourceType, source_type):
-            raise Exception(f'Unknown source type {source_type}')
+        self.source_type = source_type
 
-        self.source_type = getattr(Manifestation.SourceType, source_type)
+        self.is_singleton = False
+        if singleton:
+            self.is_singleton = True
 
-        self.is_singleton = True
         #only makes sense if doubles may be detected and overriding may be activated
         #self.titles.all().delete()
 
@@ -317,7 +303,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             self.specific_figure = True
 
         if PRINT_TYPE_KEY in raw_data and (print_type := raw_data[PRINT_TYPE_KEY]):
-            self.print_type = Manifestation.PrintType.parse(print_type)
+            self.print_type = Manifestation.PrintType.parse_from_german(print_type)
 
         if AUTOGRAPH_HANDWRITING_KEY in raw_data and \
             raw_data[AUTOGRAPH_HANDWRITING_KEY]:

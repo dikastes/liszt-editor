@@ -35,13 +35,15 @@
 		Datierung und Ort
 	    </a>
 	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_provenance' object.id %}"
-		{% if 'provenance' in request.path %}class="active"{% endif %}
-		>
-		Provenienz
-	    </a>
-	</li>
+	{% if object.is_singleton %}
+		<li>
+		    <a href="{% url 'edwoca:manifestation_provenance' object.id %}"
+			{% if 'provenance' in request.path %}class="active"{% endif %}
+			>
+			Provenienz
+		    </a>
+		</li>
+	{% endif %}
 	<li>
 	    <a href="{% url 'edwoca:manifestation_print' object.id %}"
 		{% if 'print' in request.path %}class="active"{% endif %}
@@ -63,13 +65,15 @@
 		Literatur
 	    </a>
 	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_digcopy' object.id %}"
-		{% if 'digcopy' in request.path %}class="active"{% endif %}
-		>
-		Digitalisat
-	    </a>
-	</li>
+	{% if object.is_singleton %}
+		<li>
+		    <a href="{% url 'edwoca:manifestation_digcopy' object.id %}"
+			{% if 'digcopy' in request.path %}class="active"{% endif %}
+			>
+			Digitalisat
+		    </a>
+		</li>
+	{% endif %}
 	<li>
 	    <a href="{% url 'edwoca:manifestation_comment' object.id %}"
 		{% if 'comment' in request.path %}class="active"{% endif %}
