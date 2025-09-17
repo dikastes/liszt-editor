@@ -152,13 +152,17 @@ INTERNAL_IPS = [
         '127.0.0.1',
     ]
 
-#FORM_RENDERER = 'edwoca.forms.EdwocaFormRenderer'
-
 Z_ID = "5080468"
 Z_LIBRARY_TYPE = 'group'
 Z_API_KEY = os.environ['ZOTERO_API_KEY']
 
 RISM_API_KEY = os.environ['RISM_API_KEY']
+
+EDWOCA_FIXED_PERSONS = {
+        'Liszt': '118573527',
+        'zS': None,
+        'Dr': None
+        }
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'

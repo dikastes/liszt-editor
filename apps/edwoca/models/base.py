@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -133,10 +134,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         DIGITAL_COPY_KEY = 'Digitalisat'
 
-        LISZT_GND_ID = '118573527'
-
-        ANONYMOUS_WRITERS = ['zS', 'Dr']
-
         FUNCTION_KEY = 'Funktion'
 
         DEDUCED_PLACE_NAME_KEY = 'Ort ermittelt (normiert)'
@@ -169,12 +166,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         self.taken_information = '\n'.join(taken_information)
 
-        for writer in ANONYMOUS_WRITERS:
-            if Person.objects.filter(interim_designator = writer).count() == 0:
-                Person.objects.create(interim_designator = writer)
+        fixed_persons = settings.EDWOCA_FIXED_PERSONS
+
+        for person in fixed_persons:
+            if (gnd_id := fixed_persons[person]):
+                Person.fetch_or_get(gnd_id)
+            else:
+                if Person.objects.filter(interim_designator = person).count() == 0:
+                    Person.objects.create(interim_designator = person)
 
         # add stitch template flag to manifestation?
-        liszt = Person.fetch_or_get(LISZT_GND_ID)
 
         self.source_type = source_type
 
@@ -278,11 +279,17 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     dedicatee = Person.fetch_or_get(gnd_id)
                     self.dedicatees.add(dedicatee)
                 else:
-                    for writer in ANONYMOUS_WRITERS:
-                        if writer in dedication:
-                            dedicatee = Person.objects.get(interim_designator = writer)
-                            self.dedicatees.add(dedicatee)
-                            break
+                    for person in fixed_persons:
+                        if (gnd_id := fixed_persons[person]):
+                            if person in dedication:
+                                dedicatee = Person.objects.get(gnd_id = gnd_id)
+                                self.dedicatees.add(dedicatee)
+                                break
+                        else:
+                            if person in dedication:
+                                dedicatee = Person.objects.get(interim_designator = person)
+                                self.dedicatees.add(dedicatee)
+                                break
 
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY].replace(' | ', '\n')
         if raw_data[MACHINE_READABLE_DATE_KEY]:
@@ -309,7 +316,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if AUTOGRAPH_HANDWRITING_KEY in raw_data and \
             raw_data[AUTOGRAPH_HANDWRITING_KEY]:
             ManifestationHandwriting.objects.create(
-                    writer = liszt,
+                    writer = Person.objects.get(gnd_id = list(fixed_persons.values())[0]),
                     manifestation = self,
                     medium = raw_data[AUTOGRAPH_HANDWRITING_KEY]
                 )
@@ -331,32 +338,34 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             dubious_writer = dubious_writer
                         )
                 else:
-                    if 'Liszt' in entry:
-                        ManifestationHandwriting.objects.create(
-                                writer = liszt,
-                                manifestation = self,
-                                medium = medium,
-                                dubious_writer = dubious_writer
-                            )
-                    else:
-                        anonymous_writer_found = False
-                        for designator in ANONYMOUS_WRITERS:
-                            if designator in entry:
-                                writer = Person.objects.get(interim_designator = designator)
+                    fixed_person_found = False
+                    for person in fixed_persons:
+                        if (gnd_id := fixed_persons[person]):
+                            if person in entry:
                                 ManifestationHandwriting.objects.create(
-                                        writer = writer,
+                                        writer = Person.objects.get(gnd_id = gnd_id),
                                         manifestation = self,
                                         medium = medium,
                                         dubious_writer = dubious_writer
                                     )
-                                anonymous_writer_found = True
+                                fixed_person_found = True
                                 break
-                        if not anonymous_writer_found:
-                            ManifestationHandwriting.objects.create(
-                                    manifestation = self,
-                                    medium = medium,
-                                    dubious_writer = dubious_writer
-                                )
+                        else:
+                            if person in entry:
+                                ManifestationHandwriting.objects.create(
+                                        writer = Person.objects.get(interim_designator = person),
+                                        manifestation = self,
+                                        medium = medium,
+                                        dubious_writer = dubious_writer
+                                    )
+                                fixed_person_found = True
+                                break
+                    if not fixed_person_found:
+                        ManifestationHandwriting.objects.create(
+                                manifestation = self,
+                                medium = medium,
+                                dubious_writer = dubious_writer
+                            )
 
         if ENVELOPE_TITLE_KEY in raw_data and\
             raw_data[ENVELOPE_TITLE_KEY]:
@@ -371,30 +380,33 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 'dubious_writer': True if '?' in entry else False
                             }]
                     else:
-                        if 'Liszt' in entry:
-                            writer_medium_list += [{
-                                    'writer': liszt,
-                                    'medium': Manifestation.extract_medium(entry),
-                                    'dubious_writer': True if '?' in entry else False
-                                }]
-                        else:
-                            anonymous_writer_found = False
-                            for anonymous_writer in ANONYMOUS_WRITERS:
-                                if anonymous_writer in entry:
+                        fixed_person_found = False
+                        for person in fixed_persons:
+                            if (gnd_id := fixed_persons[person]):
+                                if person in entry:
                                     writer_medium_list += [{
-                                            'writer': Person.objects.get(interim_designator = anonymous_writer),
+                                            'writer': Person.objects.get(gnd_id = gnd_id),
                                             'medium': Manifestation.extract_medium(entry),
                                             'dubious_writer': True if '?' in entry else False
                                         }]
-                                    anonymous_writer_found = True
+                                    fixed_person_found = True
                                     break
-                            if not anonymous_writer_found:
-                                print(f"no writer found for envelope title")
+                            else:
+                                if person in entry:
+                                    writer_medium_list += [{
+                                            'writer': Person.objects.get(interim_designator = person),
+                                            'medium': Manifestation.extract_medium(entry),
+                                            'dubious_writer': True if '?' in entry else False
+                                        }]
+                                    fixed_person_found = True
+                                    break
+                        if not fixed_person_found:
+                            print(f"no writer found for envelope title")
 
             if ENVELOPE_TITLE_MEDIUM_KEY in raw_data:
                 writer_medium_list += [{
-                        'writer': liszt,
-                        'medium': raw_data[HEAD_TITLE_MEDIUM_KEY],
+                        'writer': Person.objects.get(gnd_id = list(fixed_persons.values())[0]),
+                        'medium': raw_data[ENVELOPE_TITLE_MEDIUM_KEY],
                         'dubious_writer': False
                     }]
 
@@ -461,29 +473,32 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 'dubious_writer': True if '?' in entry else False
                             }]
                     else:
-                        if 'Liszt' in entry:
-                            writer_medium_list += [{
-                                    'writer': liszt,
-                                    'medium': Manifestation.extract_medium(entry),
-                                    'dubious_writer': True if '?' in entry else False
-                                }]
-                        else:
-                            anonymous_writer_found = False
-                            for anonymous_writer in ANONYMOUS_WRITERS:
-                                if anonymous_writer in entry:
+                        fixed_person_found = False
+                        for person in fixed_persons:
+                            if (gnd_id := fixed_persons[person]):
+                                if person in entry:
                                     writer_medium_list += [{
-                                            'writer': Person.objects.get(interim_designator = anonymous_writer),
+                                            'writer': Person.objects.get(gnd_id = gnd_id),
                                             'medium': Manifestation.extract_medium(entry),
                                             'dubious_writer': True if '?' in entry else False
                                         }]
-                                    anonymous_writer_found = True
+                                    fixed_person_found = True
                                     break
-                            if not anonymous_writer_found:
-                                print(f"no writer found for envelope title")
+                            else:
+                                if person in entry:
+                                    writer_medium_list += [{
+                                            'writer': Person.objects.get(interim_designator = person),
+                                            'medium': Manifestation.extract_medium(entry),
+                                            'dubious_writer': True if '?' in entry else False
+                                        }]
+                                    fixed_person_found = True
+                                    break
+                        if not fixed_person_found:
+                            print(f"no writer found for head title")
 
             if HEAD_TITLE_MEDIUM_KEY in raw_data:
                 writer_medium_list += [{
-                        'writer': liszt,
+                        'writer': Person.objects.get(gnd_id = list(fixed_persons.values())[0]),
                         'medium': raw_data[HEAD_TITLE_MEDIUM_KEY],
                         'dubious_writer': False
                     }]
