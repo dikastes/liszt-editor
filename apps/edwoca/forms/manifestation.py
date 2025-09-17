@@ -276,33 +276,48 @@ class ManifestationClassificationForm(ModelForm):
     def as_daisy(self):
         form = div(cls='mb-10')
 
-        manifestation_form_field = self['manifestation_form']
-        edition_type_field = self['edition_type']
-        function_field = self['function']
-        source_type_field = self['source_type']
+        if self.instance and not self.instance.is_singleton:
+            edition_type_field = self['edition_type']
+            source_type_field = self['source_type']
 
-        manifestation_form_label = label(manifestation_form_field.label, cls='flex-1')
-        manifestation_form_label.add(raw(str(manifestation_form_field)))
+            edition_type_label = label(edition_type_field.label, cls='flex-1')
+            edition_type_label.add(raw(str(edition_type_field)))
 
-        edition_type_label = label(edition_type_field.label, cls='flex-1')
-        edition_type_label.add(raw(str(edition_type_field)))
+            source_type_label = label(source_type_field.label, cls='flex-1')
+            source_type_label.add(raw(str(source_type_field)))
+            
+            palette = div(cls='flex flex-rows w-full gap-10 my-5')
+            palette.add(edition_type_label)
+            palette.add(source_type_label)
+            form.add(palette)
+        else:
+            manifestation_form_field = self['manifestation_form']
+            edition_type_field = self['edition_type']
+            function_field = self['function']
+            source_type_field = self['source_type']
 
-        function_label = label(function_field.label, cls='flex-1')
-        function_label.add(raw(str(function_field)))
+            manifestation_form_label = label(manifestation_form_field.label, cls='flex-1')
+            manifestation_form_label.add(raw(str(manifestation_form_field)))
 
-        source_type_label = label(source_type_field.label, cls='flex-1')
-        source_type_label.add(raw(str(source_type_field)))
+            edition_type_label = label(edition_type_field.label, cls='flex-1')
+            edition_type_label.add(raw(str(edition_type_field)))
 
-        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette1.add(manifestation_form_label)
-        palette1.add(edition_type_label)
+            function_label = label(function_field.label, cls='flex-1')
+            function_label.add(raw(str(function_field)))
 
-        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette2.add(function_label)
-        palette2.add(source_type_label)
+            source_type_label = label(source_type_field.label, cls='flex-1')
+            source_type_label.add(raw(str(source_type_field)))
 
-        form.add(palette1)
-        form.add(palette2)
+            palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
+            palette1.add(manifestation_form_label)
+            palette1.add(edition_type_label)
+
+            palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
+            palette2.add(function_label)
+            palette2.add(source_type_label)
+
+            form.add(palette1)
+            form.add(palette2)
 
         return mark_safe(str(form))
 

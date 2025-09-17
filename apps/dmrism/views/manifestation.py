@@ -84,7 +84,7 @@ def manifestation_pull(request, pk):
     for field in _field_list:
         old_value = getattr(manifestation, field)
         new_value = getattr(temporary_manifestation, field)
-        if old_value != new_value:
+        if old_value != None and new_value != None and old_value != new_value:
             unchanged_fields = False
             break
 
@@ -154,7 +154,8 @@ def manifestation_confirm_pull(request, pk):
 
 
 def manifestation_reject_pull(request, pk):
-    temporary_manifestation = Manifestation.objects.get(temporary_target = pk)
-    temporary_manifestation.delete()
+    Manifestation.objects.filter(temporary_target = pk).delete()
+    #temporary_manifestation = Manifestation.objects.get(temporary_target = pk)
+    #temporary_manifestation.delete()
 
     return redirect('dmrism:manifestation_detail', pk = pk)

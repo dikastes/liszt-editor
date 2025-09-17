@@ -345,7 +345,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         self.items.create()
         self.missing_item = False
 
-    def pull_rism_data(self, singleton):
+    def pull_rism_data(self, singleton = None):
         EXTENT_MARKER = 'Umfang: '
         HANDWRITING_MARKER = 'Schrift: '
         PAPER_MARKER = 'Papier: '
@@ -484,11 +484,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 in general_notes
                 if general_note.get('a').startswith(HANDWRITING_MARKER)
             ]
-
-        self.is_singleton = singleton
         self.private_comment = '\n'.join(comment)
+
+        if singleton != None:
+            self.is_singleton = singleton
+
         self.rism_id_unaligned = False
-        self.save()
 
         return self
 

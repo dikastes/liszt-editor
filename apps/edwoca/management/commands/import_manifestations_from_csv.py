@@ -77,11 +77,12 @@ class Command(BaseCommand):
 
                 try:
                     manifestation.parse_csv(row, source_type, manifestation_form, function, singleton)
+                    manifestation.save()
+                    if manifestation.rism_id:
+                        manifestation.pull_rism_data(singleton)
+                    manifestation.save()
                 except (GNDNotFoundError, GNDIdError) as e:
                     manifestation.delete()
                     print(f"GND Error in {row[Manifestation.RISM_ID_KEY]}, {row[Manifestation.CURRENT_SIGNATURE_KEY]}")
                     print(e)
                     continue
-                if manifestation.rism_id:
-                    manifestation.pull_rism_data(singleton)
-                manifestation.save()
