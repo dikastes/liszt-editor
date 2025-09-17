@@ -1,0 +1,86 @@
+name: liszt
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: web.Dockerfile
+    command: python manage.py runserver 0.0.0.0:8000
+    env_file: .env
+    environment:
+      DEBUG: "1"
+      ALLOWED_HOSTS: "*"
+
+      # DB-Verbindung – Passwörter kommen aus .env
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+
+      # Redis / Elasticsearch
+      REDIS_URL: redis://redis:6379/0
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+
+      PYTHONUNBUFFERED: "1"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    env_file: .env
+    environment:
+      POSTGRES_DB: liszt_db
+      POSTGRES_USER: liszt_user
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ingest.geoip.downloader.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health | grep -E '\"status\":\"(yellow|green)\"'"]
+      interval: 10s
+      timeout: 5s
+      retries: 60
+
+
+volumes:
+  postgres_data:
+  redis_data:
+  es_data:
+  static_volume:
+  media_volume:

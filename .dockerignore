@@ -1,0 +1,13 @@
+venv
+**/__pycache__
+**/*.py[cod]
+**/.mypy_cache
+**/.pytest_cache
+liszteditor/whoosh_index
+
+node_modules
+apps/*/node_modules
+
+.git
+.gitignore
+
