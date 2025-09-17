@@ -502,8 +502,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         super().save(**kwargs)
 
     def get_or_create(rism_id, singleton):
-        return Manifestation.objects.filter(rism_id = rism_id).first() or \
-            Manifestation.objects.create(rism_id = rism_id).pull_rism_data(singleton)
+        manifestation = Manifestation.objects.filter(rism_id = rism_id).first()
+        if not manifestation:
+            manifestation = Manifestation.objects.create(rism_id = rism_id)
+            manifestation.pull_rism_data(singleton)
+            manifestation.save()
+        return manifestation
 
 
 
