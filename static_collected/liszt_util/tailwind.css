@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@tailwind typography;
+@tailwind layout;
+
+.hidden {
+    display: none;
+}
+
+/* stylings for sumoselect */
+p.CaptionCont {
+    width: 100%;
+    border-radius: var(--rounded-btn,0.5rem);
+}
+
+p.CaptionCont label i {
+    background-image: none;
+}
+
+div.modal-box {
+    max-width: 64rem;
+}

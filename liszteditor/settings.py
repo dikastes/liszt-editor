@@ -12,17 +12,18 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import dotenv
+from dotenv import load_dotenv
 from django.urls import reverse_lazy
+import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-dotenv_file = os.path.join(BASE_DIR, '.env')
-if os.path.isfile(dotenv_file):
-    dotenv.load_dotenv(dotenv_file)
-else:
-    print("Could not find .env file")
-    exit(1)
+try:
+    dot_env_path = BASE_DIR / ".env"
+    if dot_env_path.is_file():
+        load_dotenv(dotenv_path=dot_env_path, override=False)
+except Exception:
+    pass  # .env ist optional im Container
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -99,11 +100,22 @@ WSGI_APPLICATION = 'liszteditor.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": dj_database_url.parse(
+        os.getenv('DATABASE_URL'),  
+        conn_max_age=600,            
+        ssl_require=False           
+    )
+}
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": os.getenv("REDIS_URL", "redis://localhost:6379/0"),
     }
 }
+SESSION_ENGINE = "django.contrib.sessions.backends.cached_db"
+
+
 
 
 # Password validation
@@ -162,12 +174,19 @@ RISM_API_KEY = os.environ['RISM_API_KEY']
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'
+
+ELASTICSEARCH_HOSTS = os.getenv("ELASTICSEARCH_HOSTS", "http://localhost:9200")
+
 HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index')
-    },
+    "default": {
+        "ENGINE": "haystack.backends.elasticsearch8_backend.Elasticsearch8SearchEngine",
+        "URL": ELASTICSEARCH_HOSTS,
+        "INDEX_NAME": "haystack",
+        # Optional:
+        # "KWARGS": {"request_timeout": 10},
+    }
 }
+
 
 GLOBAL_NAVIGATION = {
         'edwoca': {

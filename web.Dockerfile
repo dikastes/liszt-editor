@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.6
-FROM python:3.12-slim
+FROM python:3.12
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -7,7 +7,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 # Systemabhängigkeiten
 RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential libpq-dev curl ca-certificates git nodejs npm \
+      build-essential libpq-dev curl ca-certificates git nodejs npm bash \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
@@ -42,10 +42,5 @@ RUN for APP in edwoca bib dmad_on_django liszt_util; do \
         fi; \
       fi; \
     done
-
-# Migrations + Collectstatic
-RUN python manage.py makemigrations --noinput && \
-    python manage.py migrate --noinput && \
-    python manage.py collectstatic --noinput
 
 EXPOSE 8000
