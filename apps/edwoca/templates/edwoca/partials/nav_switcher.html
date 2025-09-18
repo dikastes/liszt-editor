@@ -1,0 +1,57 @@
+<div class="flex flex-col h-full">
+    <div class="flex-1">
+	{% if entity_type == 'work' %}
+	    -- Navigation --
+	{% endif %}
+	{% if entity_type == 'expression' %}
+	    -- Navigation --
+	{% endif %}
+	{% if entity_type == 'manifestation' %}
+	    {% if object.is_singleton %}
+		-- Navigation --
+	    {% else %}
+		<ul class="menu p-0">
+		    <li class="list-row">
+			<a 
+			    href="{% url 'edwoca:manifestation_update' object.id %}"
+			    title="{{ object }}"
+			    class="active"> M-{{ object.id }} </a>
+			<ul>
+			    {% for item in object.items.all %}
+				<li>
+				    <a 
+					href="{% url 'edwoca:item_update' item.id %}"
+					title="{{ item }}">
+					I-{{ item.id }}
+				    </a>
+				</li>
+			    {% endfor %}
+			</ul>
+		    </li>
+		</ul>
+	    {% endif %}
+	{% endif %}
+	{% if entity_type == 'item' %}
+	    <ul class="menu p-0">
+		<li class="list-row">
+		    <a href="{% url 'edwoca:manifestation_update' object.manifestation.id %}" title="{{ object.manifestation }}"> M-{{ object.manifestation.id }} </a>
+		    <ul>
+			{% for item in object.manifestation.items.all %}
+			    <li>
+				<a 
+				    href="{% url 'edwoca:item_update' item.id %}"
+				    {% if item.id == object.id %}class="active"{% endif %}
+				    title="{{ item }}">
+				    I-{{ item.id }}
+				</a>
+			    </li>
+			{% endfor %}
+		    </ul>
+		</li>
+	    </ul>
+	{% endif %}
+    </div>
+    <div class="flex-0">
+	    <label for="submit-form" class="btn btn-primary btn-sm"> speichern </label>
+    </div>
+</div>

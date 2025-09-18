@@ -29,7 +29,9 @@ module.exports = {
     'checkbox',
     'textarea',
     'textarea-bordered',
-    'toggle'
+    'toggle',
+    'list',
+    'list-row'
   ],
   theme: {
     extend: {

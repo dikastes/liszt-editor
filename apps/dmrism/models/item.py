@@ -59,6 +59,9 @@ class Item(WemiBaseClass):
             return self.manifestation.__str__()
         return self.get_current_signature()
 
+    def get_siblings(self):
+        return self.manifestation.items.exclude(id = self.id)
+
     def get_pref_title(self):
         return self.__str__()
 
