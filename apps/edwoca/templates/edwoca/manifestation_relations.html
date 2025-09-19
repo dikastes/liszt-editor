@@ -4,6 +4,8 @@
 
 {% block content %}
 
+{% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5 mb-10">
 	<div class="prose">
 		<h2> Quellen </h2>
@@ -89,16 +91,6 @@
     </div>
 </div>
 
-<div class="bg-base-200 border border-base-300 p-5 mt-5">
-	<p class="prose">
-		{% include 'edwoca/partials/classification_preview.html' %}
-	</p>
-	<p class="prose">
-		{% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
-	<p class="prose">
-		{% include 'edwoca/partials/contributors_preview.html' %}
-	<p class="prose">
-		{% include 'edwoca/partials/bib_preview.html' %}
-	</p>
-</div>
+{% include 'edwoca/partials/manifestation/preview-divs/relations_epilog.html' %}
+
 {% endblock %}

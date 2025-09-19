@@ -1,0 +1,25 @@
+<p>
+	<em> Quellenart: </em>
+	{% if object.edition_type %}
+		<span class="mx-2">
+			{{ object.edition_type }}
+		</span>
+	{% else %}
+		<span class="badge badge-primary">keine Ausgabeform</span>
+	{% endif %}
+	{% if object.source_type %}
+	<span class="mx-2">
+		{{ object.source_type }}
+	</span>
+	{% endif %}
+	{% if object.manifestation_form %}
+	<span class="mx-2">
+		{{ object.manifestation_form }}
+	</span>
+	{% endif %}
+	{% if object.function %}
+	<span class="mx-2">
+		{{ object.function }}
+	</span>
+	{% endif %}
+</p>

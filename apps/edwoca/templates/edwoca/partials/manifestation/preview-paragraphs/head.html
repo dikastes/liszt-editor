@@ -1,0 +1,15 @@
+<p class="m-0">
+	<em> Kopf: </em>
+	{% for item in object.items.all %}
+		{{ item }}
+	{% empty %}
+		<span class="badge badge-primary"> keine Exemplare </span>
+	{% endfor %}
+	{{ object.rism_id|default:'' }}
+</p>
+{% if object.private_head_comment %}
+	<p class="m-0 truncate">
+		<span class="badge badge-primary">Kommentar</span>
+		{{ object.private_head_comment }}
+	</p>
+{% endif %}

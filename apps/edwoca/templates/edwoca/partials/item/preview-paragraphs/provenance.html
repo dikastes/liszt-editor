@@ -1,0 +1,41 @@
+{% if object.is_singleton %}
+	{% for item in object.items.all %}
+		<p class="m-0">
+			<em> Provenienz: </em>
+			{% for station in item.person_provenance_stations.all %}
+				{{ station }}
+			{% endfor %}
+			{% for station in item.corporation_provenance_stations.all %}
+				{{ station }}
+			{% endfor %}
+			{% if item.person_provenance_stations.count == 0 and item.corporation_provenance_stations.count == 0 %}
+				<span class="badge"> keine Angaben </span>
+			{% endif %}
+		</p>
+		{% if item.private_provenance_comment %}
+			<p class="m-0 truncate">
+				<span class="badge badge-primary">Kommentar</span>
+				{{ item.private_provenance_comment }}
+			</p>
+		{% endif %}
+	{% endfor %}
+{% else %}
+	<p class="m-0">
+		<em> Provenienz: </em>
+		{% for station in object.person_provenance_stations.all %}
+			{{ station }}
+		{% endfor %}
+		{% for station in object.corporation_provenance_stations.all %}
+			{{ station }}
+		{% endfor %}
+		{% if object.person_provenance_stations.count == 0 and object.corporation_provenance_stations.count == 0 %}
+			<span class="badge"> keine Angaben </span>
+		{% endif %}
+	</p>
+	{% if object.private_provenance_comment %}
+		<p class="m-0 truncate">
+			<span class="badge badge-primary">Kommentar</span>
+			{{ object.private_provenance_comment }}
+		</p>
+	{% endif %}
+{% endif %}

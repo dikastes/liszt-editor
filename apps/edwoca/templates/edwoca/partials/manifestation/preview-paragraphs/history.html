@@ -1,0 +1,14 @@
+<p class="m-0">
+	<em>Datierung und Ort</em>:
+	{{ object.date_diplomatic|default:'' }}
+	{{ object.places.all|join:", "|default:'<span class="badge badge-primary">ohne Ort</span>' }},
+	{{ object.period.display.strip|default:'<span class="badge badge-primary">ohne Jahr</span>' }}
+</p>
+<p class="truncate m-0">
+{% if object.private_history_comment %}
+	<span class="badge badge-primary">Kommentar</span>
+	<span class="truncate">
+		{{ object.private_history_comment }}
+	</span>
+{% endif %}
+</p>

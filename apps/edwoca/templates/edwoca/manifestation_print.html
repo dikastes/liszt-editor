@@ -2,6 +2,8 @@
 
 {% block content %}
 
+{% include 'edwoca/partials/manifestation/preview-divs/print_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5">
     <h2 class="card-title mt-0"> {{ view_title }} </h2>
 
@@ -78,19 +80,6 @@
     {% endif %}
 </div>
 
-<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
-	<p class="prose">
-		{% include 'edwoca/partials/classification_preview.html' %}
-	</p>
-	<p class="prose">
-		{% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
-	</p>
-	<p class="prose">
-		{% include 'edwoca/partials/contributors_preview.html' %}
-	</p>
-	<p class="prose">
-		{% include 'edwoca/partials/bib_preview.html' %}
-	</p>
-</div>
+{% include 'edwoca/partials/manifestation/preview-divs/print_epilog.html' %}
 
 {% endblock %}

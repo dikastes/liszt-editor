@@ -3,7 +3,7 @@
 {% block content %}
 
 {% if property %}
-	{% include 'edwoca/partials/preview_'|add:property|add:'_prolog.html' %}
+	{% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_prolog.html' %}
 {% endif %}
 
 <div class="bg-white border border-base-300 p-5">
@@ -18,7 +18,7 @@
 </div>
 
 {% if property %}
-	{% include 'edwoca/partials/preview_'|add:property|add:'_epilog.html' %}
+	{% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_epilog.html' %}
 {% endif %}
 
 {% endblock %}

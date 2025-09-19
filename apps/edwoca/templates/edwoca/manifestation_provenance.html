@@ -169,6 +169,9 @@
 {% endblock %}
 
 {% block content %}
+
+{% include 'edwoca/partials/manifestation/preview-divs/provenance_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5">
     <h2 class="card-title mt-0 flex-1"> Provenienz (Personen) </h2>
 
@@ -227,17 +230,6 @@
     </form>
 </div>
 
+{% include 'edwoca/partials/manifestation/preview-divs/provenance_epilog.html' %}
 
-
-<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
-    <p class="prose">
-        {% include 'edwoca/partials/classification_preview.html' %}
-    </p>
-    <p class="prose">
-        {% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
-    </p>
-    <p class="prose">
-        {% include 'edwoca/partials/bib_preview.html' %}
-    </p>
-</div>
 {% endblock %}

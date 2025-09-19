@@ -1,0 +1,8 @@
+<p class="m-0 truncate">
+	<em> Literatur: </em>
+	{% for item in object.bib.all %}
+		{{ bib }}
+	{% empty %}
+		<span class="badge badge-primary"> keine Literaturangabe </span>
+	{% endfor %}
+</p>

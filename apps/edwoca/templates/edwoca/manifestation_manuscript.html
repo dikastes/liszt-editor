@@ -2,6 +2,8 @@
 
 {% block content %}
 
+{% include 'edwoca/partials/manifestation/preview-divs/manuscript_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5">
     <h2 class="card-title mt-0"> Manuskriptspezifika </h2>
 
@@ -68,5 +70,7 @@
         </form>
     </div>
 </div>
+
+{% include 'edwoca/partials/manifestation/preview-divs/manuscript_epilog.html' %}
 
 {% endblock %}

@@ -1,0 +1,15 @@
+<p class="m-0">
+	<em> Titel und Widmung: </em>
+	{% for title in object.titles.all %}
+		<span class="w-32 truncate mx-2">
+			{{ title.title }}
+		</span>
+	{% endfor %}
+	{{ object.dedication|default:'' }}
+</p>
+{% if object.private_title_comment %}
+	<p class="m-0 truncate">
+		<span class="badge badge-primary">Kommentar</span>
+		{{ object.private_title_comment }}
+	</p>
+{% endif %}

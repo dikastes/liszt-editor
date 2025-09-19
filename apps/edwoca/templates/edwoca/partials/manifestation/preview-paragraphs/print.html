@@ -1,0 +1,8 @@
+<p class="m-0">
+	<em> Druckspezifika: </em>
+	{{ object.publisher|default:'' }}
+	{{ object.plate_number|default:'' }}
+	{% if not object.publisher and not object.plate_number %}
+		<span class="badge"> keine Angaben </span>
+	{% endif %}
+</p>
