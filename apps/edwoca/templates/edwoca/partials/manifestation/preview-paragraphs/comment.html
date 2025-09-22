@@ -1,5 +1,5 @@
-<p>
-	<span class="inline-block truncate mr-5">
+<p class="m-0 flex">
+	<span class="mr-5">
 		<em> Kommentar: </em>
 	</span>
 	{% if object.private_comment %}
@@ -7,7 +7,7 @@
 			{{ object.private_comment }}
 		</span>
 	{% else %}
-		<span class="badge badge-primary">
+		<span class="badge badge-primary mr-5">
 			kein interner Kommentar
 		</span>
 	{% endif %}
@@ -16,14 +16,14 @@
 			{{ object.public_comment }}
 		</span>
 	{% else %}
-		<span class="badge badge-primary">
+		<span class="badge badge-primary mr-5">
 			kein externer Kommentar
 		</span>
 	{% endif %}
 </p>
 {% if object.taken_information %}
-<p class="truncate">
-	<span class="badge badge-primary">
+<p class="m-0 truncate">
+	<span class="badge badge-primary mr-5">
 		übernommene Informationen
 	</span>
 	{{ object.taken_information }}

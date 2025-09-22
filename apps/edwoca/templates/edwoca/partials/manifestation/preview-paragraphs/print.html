@@ -1,5 +1,7 @@
 <p class="m-0">
-	<em> Druckspezifika: </em>
+	<span class="mr-5">
+		<em> Druckspezifika: </em>
+	</span>
 	{{ object.publisher|default:'' }}
 	{{ object.plate_number|default:'' }}
 	{% if not object.publisher and not object.plate_number %}

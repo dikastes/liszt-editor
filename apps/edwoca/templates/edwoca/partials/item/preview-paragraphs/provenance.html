@@ -1,7 +1,9 @@
 {% if object.is_singleton %}
 	{% for item in object.items.all %}
 		<p class="m-0">
-			<em> Provenienz: </em>
+			<span class="mr-5">
+				<em> Provenienz: </em>
+			</span>
 			{% for station in item.person_provenance_stations.all %}
 				{{ station }}
 			{% endfor %}
@@ -14,7 +16,7 @@
 		</p>
 		{% if item.private_provenance_comment %}
 			<p class="m-0 truncate">
-				<span class="badge badge-primary">Kommentar</span>
+				<span class="badge badge-primary mr-5">Kommentar</span>
 				{{ item.private_provenance_comment }}
 			</p>
 		{% endif %}

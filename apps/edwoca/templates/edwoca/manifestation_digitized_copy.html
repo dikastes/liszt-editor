@@ -1,6 +1,9 @@
 {% extends 'edwoca/base.html' %}
 
 {% block content %}
+
+{% include 'edwoca/partials/manifestation/preview-divs/digitized_copy_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5">
     <h2 class="card-title mt-0"> Digitale Kopie für {{ object }} </h2>
 
@@ -11,4 +14,7 @@
         <input type="submit" value="Speichern" class="btn btn-primary mt-5">
     </form>
 </div>
+
+{% include 'edwoca/partials/manifestation/preview-divs/digitized_copy_epilog.html' %}
+
 {% endblock %}
