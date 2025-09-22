@@ -391,11 +391,8 @@ class ManifestationPrintForm(ModelForm, SimpleFormMixin):
 class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
-        fields = ['paper', 'extent', 'measure', 'private_manuscript_comment']
+        fields = ['extent', 'measure', 'private_manuscript_comment']
         widgets = {
-                'paper': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
-                    }),
                 'extent': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     }),

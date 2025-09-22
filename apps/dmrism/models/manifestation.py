@@ -226,10 +226,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-    paper = models.TextField(
-            blank = True,
-            null = True
-        )
     date_diplomatic = models.TextField(
             blank = True,
             null = True
@@ -471,7 +467,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 if note.get('a').startswith(EXTENT_MARKER)
             )
 
-        self.paper = '\n'.join(
+        self.measure = '\n'.join(
                 note.get('a').replace(PAPER_MARKER, '')
                 for note
                 in general_notes
