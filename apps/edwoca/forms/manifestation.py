@@ -1,6 +1,7 @@
 from .base import *
 from bib.models import ZotItem
 from django import forms
+from django.conf import settings
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
@@ -107,7 +108,7 @@ class ManifestationBibForm(BaseBibForm):
 
 class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
     kwargs = {
-            'years': range(1811, 1900),
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
                 'class': 'select select-bordered'
             }

@@ -1,5 +1,6 @@
 from calendar import monthrange
 from django.db import models
+from django.conf import settings
 import re
 from re import split
 from datetime import date, datetime
@@ -79,8 +80,16 @@ class Period(models.Model):
         components = split('-|–|\$|\|', string)
         is_range = True if len(components) > 5 else False
 
-        not_before = date(1811, 10, 22)
-        not_after = date(1886, 7, 31)
+        not_before = date(
+                settings.EDWOCA_FIXED_DATES['birth']['year'],
+                settings.EDWOCA_FIXED_DATES['birth']['month'],
+                settings.EDWOCA_FIXED_DATES['birth']['day'],
+            )
+        not_after = date(
+                settings.EDWOCA_FIXED_DATES['death']['year'],
+                settings.EDWOCA_FIXED_DATES['death']['month'],
+                settings.EDWOCA_FIXED_DATES['death']['day'],
+            )
 
         not_before_year = components[0].strip()
 

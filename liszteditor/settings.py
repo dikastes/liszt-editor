@@ -162,7 +162,20 @@ EDWOCA_FIXED_PERSONS = {
         'Liszt': '118573527',
         'zS': None,
         'Dr': None
+    }
+
+EDWOCA_FIXED_DATES = {
+        'birth': {
+            'day': 22,
+            'month': 10,
+            'year': 1811
+        },
+        'death': {
+            'day': 31,
+            'month': 7,
+            'year': 1886
         }
+    }
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'

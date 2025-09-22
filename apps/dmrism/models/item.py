@@ -178,7 +178,9 @@ class ItemContributor(BaseContributor):
 
 class ProvenanceStationRenderMixin:
     def __str__(self):
-        return f'{self.owner} ({self.period})'
+        owner_string = self.owner or 'unbekannt'
+        period_string = self.period or 'ohne Zeitraum'
+        return f'{str(owner_string)} ({str(period_string)})'
 
 
 class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):

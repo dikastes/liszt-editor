@@ -698,64 +698,64 @@ def manifestation_remove_handwriting_writer(request, pk, handwriting_pk):
     return redirect('edwoca:manifestation_manuscript', pk=pk)
 
 
-def person_provenance_add_owner(request, item_id, pps_id, person_id):
+def person_provenance_add_owner(request, pk, pps_id, person_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     person = get_object_or_404(Person, pk=person_id)
     pps.owner = person
     pps.save()
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def person_provenance_add_bib(request, item_id, pps_id, bib_id):
+def person_provenance_add_bib(request, pk, pps_id, bib_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     bib = get_object_or_404(ZotItem, pk=bib_id)
     pps.bib = bib
     pps.save()
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def corporation_provenance_add_owner(request, item_id, cps_id, corporation_id):
+def corporation_provenance_add_owner(request, pk, cps_id, corporation_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     corporation = get_object_or_404(Corporation, pk=corporation_id)
     cps.owner = corporation
     cps.save()
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def corporation_provenance_add_bib(request, item_id, cps_id, bib_id):
+def corporation_provenance_add_bib(request, pk, cps_id, bib_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     bib = get_object_or_404(ZotItem, pk=bib_id)
     cps.bib = bib
     cps.save()
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def person_provenance_remove_owner(request, item_id, pps_id):
+def person_provenance_remove_owner(request, pk, pps_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     pps.owner = None
     pps.save()
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def person_provenance_remove_bib(request, item_id, pps_id):
+def person_provenance_remove_bib(request, pk, pps_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     pps.bib = None
     pps.save()
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def corporation_provenance_remove_owner(request, item_id, cps_id):
+def corporation_provenance_remove_owner(request, pk, cps_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     cps.owner = None
     cps.save()
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def corporation_provenance_remove_bib(request, item_id, cps_id):
+def corporation_provenance_remove_bib(request, pk, cps_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     cps.bib = None
     cps.save()
-    return redirect('edwoca:manifestation_provenance', item_id=item_id)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
 class ManifestationDigitizedCopyView(SimpleFormView):
