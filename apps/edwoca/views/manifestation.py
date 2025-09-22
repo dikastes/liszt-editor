@@ -2,7 +2,7 @@ from ..forms.manifestation import *
 from ..forms.item import SignatureFormSet, ItemForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet
 from ..forms.manifestation import *
 from ..models import Manifestation as EdwocaManifestation
-from ..models import ManifestationTitle, ManifestationTitleHandwriting
+from ..models import ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
 from .base import *
 from bib.models import ZotItem
 from django.forms import inlineformset_factory
@@ -758,24 +758,43 @@ def corporation_provenance_remove_bib(request, pk, cps_id):
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-class ManifestationDigitizedCopyView(SimpleFormView):
-    model = Manifestation
-    property = 'digitized_copy'
-    template_name = 'edwoca/manifestation_digitized_copy.html'
 
-    def get_form_class(self):
-        return ItemDigitizedCopyForm
+def manifestation_digital_copy(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    item = manifestation.items.first()
+    context = {
+        'object': manifestation,
+        'item': item,
+        'entity_type': 'manifestation',
+    }
 
-    def get_object(self):
-        manifestation = get_object_or_404(self.model, pk=self.kwargs['pk'])
-        return manifestation.items.first().digital_copies.first() or DigitalCopy(item=manifestation.items.first())
+    if request.method == 'POST':
+        for digital_copy in item.digital_copies.all():
+            prefix = f'digital_copy_{digital_copy.id}'
+            form = ItemDigitizedCopyForm(request.POST, instance=digital_copy, prefix=prefix)
+            if form.is_valid():
+                form.save()
+        return redirect('edwoca:manifestation_digital_copy', pk=pk)
+    else:
+        forms = []
+        for digital_copy in item.digital_copies.all():
+            prefix = f'digital_copy_{digital_copy.id}'
+            forms.append(ItemDigitizedCopyForm(instance=digital_copy, prefix=prefix))
+        context['forms'] = forms
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        manifestation = get_object_or_404(Manifestation, pk=self.kwargs['pk'])
-        context['object'] = manifestation
-        context['item'] = manifestation.items.first()
-        return context
+    return render(request, 'edwoca/manifestation_digital_copy.html', context)
+
+
+def manifestation_digital_copy_add(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    item = manifestation.items.first()
+    DigitalCopy.objects.create(item=item)
+    return redirect('edwoca:manifestation_digital_copy', pk=pk)
+
+
+class ManifestationDigitalCopyDeleteView(DeleteView):
+    model = DigitalCopy
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_digitized_copy', kwargs={'pk': self.kwargs['pk']})
+        manifestation = self.object.item.manifestation
+        return reverse('edwoca:manifestation_digital_copy',kwargs={'pk': manifestation.id})

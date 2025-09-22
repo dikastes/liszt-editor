@@ -28,14 +28,14 @@
     <h2 class="card-title mt-0 flex-1"> Digitale Kopien für {{ object }} </h2>
 
     <div class="mt-5">
-    {% for digital_copy in object.digital_copies.all %}
+    {% for digital_copy in item.digital_copies.all %}
         <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
             <div class="flex-1 m-0">
                 <p class="font-bold">{{ digital_copy.url }}</p>
                 <p>{{ digital_copy.get_link_type_display }}</p>
             </div>
             <a href="#digital-copy-modal-{{ digital_copy.id }}" class="btn flex-0"> bearbeiten </a>
-            <form action="{% url 'edwoca:item_digital_copy_delete' digital_copy.id %}" method="post" class="flex-0 m-0">
+            <form action="{% url 'edwoca:manifestation_digital_copy_delete' digital_copy.id %}" method="post" class="flex-0 m-0">
                 {% csrf_token %}
                 <input type="submit" class="btn btn-primary" value="löschen"/>
             </form>
@@ -46,7 +46,7 @@
     </div>
     <div class="flex items-center">
         <div class="flex-1"></div>
-        <a href="{% url 'edwoca:item_digital_copy_add' object.id %}" class="btn flex-0"> Digitale Kopie hinzufügen </a>
+        <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn flex-0"> Digitale Kopie hinzufügen </a>
     </div>
 
 </div>

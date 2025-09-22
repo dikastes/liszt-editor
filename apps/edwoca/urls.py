@@ -105,7 +105,9 @@ urlpatterns = [
         path('manifestations/<int:pk>/classification', views.ManifestationClassificationUpdateView.as_view(), name = 'manifestation_classification'),
         path('manifestations/<int:pk>/print', views.ManifestationPrintUpdateView.as_view(), name = 'manifestation_print'),
         path('manifestations/<int:pk>/manuscript', views.manifestation_manuscript_update, name = 'manifestation_manuscript'),
-        path('manifestations/<int:pk>/digitized_copy/', views.ManifestationDigitizedCopyView.as_view(), name='manifestation_digcopy'),
+        path('manifestations/<int:pk>/digital_copy/', views.manifestation_digital_copy, name='manifestation_digital_copy'),
+        path('manifestations/<int:pk>/digital_copy/add/', views.manifestation_digital_copy_add, name='manifestation_digital_copy_add'),
+        path('manifestations/digital_copy/delete/<int:pk>/', views.ManifestationDigitalCopyDeleteView.as_view(), name='manifestation_digital_copy_delete'),
         path('manifestations/<int:pk>/handwriting/<int:handwriting_pk>/add_writer/<int:person_pk>', views.manifestation_add_handwriting_writer, name = 'manifestation_add_handwriting_writer'),
         path('manifestations/<int:pk>/handwriting/<int:handwriting_pk>/remove_writer', views.manifestation_remove_handwriting_writer, name = 'manifestation_remove_handwriting_writer'),
         path('manifestations/handwriting/<int:pk>/delete', views.ManifestationHandwritingDeleteView.as_view(), name = 'manifestation_handwriting_delete'),
@@ -132,7 +134,10 @@ urlpatterns = [
         path('items/removecontributor/<int:pk>', views.ItemContributorRemoveView.as_view(), name = 'item_contributor_remove'),
         path('items/<int:pk>/provenance', views.item_provenance, name = 'item_provenance'),
 
-        path('items/<int:pk>/digcopy', views.ItemDigCopyView.as_view(), name = 'item_digcopy'),
+        path('item/<int:pk>/digital_copy/', views.item_digital_copy, name = 'item_digital_copy'),
+        path('item/<int:item_id>/digital_copy/add/', views.item_digital_copy_add, name = 'item_digital_copy_add'),
+        path('item/digital_copy/delete/<int:pk>/', views.ItemDigitalCopyDeleteView.as_view(), name = 'item_digital_copy_delete'),
+
         path('items/<int:pk>/comment', views.ItemCommentUpdateView.as_view(), name = 'item_comment'),
         path('items/<int:pk>/dedication', views.ItemDedicationUpdateView.as_view(), name = 'item_dedication'),
         path('items/<int:pk>/add_dedicatee/<int:person_id>', views.item_add_dedicatee, name = 'item_add_dedicatee'),

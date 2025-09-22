@@ -172,24 +172,46 @@ def item_provenance(request, pk):
     return render(request, 'edwoca/item_provenance.html', context)
 
 
-class ItemDigCopyView(SimpleFormView):
-    model = Item
-    property = 'digitized_copy'
-    template_name = 'edwoca/item_digcopy.html'
-    form_class = ItemDigitizedCopyForm
+def item_digital_copy(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    context = {
+        'object': item,
+        'entity_type': 'item',
+    }
 
-    def get_object(self):
-        item = get_object_or_404(self.model, pk=self.kwargs['pk'])
-        return item.digital_copies.first() or DigitalCopy(item=item)
+    if request.method == 'POST':
+        for digital_copy in item.digital_copies.all():
+            prefix = f'digital_copy_{digital_copy.id}'
+            form = ItemDigitizedCopyForm(request.POST, instance=digital_copy, prefix=prefix)
+            if form.is_valid():
+                form.save()
+        return redirect('edwoca:item_digital_copy', pk=pk)
+    else:
+        forms = []
+        for digital_copy in item.digital_copies.all():
+            prefix = f'digital_copy_{digital_copy.id}'
+            forms.append(ItemDigitizedCopyForm(instance=digital_copy, prefix=prefix))
+        context['forms'] = forms
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        item = get_object_or_404(Item, pk=self.kwargs['pk'])
-        context['object'] = item
-        return context
+    return render(request, 'edwoca/item_digcopy.html', context)
+
+
+def item_digital_copy_add(request, item_id):
+    item = get_object_or_404(Item, pk=item_id)
+    DigitalCopy.objects.create(item=item)
+    if item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_digital_copy', pk=item.manifestation.id)
+    return redirect('edwoca:item_digital_copy', pk=item_id)
+
+
+class ItemDigitalCopyDeleteView(DeleteView):
+    model = DigitalCopy
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:item_digcopy', kwargs={'pk': self.kwargs['pk']})
+        item = self.object.item
+        if item.manifestation.is_singleton:
+            return reverse('edwoca:manifestation_digital_copy', kwargs={'pk': manifestation.id})
+        return reverse('edwoca:item_digital_copy', kwargs={'pk': manifestation.id})
 
 
 class ItemCommentUpdateView(SimpleFormView):

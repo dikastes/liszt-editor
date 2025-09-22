@@ -67,7 +67,7 @@
 	</li>
 	{% if object.is_singleton %}
 		<li>
-		    <a href="{% url 'edwoca:manifestation_digcopy' object.id %}"
+		    <a href="{% url 'edwoca:manifestation_digital_copy' object.id %}"
 			{% if 'digcopy' in request.path %}class="active"{% endif %}
 			>
 			Digitalisat
