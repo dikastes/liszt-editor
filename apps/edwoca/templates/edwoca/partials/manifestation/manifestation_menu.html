@@ -51,13 +51,15 @@
 		Verlag und Druckspezifika
 	    </a>
 	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_manuscript' object.id %}"
-		{% if 'manuscript' in request.path %}class="active"{% endif %}
-		>
-		Manuskriptspezifika
-	    </a>
-	</li>
+	{% if object.is_singleton %}
+		<li>
+		    <a href="{% url 'edwoca:manifestation_manuscript' object.id %}"
+			{% if 'manuscript' in request.path %}class="active"{% endif %}
+			>
+			Manuskriptspezifika
+		    </a>
+		</li>
+	{% endif %}
 	<li>
 	    <a href="{% url 'edwoca:manifestation_bibliography' object.id %}"
 		{% if 'bibliography' in request.path %}class="active"{% endif %}

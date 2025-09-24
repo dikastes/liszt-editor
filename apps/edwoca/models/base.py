@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, ManifestationHandwriting, ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
+from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem

@@ -50,7 +50,21 @@ class Item(WemiBaseClass):
             null = True
         )
     is_template = models.BooleanField(default=False)
+    extent = models.TextField(
+            blank = True,
+            null = True
+        )
+    measure = models.TextField(
+            blank = True,
+            null = True
+        )
+    private_manuscript_comment = models.TextField(
+            blank = True,
+            null = True
+        )
 
+    def render_handwritings(self):
+        return ', '.join(handwriting.__str__() for handwriting in self.handwritings)
 
     def __str__(self):
         #title = self.get_pref_title() or '<ohne Titel>'
@@ -265,3 +279,10 @@ class DigitalCopy(models.Model):
             default=LinkType.DIGITIZED
         )
 
+
+class ItemHandwriting(BaseHandwriting):
+    item = models.ForeignKey(
+            'item',
+            related_name = 'handwritings',
+            on_delete = models.CASCADE
+        )

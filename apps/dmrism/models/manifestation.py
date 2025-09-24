@@ -218,14 +218,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-    extent = models.TextField(
-            blank = True,
-            null = True
-        )
-    measure = models.TextField(
-            blank = True,
-            null = True
-        )
     date_diplomatic = models.TextField(
             blank = True,
             null = True
@@ -252,10 +244,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-    private_manuscript_comment = models.TextField(
-            blank = True,
-            null = True
-        )
     private_print_comment = models.TextField(
             blank = True,
             null = True
@@ -273,9 +261,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     specific_figure = models.BooleanField(
             default = False
         )
-
-    def render_handwritings(self):
-        return ', '.join(handwriting.__str__() for handwriting in self.handwritings)
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -581,43 +566,9 @@ class RelatedManifestation(RelatedEntity):
         )
 
 
-class BaseHandwriting(models.Model):
-    class Meta:
-        abstract = True
-
-    writer = models.ForeignKey(
-            'dmad.Person',
-            on_delete = models.SET_NULL,
-            null = True
-        )
-    medium = models.CharField(
-            max_length = 100,
-            null = True,
-            blank = True
-        )
-    dubious_writer = models.BooleanField(default = False)
-
-    def __str__(self):
-        if self.dubious_writer:
-            return f"[{self.writer.__str__()}] ({self.medium})"
-        return f"{self.writer.__str__()} ({self.medium})"
-
-
-class ManifestationHandwriting(BaseHandwriting):
-    manifestation = models.ForeignKey(
-            'Manifestation',
-            related_name = 'handwritings',
-            on_delete = models.CASCADE
-        )
-
-
 class ManifestationTitleHandwriting(BaseHandwriting):
     manifestation_title = models.ForeignKey(
             'ManifestationTitle',
             related_name = 'handwritings',
             on_delete = models.CASCADE
         )
-
-
-
-

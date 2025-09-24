@@ -283,3 +283,71 @@ class LibraryUpdateView(UpdateView):
 class LibraryDeleteView(DeleteView):
     model = Library
     template_name = 'edwoca/simple_form.html'
+
+
+def item_manuscript_update(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    context = {
+        'object': item,
+        'entity_type': 'item'
+    }
+
+    if request.method == 'POST':
+        if 'save_changes' in request.POST:
+            form = ItemManuscriptForm(request.POST, instance=item)
+            if form.is_valid():
+                form.save()
+
+            for handwriting in item.handwritings.all():
+                prefix = f'handwriting_{handwriting.id}'
+                handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                if handwriting_form.is_valid():
+                    handwriting_form.save()
+
+        if 'add_handwriting' in request.POST:
+            ItemHandwriting.objects.create(item=item)
+
+        return redirect('edwoca:manifestation_manuscript', pk=pk)
+
+    else:
+        form = ItemManuscriptForm(instance=item)
+        handwriting_forms = []
+        for handwriting in item.handwritings.all():
+            prefix = f'handwriting_{handwriting.id}'
+            handwriting_forms.append(ItemHandwritingForm(instance=handwriting, prefix=prefix))
+        context['handwriting_forms'] = handwriting_forms
+
+    context['form'] = form
+    search_form = SearchForm(request.GET or None)
+    context['search_form'] = search_form
+
+    if search_form.is_valid() and search_form.cleaned_data.get('q'):
+        context['query'] = search_form.cleaned_data.get('q')
+        context[f"found_persons"] = search_form.search().models(Person)
+
+    if request.GET.get('handwriting_id'):
+        context['handwriting_id'] = int(request.GET.get('handwriting_id'))
+
+    return render(request, 'edwoca/manifestation_manuscript.html', context)
+
+
+def item_add_handwriting_writer(request, pk, handwriting_pk, person_pk):
+    handwriting = get_object_or_404(ItemHandwriting, pk=handwriting_pk)
+    person = get_object_or_404(Person, pk=person_pk)
+    handwriting.writer = person
+    handwriting.save()
+    return redirect('edwoca:item_manuscript', pk=pk)
+
+
+def item_remove_handwriting_writer(request, pk, handwriting_pk):
+    handwriting = get_object_or_404(ItemHandwriting, pk=handwriting_pk)
+    handwriting.writer = None
+    handwriting.save()
+    return redirect('edwoca:item_manuscript', pk=pk)
+
+
+class ItemHandwritingDeleteView(DeleteView):
+    model = ItemHandwriting
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.item.id})

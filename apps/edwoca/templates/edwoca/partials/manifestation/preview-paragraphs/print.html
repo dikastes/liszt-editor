@@ -5,6 +5,6 @@
 	{{ object.publisher|default:'' }}
 	{{ object.plate_number|default:'' }}
 	{% if not object.publisher and not object.plate_number %}
-		<span class="badge"> keine Angaben </span>
+		<span class="badge badge-primary">!</span> keine Angaben
 	{% endif %}
 </p>

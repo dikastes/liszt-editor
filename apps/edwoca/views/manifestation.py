@@ -1,5 +1,5 @@
 from ..forms.manifestation import *
-from ..forms.item import SignatureFormSet, ItemForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet
+from ..forms.item import SignatureFormSet, ItemForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
 from ..forms.manifestation import *
 from ..models import Manifestation as EdwocaManifestation
 from ..models import ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
@@ -12,7 +12,7 @@ from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Place, Corporation, Status, Person
-from dmrism.models.item import Signature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library
+from dmrism.models.item import Signature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting
 from dmrism.models.manifestation import Manifestation as DmrismManifestation
 from dmrism.models.manifestation import ManifestationBib
 
@@ -303,10 +303,10 @@ class ManifestationTitleDeleteView(DeleteView):
 
 
 class ManifestationHandwritingDeleteView(DeleteView):
-    model = ManifestationHandwriting
+    model = ItemHandwriting
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_manuscript', kwargs={'pk': self.object.manifestation.id})
+        return reverse_lazy('edwoca:manifestation_manuscript', kwargs={'pk': self.object.item.manifestation.id})
 
 
 class ManifestationTitleHandwritingDeleteView(DeleteView):
@@ -628,6 +628,7 @@ class CorporationProvenanceStationDeleteView(DeleteView):
 
 def manifestation_manuscript_update(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
+    item = manifestation.items.first()
     context = {
         'object': manifestation,
         'entity_type': 'manifestation'
@@ -635,27 +636,27 @@ def manifestation_manuscript_update(request, pk):
 
     if request.method == 'POST':
         if 'save_changes' in request.POST:
-            form = ManifestationManuscriptForm(request.POST, instance=manifestation)
+            form = ItemManuscriptForm(request.POST, instance=item)
             if form.is_valid():
                 form.save()
 
-            for handwriting in manifestation.handwritings.all():
+            for handwriting in item.handwritings.all():
                 prefix = f'handwriting_{handwriting.id}'
-                handwriting_form = ManifestationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
 
         if 'add_handwriting' in request.POST:
-            ManifestationHandwriting.objects.create(manifestation=manifestation)
+            ItemHandwriting.objects.create(item=item)
 
         return redirect('edwoca:manifestation_manuscript', pk=pk)
 
     else:
-        form = ManifestationManuscriptForm(instance=manifestation)
+        form = ItemManuscriptForm(instance=item)
         handwriting_forms = []
-        for handwriting in manifestation.handwritings.all():
+        for handwriting in item.handwritings.all():
             prefix = f'handwriting_{handwriting.id}'
-            handwriting_forms.append(ManifestationHandwritingForm(instance=handwriting, prefix=prefix))
+            handwriting_forms.append(ItemHandwritingForm(instance=handwriting, prefix=prefix))
         context['handwriting_forms'] = handwriting_forms
 
     context['form'] = form
@@ -669,22 +670,11 @@ def manifestation_manuscript_update(request, pk):
     if request.GET.get('handwriting_id'):
         context['handwriting_id'] = int(request.GET.get('handwriting_id'))
 
-    if manifestation.stitcher:
-        context['linked_stitcher'] = manifestation.stitcher
-    else:
-        stitcher_search_form = SearchForm(request.GET or None, prefix='stitcher')
-        context['stitcher_searchform'] = stitcher_search_form
-        context['show_stitcher_search_form'] = True
-
-        if stitcher_search_form.is_valid() and stitcher_search_form.cleaned_data.get('q'):
-            context['stitcher_query'] = stitcher_search_form.cleaned_data.get('q')
-            context[f"found_stitchers"] = stitcher_search_form.search().models(Corporation)
-
     return render(request, 'edwoca/manifestation_manuscript.html', context)
 
 
 def manifestation_add_handwriting_writer(request, pk, handwriting_pk, person_pk):
-    handwriting = get_object_or_404(ManifestationHandwriting, pk=handwriting_pk)
+    handwriting = get_object_or_404(ItemHandwriting, pk=handwriting_pk)
     person = get_object_or_404(Person, pk=person_pk)
     handwriting.writer = person
     handwriting.save()
@@ -692,7 +682,7 @@ def manifestation_add_handwriting_writer(request, pk, handwriting_pk, person_pk)
 
 
 def manifestation_remove_handwriting_writer(request, pk, handwriting_pk):
-    handwriting = get_object_or_404(ManifestationHandwriting, pk=handwriting_pk)
+    handwriting = get_object_or_404(ItemHandwriting, pk=handwriting_pk)
     handwriting.writer = None
     handwriting.save()
     return redirect('edwoca:manifestation_manuscript', pk=pk)

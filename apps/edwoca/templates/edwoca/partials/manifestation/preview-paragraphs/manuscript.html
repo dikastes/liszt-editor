@@ -1,4 +1,4 @@
-<p class="m-0 flex">
+<p class="m-0 truncate">
 	<span class="mr-5">
 		<em> Manuskriptspezifika: </em>
 	</span>
@@ -7,27 +7,21 @@
 			{{ object.paper }}
 		</span>
 	{% else %}
-		<span class="badge badge-primary">
-			keine Papierangaben
-		</span>
+		<span class="badge badge-primary">!</span> keine Papierangaben
 	{% endif %}
 	{% if object.extent %}
 		<span class="inline-block w-48 truncate mr-5">
 			{{ object.extent }}
 		</span>
 	{% else %}
-		<span class="badge badge-primary">
-			keine Umfangangaben
-		</span>
+		<span class="badge badge-primary">!</span> keine Umfangangaben
 	{% endif %}
 	{% if object.measure %}
 		<span class="inline-block w-48 truncate mr-5">
 			{{ object.measure }}
 		</span>
 	{% else %}
-		<span class="badge badge-primary">
-			keine Maßangaben
-		</span>
+		<span class="badge badge-primary">!</span> keine Maßangaben
 	{% endif %}
 </p>
 {% if object.private_manuscript_comment %}

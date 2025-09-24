@@ -372,3 +372,60 @@ class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):
                 'class': SimpleFormMixin.text_area_classes
             })
         }
+
+
+class ItemManuscriptForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Item
+        fields = ['extent', 'measure', 'private_manuscript_comment']
+        widgets = {
+                'extent': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'measure': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'private_manuscript_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            }
+
+
+class ItemHandwritingForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = ItemHandwriting
+        fields = ['medium', 'dubious_writer']
+        widgets = {
+                'medium': TextInput( attrs = {
+                        'class': 'grow'
+                    }),
+                'dubious_writer': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+            }
+
+    def as_daisy(self):
+        form = div(cls='flex gap-5') # Add flex and gap classes to the main form div
+        medium_field = self['medium']
+        dubious_writer_field = self['dubious_writer']
+
+        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2 flex-1') # Add flex-1 to medium label
+        medium_label.add(raw(str(medium_field)))
+
+        dubious_writer_label = label(_for=dubious_writer_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')
+        dubious_writer_label.add(span(dubious_writer_field.label, cls='label-text'))
+        dubious_writer_label.add(raw(str(dubious_writer_field)))
+
+        form.add(medium_label)
+        form.add(dubious_writer_label)
+
+        return mark_safe(str(form))
+
+
+ItemHandwritingFormSet = inlineformset_factory(
+        Item,
+        ItemHandwriting,
+        form = ItemHandwritingForm,
+        extra = 0,
+        can_delete = True
+    )

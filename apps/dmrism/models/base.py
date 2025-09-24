@@ -130,3 +130,27 @@ class Event(models.Model):
             null = True
         )
 """
+
+
+class BaseHandwriting(models.Model):
+    class Meta:
+        abstract = True
+
+    writer = models.ForeignKey(
+            'dmad.Person',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    medium = models.CharField(
+            max_length = 100,
+            null = True,
+            blank = True
+        )
+    dubious_writer = models.BooleanField(default = False)
+
+    def __str__(self):
+        if self.dubious_writer:
+            return f"[{self.writer.__str__()}] ({self.medium})"
+        return f"{self.writer.__str__()} ({self.medium})"
+
+

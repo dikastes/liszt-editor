@@ -28,6 +28,13 @@
 	    </a>
 	</li>
 	<li>
+	    <a href="{% url 'edwoca:item_manuscript' object.id %}"
+		{% if 'manuscript' in request.path %}class="active"{% endif %}
+		>
+		Manuskriptspezifika
+	    </a>
+	</li>
+	<li>
 	    <a href="{% url 'edwoca:item_digital_copy' object.id %}"
 		{% if 'digcopy' in request.path %}class="active"{% endif %}
 		>

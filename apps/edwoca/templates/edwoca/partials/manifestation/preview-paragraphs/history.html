@@ -3,8 +3,8 @@
 		<em>Datierung und Ort</em>:
 	</span>
 	{{ object.date_diplomatic|default:'' }}
-	{{ object.places.all|join:", "|default:'<span class="badge badge-primary">ohne Ort</span>' }}
-	{{ object.period.display.strip|default:'<span class="badge badge-primary">ohne Jahr</span>' }}
+	{{ object.places.all|join:", "|default:'<span class="badge badge-primary">!</span> keine Ortsangabe' }}
+	{{ object.period.display.strip|default:'<span class="badge badge-primary">!</span> keine Datierung' }}
 </p>
 <p class="truncate m-0">
 {% if object.private_history_comment %}
