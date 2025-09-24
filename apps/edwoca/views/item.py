@@ -307,7 +307,7 @@ def item_manuscript_update(request, pk):
         if 'add_handwriting' in request.POST:
             ItemHandwriting.objects.create(item=item)
 
-        return redirect('edwoca:manifestation_manuscript', pk=pk)
+        return redirect('edwoca:item_manuscript', pk=pk)
 
     else:
         form = ItemManuscriptForm(instance=item)
@@ -328,7 +328,7 @@ def item_manuscript_update(request, pk):
     if request.GET.get('handwriting_id'):
         context['handwriting_id'] = int(request.GET.get('handwriting_id'))
 
-    return render(request, 'edwoca/manifestation_manuscript.html', context)
+    return render(request, 'edwoca/item_manuscript.html', context)
 
 
 def item_add_handwriting_writer(request, pk, handwriting_pk, person_pk):

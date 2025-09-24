@@ -1,0 +1,76 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+{% include 'edwoca/partials/item/preview-divs/manuscript_prolog.html' %}
+
+<div class="bg-white border border-base-300 p-5">
+    <h2 class="card-title mt-0"> Manuskriptspezifika </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_daisy }}
+
+        <input type="submit" name="save_changes" value="Speichern" class="btn btn-primary mt-3">
+    </form>
+
+    <div class="mt-5">
+        <h3 class="text-lg font-bold mb-5">Handschriften</h3>
+        {% for form in handwriting_forms %}
+            <div class="flex gap-5 items-center mb-5 rounded-lg">
+                <form method="post" class="flex-1 flex gap-5 m-0">
+                    {% csrf_token %}
+                    <div class="flex-1">
+                        {{ form.as_daisy }}
+                    </div>
+                    <input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-secondary">
+                </form>
+                <form action="{% url 'edwoca:item_handwriting_delete' form.instance.id %}" method="post" class="flex-0 m-0">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary" value="löschen"/>
+                </form>
+            </div>
+            {% if form.instance.writer %}
+                <div class="flex gap-5 items-center mb-10">
+                    <label class="input input-bordered flex-1 flex items-center gap-2">
+                        Schreiber
+                        <input type="text" class="grow" disabled value="{{ form.instance.writer }}" />
+                    </label>
+                    <a class="btn" href="{% url 'edwoca:item_remove_handwriting_writer' object.id form.instance.id %}">Entfernen</a>
+                </div>
+            {% else %}
+                <div class="mt-2">
+                    <div class="items-center">
+                        <form action="{% url 'edwoca:item_manuscript' object.id %}" method="get" class="flex gap-5">
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                Schreiber
+                                {{ search_form.q }}
+                            </label>
+                            <input type="hidden" name="handwriting_id" value="{{ form.instance.id }}">
+                            <input type="submit" class="btn flex-0" value="Suchen"/>
+                        </form>
+                    </div>
+                    {% if search_form.is_valid and search_form.cleaned_data.q and handwriting_id == form.instance.id %}
+                        <ul>
+                        {% for person in found_persons %}
+                            <li>
+                                <a href="{% url 'edwoca:item_add_handwriting_writer' object.id form.instance.id person.pk %}">{{ person.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Suchergebnisse</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endfor %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="submit" name="add_handwriting" value="Handschrift hinzufügen" class="btn btn-secondary mt-3">
+        </form>
+    </div>
+</div>
+
+{% include 'edwoca/partials/item/preview-divs/manuscript_epilog.html' %}
+
+{% endblock %}
