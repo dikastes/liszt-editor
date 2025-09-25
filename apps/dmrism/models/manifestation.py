@@ -396,23 +396,16 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 if corporate_name.get('4') == 'fmo'
             ]
 
-        # 031$d tempo
-        # 031$q metronom
-        # 031$t textincipit
-        # bsp 1001340874
+        private_head_comment = []
+        if tempo := data.get('031').get('d'):
+            private_head_comment += [ 'Tempo (RISM): ' + tempo ]
+        if metronom := data.get('031').get('q'):
+            private_head_comment += [ 'Metronom (RISM): ' + metronom ]
+        if textincipit := data.get('031').get('t'):
+            private_head_comment += [ 'Text-Incipit (RISM): ' + textincipit ]
 
-        # musical_incipits_information = data.get('031')
-        #self.tempo = musical_incipits_information.get('d')
+        self.private_head_comment = '\n'.join([self.private_head_comment] + private_head_comment)
 
-        # bsp?
-        # self.metronom = musical_incipits_information.get('q')
-
-        # bsp?
-        # self.textual_incipit = musical_incipits_information.get('t')
-
-        # diese informationen werden teil der expressions-charakteristika; heir muss erst abgewartet werden
-
-        # bsp 1001310759
         language_code = data.get('041')
         if language_code:
             self.language = Language[lang_find(language_code.get('a'))['iso639_1'].upper()]
@@ -425,8 +418,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 if field.get('a')
             ]
 
-        # bsp 1001340032
-        #breakpoint()
         # - ascertain order from rism
         for host_item_entry in data.get_fields('773'):
             target_rism_id = host_item_entry.get('w').replace('sources/', '')
@@ -445,12 +436,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 )
 
         general_notes = data.get_fields('500')
-        self.extent = '\n'.join(
-                note.get('a').replace(EXTENT_MARKER, '')
-                for note
-                in general_notes
-                if note.get('a').startswith(EXTENT_MARKER)
-            )
+        #self.extent = '\n'.join(
+                #note.get('a').replace(EXTENT_MARKER, '')
+                #for note
+                #in general_notes
+                #if note.get('a').startswith(EXTENT_MARKER)
+            #)
 
         self.measure = '\n'.join(
                 note.get('a').replace(PAPER_MARKER, '')

@@ -315,9 +315,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if AUTOGRAPH_HANDWRITING_KEY in raw_data and \
             raw_data[AUTOGRAPH_HANDWRITING_KEY]:
-            ManifestationHandwriting.objects.create(
+            ItemHandwriting.objects.create(
                     writer = Person.objects.get(gnd_id = list(fixed_persons.values())[0]),
-                    manifestation = self,
+                    item = single_item,
                     medium = raw_data[AUTOGRAPH_HANDWRITING_KEY]
                 )
 
@@ -331,9 +331,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 medium = Manifestation.extract_medium(entry)
                 if writer_gnd_id:
                     writer = Person.fetch_or_get(writer_gnd_id)
-                    ManifestationHandwriting.objects.create(
+                    ItemHandwriting.objects.create(
                             writer = writer,
-                            manifestation = self,
+                            item = single_item,
                             medium = medium,
                             dubious_writer = dubious_writer
                         )
@@ -342,9 +342,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     for person in fixed_persons:
                         if (gnd_id := fixed_persons[person]):
                             if person in entry:
-                                ManifestationHandwriting.objects.create(
+                                ItemHandwriting.objects.create(
                                         writer = Person.objects.get(gnd_id = gnd_id),
-                                        manifestation = self,
+                                        item = single_item,
                                         medium = medium,
                                         dubious_writer = dubious_writer
                                     )
@@ -352,17 +352,17 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 break
                         else:
                             if person in entry:
-                                ManifestationHandwriting.objects.create(
+                                ItemHandwriting.objects.create(
                                         writer = Person.objects.get(interim_designator = person),
-                                        manifestation = self,
+                                        item = single_item,
                                         medium = medium,
                                         dubious_writer = dubious_writer
                                     )
                                 fixed_person_found = True
                                 break
                     if not fixed_person_found:
-                        ManifestationHandwriting.objects.create(
-                                manifestation = self,
+                        ItemHandwriting.objects.create(
+                                item = single_item,
                                 medium = medium,
                                 dubious_writer = dubious_writer
                             )
