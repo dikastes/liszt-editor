@@ -110,11 +110,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             related_name = 'temporary_copy'
         )
     # move to edwoca?
-    plate_number = models.CharField(
-            max_length = 10,
-            null = True,
-            blank = True
-        )
     period = models.OneToOneField(
             'dmad.Period',
             on_delete = models.SET_NULL,
@@ -214,19 +209,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-    handwriting = models.TextField(
-            blank = True,
-            null = True
-        )
+    #handwriting = models.TextField(
+            #blank = True,
+            #null = True
+        #)
     date_diplomatic = models.TextField(
             blank = True,
             null = True
-        )
-    publisher = models.ForeignKey(
-            'dmad.Corporation',
-            related_name = 'published_manifestations',
-            null = True,
-            on_delete = models.SET_NULL
         )
     private_head_comment = models.TextField(
             blank = True,
@@ -482,6 +471,24 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         return manifestation
 
 
+class Publication(models.Model):
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE,
+            related_name = 'publications'
+        )
+    publisher = models.ForeignKey(
+            'dmad.Corporation',
+            related_name = 'published_manifestations',
+            null = True,
+            on_delete = models.SET_NULL
+        )
+    plate_number = models.CharField(
+            max_length = 50,
+            null = True,
+            blank = True
+        )
+
 
 class ManifestationTitle(models.Model):
 
@@ -562,4 +569,20 @@ class ManifestationTitleHandwriting(BaseHandwriting):
             'ManifestationTitle',
             related_name = 'handwritings',
             on_delete = models.CASCADE
+        )
+
+
+class ManifestationPersonDedication(BasePersonDedication):
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE,
+            related_name = 'manifestation_person_dedications'
+        )
+
+
+class ManifestationCorporationDedication(BaseCorporationDedication):
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE,
+            related_name = 'manifestation_corporation_dedications'
         )

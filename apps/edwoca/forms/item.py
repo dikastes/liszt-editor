@@ -10,18 +10,18 @@ from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 
 
-class ItemForm(ModelForm):
-    class Meta:
-        model = Item
-        fields = ['cover', 'handwriting']
-        widgets = {
-                'cover': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
-                    }),
-                'handwriting': TextInput( attrs = {
-                        'class': 'grow w-full'
-                    })
-            }
+#class ItemForm(ModelForm):
+    #class Meta:
+        #model = Item
+        #fields = ['cover', 'handwriting']
+        #widgets = {
+                #'cover': Textarea( attrs = {
+                        #'class': SimpleFormMixin.text_area_classes
+                    #}),
+                #'handwriting': TextInput( attrs = {
+                        #'class': 'grow w-full'
+                    #})
+            #}
 
 
 class SignatureForm(ModelForm):
@@ -98,21 +98,21 @@ NewItemSignatureFormSet = inlineformset_factory(
     )
 
 
-class ItemDedicationForm(ModelForm, SimpleFormMixin):
-    class Meta:
-        model = Item
-        fields = ['dedication', 'private_dedication_comment']
-        widgets = {
-                'dedication': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
-                    }),
-                'private_dedication_comment': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
-                    })
-            }
-        labels = {
-            'private_dedication_comment': 'Interner Widmungskommentar',
-        }
+#class ItemDedicationForm(ModelForm, SimpleFormMixin):
+    #class Meta:
+        #model = Item
+        #fields = ['dedication', 'private_dedication_comment']
+        #widgets = {
+                #'dedication': Textarea( attrs = {
+                        #'class': SimpleFormMixin.text_area_classes
+                    #}),
+                #'private_dedication_comment': Textarea( attrs = {
+                        #'class': SimpleFormMixin.text_area_classes
+                    #})
+            #}
+        #labels = {
+            #'private_dedication_comment': 'Interner Widmungskommentar',
+        #}
 
 
 class ItemCommentForm(CommentForm):

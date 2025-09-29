@@ -1,43 +1,283 @@
 {% extends 'edwoca/base.html' %}
 
+{% block modals %}
+    {% for person_dedication_form in person_dedication_forms %}
+        <div class="modal" role="dialog" id="person-dedication-modal-{{ person_dedication_form.instance.id }}">
+            <div class="modal-box w-11/12 max-w-5xl">
+                <h3 class="text-lg font-bold">Personenwidmung bearbeiten</h3>
+                <form method="post" class="mt-5">
+                    {% csrf_token %}
+                    {{ person_dedication_form.management_form }}
+                    <div class="flex flex-rows w-full gap-10 my-5">
+                        <div class="form-control">
+                            <label class="label-text">{{ person_dedication_form.not_before.label }}</label>
+                            <div class="flex">
+                                {{ person_dedication_form.not_before }}
+                            </div>
+                        </div>
+                        <div class="form-control">
+                            <label class="label-text">{{ person_dedication_form.not_after.label }}</label>
+                            <div class="flex">
+                                {{ person_dedication_form.not_after }}
+                            </div>
+                        </div>
+                    </div>
+                    <label class="input input-bordered flex items-center gap-2 my-5">
+                        {{ person_dedication_form.display.label }}
+                        {{ person_dedication_form.display }}
+                    </label>
+                    {{ person_dedication_form.diplomatic_dedication }}
+                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-person-{{ person_dedication_form.instance.id }}">
+                </form>
+
+                <div class="mt-5">
+                    <h4 class="text-lg font-bold mb-5">Widmungsträger</h4>
+                    {% if person_dedication_form.instance.dedicatee %}
+                        <div class="flex gap-5 items-center mb-10">
+                            <label class="input input-bordered flex-1 flex items-center gap-2">
+                                Widmungsträger
+                                <input type="text" class="grow" disabled value="{{ person_dedication_form.instance.dedicatee }}" />
+                            </label>
+                            <a class="btn" href="{% url 'edwoca:item_person_dedication_remove_dedicatee' object.id person_dedication_form.instance.id %}">Entfernen</a>
+                        </div>
+                    {% else %}
+                        <div class="mb-10">
+                            <div class="items-center">
+                                <form action="{% url 'edwoca:item_dedication' object.id %}#person-dedication-modal-{{ person_dedication_form.instance.id }}" method="get" class="flex gap-5">
+                                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                                        Widmungsträger
+                                        <input type="text" name="dedicatee-q" class="grow" {% if query_dedicatee %}value="{{ query_dedicatee }}"{% endif %}>
+                                    </label>
+                                    <input type="hidden" name="person_dedication_id" value="{{ person_dedication_form.instance.id }}">
+                                    <input type="submit" class="btn flex-0" value="Suchen"/>
+                                </form>
+                            </div>
+                            {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
+                                <ul>
+                                {% for person in found_persons %}
+                                    <li>
+                                        <a href="{% url 'edwoca:item_person_dedication_add_dedicatee' object.id person_dedication_form.instance.id person.pk %}">{{ person.object }}</a>
+                                    </li>
+                                {% empty %}
+                                    <li>Keine Suchergebnisse</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mt-5">
+                    <h4 class="text-lg font-bold mb-5">Ort</h4>
+                    {% if person_dedication_form.instance.place %}
+                        <div class="flex gap-5 items-center mb-10">
+                            <label class="input input-bordered flex-1 flex items-center gap-2">
+                                Ort
+                                <input type="text" class="grow" disabled value="{{ person_dedication_form.instance.place }}" />
+                            </label>
+                            <a class="btn" href="{% url 'edwoca:item_dedication_remove_place' object.id person_dedication_form.instance.id %}">Entfernen</a>
+                        </div>
+                    {% else %}
+                        <div class="mb-10">
+                            <div class="items-center">
+                                <form action="{% url 'edwoca:item_dedication' object.id %}#person-dedication-modal-{{ person_dedication_form.instance.id }}" method="get" class="flex gap-5">
+                                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                                        Ort
+                                        <input type="text" name="place-q" class="grow" {% if query_place %}value="{{ query_place }}"{% endif %}>
+                                    </label>
+                                    <input type="hidden" name="person_dedication_id" value="{{ person_dedication_form.instance.id }}">
+                                    <input type="submit" class="btn flex-0" value="Suchen"/>
+                                </form>
+                            </div>
+                            {% if query_place and person_dedication_id == person_dedication_form.instance.id %}
+                                <ul>
+                                {% for place in found_places %}
+                                    <li>
+                                        <a href="{% url 'edwoca:item_dedication_add_place' object.id person_dedication_form.instance.id place.pk %}">{{ place.object }}</a>
+                                    </li>
+                                {% empty %}
+                                    <li>Keine Suchergebnisse</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="modal-action flex-0 m-0">
+                    <label for="save-button-person-{{ person_dedication_form.instance.id }}" class="btn btn-primary">Speichern</label>
+                    <a href="#" class="btn">Schließen</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    {% for corporation_dedication_form in corporation_dedication_forms %}
+        <div class="modal" role="dialog" id="corporation-dedication-modal-{{ corporation_dedication_form.instance.id }}">
+            <div class="modal-box w-11/12 max-w-5xl">
+                <h3 class="text-lg font-bold">Körperschaftswidmung bearbeiten</h3>
+                <form method="post" class="mt-5">
+                    {% csrf_token %}
+                    {{ corporation_dedication_form.management_form }}
+                    <div class="flex flex-rows w-full gap-10 my-5">
+                        <div class="form-control">
+                            <label class="label-text">{{ corporation_dedication_form.not_before.label }}</label>
+                            <div class="flex">
+                                {{ corporation_dedication_form.not_before }}
+                            </div>
+                        </div>
+                        <div class="form-control">
+                            <label class="label-text">{{ corporation_dedication_form.not_after.label }}</label>
+                            <div class="flex">
+                                {{ corporation_dedication_form.not_after }}
+                            </div>
+                        </div>
+                    </div>
+                    <label class="input input-bordered flex items-center gap-2 my-5">
+                        {{ corporation_dedication_form.display.label }}
+                        {{ corporation_dedication_form.display }}
+                    </label>
+                    {{ corporation_dedication_form.diplomatic_dedication }}
+                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-corporation-{{ corporation_dedication_form.instance.id }}">
+                </form>
+
+                <div class="mt-5">
+                    <h4 class="text-lg font-bold mb-5">Widmungsträger</h4>
+                    {% if corporation_dedication_form.instance.dedicatee %}
+                        <div class="flex gap-5 items-center mb-10">
+                            <label class="input input-bordered flex-1 flex items-center gap-2">
+                                Widmungsträger
+                                <input type="text" class="grow" disabled value="{{ corporation_dedication_form.instance.dedicatee }}" />
+                            </label>
+                            <a class="btn" href="{% url 'edwoca:item_corporation_dedication_remove_dedicatee' object.id corporation_dedication_form.instance.id %}">Entfernen</a>
+                        </div>
+                    {% else %}
+                        <div class="mb-10">
+                            <div class="items-center">
+                                <form action="{% url 'edwoca:item_dedication' object.id %}#corporation-dedication-modal-{{ corporation_dedication_form.instance.id }}" method="get" class="flex gap-5">
+                                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                                        Widmungsträger
+                                        <input type="text" name="dedicatee-q" class="grow" {% if query_dedicatee %}value="{{ query_dedicatee }}"{% endif %}>
+                                    </label>
+                                    <input type="hidden" name="corporation_dedication_id" value="{{ corporation_dedication_form.instance.id }}">
+                                    <input type="submit" class="btn flex-0" value="Suchen"/>
+                                </form>
+                            </div>
+                            {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
+                                <ul>
+                                {% for corporation in found_corporations %}
+                                    <li>
+                                        <a href="{% url 'edwoca:item_corporation_dedication_add_dedicatee' object.id corporation_dedication_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
+                                    </li>
+                                {% empty %}
+                                    <li>Keine Suchergebnisse</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="mt-5">
+                    <h4 class="text-lg font-bold mb-5">Ort</h4>
+                    {% if corporation_dedication_form.instance.place %}
+                        <div class="flex gap-5 items-center mb-10">
+                            <label class="input input-bordered flex-1 flex items-center gap-2">
+                                Ort
+                                <input type="text" class="grow" disabled value="{{ corporation_dedication_form.instance.place }}" />
+                            </label>
+                            <a class="btn" href="{% url 'edwoca:item_dedication_remove_place' object.id corporation_dedication_form.instance.id %}">Entfernen</a>
+                        </div>
+                    {% else %}
+                        <div class="mb-10">
+                            <div class="items-center">
+                                <form action="{% url 'edwoca:item_dedication' object.id %}#corporation-dedication-modal-{{ corporation_dedication_form.instance.id }}" method="get" class="flex gap-5">
+                                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                                        Ort
+                                        <input type="text" name="place-q" class="grow" {% if query_place %}value="{{ query_place }}"{% endif %}>
+                                    </label>
+                                    <input type="hidden" name="corporation_dedication_id" value="{{ corporation_dedication_form.instance.id }}">
+                                    <input type="submit" class="btn flex-0" value="Suchen"/>
+                                </form>
+                            </div>
+                            {% if query_place and corporation_dedication_id == corporation_dedication_form.instance.id %}
+                                <ul>
+                                {% for place in found_places %}
+                                    <li>
+                                        <a href="{% url 'edwoca:item_dedication_add_place' object.id corporation_dedication_form.instance.id place.pk %}">{{ place.object }}</a>
+                                    </li>
+                                {% empty %}
+                                    <li>Keine Suchergebnisse</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+
+                <div class="modal-action flex-0 m-0">
+                    <label for="save-button-corporation-{{ corporation_dedication_form.instance.id }}" class="btn btn-primary">Speichern</label>
+                    <a href="#" class="btn">Schließen</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
+
 {% block content %}
-<div class="bg-white border border-base-300 p-5 mt-5">
-    <h2 class="card-title mt-0"> Widmung </h2>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_daisy }}
-        <input id="submit-form" type="submit" value="Speichern" class="hidden" id="submit-form">
-    </form>
+
+{% include 'edwoca/partials/item/preview-divs/title_prolog.html' %}
+
+<div class="bg-white border border-base-300 p-5">
+    <h2 class="card-title mt-0 flex-1"> Widmung </h2>
 
     <div class="mt-5">
-        <h3 class="text-lg font-bold mb-5">Widmungsträger</h3>
-        <form method="get" class="flex-1 flex gap-5">
-            <label class="input input-bordered flex items-center gap-2 flex-1">
-                Widmungsträger
-                {{ searchform.q }}
-            </label>
-            <input type="submit" id="submit-form-dedicatee" class="btn" value="Suchen"/>
-        </form>
-        {% if query %}
-            <ul>
-            {% for person in found_persons %}
-                <li>
-                    <a href="{% url 'edwoca:item_add_dedicatee' object.id person.pk %}">{{ person.object }}</a>
-                </li>
-            {% empty %}
-                <li> keine Suchergebnisse </li>
-            {% endfor %}
-            </ul>
-        {% endif %}
-
-        <ul class="mt-5">
-        {% for dedicatee in object.dedicatees.all %}
-            <li class="flex items-center">
-                <p class="flex-1">{{ dedicatee }}</p>
-                <a href="{% url 'edwoca:item_remove_dedicatee' object.id dedicatee.id %}" class="btn">Löschen</a>
-            </li>
+        <h3 class="text-lg font-bold">Personenwidmungen</h3>
+        {% for person_dedication in object.itempersondedication_set.all %}
+            <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
+                <div class="flex-1 m-0">
+                    <p class="font-bold">{{ person_dedication.dedicatee }}</p>
+                    <p class="text-sm">{{ person_dedication.diplomatic_dedication }}</p>
+                </div>
+                <a href="#person-dedication-modal-{{ person_dedication.id }}" class="btn flex-0"> bearbeiten </a>
+                <form action="{% url 'edwoca:item_person_dedication_delete' person_dedication.id %}" method="post" class="flex-0 m-0">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary" value="löschen"/>
+                </form>
+            </div>
+        {% empty %}
+            <p> keine Personenwidmungen </p>
         {% endfor %}
-        </ul>
+        <div class="flex items-center mt-5">
+            <div class="flex-1"></div>
+            <a href="{% url 'edwoca:item_person_dedication_add' object.id %}" class="btn flex-0"> Personenwidmung hinzufügen </a>
+        </div>
+    </div>
+
+    <div class="mt-5">
+        <h3 class="text-lg font-bold">Körperschaftswidmungen</h3>
+        {% for corporation_dedication in object.itemcorporationdedication_set.all %}
+            <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
+                <div class="flex-1 m-0">
+                    <p class="font-bold">{{ corporation_dedication.dedicatee }}</p>
+                    <p class="text-sm">{{ corporation_dedication.diplomatic_dedication }}</p>
+                </div>
+                <a href="#corporation-dedication-modal-{{ corporation_dedication.id }}" class="btn flex-0"> bearbeiten </a>
+                <form action="{% url 'edwoca:item_corporation_dedication_delete' corporation_dedication.id %}" method="post" class="flex-0 m-0">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary" value="löschen"/>
+                </form>
+            </div>
+        {% empty %}
+            <p> keine Körperschaftswidmungen </p>
+        {% endfor %}
+        <div class="flex items-center mt-5">
+            <div class="flex-1"></div>
+            <a href="{% url 'edwoca:item_corporation_dedication_add' object.id %}" class="btn flex-0"> Körperschaftswidmung hinzufügen </a>
+        </div>
     </div>
 </div>
+
+{% include 'edwoca/partials/item/preview-divs/title_epilog.html' %}
+
 {% endblock %}

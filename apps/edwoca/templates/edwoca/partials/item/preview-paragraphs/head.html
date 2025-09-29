@@ -1,0 +1,10 @@
+<p class="m-0">
+	<em> Kopf: </em>
+	{{ object }}
+</p>
+{% if object.private_head_comment %}
+	<p class="m-0 truncate">
+		<span class="badge badge-primary">Kommentar</span>
+		{{ object.private_head_comment }}
+	</p>
+{% endif %}

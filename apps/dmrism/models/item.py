@@ -7,36 +7,36 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Item(WemiBaseClass):
-    cover = models.TextField(
-            null = True,
-            blank = True
-        )
-    handwriting = models.CharField(
-            max_length=20,
-            null=True,
-            blank=True
-        )
-    location = models.TextField(
-            null = True,
-            blank = True
-        )
-    iiif_manifest = models.URLField(
-            null = True,
-            blank = True
-        )
+    #cover = models.TextField(
+            #null = True,
+            #blank = True
+        #)
+    #handwriting = models.CharField(
+            #max_length=20,
+            #null=True,
+            #blank=True
+        #)
+    #location = models.TextField(
+            #null = True,
+            #blank = True
+        #)
+    #iiif_manifest = models.URLField(
+            #null = True,
+            #blank = True
+        #)
     manifestation = models.ForeignKey(
             'Manifestation',
             on_delete = models.CASCADE,
             related_name = 'items'
         )
-    dedication = models.TextField(
-            blank=True,
-            null=True
-        )
-    dedicatees = models.ManyToManyField(
-            'dmad.Person',
-            related_name='item_dedicatees'
-        )
+    #dedication = models.TextField(
+            #blank=True,
+            #null=True
+        #)
+    #dedicatees = models.ManyToManyField(
+            #'dmad.Person',
+            #related_name='item_dedicatees'
+        #)
     private_dedication_comment = models.TextField(
             blank = True,
             null = True
@@ -284,5 +284,19 @@ class ItemHandwriting(BaseHandwriting):
     item = models.ForeignKey(
             'item',
             related_name = 'handwritings',
+            on_delete = models.CASCADE
+        )
+
+
+class ItemPersonDedication(BasePersonDedication):
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE
+        )
+
+
+class ItemCorporationDedication(BaseCorporationDedication):
+    item = models.ForeignKey(
+            'Item',
             on_delete = models.CASCADE
         )

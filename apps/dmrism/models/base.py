@@ -154,3 +154,47 @@ class BaseHandwriting(models.Model):
         return f"{self.writer.__str__()} ({self.medium})"
 
 
+class BaseDedication(models.Model):
+    class Meta:
+        abstract = True
+
+    period = models.ForeignKey(
+            'dmad.Period',
+            on_delete = models.SET_NULL,
+            null = True,
+            related_name = '%(class)s'
+        )
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.SET_NULL,
+            null = True,
+            related_name = '%(class)s'
+        )
+    diplomatic_dedication = models.TextField(
+            null = True,
+            blank = True
+        )
+
+
+class BasePersonDedication(BaseDedication):
+    class Meta:
+        abstract = True
+
+    dedicatee = models.ForeignKey(
+            'dmad.Person',
+            on_delete = models.SET_NULL,
+            null = True,
+            related_name = '%(class)s'
+        )
+
+
+class BaseCorporationDedication(BaseDedication):
+    class Meta:
+        abstract = True
+
+    dedicatee = models.ForeignKey(
+            'dmad.Corporation',
+            on_delete = models.SET_NULL,
+            null = True,
+            related_name = '%(class)s'
+        )

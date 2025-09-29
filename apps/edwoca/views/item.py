@@ -1,13 +1,14 @@
 from .base import *
 from ..forms.item import *
+from ..forms.dedication import ItemPersonDedicationForm, ItemCorporationDedicationForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from ..models import Item as EdwocaItem
-from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, DigitalCopy
+from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, DigitalCopy, ItemPersonDedication, ItemCorporationDedication
 from dmad_on_django.forms import SearchForm
-from dmad_on_django.models import Person, Corporation
+from dmad_on_django.models import Person, Corporation, Place
 from bib.models import ZotItem
 
 
@@ -30,7 +31,6 @@ class ItemSearchView(EdwocaSearchView):
 
 def item_update(request, pk):
     item = get_object_or_404(Item, pk=pk)
-    form = ItemForm(request.POST or None, instance=item)
 
     if request.POST and 'add_signature' in request.POST:
         data = request.POST.copy()
@@ -41,14 +41,12 @@ def item_update(request, pk):
         signature_formset = SignatureFormSet(request.POST or None, instance=item)
 
     if request.method == 'POST' and 'add_signature' not in request.POST:
-        if form.is_valid() and signature_formset.is_valid():
-            form.save()
+        if signature_formset.is_valid():
             signature_formset.save()
             return redirect('edwoca:item_update', pk=pk)
 
     context = {
         'object': item,
-        'form': form,
         'signature_formset': signature_formset,
         'entity_type': 'item',
     }
@@ -56,6 +54,7 @@ def item_update(request, pk):
 
 
 
+"""
 class ItemCreateView(EntityMixin, CreateView):
     model = EdwocaItem
     form_class = ItemForm
@@ -69,6 +68,7 @@ class ItemCreateView(EntityMixin, CreateView):
         self.object.manifestation = Manifestation.objects.get(id=self.kwargs['manifestation_id'])
         self.object.save()
         return redirect(self.get_success_url())
+"""
 
 
 class ItemRelationsUpdateView(EntityMixin, RelationsUpdateView):
@@ -221,35 +221,145 @@ class ItemCommentUpdateView(SimpleFormView):
     template_name = 'edwoca/item_comment.html'
 
 
-class ItemDedicationUpdateView(SimpleFormView):
-    model = Item
-    property = 'dedication'
-    form_class = ItemDedicationForm
-    template_name = 'edwoca/item_dedication.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        search_form = SearchForm(self.request.GET or None)
-        context['searchform'] = search_form
-        context['show_search_form'] = True
-
-        if search_form.is_valid() and search_form.cleaned_data.get('q'):
-            context['query'] = search_form.cleaned_data.get('q')
-            context[f"found_persons"] = search_form.search().models(Person)
-        return context
-
-
-def item_add_dedicatee(request, pk, person_id):
+def item_dedication(request, pk):
     item = get_object_or_404(Item, pk=pk)
-    person = get_object_or_404(Person, pk=person_id)
-    item.dedicatees.add(person)
+    context = {
+        'object': item,
+        'entity_type': 'item',
+    }
+
+    if request.method == 'POST':
+        # Handle existing PersonDedication forms
+        for person_dedication in item.itempersondedication_set.all():
+            prefix = f'person_dedication_{person_dedication.id}'
+            form = ItemPersonDedicationForm(request.POST, instance=person_dedication, prefix=prefix)
+            if form.is_valid():
+                form.save()
+
+        # Handle existing CorporationDedication forms
+        for corporation_dedication in item.itemcorporationdedication_set.all():
+            prefix = f'corporation_dedication_{corporation_dedication.id}'
+            form = ItemCorporationDedicationForm(request.POST, instance=corporation_dedication, prefix=prefix)
+            if form.is_valid():
+                form.save()
+
+        return redirect('edwoca:item_dedication', pk=pk)
+    else:
+        # Initialize forms for existing PersonDedication
+        person_dedication_forms = []
+        for person_dedication in item.itempersondedication_set.all():
+            prefix = f'person_dedication_{person_dedication.id}'
+            person_dedication_forms.append(ItemPersonDedicationForm(instance=person_dedication, prefix=prefix))
+        context['person_dedication_forms'] = person_dedication_forms
+
+        # Initialize forms for existing CorporationDedication
+        corporation_dedication_forms = []
+        for corporation_dedication in item.itemcorporationdedication_set.all():
+            prefix = f'corporation_dedication_{corporation_dedication.id}'
+            corporation_dedication_forms.append(ItemCorporationDedicationForm(instance=corporation_dedication, prefix=prefix))
+        context['corporation_dedication_forms'] = corporation_dedication_forms
+
+    q_dedicatee = request.GET.get('dedicatee-q')
+    q_place = request.GET.get('place-q')
+
+    if q_dedicatee:
+        dedicatee_search_form = SearchForm(request.GET, prefix='dedicatee')
+        if dedicatee_search_form.is_valid():
+            context['query_dedicatee'] = dedicatee_search_form.cleaned_data.get('q')
+            context['found_persons'] = dedicatee_search_form.search().models(Person)
+            context['found_corporations'] = dedicatee_search_form.search().models(Corporation)
+    else:
+        dedicatee_search_form = SearchForm(prefix='dedicatee')
+
+    if q_place:
+        place_search_form = SearchForm(request.GET, prefix='place')
+        if place_search_form.is_valid():
+            context['query_place'] = place_search_form.cleaned_data.get('q')
+            context['found_places'] = place_search_form.search().models(Place)
+    else:
+        place_search_form = SearchForm(prefix='place')
+
+    context['dedicatee_search_form'] = dedicatee_search_form
+    context['place_search_form'] = place_search_form
+
+    if request.GET.get('person_dedication_id'):
+        context['person_dedication_id'] = int(request.GET.get('person_dedication_id'))
+    if request.GET.get('corporation_dedication_id'):
+        context['corporation_dedication_id'] = int(request.GET.get('corporation_dedication_id'))
+
+    return render(request, 'edwoca/item_dedication.html', context)
+
+
+def item_person_dedication_add(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    ItemPersonDedication.objects.create(item=item)
+    return redirect('edwoca:item_dedication', pk=pk)
+
+def item_corporation_dedication_add(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    ItemCorporationDedication.objects.create(item=item)
     return redirect('edwoca:item_dedication', pk=pk)
 
 
-def item_remove_dedicatee(request, pk, dedicatee_id):
-    dedicatee = get_object_or_404(Person, pk=dedicatee_id)
-    item = get_object_or_404(Item, pk=pk)
-    item.dedicatees.remove(dedicatee)
+def item_person_dedication_delete(request, pk):
+    dedication = get_object_or_404(ItemPersonDedication, pk=pk)
+    item_pk = dedication.item.pk
+    dedication.delete()
+    return redirect('edwoca:item_dedication', pk=item_pk)
+
+def item_corporation_dedication_delete(request, pk):
+    dedication = get_object_or_404(ItemCorporationDedication, pk=pk)
+    item_pk = dedication.item.pk
+    dedication.delete()
+    return redirect('edwoca:item_dedication', pk=item_pk)
+
+def item_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
+    dedication = get_object_or_404(ItemPersonDedication, pk=dedication_id)
+    person = get_object_or_404(Person, pk=person_id)
+    dedication.dedicatee = person
+    dedication.save()
+    return redirect('edwoca:item_dedication', pk=pk)
+
+def item_person_dedication_remove_dedicatee(request, pk, dedication_id):
+    dedication = get_object_or_404(ItemPersonDedication, pk=dedication_id)
+    dedication.dedicatee = None
+    dedication.save()
+    return redirect('edwoca:item_dedication', pk=pk)
+
+def item_corporation_dedication_add_dedicatee(request, pk, dedication_id, corporation_id):
+    dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
+    corporation = get_object_or_404(Corporation, pk=corporation_id)
+    dedication.dedicatee = corporation
+    dedication.save()
+    return redirect('edwoca:item_dedication', pk=pk)
+
+def item_corporation_dedication_remove_dedicatee(request, pk, dedication_id):
+    dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
+    dedication.dedicatee = None
+    dedication.save()
+    return redirect('edwoca:item_dedication', pk=pk)
+
+def item_dedication_add_place(request, pk, dedication_id, place_id):
+    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
+    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
+    try:
+        dedication = ItemPersonDedication.objects.get(pk=dedication_id)
+    except ItemPersonDedication.DoesNotExist:
+        dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
+    place = get_object_or_404(Place, pk=place_id)
+    dedication.place = place
+    dedication.save()
+    return redirect('edwoca:item_dedication', pk=pk)
+
+def item_dedication_remove_place(request, pk, dedication_id):
+    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
+    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
+    try:
+        dedication = ItemPersonDedication.objects.get(pk=dedication_id)
+    except ItemPersonDedication.DoesNotExist:
+        dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
+    dedication.place = None
+    dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
 
 

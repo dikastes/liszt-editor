@@ -53,11 +53,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             return f"{catalog_number} unbekannt {numerus_currens}"
 
         publisher_addition = self.period
-        if self.plate_number:
-            publisher_addition = self.plate_number
+        if self.publications.first() and self.publications.first().plate_number:
+            publisher_addition = self.publications.first().plate_number
 
-        if self.publisher:
-            return f"{catalog_number}, {self.publisher.get_designator()} {publisher_addition}"
+        if self.publications.first() and self.publications.first().publisher:
+            return f"{catalog_number}, {self.publications.first().publisher.get_designator()} {publisher_addition}"
         return f"{catalog_number}, << Verlag >> {publisher_addition}"
 
     def extract_gnd_id(string):

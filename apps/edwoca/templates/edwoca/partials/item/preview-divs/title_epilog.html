@@ -1,0 +1,23 @@
+<div class="border border-base-300 bg-base-200 p-5 w-full mt-5 flex flex-col gap-2">
+	<div class="prose">
+		{% include 'edwoca/partials/manifestation/preview-paragraphs/history.html' with object=object.manifestation %}
+	</div>
+	<div class="prose">
+		{% include 'edwoca/partials/item/preview-paragraphs/provenance.html' %}
+	</div>
+	<div class="prose">
+		{% include 'edwoca/partials/manifestation/preview-paragraphs/print.html' with object=object.manifestation %}
+	</div>
+	<div class="prose">
+		{% include 'edwoca/partials/item/preview-paragraphs/manuscript.html' %}
+	</div>
+	<div class="prose">
+		{% include 'edwoca/partials/manifestation/preview-paragraphs/bib.html' with object=object.manifestation %}
+	</div>
+	<div class="prose">
+		{% include 'edwoca/partials/item/preview-paragraphs/digital_copy.html' %}
+	</div>
+	<div class="prose">
+		{% include 'edwoca/partials/item/preview-paragraphs/comment.html' %}
+	</div>
+</div>

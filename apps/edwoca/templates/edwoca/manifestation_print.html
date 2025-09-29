@@ -7,43 +7,59 @@
 <div class="bg-white border border-base-300 p-5">
     <h2 class="card-title mt-0"> {{ view_title }} </h2>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_daisy }}
 
-        <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
-    </form>
 
     <div class="mt-5">
-        <h3 class="text-lg font-bold">Verlag</h3>
-        {% if object.publisher %}
-            <div class="flex gap-5">
-                <label class="flex-1 input input-bordered flex items-center gap-2">
-                    Verlag
-                    <input type="text" class="grow" disabled value="{{ object.publisher.get_designator }}" />
-                </label>
-                <a class="flex-0 btn" href="{% url 'edwoca:manifestation_remove_publisher' object.id %}"> löschen </a>
-            </div>
-        {% else %}
-            <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1 flex gap-5">
-                <label class="input input-bordered flex items-center gap-2 flex-1">
-                    Verlag
-                    {{ publisher_searchform.q }}
-                </label>
-                <input type="submit" id="submit-form-publisher" class="btn" value="Suchen"/>
+        <h3 class="text-lg font-bold">Veröffentlichungen</h3>
+        <form method="post">
+            {% csrf_token %}
+            <button class="btn" name="add_publication">Neue Veröffentlichung</button>
+        </form>
+        {% for form in publication_forms %}
+            <form method="post" class="mt-2 flex gap-5 items-end">
+                {% csrf_token %}
+                <div class="flex-1">
+                    {% if form.instance.publisher %}
+                        <label class="input input-bordered flex items-center gap-2 flex-1">
+                            Verlag
+                            <input type="text" class="grow" disabled value="{{ form.instance.publisher.get_designator }}" />
+                        </label>
+                    {% else %}
+                        <form method="get" class="flex-1 flex gap-5">
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                Verlag
+                                <input type="text" name="q" class="grow" />
+                            </label>
+                            <input type="submit" class="btn" value="Suchen"/>
+                        </form>
+                        {% if request.GET.q %}
+                            <ul>
+                            {% for publisher in found_publishers %}
+                                <li>
+                                    <a href="{% url 'edwoca:manifestation_add_publication_publisher' object.id form.instance.id publisher.object.id %}">{{ publisher.object.get_designator }}</a>
+                                </li>
+                            {% empty %}
+                                <li> keine Suchergebnisse </li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+                    {% for field in form %}
+                        {% if field.name == 'publisher' %}
+                            {{ field }}
+                        {% else %}
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                {{ field.label }}
+                                {{ field }}
+                            </label>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <div class="flex-0">
+                    <a href="{% url 'edwoca:manifestation_publication_delete' form.instance.id %}" class="btn">Löschen</a>
+                </div>
             </form>
-            {% if publisher_query %}
-                <ul>
-                {% for publisher in found_publishers %}
-                    <li>
-                        <a href="{% url 'edwoca:manifestation_add_publisher' object.id publisher.object.id %}">{{ publisher.object.get_designator }}</a>
-                    </li>
-                {% empty %}
-                    <li> keine Suchergebnisse </li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        {% endif %}
+        {% endfor %}
     </div>
     {% if not object.is_singleton %}
     <div class="mt-5">
