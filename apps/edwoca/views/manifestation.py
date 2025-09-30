@@ -106,8 +106,10 @@ def manifestation_update(request, pk):
             # Check if a new item should be created based on signature formset data
             if new_signature_formset.is_valid() and new_signature_formset.has_changed():
                 # Create new_item instance
-                new_item.manifestation = manifestation
-                new_item.save()
+                if manifestation.items.count():
+                    new_item = Item.objects.create(manifestation = manifestation)
+                else:
+                    new_item = Item.objects.create(manifestation = manifestation, is_template = True)
 
                 # Associate the signature formset with the newly created item
                 new_signature_formset = SignatureFormSet(request.POST, instance=new_item, prefix='new_signatures')
