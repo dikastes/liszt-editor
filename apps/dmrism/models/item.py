@@ -90,7 +90,7 @@ class Item(WemiBaseClass):
         return self.get_current_signature() + ', vormalig ' + former_string
 
     def get_current_signature(self):
-        return next(self.signatures.filter(status = Signature.Status.CURRENT).iterator(), 'ohne Signatur').__str__()
+        return next(self.signatures.filter(status = BaseSignature.Status.CURRENT).iterator(), 'ohne Signatur').__str__()
 
     def save(self, *args, **kwargs):
         if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
@@ -128,21 +128,18 @@ class Library(models.Model):
         return f"{self.name} ({self.siglum})"
 
 
-class Signature(models.Model):
+class BaseSignature(models.Model):
+    class Meta:
+        abstract = True
+
     class Status(models.TextChoices):
         CURRENT = 'C', _('Current')
         FORMER = 'F', _('Former')
 
-    item = models.ForeignKey(
-            'Item',
-            on_delete = models.CASCADE,
-            related_name = 'signatures',
-            null = True
-        )
     library = models.ForeignKey(
-            'Library',
+            'dmrism.Library',
             on_delete = models.SET_NULL,
-            related_name = 'signatures',
+            related_name = '%(class)s',
             null = True
         )
     signature = models.CharField(
@@ -156,6 +153,18 @@ class Signature(models.Model):
             default=Status.CURRENT
         )
 
+    def __str__(self):
+        return f"{self.library.siglum} {self.signature}"
+
+
+class ItemSignature(BaseSignature):
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE,
+            related_name = 'signatures',
+            null = True
+        )
+
     class Meta:
         constraints = [
             UniqueConstraint(
@@ -164,9 +173,6 @@ class Signature(models.Model):
                 name='unique_current_item_signature'
             )
         ]
-
-    def __str__(self):
-        return f"{self.library.siglum} {self.signature}"
 
 
 class RelatedItem(RelatedEntity):
@@ -194,7 +200,17 @@ class ProvenanceStationRenderMixin:
     def __str__(self):
         owner_string = self.owner or 'unbekannt'
         period_string = self.period or 'ohne Zeitraum'
-        return f'{str(owner_string)} ({str(period_string)})'
+        
+        parts = [f'{str(owner_string)} ({str(period_string)})']
+        
+        if hasattr(self, 'bib') and self.bib:
+            parts.append(f'Bib: {self.bib}')
+        
+        if hasattr(self, 'letters') and self.letters.exists():
+            letter_strings = ', '.join(str(letter) for letter in self.letters.all())
+            parts.append(f'Letter: {letter_strings}')
+            
+        return ' | '.join(parts)
 
 
 class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
@@ -253,7 +269,10 @@ class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             )
 
 
-class DigitalCopy(models.Model):
+class BaseDigitalCopy(models.Model):
+    class Meta:
+        abstract = True
+
     class LinkType(models.TextChoices):
         DIGITIZED = 'Dig', _('Digitized')
         IIIF_MANIFEST = 'IIIF', _('IIIF Manifest')
@@ -265,11 +284,6 @@ class DigitalCopy(models.Model):
                 return DigitalCopy.LinkType.DIGITIZED
             return None
 
-    item = models.ForeignKey(
-            'Item',
-            on_delete = models.CASCADE,
-            related_name = 'digital_copies'
-        )
     url = models.URLField()
     link_type = models.TextField(
             max_length = 20,
@@ -277,6 +291,14 @@ class DigitalCopy(models.Model):
             blank = True,
             choices=LinkType,
             default=LinkType.DIGITIZED
+        )
+
+
+class ItemDigitalCopy(BaseDigitalCopy):
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE,
+            related_name = 'digital_copies'
         )
 
 

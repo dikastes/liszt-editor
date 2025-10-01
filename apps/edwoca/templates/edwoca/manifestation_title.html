@@ -358,7 +358,7 @@
 
     <div class="mt-5">
         <h3 class="text-lg font-bold">Personenwidmungen</h3>
-        {% for person_dedication in object.manifestationpersondedication_set.all %}
+        {% for person_dedication in object.manifestation_person_dedications.all %}
             <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
                 <div class="flex-1 m-0">
                     <p class="font-bold">{{ person_dedication.dedicatee }}</p>
@@ -381,7 +381,7 @@
 
     <div class="mt-5">
         <h3 class="text-lg font-bold">Körperschaftswidmungen</h3>
-        {% for corporation_dedication in object.manifestationcorporationdedication_set.all %}
+        {% for corporation_dedication in object.manifestation_corporation_dedications.all %}
             <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
                 <div class="flex-1 m-0">
                     <p class="font-bold">{{ corporation_dedication.dedicatee }}</p>

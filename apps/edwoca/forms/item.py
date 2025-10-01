@@ -26,7 +26,7 @@ from django.utils.safestring import mark_safe
 
 class SignatureForm(ModelForm):
     class Meta:
-        model = Signature
+        model = ItemSignature
         fields = ['library', 'signature', 'status', 'id']
         widgets = {
                 'library': Select( attrs = {
@@ -81,7 +81,7 @@ class SignatureForm(ModelForm):
 
 SignatureFormSet = inlineformset_factory(
         Item,
-        Signature,
+        ItemSignature,
         form = SignatureForm,
         extra = 0,
         max_num = 100,
@@ -90,7 +90,7 @@ SignatureFormSet = inlineformset_factory(
 
 NewItemSignatureFormSet = inlineformset_factory(
         Item,
-        Signature,
+        ItemSignature,
         form = SignatureForm,
         extra = 1,
         max_num = 1,
@@ -335,7 +335,7 @@ class LibraryForm(ModelForm):
 
 class ItemDigitizedCopyForm(ModelForm, SimpleFormMixin):
     class Meta:
-        model = DigitalCopy
+        model = ItemDigitalCopy
         fields = ['url', 'link_type', 'item']
         widgets = {
             'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes}),

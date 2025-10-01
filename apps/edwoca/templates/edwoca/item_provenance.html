@@ -7,34 +7,86 @@
             <div class="modal-box w-11/12 max-w-5xl">
                 <h3 class="text-lg font-bold">Personen-Provenienz bearbeiten</h3>
 
+                <h3 class="text-lg font-bold">Verknüpfte Literatur</h3>
                 {% if pps_form.instance.bib %}
-                    <div class="flex gap-5 items-center">
-                        <label class="input input-bordered flex-1 flex items-center gap-2">
-                            Literatur
-                            <input type="text" class="grow" disabled value="{{ pps_form.instance.bib }}" />
-                        </label>
-                        <a class="btn" href="{% url 'edwoca:person_provenance_remove_bib' object.id pps_form.instance.id %}">Entfernen</a>
-                    </div>
+                    <ul>
+                        <li>
+                            <div class="flex gap-5 items-center">
+                                <label class="input input-bordered flex-1 flex items-center gap-2">
+                                    Literatur
+                                    <input type="text" class="grow" disabled value="{{ pps_form.instance.bib }}" />
+                                </label>
+                                <form method="post" action="{% url 'edwoca:person_provenance_remove_bib' object.id pps_form.instance.id %}" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-small" value="entfernen">
+                                </form>
+                            </div>
+                        </li>
+                    </ul>
                 {% else %}
-                    <form method="get" class="flex-1 flex gap-5">
-                        <label class="input input-bordered flex items-center gap-2 flex-1">
-                            Literatur-Suche
-                            {{ bib_search_form.q }}
-                        </label>
-                        <input type="submit" class="btn" value="Suchen"/>
-                    </form>
-                    {% if found_bibs %}
-                        <h3 class="text-lg font-bold mt-5">Bib-Datensätze</h3>
-                        <ul>
-                        {% for bib in found_bibs %}
-                            <li>
-                                <a href="{% url 'edwoca:person_provenance_add_bib' object.id pps_form.instance.id bib.pk %}">{{ bib.object }}</a>
-                            </li>
-                        {% empty %}
-                            <li>Keine Bib-Datensätze gefunden</li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
+                    <ul>
+                        <li> <em> keine Literatur verknüpft </em> </li>
+                    </ul>
+                {% endif %}
+
+                <form method="get" class="flex-1 flex gap-5 mt-5">
+                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                        Literatur-Suche
+                        {{ bib_search_form.q }}
+                    </label>
+                    <input type="submit" class="btn" value="Suchen"/>
+                </form>
+                {% if found_bibs %}
+                    <h3 class="text-lg font-bold mt-5">Bib-Datensätze</h3>
+                    <ul>
+                    {% for bib in found_bibs %}
+                        <li>
+                            <a href="{% url 'edwoca:person_provenance_add_bib' object.id pps_form.instance.id bib.pk %}">{{ bib.object }}</a>
+                        </li>
+                    {% empty %}
+                        <li>Keine Bib-Datensätze gefunden</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <h3 class="text-lg font-bold mt-5">Verknüpfte Briefe</h3>
+                <ul>
+                {% for letter in pps_form.instance.letters.all %}
+                    <li>
+                        <div class="flex gap-5 items-center mt-5">
+                            <label class="input input-bordered flex-1 flex items-center gap-2">
+                                Brief
+                                <input type="text" class="grow" disabled value="{{ letter }}" />
+                            </label>
+                            <form method="post" action="{% url 'edwoca:person_provenance_remove_letter' object.id pps_form.instance.id letter.id %}" class="flex-0">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-small" value="entfernen">
+                            </form>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li> <em> keine Briefe verknüpft </em> </li>
+                {% endfor %}
+                </ul>
+
+                <form method="get" class="flex-1 flex gap-5 mt-5">
+                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                        Brief-Suche
+                        {{ letter_search_form.q }}
+                    </label>
+                    <input type="submit" class="btn" value="Suchen"/>
+                </form>
+                {% if found_letters %}
+                    <h3 class="text-lg font-bold mt-5">Briefe</h3>
+                    <ul>
+                    {% for letter in found_letters %}
+                        <li>
+                            <a href="{% url 'edwoca:person_provenance_add_letter' object.id pps_form.instance.id letter.pk %}">{{ letter.object }}</a>
+                        </li>
+                    {% empty %}
+                        <li>Keine Briefe gefunden</li>
+                    {% endfor %}
+                    </ul>
                 {% endif %}
 
                 {% if pps_form.instance.owner %}
@@ -90,34 +142,87 @@
             <div class="modal-box w-11/12 max-w-5xl">
                 <h3 class="text-lg font-bold">Körperschafts-Provenienz bearbeiten</h3>
 
+                <h3 class="text-lg font-bold">Verknüpfte Literatur</h3>
+                <h3 class="text-lg font-bold">Verknüpfte Literatur</h3>
                 {% if cps_form.instance.bib %}
-                    <div class="flex gap-5 items-center">
-                        <label class="input input-bordered flex-1 flex items-center gap-2">
-                            Literatur
-                            <input type="text" class="grow" disabled value="{{ cps_form.instance.bib }}" />
-                        </label>
-                        <a class="btn" href="{% url 'edwoca:corporation_provenance_remove_bib' object.id cps_form.instance.id %}">Entfernen</a>
-                    </div>
+                    <ul>
+                        <li>
+                            <div class="flex gap-5 items-center">
+                                <label class="input input-bordered flex-1 flex items-center gap-2">
+                                    Literatur
+                                    <input type="text" class="grow" disabled value="{{ cps_form.instance.bib }}" />
+                                </label>
+                                <form method="post" action="{% url 'edwoca:corporation_provenance_remove_bib' object.id cps_form.instance.id %}" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-small" value="entfernen">
+                                </form>
+                            </div>
+                        </li>
+                    </ul>
                 {% else %}
-                    <form method="get" class="flex-1 flex gap-5">
-                        <label class="input input-bordered flex items-center gap-2 flex-1">
-                            Literatur-Suche
-                            {{ bib_search_form.q }}
-                        </label>
-                        <input type="submit" class="btn" value="Suchen"/>
-                    </form>
-                    {% if found_bibs %}
-                        <h3 class="text-lg font-bold mt-5">Bib-Datensätze</h3>
-                        <ul>
-                        {% for bib in found_bibs %}
-                            <li>
-                                <a href="{% url 'edwoca:corporation_provenance_add_bib' object.id cps_form.instance.id bib.pk %}">{{ bib.object }}</a>
-                            </li>
-                        {% empty %}
-                            <li>Keine Bib-Datensätze gefunden</li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
+                    <ul>
+                        <li> <em> keine Literatur verknüpft </em> </li>
+                    </ul>
+                {% endif %}
+
+                <form method="get" class="flex-1 flex gap-5 mt-5">
+                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                        Literatur-Suche
+                        {{ bib_search_form.q }}
+                    </label>
+                    <input type="submit" class="btn" value="Suchen"/>
+                </form>
+                {% if found_bibs %}
+                    <h3 class="text-lg font-bold mt-5">Bib-Datensätze</h3>
+                    <ul>
+                    {% for bib in found_bibs %}
+                        <li>
+                            <a href="{% url 'edwoca:corporation_provenance_add_bib' object.id cps_form.instance.id bib.pk %}">{{ bib.object }}</a>
+                        </li>
+                    {% empty %}
+                        <li>Keine Bib-Datensätze gefunden</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+
+                <h3 class="text-lg font-bold mt-5">Verknüpfte Briefe</h3>
+                <ul>
+                {% for letter in cps_form.instance.letters.all %}
+                    <li>
+                        <div class="flex gap-5 items-center mt-5">
+                            <label class="input input-bordered flex-1 flex items-center gap-2">
+                                Brief
+                                <input type="text" class="grow" disabled value="{{ letter }}" />
+                            </label>
+                            <form method="post" action="{% url 'edwoca:corporation_provenance_remove_letter' object.id cps_form.instance.id letter.id %}" class="flex-0">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-small" value="entfernen">
+                            </form>
+                        </div>
+                    </li>
+                {% empty %}
+                    <li> <em> keine Briefe verknüpft </em> </li>
+                {% endfor %}
+                </ul>
+
+                <form method="get" class="flex-1 flex gap-5 mt-5">
+                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                        Brief-Suche
+                        {{ letter_search_form.q }}
+                    </label>
+                    <input type="submit" class="btn" value="Suchen"/>
+                </form>
+                {% if found_letters %}
+                    <h3 class="text-lg font-bold mt-5">Briefe</h3>
+                    <ul>
+                    {% for letter in found_letters %}
+                        <li>
+                            <a href="{% url 'edwoca:corporation_provenance_add_letter' object.id cps_form.instance.id letter.pk %}">{{ letter.object }}</a>
+                        </li>
+                    {% empty %}
+                        <li>Keine Briefe gefunden</li>
+                    {% endfor %}
+                    </ul>
                 {% endif %}
 
                 {% if cps_form.instance.owner %}

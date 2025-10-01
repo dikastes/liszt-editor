@@ -1,11 +1,11 @@
 from .base import *
 from ..rism_tools import get_rism_data
-from .item import DigitalCopy
+from .item import ItemDigitalCopy
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from .item import Item, Signature, Library
+from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
 from bib.models import ZotItem
 from iso639 import find as lang_find
@@ -335,9 +335,9 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             library.save()
 
         if self.items.count() == 0:
-            signature = Signature.objects.create(
+            signature = ItemSignature.objects.create(
                     library = library,
-                    status = Signature.Status.CURRENT,
+                    status = BaseSignature.Status.CURRENT,
                     signature = location.get('c')
                 )
             item = Item.objects.create(
@@ -346,9 +346,9 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             item.signatures.add(signature)
 
             if location.get('d'):
-                signature = Signature.objects.create(
+                signature = ItemSignature.objects.create(
                         library = library,
-                        status = Signature.Status.FORMER,
+                        status = BaseSignature.Status.FORMER,
                         signature = location.get('d')
                     )
                 item.signatures.add(signature)
@@ -418,10 +418,10 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 )
 
         for electronic_location in data.get_fields('856'):
-            DigitalCopy.objects.create(
+            ItemDigitalCopy.objects.create(
                     item = self.items.all()[0],
                     url = electronic_location.get('u'),
-                    link_type = DigitalCopy.LinkType.parse(electronic_location.get('x'))
+                    link_type = BaseDigitalCopy.LinkType.parse(electronic_location.get('x'))
                 )
 
         general_notes = data.get_fields('500')

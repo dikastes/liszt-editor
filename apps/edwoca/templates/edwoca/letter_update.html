@@ -1,0 +1,264 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+<div class="bg-white border border-base-300 p-5">
+    <h2 class="card-title mt-0 flex-1">Brief bearbeiten</h2>
+
+    <form method="post" class="mt-5">
+        {% csrf_token %}
+        {{ form.as_daisy }}
+        <input type="submit" value="Speichern" class="hidden" id="submit-form">
+    </form>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mt-5">
+    <h2 class="card-title mt-0 flex-1">Beziehungen</h2>
+
+    <div class="grid grid-cols-2 gap-5">
+        <div>
+            <h3 class="text-lg font-bold">Absender (Person)</h3>
+            {% if object.sender_person %}
+                <div class="flex gap-5 items-center mb-10">
+                    <label class="input input-bordered flex-1 flex items-center gap-2">
+                        Absender
+                        <input type="text" class="grow" disabled value="{{ object.sender_person }}" />
+                    </label>
+                    <a class="btn" href="{% url 'edwoca:letter_remove_sender_person' object.id %}">Entfernen</a>
+                </div>
+            {% else %}
+                <div class="mb-10">
+                    <div class="items-center">
+                        <form method="get" class="flex gap-5">
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                Absender
+                                <input type="text" name="sender-person-q" class="grow" {% if query_sender_person %}value="{{ query_sender_person }}"{% endif %}>
+                            </label>
+                            <input type="submit" class="btn flex-0" value="Suchen"/>
+                        </form>
+                    </div>
+                    {% if query_sender_person %}
+                        <ul>
+                        {% for person in found_sender_persons %}
+                            <li>
+                                <a href="{% url 'edwoca:letter_add_sender_person' object.id person.pk %}">{{ person.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Suchergebnisse</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h3 class="text-lg font-bold">Empfänger (Person)</h3>
+            {% if object.receiver_person %}
+                <div class="flex gap-5 items-center mb-10">
+                    <label class="input input-bordered flex-1 flex items-center gap-2">
+                        Empfänger
+                        <input type="text" class="grow" disabled value="{{ object.receiver_person }}" />
+                    </label>
+                    <a class="btn" href="{% url 'edwoca:letter_remove_receiver_person' object.id %}">Entfernen</a>
+                </div>
+            {% else %}
+                <div class="mb-10">
+                    <div class="items-center">
+                        <form method="get" class="flex gap-5">
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                Empfänger
+                                <input type="text" name="receiver-person-q" class="grow" {% if query_receiver_person %}value="{{ query_receiver_person }}"{% endif %}>
+                            </label>
+                            <input type="submit" class="btn flex-0" value="Suchen"/>
+                        </form>
+                    </div>
+                    {% if query_receiver_person %}
+                        <ul>
+                        {% for person in found_receiver_persons %}
+                            <li>
+                                <a href="{% url 'edwoca:letter_add_receiver_person' object.id person.pk %}">{{ person.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Suchergebnisse</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h3 class="text-lg font-bold">Absender (Körperschaft)</h3>
+            {% if object.sender_corporation %}
+                <div class="flex gap-5 items-center mb-10">
+                    <label class="input input-bordered flex-1 flex items-center gap-2">
+                        Absender
+                        <input type="text" class="grow" disabled value="{{ object.sender_corporation }}" />
+                    </label>
+                    <a class="btn" href="{% url 'edwoca:letter_remove_sender_corporation' object.id %}">Entfernen</a>
+                </div>
+            {% else %}
+                <div class="mb-10">
+                    <div class="items-center">
+                        <form method="get" class="flex gap-5">
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                Absender
+                                <input type="text" name="sender-corporation-q" class="grow" {% if query_sender_corporation %}value="{{ query_sender_corporation }}"{% endif %}>
+                            </label>
+                            <input type="submit" class="btn flex-0" value="Suchen"/>
+                        </form>
+                    </div>
+                    {% if query_sender_corporation %}
+                        <ul>
+                        {% for corporation in found_sender_corporations %}
+                            <li>
+                                <a href="{% url 'edwoca:letter_add_sender_corporation' object.id corporation.pk %}">{{ corporation.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Suchergebnisse</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h3 class="text-lg font-bold">Empfänger (Körperschaft)</h3>
+            {% if object.receiver_corporation %}
+                <div class="flex gap-5 items-center mb-10">
+                    <label class="input input-bordered flex-1 flex items-center gap-2">
+                        Empfänger
+                        <input type="text" class="grow" disabled value="{{ object.receiver_corporation }}" />
+                    </label>
+                    <a class="btn" href="{% url 'edwoca:letter_remove_receiver_corporation' object.id %}">Entfernen</a>
+                </div>
+            {% else %}
+                <div class="mb-10">
+                    <div class="items-center">
+                        <form method="get" class="flex gap-5">
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                Empfänger
+                                <input type="text" name="receiver-corporation-q" class="grow" {% if query_receiver_corporation %}value="{{ query_receiver_corporation }}"{% endif %}>
+                            </label>
+                            <input type="submit" class="btn flex-0" value="Suchen"/>
+                        </form>
+                    </div>
+                    {% if query_receiver_corporation %}
+                        <ul>
+                        {% for corporation in found_receiver_corporations %}
+                            <li>
+                                <a href="{% url 'edwoca:letter_add_receiver_corporation' object.id corporation.pk %}">{{ corporation.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Suchergebnisse</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h3 class="text-lg font-bold">Absendeort</h3>
+            {% if object.sender_place %}
+                <div class="flex gap-5 items-center mb-10">
+                    <label class="input input-bordered flex-1 flex items-center gap-2">
+                        Absendeort
+                        <input type="text" class="grow" disabled value="{{ object.sender_place }}" />
+                    </label>
+                    <a class="btn" href="{% url 'edwoca:letter_remove_sender_place' object.id %}">Entfernen</a>
+                </div>
+            {% else %}
+                <div class="mb-10">
+                    <div class="items-center">
+                        <form method="get" class="flex gap-5">
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                Absendeort
+                                <input type="text" name="sender-place-q" class="grow" {% if query_sender_place %}value="{{ query_sender_place }}"{% endif %}>
+                            </label>
+                            <input type="submit" class="btn flex-0" value="Suchen"/>
+                        </form>
+                    </div>
+                    {% if query_sender_place %}
+                        <ul>
+                        {% for place in found_sender_places %}
+                            <li>
+                                <a href="{% url 'edwoca:letter_add_sender_place' object.id place.pk %}">{{ place.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Suchergebnisse</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+        <div>
+            <h3 class="text-lg font-bold">Empfangsort</h3>
+            {% if object.receiver_place %}
+                <div class="flex gap-5 items-center mb-10">
+                    <label class="input input-bordered flex-1 flex items-center gap-2">
+                        Empfangsort
+                        <input type="text" class="grow" disabled value="{{ object.receiver_place }}" />
+                    </label>
+                    <a class="btn" href="{% url 'edwoca:letter_remove_receiver_place' object.id %}">Entfernen</a>
+                </div>
+            {% else %}
+                <div class="mb-10">
+                    <div class="items-center">
+                        <form method="get" class="flex gap-5">
+                            <label class="input input-bordered flex items-center gap-2 flex-1">
+                                Empfangsort
+                                <input type="text" name="receiver-place-q" class="grow" {% if query_receiver_place %}value="{{ query_receiver_place }}"{% endif %}>
+                            </label>
+                            <input type="submit" class="btn flex-0" value="Suchen"/>
+                        </form>
+                    </div>
+                    {% if query_receiver_place %}
+                        <ul>
+                        {% for place in found_receiver_places %}
+                            <li>
+                                <a href="{% url 'edwoca:letter_add_receiver_place' object.id place.pk %}">{{ place.object }}</a>
+                            </li>
+                        {% empty %}
+                            <li>Keine Suchergebnisse</li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div>
+        <h3 class="text-lg font-bold">Editionen</h3>
+        {% for edition in object.edition.all %}
+            <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
+                <div class="flex-1 m-0">
+                    <p class="font-bold">{{ edition }}</p>
+                </div>
+                <a href="{% url 'edwoca:letter_remove_edition' object.id edition.id %}" class="btn flex-0"> Entfernen </a>
+            </div>
+        {% endfor %}
+        <div class="mb-10">
+            <div class="items-center">
+                <form method="get" class="flex gap-5">
+                    <label class="input input-bordered flex items-center gap-2 flex-1">
+                        Edition
+                        <input type="text" name="edition-q" class="grow" {% if query_edition %}value="{{ query_edition }}"{% endif %}>
+                    </label>
+                    <input type="submit" class="btn flex-0" value="Suchen"/>
+                </form>
+            </div>
+            {% if query_edition %}
+                <ul>
+                {% for edition in found_editions %}
+                    <li>
+                        <a href="{% url 'edwoca:letter_add_edition' object.id edition.pk %}">{{ edition.object }}</a>
+                    </li>
+                {% empty %}
+                    <li>Keine Suchergebnisse</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,13 +1,15 @@
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView
-from django.views.generic.edit import UpdateView, FormView
+from django.views.generic.edit import UpdateView, FormView, CreateView, DeleteView
 from django.db.models import Case, When
 from liszt_util.forms import SearchForm
-from dmad_on_django.models import Person, Status
+from dmad_on_django.models import Person, Status, Corporation, Place
+from bib.models import ZotItem
+from ..forms import LetterForm
 from liszt_util.tools import snake_to_camel_case, camel_to_snake_case
 from haystack.generic_views import SearchView
-from ..models import Work, Expression, Manifestation, Item
+from ..models import Work, Expression, Manifestation, Item, Letter
 from dmrism.models import Library
 from edwoca import forms as edwoca_forms
 from edwoca import models as edwoca_models
@@ -29,6 +31,7 @@ class EdwocaListView(ListView):
         context['manifestation_count'] = Manifestation.objects.count()
         context['item_count'] = Item.objects.count()
         context['library_count'] = Library.objects.count()
+        context['letter_count'] = Letter.objects.count()
         context['list_entity_type'] = self.model.__name__.lower()
         return context
 
@@ -69,6 +72,7 @@ class EdwocaSearchView(SearchView):
         context['manifestation_count'] = Manifestation.objects.count()
         context['item_count'] = Item.objects.count()
         context['library_count'] = Library.objects.count()
+        context['letter_count'] = Letter.objects.count()
         context['object_list'] = [ result.object for result in SearchForm(self.request.GET).search().models(self.model) ]
         context['list_entity_type'] = self.get_model_name().lower()
 
@@ -259,3 +263,206 @@ class ContributorAddView(EntityMixin, FormView):
     def form_valid(self, form):
         form.save()
         return super().form_valid(form)
+
+
+class LetterListView(EdwocaListView):
+    model = Letter
+
+
+class LetterSearchView(EdwocaSearchView):
+    model = Letter
+
+
+class LetterCreateView(CreateView):
+    model = Letter
+    template_name = 'edwoca/simple_form.html'
+    form_class = LetterForm
+
+
+class LetterDeleteView(DeleteView):
+    model = Letter
+    template_name = 'edwoca/simple_form.html'
+
+
+
+def letter_update(request, pk):
+    letter = get_object_or_404(Letter, pk=pk)
+    context = {
+        'object': letter,
+        'entity_type': 'letter'
+    }
+
+    if request.method == 'POST':
+        form = LetterForm(request.POST, instance=letter)
+        if form.is_valid():
+            form.save()
+            return redirect('edwoca:letter_update', pk=pk)
+    else:
+        form = LetterForm(instance=letter)
+
+    context['form'] = form
+
+    # Search forms
+    q_sender_person = request.GET.get('sender-person-q')
+    q_receiver_person = request.GET.get('receiver-person-q')
+    q_sender_corporation = request.GET.get('sender-corporation-q')
+    q_receiver_corporation = request.GET.get('receiver-corporation-q')
+    q_sender_place = request.GET.get('sender-place-q')
+    q_receiver_place = request.GET.get('receiver-place-q')
+    q_edition = request.GET.get('edition-q')
+
+    if q_sender_person:
+        sender_person_search_form = SearchForm(request.GET, prefix='sender-person')
+        if sender_person_search_form.is_valid():
+            context['query_sender_person'] = sender_person_search_form.cleaned_data.get('q')
+            context['found_sender_persons'] = sender_person_search_form.search().models(Person)
+    else:
+        sender_person_search_form = SearchForm(prefix='sender-person')
+
+    if q_receiver_person:
+        receiver_person_search_form = SearchForm(request.GET, prefix='receiver-person')
+        if receiver_person_search_form.is_valid():
+            context['query_receiver_person'] = receiver_person_search_form.cleaned_data.get('q')
+            context['found_receiver_persons'] = receiver_person_search_form.search().models(Person)
+    else:
+        receiver_person_search_form = SearchForm(prefix='receiver-person')
+
+    if q_sender_corporation:
+        sender_corporation_search_form = SearchForm(request.GET, prefix='sender-corporation')
+        if sender_corporation_search_form.is_valid():
+            context['query_sender_corporation'] = sender_corporation_search_form.cleaned_data.get('q')
+            context['found_sender_corporations'] = sender_corporation_search_form.search().models(Corporation)
+    else:
+        sender_corporation_search_form = SearchForm(prefix='sender-corporation')
+
+    if q_receiver_corporation:
+        receiver_corporation_search_form = SearchForm(request.GET, prefix='receiver-corporation')
+        if receiver_corporation_search_form.is_valid():
+            context['query_receiver_corporation'] = receiver_corporation_search_form.cleaned_data.get('q')
+            context['found_receiver_corporations'] = receiver_corporation_search_form.search().models(Corporation)
+    else:
+        receiver_corporation_search_form = SearchForm(prefix='receiver-corporation')
+
+    if q_sender_place:
+        sender_place_search_form = SearchForm(request.GET, prefix='sender-place')
+        if sender_place_search_form.is_valid():
+            context['query_sender_place'] = sender_place_search_form.cleaned_data.get('q')
+            context['found_sender_places'] = sender_place_search_form.search().models(Place)
+    else:
+        sender_place_search_form = SearchForm(prefix='sender-place')
+
+    if q_receiver_place:
+        receiver_place_search_form = SearchForm(request.GET, prefix='receiver-place')
+        if receiver_place_search_form.is_valid():
+            context['query_receiver_place'] = receiver_place_search_form.cleaned_data.get('q')
+            context['found_receiver_places'] = receiver_place_search_form.search().models(Place)
+    else:
+        receiver_place_search_form = SearchForm(prefix='receiver-place')
+
+    if q_edition:
+        edition_search_form = SearchForm(request.GET, prefix='edition')
+        if edition_search_form.is_valid():
+            context['query_edition'] = edition_search_form.cleaned_data.get('q')
+            context['found_editions'] = edition_search_form.search().models(ZotItem)
+    else:
+        edition_search_form = SearchForm(prefix='edition')
+
+    context['sender_person_search_form'] = sender_person_search_form
+    context['receiver_person_search_form'] = receiver_person_search_form
+    context['sender_corporation_search_form'] = sender_corporation_search_form
+    context['receiver_corporation_search_form'] = receiver_corporation_search_form
+    context['sender_place_search_form'] = sender_place_search_form
+    context['receiver_place_search_form'] = receiver_place_search_form
+    context['edition_search_form'] = edition_search_form
+
+    return render(request, 'edwoca/letter_update.html', context)
+
+def letter_add_sender_person(request, pk, person_id):
+    letter = get_object_or_404(Letter, pk=pk)
+    person = get_object_or_404(Person, pk=person_id)
+    letter.sender_person = person
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_remove_sender_person(request, pk):
+    letter = get_object_or_404(Letter, pk=pk)
+    letter.sender_person = None
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_add_receiver_person(request, pk, person_id):
+    letter = get_object_or_404(Letter, pk=pk)
+    person = get_object_or_404(Person, pk=person_id)
+    letter.receiver_person = person
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_remove_receiver_person(request, pk):
+    letter = get_object_or_404(Letter, pk=pk)
+    letter.receiver_person = None
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_add_sender_corporation(request, pk, corporation_id):
+    letter = get_object_or_404(Letter, pk=pk)
+    corporation = get_object_or_404(Corporation, pk=corporation_id)
+    letter.sender_corporation = corporation
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_remove_sender_corporation(request, pk):
+    letter = get_object_or_404(Letter, pk=pk)
+    letter.sender_corporation = None
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_add_receiver_corporation(request, pk, corporation_id):
+    letter = get_object_or_404(Letter, pk=pk)
+    corporation = get_object_or_404(Corporation, pk=corporation_id)
+    letter.receiver_corporation = corporation
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_remove_receiver_corporation(request, pk):
+    letter = get_object_or_404(Letter, pk=pk)
+    letter.receiver_corporation = None
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_add_sender_place(request, pk, place_id):
+    letter = get_object_or_404(Letter, pk=pk)
+    place = get_object_or_404(Place, pk=place_id)
+    letter.sender_place = place
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_remove_sender_place(request, pk):
+    letter = get_object_or_404(Letter, pk=pk)
+    letter.sender_place = None
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_add_receiver_place(request, pk, place_id):
+    letter = get_object_or_404(Letter, pk=pk)
+    place = get_object_or_404(Place, pk=place_id)
+    letter.receiver_place = place
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_remove_receiver_place(request, pk):
+    letter = get_object_or_404(Letter, pk=pk)
+    letter.receiver_place = None
+    letter.save()
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_add_edition(request, pk, zotitem_id):
+    letter = get_object_or_404(Letter, pk=pk)
+    zotitem = get_object_or_404(ZotItem, pk=zotitem_id)
+    letter.edition.add(zotitem)
+    return redirect('edwoca:letter_update', pk=pk)
+
+def letter_remove_edition(request, pk, zotitem_id):
+    letter = get_object_or_404(Letter, pk=pk)
+    zotitem = get_object_or_404(ZotItem, pk=zotitem_id)
+    letter.edition.remove(zotitem)
+    return redirect('edwoca:letter_update', pk=pk)

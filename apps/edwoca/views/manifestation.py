@@ -2,8 +2,8 @@ from ..forms.manifestation import *
 from ..forms.item import SignatureFormSet, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
 from ..forms.publication import PublicationForm
 from ..forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
-from ..models import Manifestation as EdwocaManifestation
-from ..models import ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
+from ..models import Manifestation as EdwocaManifestation, Letter
+from ..models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from .base import *
 from bib.models import ZotItem
 from django.forms import inlineformset_factory
@@ -13,7 +13,7 @@ from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Place, Corporation, Status, Person
-from dmrism.models.item import Signature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting
+from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting
 from dmrism.models.manifestation import Manifestation as DmrismManifestation, Publication, ManifestationPersonDedication, ManifestationCorporationDedication
 from dmrism.models.manifestation import ManifestationBib
 
@@ -41,7 +41,7 @@ def manifestation_create(request):
             item = Item.objects.create(manifestation=manifestation)
 
             library = form.cleaned_data['library']
-            signature = Signature.objects.create(
+            signature = ItemSignature.objects.create(
                 library=library,
                 signature=form.cleaned_data['signature']
             )
@@ -488,6 +488,20 @@ class ManifestationBibDeleteView(DeleteView):
         return reverse_lazy('edwoca:manifestation_bibliography', kwargs={'pk': self.object.manifestation.id})
 
 
+def manifestation_letter_add(request, pk, letter_pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    letter = get_object_or_404(Letter, pk=letter_pk)
+    letter.manifestation.add(manifestation)
+    return redirect('edwoca:manifestation_bibliography', pk=pk)
+
+
+def manifestation_letter_remove(request, pk, letter_pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    letter = get_object_or_404(Letter, pk=letter_pk)
+    letter.manifestation.remove(manifestation)
+    return redirect('edwoca:manifestation_bibliography', pk=pk)
+
+
 class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
     model = Manifestation
     form_class = ManifestationBibForm
@@ -499,13 +513,23 @@ class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        search_form = SearchForm(self.request.GET or None)
-        context['searchform'] = search_form
-        context['show_search_form'] = True
+        
+        zotitem_search_form = SearchForm(self.request.GET or None, prefix='zotitem')
+        context['zotitem_searchform'] = zotitem_search_form
+        context['show_zotitem_search_form'] = True
 
-        if search_form.is_valid() and search_form.cleaned_data.get('q'):
-            context['query'] = search_form.cleaned_data.get('q')
-            context[f"found_bibs"] = search_form.search().models(ZotItem)
+        if zotitem_search_form.is_valid() and zotitem_search_form.cleaned_data.get('q'):
+            context['zotitem_query'] = zotitem_search_form.cleaned_data.get('q')
+            context[f"found_bibs"] = zotitem_search_form.search().models(ZotItem)
+
+        letter_search_form = SearchForm(self.request.GET or None, prefix='letter')
+        context['letter_searchform'] = letter_search_form
+        context['show_letter_search_form'] = True
+
+        if letter_search_form.is_valid() and letter_search_form.cleaned_data.get('q'):
+            context['letter_query'] = letter_search_form.cleaned_data.get('q')
+            context[f"found_letters"] = letter_search_form.search().models(Letter)
+
         return context
 
 
@@ -672,6 +696,16 @@ def manifestation_provenance(request, pk):
     context['bib_search_form'] = bib_search_form
     context['owner_search_form'] = owner_search_form
 
+    q_letter = request.GET.get('letter-q')
+    if q_letter:
+        letter_search_form = SearchForm(request.GET, prefix='letter')
+        if letter_search_form.is_valid():
+            context['query_letter'] = letter_search_form.cleaned_data.get('q')
+            context['found_letters'] = letter_search_form.search().models(Letter)
+    else:
+        letter_search_form = SearchForm(prefix='letter')
+    context['letter_search_form'] = letter_search_form
+
     return render(request, 'edwoca/manifestation_provenance.html', context)
 
 
@@ -818,6 +852,18 @@ def person_provenance_remove_bib(request, pk, pps_id):
     pps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
+def person_provenance_add_letter(request, pk, pps_id, letter_pk):
+    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    letter = get_object_or_404(Letter, pk=letter_pk)
+    letter.person_provenance.add(pps)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+def person_provenance_remove_letter(request, pk, pps_id, letter_pk):
+    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    letter = get_object_or_404(Letter, pk=letter_pk)
+    letter.person_provenance.remove(pps)
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
 
 def corporation_provenance_remove_owner(request, pk, cps_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
@@ -827,10 +873,59 @@ def corporation_provenance_remove_owner(request, pk, cps_id):
 
 
 def corporation_provenance_remove_bib(request, pk, cps_id):
+
+
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+
+
     cps.bib = None
+
+
     cps.save()
+
+
     return redirect('edwoca:manifestation_provenance', pk=pk)
+
+
+
+
+
+def corporation_provenance_add_letter(request, pk, cps_id, letter_pk):
+
+
+    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+
+
+    letter = get_object_or_404(Letter, pk=letter_pk)
+
+
+    letter.corporation_provenance.add(cps)
+
+
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+
+
+
+
+def corporation_provenance_remove_letter(request, pk, cps_id, letter_pk):
+
+
+    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+
+
+    letter = get_object_or_404(Letter, pk=letter_pk)
+
+
+    letter.corporation_provenance.remove(cps)
+
+
+    return redirect('edwoca:manifestation_provenance', pk=pk)
+
+
+
+
+
 
 
 
@@ -863,12 +958,12 @@ def manifestation_digital_copy(request, pk):
 def manifestation_digital_copy_add(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     item = manifestation.items.first()
-    DigitalCopy.objects.create(item=item)
+    ItemDigitalCopy.objects.create(item=item)
     return redirect('edwoca:manifestation_digital_copy', pk=pk)
 
 
 class ManifestationDigitalCopyDeleteView(DeleteView):
-    model = DigitalCopy
+    model = ItemDigitalCopy
 
     def get_success_url(self):
         manifestation = self.object.item.manifestation

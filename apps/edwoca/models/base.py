@@ -1,13 +1,15 @@
 from django.conf import settings
 from django.db import models
+from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, Signature, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, DigitalCopy
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
 from re import compile, split
+
 
 class EdwocaUpdateUrlMixin:
     def get_absolute_url(self):
@@ -212,18 +214,18 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         library = Library.objects.filter(siglum = raw_data[INSTITUTION_KEY]).first() or \
             Library.objects.create(siglum = raw_data[INSTITUTION_KEY])
-        signature = Signature.objects.create(
+        signature = ItemSignature.objects.create(
                 library = library,
-                status = Signature.Status.CURRENT,
+                status = BaseSignature.Status.CURRENT,
                 signature = raw_data[Manifestation.CURRENT_SIGNATURE_KEY]
             )
         single_item = Item.objects.create(manifestation = self)
         single_item.signatures.add(signature)
 
         if raw_data[FORMER_SIGNATURE_KEY]:
-            former_signature = Signature.objects.create(
+            former_signature = ItemSignature.objects.create(
                     library = library,
-                    status = Signature.Status.FORMER,
+                    status = BaseSignature.Status.FORMER,
                     signature = raw_data[FORMER_SIGNATURE_KEY]
                 )
             single_item.signatures.add(former_signature)
@@ -372,7 +374,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             writer_medium_list = []
             if ENVELOPE_TITLE_WRITER_KEY in raw_data:
                 for entry in split('\$|\),', raw_data[ENVELOPE_TITLE_WRITER_KEY]):
-                    writer_gnd_id = Manifestation.extract_gnd_id(entry)
+                    writer_gnd_id = Manifestation.extract_gnd_id(etry)
                     if writer_gnd_id:
                         writer_medium_list += [{
                                 'writer': Person.fetch_or_get(writer_gnd_id),
@@ -570,7 +572,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             self.private_manuscript_comment = f'Beschreiung physischer Merkmale: {phys_features}'
 
         if raw_data[DIGITAL_COPY_KEY]:
-            DigitalCopy.objects.create(
+            ItemDigitalCopy.objects.create(
                     item = single_item,
                     url = raw_data[DIGITAL_COPY_KEY]
                 )
@@ -691,3 +693,133 @@ class Event(models.Model):
             on_delete=models.SET_NULL,
             null = True
         )
+
+
+class LetterSignature(BaseSignature):
+    letter = models.ForeignKey(
+            'Letter',
+            on_delete = models.CASCADE,
+            related_name = 'signatures'
+        )
+
+    class Meta:
+        constraints = [
+            UniqueConstraint(
+                fields=['letter'],
+                condition=Q(status='C'),
+                name='unique_current_letter_signature'
+            )
+        ]
+
+
+class LetterDigitalCopy(BaseDigitalCopy):
+    letter = models.ForeignKey(
+            'Letter',
+            on_delete = models.CASCADE,
+            related_name = 'digital_copies'
+        )
+
+
+class Letter(models.Model):
+    class Category(models.TextChoices):
+        SKETCH = 'S', _('Sketch')
+        LETTER = 'L', _('Letter')
+        POSTCARD = 'P', _('Postcard')
+        COPY = 'C', _('Copy')
+
+    receiver_person = models.ForeignKey(
+            'dmad.Person',
+            null = True,
+            on_delete = models.SET_NULL,
+            related_name = 'received_letters'
+        )
+    sender_person = models.ForeignKey(
+            'dmad.Person',
+            null = True,
+            on_delete = models.SET_NULL,
+            related_name = 'sent_letters'
+        )
+    receiver_corporation = models.ForeignKey(
+            'dmad.Corporation',
+            null = True,
+            on_delete = models.SET_NULL,
+            related_name = 'received_letters'
+        )
+    sender_corporation = models.ForeignKey(
+            'dmad.Corporation',
+            null = True,
+            on_delete = models.SET_NULL,
+            related_name = 'sent_letters'
+        )
+    receiver_place = models.ForeignKey(
+            'dmad.Place',
+            null = True,
+            on_delete = models.SET_NULL,
+            related_name = 'received_letters'
+        )
+    sender_place = models.ForeignKey(
+            'dmad.Place',
+            null = True,
+            on_delete = models.SET_NULL,
+            related_name = 'sent_letters'
+        )
+    period = models.OneToOneField(
+            'dmad.Period',
+            on_delete=models.SET_NULL,
+            null = True,
+            blank = True,
+            related_name = 'letter'
+        )
+    edition = models.ManyToManyField(
+            'bib.ZotItem',
+            related_name = 'edited_letters'
+        )
+    category = models.CharField(
+            max_length = 1,
+            choices = Category,
+            default = Category.LETTER
+        )
+    comment = models.TextField(
+            null = True,
+            blank = True
+        )
+    manifestation = models.ManyToManyField(
+            'Manifestation',
+            related_name = 'letters'
+        )
+    person_provenance = models.ManyToManyField(
+            'dmrism.PersonProvenanceStation',
+            related_name = 'letters'
+        )
+    corporation_provenance = models.ManyToManyField(
+            'dmrism.CorporationProvenanceStation',
+            related_name = 'letters'
+        )
+
+    def get_absolute_url(self):
+        return reverse('edwoca:letter_update', kwargs={'pk': self.id})
+
+    def __str__(self):
+        if self.sender_person:
+            if self.sender_corporation:
+                sender = str(self.sender_person) + ' u. a.'
+            else:
+                sender = str(self.sender_person)
+        else:
+            if self.sender_corporation:
+                sender = str(self.sender_corporation)
+            else:
+                sender = 'unbekannt'
+
+        if self.receiver_person:
+            if self.receiver_corporation:
+                receiver = str(self.receiver_person) + ' u. a.'
+            else:
+                receiver = str(self.receiver_person)
+        else:
+            if self.receiver_corporation:
+                receiver = str(self.receiver_corporation)
+            else:
+                receiver = 'unbekannt'
+
+        return f'{sender} an {receiver}, {self.period}'

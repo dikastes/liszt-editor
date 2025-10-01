@@ -6,7 +6,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from ..models import Item as EdwocaItem
-from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, DigitalCopy, ItemPersonDedication, ItemCorporationDedication
+from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, ItemDigitalCopy, ItemPersonDedication, ItemCorporationDedication
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Person, Corporation, Place
 from bib.models import ZotItem
@@ -169,6 +169,16 @@ def item_provenance(request, pk):
     context['bib_search_form'] = bib_search_form
     context['owner_search_form'] = owner_search_form
 
+    q_letter = request.GET.get('letter-q')
+    if q_letter:
+        letter_search_form = SearchForm(request.GET, prefix='letter')
+        if letter_search_form.is_valid():
+            context['query_letter'] = letter_search_form.cleaned_data.get('q')
+            context['found_letters'] = letter_search_form.search().models(Letter)
+    else:
+        letter_search_form = SearchForm(prefix='letter')
+    context['letter_search_form'] = letter_search_form
+
     return render(request, 'edwoca/item_provenance.html', context)
 
 
@@ -198,14 +208,14 @@ def item_digital_copy(request, pk):
 
 def item_digital_copy_add(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
-    DigitalCopy.objects.create(item=item)
+    ItemDigitalCopy.objects.create(item=item)
     if item.manifestation.is_singleton:
         return redirect('edwoca:manifestation_digital_copy', pk=item.manifestation.id)
     return redirect('edwoca:item_digital_copy', pk=item_id)
 
 
 class ItemDigitalCopyDeleteView(DeleteView):
-    model = DigitalCopy
+    model = ItemDigitalCopy
 
     def get_success_url(self):
         item = self.object.item

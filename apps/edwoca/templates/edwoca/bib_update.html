@@ -26,19 +26,19 @@
 
 		<h3> neuen Titel verknüpfen </h3>
 
-		{% if show_search_form == True %}
+		{% if show_zotitem_search_form == True %}
 
 		<form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
 			<label class="input input-bordered flex items-center gap-2 flex-1">
 				Literatur
-				{{ searchform.q }}
+				{{ zotitem_searchform.q }}
 			</label>
 			<input type="hidden" name="target_model" value="{{ entity_type}}" />
 			<input type="submit" id="submit-form" class="btn" value="Suchen"/>
 		</form>
 		
 		<ul>
-		{% if query %}
+		{% if zotitem_query %}
 			{% for found_bib in found_bibs %}
 				<li>
 					<form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_bib_add' object.id found_bib.object.pk %}">
@@ -54,7 +54,55 @@
 		{% endif %}
 		</ul>
 
+		{% endif %}
+
+		<h2> Briefe </h2>
+
+		<ul>
+		{% for letter in object.letters.all %}
+			<li>
+				<div class="flex">
+					{{ letter }}
+					<form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_letter_remove' object.id letter.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Briefe verknüpft </em> </li>
+		{% endfor %}
+		</ul>
+
+		<h3> neuen Brief verknüpfen </h3>
+
+		{% if show_letter_search_form == True %}
+
+		<form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
+			<label class="input input-bordered flex items-center gap-2 flex-1">
+				Brief
+				{{ letter_searchform.q }}
+			</label>
+			<input type="hidden" name="target_model" value="{{ entity_type}}" />
+			<input type="submit" id="submit-form" class="btn" value="Suchen"/>
+		</form>
+		
+		<ul>
+		{% if letter_query %}
+			{% for found_letter in found_letters %}
+				<li>
+					<form method="POST" action="{% url 'edwoca:manifestation_letter_add' object.id found_letter.object.pk %}">
+						{% csrf_token %}
+						<input type="submit" value="{{ found_letter.object }}" class="cursor-pointer">
+					</form>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
 		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
 
 		{% endif %}
 	</div>
