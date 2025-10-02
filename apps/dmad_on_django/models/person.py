@@ -160,6 +160,7 @@ class Person(DisplayableModel):
             try:
                 pl_person = PyLobidPerson(url, fetch_related=False)
             except GNDAPIError:
+                print("GND API error. Retry.")
                 trials -= 1
                 continue
             break

@@ -1,6 +1,6 @@
 from .base import *
 from ..rism_tools import get_rism_data
-from .item import ItemDigitalCopy
+from .item import ItemDigitalCopy, BaseDigitalCopy
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -337,7 +337,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         if self.items.count() == 0:
             signature = ItemSignature.objects.create(
                     library = library,
-                    status = BaseSignature.Status.CURRENT,
+                    status = ItemSignature.Status.CURRENT,
                     signature = location.get('c')
                 )
             item = Item.objects.create(
@@ -348,7 +348,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             if location.get('d'):
                 signature = ItemSignature.objects.create(
                         library = library,
-                        status = BaseSignature.Status.FORMER,
+                        status = ItemSignature.Status.FORMER,
                         signature = location.get('d')
                     )
                 item.signatures.add(signature)
@@ -385,13 +385,17 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 if corporate_name.get('4') == 'fmo'
             ]
 
+        if not self.private_head_comment:
+            self.private_head_comment = ''
+
         private_head_comment = []
-        if tempo := data.get('031').get('d'):
-            private_head_comment += [ 'Tempo (RISM): ' + tempo ]
-        if metronom := data.get('031').get('q'):
-            private_head_comment += [ 'Metronom (RISM): ' + metronom ]
-        if textincipit := data.get('031').get('t'):
-            private_head_comment += [ 'Text-Incipit (RISM): ' + textincipit ]
+        if data.get('031'):
+            if tempo := data.get('031').get('d'):
+                private_head_comment += [ 'Tempo (RISM): ' + tempo ]
+            if metronom := data.get('031').get('q'):
+                private_head_comment += [ 'Metronom (RISM): ' + metronom ]
+            if textincipit := data.get('031').get('t'):
+                private_head_comment += [ 'Text-Incipit (RISM): ' + textincipit ]
 
         self.private_head_comment = '\n'.join([self.private_head_comment] + private_head_comment)
 

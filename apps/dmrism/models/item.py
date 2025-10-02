@@ -279,9 +279,9 @@ class BaseDigitalCopy(models.Model):
 
         def parse(string):
             if 'iiif' in string:
-                return DigitalCopy.LinkType.IIIF_MANIFEST
+                return BaseDigitalCopy.LinkType.IIIF_MANIFEST
             if 'digitized' in string:
-                return DigitalCopy.LinkType.DIGITIZED
+                return BaseDigitalCopy.LinkType.DIGITIZED
             return None
 
     url = models.URLField()
