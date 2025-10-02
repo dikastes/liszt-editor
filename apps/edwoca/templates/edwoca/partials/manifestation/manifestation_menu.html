@@ -1,98 +1,102 @@
-<ul class="menu p-0">
-	<li>
-	    <a
-		href="{% url 'edwoca:manifestation_update' object.id %}"
-		{% if 'update' in request.path %}class="active"{% endif %}
-		>
-		Kopf
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_classification' object.id %}"
-		{% if 'classification' in request.path %}class="active"{% endif %}
-		>
-		Quellenart
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_relations' object.id %}"
-		{% if 'relations' in request.path %}class="active"{% endif %}
-		>
-		Bezüge
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_title' object.id %}"
-		{% if 'title' in request.path %}class="active"{% endif %}
-		>
-		Titelei und Widmung
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_history' object.id %}"
-		{% if 'history' in request.path %}class="active"{% endif %}
-		>
-		Datierung und Ort
-	    </a>
-	</li>
-	{% if object.is_singleton %}
+<div class="flex flex-col h-full">
+	<ul class="menu p-0 flex-1">
 		<li>
-		    <a href="{% url 'edwoca:manifestation_provenance' object.id %}"
-			{% if 'provenance' in request.path %}class="active"{% endif %}
+		    <a
+			href="{% url 'edwoca:manifestation_update' object.id %}"
+			{% if 'update' in request.path %}class="active"{% endif %}
 			>
-			Provenienz
+			Kopf
 		    </a>
 		</li>
-	{% endif %}
-	<li>
-	    <a href="{% url 'edwoca:manifestation_print' object.id %}"
-		{% if 'print' in request.path %}class="active"{% endif %}
-		>
-		Verlag und Druckspezifika
-	    </a>
-	</li>
-	{% if object.is_singleton %}
 		<li>
-		    <a href="{% url 'edwoca:manifestation_manuscript' object.id %}"
-			{% if 'manuscript' in request.path %}class="active"{% endif %}
+		    <a href="{% url 'edwoca:manifestation_classification' object.id %}"
+			{% if 'classification' in request.path %}class="active"{% endif %}
 			>
-			Manuskriptspezifika
+			Quellenart
 		    </a>
 		</li>
-	{% endif %}
-	<li>
-	    <a href="{% url 'edwoca:manifestation_bibliography' object.id %}"
-		{% if 'bibliography' in request.path %}class="active"{% endif %}
-		>
-		Literatur
-	    </a>
-	</li>
-	{% if object.is_singleton %}
 		<li>
-		    <a href="{% url 'edwoca:manifestation_digital_copy' object.id %}"
-			{% if 'digcopy' in request.path %}class="active"{% endif %}
+		    <a href="{% url 'edwoca:manifestation_relations' object.id %}"
+			{% if 'relations' in request.path %}class="active"{% endif %}
 			>
-			Digitalisat
+			Bezüge
 		    </a>
 		</li>
-	{% endif %}
-	<li>
-	    <a href="{% url 'edwoca:manifestation_comment' object.id %}"
-		{% if 'comment' in request.path %}class="active"{% endif %}
-		>
-		Kommentar
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_delete' object.id %}"
-		{% if 'delete' in request.path %}class="active"{% endif %}
-		>
-		löschen
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:manifestation_list' %}">
-		zurück
-	    </a>
-	</li>
-</ul>
+		<li>
+		    <a href="{% url 'edwoca:manifestation_title' object.id %}"
+			{% if 'title' in request.path %}class="active"{% endif %}
+			>
+			Titelei und Widmung
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:manifestation_history' object.id %}"
+			{% if 'history' in request.path %}class="active"{% endif %}
+			>
+			Datierung und Ort
+		    </a>
+		</li>
+		{% if object.is_singleton %}
+			<li>
+			    <a href="{% url 'edwoca:manifestation_provenance' object.id %}"
+				{% if 'provenance' in request.path %}class="active"{% endif %}
+				>
+				Provenienz
+			    </a>
+			</li>
+		{% endif %}
+		<li>
+		    <a href="{% url 'edwoca:manifestation_print' object.id %}"
+			{% if 'print' in request.path %}class="active"{% endif %}
+			>
+			Verlag und Druckspezifika
+		    </a>
+		</li>
+		{% if object.is_singleton %}
+			<li>
+			    <a href="{% url 'edwoca:manifestation_manuscript' object.id %}"
+				{% if 'manuscript' in request.path %}class="active"{% endif %}
+				>
+				Manuskriptspezifika
+			    </a>
+			</li>
+		{% endif %}
+		<li>
+		    <a href="{% url 'edwoca:manifestation_bibliography' object.id %}"
+			{% if 'bibliography' in request.path %}class="active"{% endif %}
+			>
+			Literatur
+		    </a>
+		</li>
+		{% if object.is_singleton %}
+			<li>
+			    <a href="{% url 'edwoca:manifestation_digital_copy' object.id %}"
+				{% if 'digcopy' in request.path %}class="active"{% endif %}
+				>
+				Digitalisat
+			    </a>
+			</li>
+		{% endif %}
+		<li>
+		    <a href="{% url 'edwoca:manifestation_comment' object.id %}"
+			{% if 'comment' in request.path %}class="active"{% endif %}
+			>
+			Kommentar
+		    </a>
+		</li>
+	</ul>
+	<ul class="menu p-0 flex-0">
+		<li>
+		    <a href="{% url 'edwoca:manifestation_delete' object.id %}"
+			{% if 'delete' in request.path %}class="active"{% endif %}
+			>
+			löschen
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:manifestation_list' %}">
+			zurück
+		    </a>
+		</li>
+	</ul>
+</div>

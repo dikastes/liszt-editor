@@ -1,63 +1,67 @@
-<ul class="menu p-0">
-	<li>
-	    <a href="{% url 'edwoca:item_update' object.id %}"
-		{% if 'update' in request.path %}class="active"{% endif %}
-		>
-		Kopf
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:item_relations' object.id %}"
-		{% if 'relations' in request.path %}class="active"{% endif %}
-		>
-		Bezüge
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:item_dedication' object.id %}"
-		{% if 'dedication' in request.path %}class="active"{% endif %}
-		>
-		Widmung
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:item_provenance' object.id %}"
-		{% if 'provenance' in request.path %}class="active"{% endif %}
-		>
-		Provenienz
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:item_manuscript' object.id %}"
-		{% if 'manuscript' in request.path %}class="active"{% endif %}
-		>
-		Manuskriptspezifika
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:item_digital_copy' object.id %}"
-		{% if 'digcopy' in request.path %}class="active"{% endif %}
-		>
-		Digitalisat
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:item_comment' object.id %}"
-		{% if 'comment' in request.path %}class="active"{% endif %}
-		>
-		Kommentar
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:item_delete' object.id %}"
-		{% if 'delete' in request.path %}class="active"{% endif %}
-		>
-		löschen
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:item_list' %}">
-		zurück
-	    </a>
-	</li>
-</ul>
+<div class="flex flex-col h-full">
+	<ul class="menu p-0 flex-1">
+		<li>
+		    <a href="{% url 'edwoca:item_update' object.id %}"
+			{% if 'update' in request.path %}class="active"{% endif %}
+			>
+			Kopf
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:item_relations' object.id %}"
+			{% if 'relations' in request.path %}class="active"{% endif %}
+			>
+			Bezüge
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:item_dedication' object.id %}"
+			{% if 'dedication' in request.path %}class="active"{% endif %}
+			>
+			Widmung
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:item_provenance' object.id %}"
+			{% if 'provenance' in request.path %}class="active"{% endif %}
+			>
+			Provenienz
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:item_manuscript' object.id %}"
+			{% if 'manuscript' in request.path %}class="active"{% endif %}
+			>
+			Manuskriptspezifika
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:item_digital_copy' object.id %}"
+			{% if 'digcopy' in request.path %}class="active"{% endif %}
+			>
+			Digitalisat
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:item_comment' object.id %}"
+			{% if 'comment' in request.path %}class="active"{% endif %}
+			>
+			Kommentar
+		    </a>
+		</li>
+	</ul>
+	<ul class="menu p-0 flex-0">
+		<li>
+		    <a href="{% url 'edwoca:item_delete' object.id %}"
+			{% if 'delete' in request.path %}class="active"{% endif %}
+			>
+			löschen
+		    </a>
+		</li>
+		<li>
+		    <a href="{% url 'edwoca:item_list' %}">
+			zurück
+		    </a>
+		</li>
+	</ul>
+</div>
