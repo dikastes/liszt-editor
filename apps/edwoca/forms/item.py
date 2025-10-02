@@ -10,19 +10,26 @@ from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 
 
-#class ItemForm(ModelForm):
-    #class Meta:
-        #model = Item
-        #fields = ['cover', 'handwriting']
-        #widgets = {
-                #'cover': Textarea( attrs = {
-                        #'class': SimpleFormMixin.text_area_classes
-                    #}),
-                #'handwriting': TextInput( attrs = {
-                        #'class': 'grow w-full'
-                    #})
-            #}
+class ItemForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = ['rism_id']
+        widgets = {
+                'rism_id': TextInput( attrs = {
+                        'class': 'grow w-full'
+                    })
+            }
 
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        rism_id_field = self['rism_id']
+        rism_id_field_label = label(rism_id_field.label, cls='input input-bordered flex flex-1 items-center gap-2')
+        rism_id_field_label.add(raw(str(rism_id_field)))
+
+        form.add(rism_id_field_label)
+
+        return mark_safe(str(form))
 
 class SignatureForm(ModelForm):
     class Meta:

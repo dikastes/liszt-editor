@@ -6,7 +6,7 @@
 
 	<form method="post">
 		{% csrf_token %}
-		{{ form.as_daisy }}
+		{{ item_form.as_daisy }}
 
                 <h3 class="text-lg font-bold mt-5">Signaturen</h3>
                 {{ signature_formset.management_form }}

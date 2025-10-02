@@ -31,6 +31,7 @@ class ItemSearchView(EdwocaSearchView):
 
 def item_update(request, pk):
     item = get_object_or_404(Item, pk=pk)
+    item_form = ItemForm(request.POST or None, instance=item)
 
     if request.POST and 'add_signature' in request.POST:
         data = request.POST.copy()
@@ -41,6 +42,8 @@ def item_update(request, pk):
         signature_formset = SignatureFormSet(request.POST or None, instance=item)
 
     if request.method == 'POST' and 'add_signature' not in request.POST:
+        if item_form.is_valid():
+            item_form.save()
         if signature_formset.is_valid():
             signature_formset.save()
             return redirect('edwoca:item_update', pk=pk)
@@ -49,6 +52,7 @@ def item_update(request, pk):
         'object': item,
         'signature_formset': signature_formset,
         'entity_type': 'item',
+        'item_form': item_form
     }
     return render(request, 'edwoca/item_update.html', context)
 
