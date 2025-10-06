@@ -8,8 +8,10 @@
 
 <div class="bg-white border border-base-300 p-5 mb-10">
 	<div class="prose">
-		<h2> Quellen </h2>
+		<h2> Manifestationen </h2>
 
+		<h3> ausgehende Verknüpfungen </h3>
+		<em> Verknüpfungen, die mit Hilfe des Suchformulars unten angelegt werden, erscheinen hier </em>
 		<ul>
 		{% for manifestation_relation in object.source_manifestation_of.all %}
 			<li>
@@ -24,11 +26,12 @@
 				</div>
 			</li>
 		{% empty %}
-			<li> <em> keine Quellen verknüpft </em> </span> </li>
+			<li> <em> keine Manifestationen verknüpft </em> </span> </li>
 		{% endfor %}
 		</ul>
 
 		<h3> eingehende Verknüpfungen </h3>
+		<em> Manifestationen, die mit dieser Manifestation verknüpft wurden, erscheinen hier </em>
 		<ul>
 		{% for manifestation_relation in object.target_manifestation_of.all %}
 			<li>
@@ -41,7 +44,7 @@
 		{% endfor %}
 		</ul>
 
-		<h3> neue Quelle verknüpfen </h3>
+		<h3> neue Manifestation verknüpfen </h3>
 
 		{% if show_search_form == True %}
 
