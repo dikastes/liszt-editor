@@ -45,14 +45,9 @@
 {% block content %}
 
 <div class="border bg-white border-base-300 p-5">
-	<div class="prose">
-		<ul id="result-list" class="list-disc">
-			{% include 'edwoca/partials/result_list.html' %}
-		</ul>
-	</div>
 	{% if page_obj.paginator.num_pages > 1 %}
 	    <div class="pagination">
-		<span class="join my-10">
+		<span class="join mb-5 ml-5">
 		    {% if page_obj.has_previous %}
 			<a href="?page=1" class="btn join-item"> &laquo; </a>
 			<a href="?page={{ page_obj.previous_page_number }}" class="btn join-item"> &lsaquo; </a>
@@ -67,6 +62,11 @@
 		</span>
 	    </div>
 	{% endif %}
+	<div class="prose">
+		<ul id="result-list" class="list-disc">
+			{% include 'edwoca/partials/result_list.html' %}
+		</ul>
+	</div>
 </div>
 {% endblock %}
 
