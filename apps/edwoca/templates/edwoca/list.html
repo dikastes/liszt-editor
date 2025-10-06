@@ -49,15 +49,15 @@
 	    <div class="pagination">
 		<span class="join mb-5 ml-5">
 		    {% if page_obj.has_previous %}
-			<a href="?page=1" class="btn join-item"> &laquo; </a>
-			<a href="?page={{ page_obj.previous_page_number }}" class="btn join-item"> &lsaquo; </a>
+			<a href="?page=1&q={{ query }}" class="btn join-item"> &laquo; </a>
+			<a href="?page={{ page_obj.previous_page_number }}&q={{ query }}" class="btn join-item"> &lsaquo; </a>
 		    {% endif %}
 		<span class="current btn join-item btn-primary">
 		Seite {{ page_obj.number }} von {{ page_obj.paginator.num_pages }}
 		</span>
 		    {% if page_obj.has_next %}
-			<a href="?page={{ page_obj.next_page_number }}" class="join-item btn"> &rsaquo; </a>
-			<a href="?page={{ page_obj.paginator.num_pages }}" class="join-item btn"> &raquo; </a>
+			<a href="?page={{ page_obj.next_page_number }}&q={{ query }}" class="join-item btn"> &rsaquo; </a>
+			<a href="?page={{ page_obj.paginator.num_pages }}&q={{ query }}" class="join-item btn"> &raquo; </a>
 		    {% endif %}
 		</span>
 	    </div>

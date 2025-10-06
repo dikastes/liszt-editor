@@ -51,6 +51,7 @@ class EntityMixin:
 class EdwocaSearchView(SearchView):
     template_name = 'edwoca/list.html'
     form_class = SearchForm
+    paginate_by = 10
 
     def get_model_name(self):
         return self.model.__name__
@@ -73,8 +74,9 @@ class EdwocaSearchView(SearchView):
         context['item_count'] = Item.objects.count()
         context['library_count'] = Library.objects.count()
         context['letter_count'] = Letter.objects.count()
-        context['object_list'] = [ result.object for result in SearchForm(self.request.GET).search().models(self.model) ]
+        context['object_list'] = [ result.object for result in context['object_list'] ]
         context['list_entity_type'] = self.get_model_name().lower()
+        context['query'] = self.request.GET.get('q', '')
 
         return context
 
