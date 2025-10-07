@@ -19,3 +19,14 @@ def camel_to_snake_case(camel_string):
             for i, c
             in enumerate(camel_string)
         )
+
+def get_model_link(model):
+    if not model:
+        return "—"
+    if not hasattr(model, 'get_absolute_url'):
+        raise NotImplementedError("model does not implement get_absolute_url")
+    return (
+        f'<a href="{model.get_absolute_url()}" '
+        f'class=link link-primary>'
+        f'{model}</a>'
+    )

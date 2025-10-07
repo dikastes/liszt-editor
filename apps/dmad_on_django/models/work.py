@@ -5,6 +5,7 @@ from .base import DisplayableModel, Status, max_trials, GNDSubjectCategory
 from dmad_on_django.models import Person
 from .subjectterm import SubjectTerm
 from .geographicareacodes import WorkGeographicAreaCode
+from liszt_util.tools import get_model_link
 
 from pylobid.pylobid import PyLobidWork, GNDAPIError
 from json import dumps, loads
@@ -159,24 +160,31 @@ class Work(DisplayableModel):
 
         if self.opus:
             table.append(("Opus", self.opus))
-        
+
         if self.work_catalouge_number:
             table.append(("Werkverzeichnisnummer", self.work_catalouge_number))
 
-        if self.form_of_work:
-            table.append(("Gattung", f'<a href="{self.form_of_work.get_absolute_url()}"class="link link-primary">{self.form_of_work}</a>'))
-
-        if self.creators.exists():
-            for creator in self.creators.all():
-                table.append(("Schöpfer:in", f'<a href="{creator.get_absolute_url()}" class="link link-primary">{creator}</a>'))
-
-        if self.broader_terms.exists():
-            for term in self.broader_terms.all():
-                table.append(("Oberbegriffe", f'<a href="{term.get_absolute_url()}"class="link link-primary">{term}</a>'))
-
-        table += GNDSubjectCategory.get_subject_category_table(self) +\
-                WorkGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
         
+        match self.form_of_work:
+            case work_form if work_form: 
+                table.append(("Gattung", get_model_link(work_form)))
+
+        match self.creators:
+            case creators if creators.exists():
+                for creator in creators.all():
+                    table.append(("Schöpfer:in", get_model_link(creator)))
+            case _:
+                pass
+
+        match self.broader_terms:
+            case terms if terms.exists():
+                for term in terms.all():
+                    table.append(("Oberbegriffe", get_model_link(term)))
+            case _:
+                pass
+
+        table += GNDSubjectCategory.get_subject_category_table(self) + \
+                WorkGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
 
         return table
 

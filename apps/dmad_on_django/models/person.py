@@ -3,6 +3,8 @@ from django.urls import reverse
 from json import dumps, loads
 import requests
 
+from liszt_util.tools import get_model_link
+
 from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
 from .place import Place
 from .geographicareacodes import PersonGeographicAreaCode
@@ -192,8 +194,8 @@ class Person(DisplayableModel):
             
             rows = [
             ("Geschlecht", self.gender),
-            ("Geburtsort", self.birth_place),
-            ("Sterbeort", self.death_place),
+            ("Geburtsort", get_model_link(self.birth_place)),
+            ("Sterbeort", get_model_link(self.death_place)),
             ("Geburtsdatum", self.birth_date),
             ("Sterbedatum", self.death_date),
             ("Charakteristischer Beruf", "todo"),
@@ -203,7 +205,7 @@ class Person(DisplayableModel):
 
             if(len(self.activity_places.all()) > 0):
                 for place in self.activity_places.all():
-                    rows.append(("Wirkungsort", str(place)))
+                    rows.append(("Wirkungsort", get_model_link(place)))
 
             return rows
     
