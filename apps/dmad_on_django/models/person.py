@@ -8,6 +8,7 @@ from liszt_util.tools import get_model_link
 from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
 from .place import Place
 from .geographicareacodes import PersonGeographicAreaCode
+from .subjectterm import SubjectTerm
 from pylobid.pylobid import PyLobidPerson, GNDAPIError
 
 
@@ -88,6 +89,8 @@ class Person(DisplayableModel):
     )
     activity_places = models.ManyToManyField(Place)
 
+    professions = models.ManyToManyField(SubjectTerm)
+
     def get_absolute_url(self):
         return reverse('dmad_on_django:person_update', kwargs={'pk': self.id})
 
@@ -131,8 +134,19 @@ class Person(DisplayableModel):
         if 'placeOfActivity' in pl_person.ent_dict:
             for place in pl_person.ent_dict['placeOfActivity']:
                 activity_place = Place.fetch_or_get(place['id'])
-                self.activity_places.add(activity_place)
                 activity_place.save()
+                self.activity_places.add(activity_place)
+                
+        
+        self.professions.clear()
+        if 'professionOrOccupation' in pl_person.ent_dict:
+            for profession in pl_person.ent_dict['professionOrOccupation']:
+                profession = SubjectTerm.fetch_or_get(profession['id'])
+                if self.professions.contains(profession):
+                    continue
+                profession.save()
+                self.professions.add(profession)
+                
 
         self.names.all().delete()
         pref_name = PersonName()
@@ -197,15 +211,18 @@ class Person(DisplayableModel):
             ("Geburtsort", get_model_link(self.birth_place)),
             ("Sterbeort", get_model_link(self.death_place)),
             ("Geburtsdatum", self.birth_date),
-            ("Sterbedatum", self.death_date),
-            ("Charakteristischer Beruf", "todo"),
-            ]+\
-            PersonGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
-            GNDSubjectCategory.get_subject_category_table(self)
+            ("Sterbedatum", self.death_date)
+            ]
+            
+            for profession in self.professions.all():
+                rows.append(("Beruf", get_model_link(profession)))
 
             if(len(self.activity_places.all()) > 0):
                 for place in self.activity_places.all():
                     rows.append(("Wirkungsort", get_model_link(place)))
+
+            rows += PersonGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
+            GNDSubjectCategory.get_subject_category_table(self)
 
             return rows
     
