@@ -554,7 +554,7 @@ def manifestation_print_update(request, pk):
         return redirect('edwoca:manifestation_print', pk=pk)
 
     publication_forms = []
-    for publication in manifestation.publication_set.all():
+    for publication in manifestation.publications.all():
         prefix = f'publication_{publication.id}'
         publication_forms.append(PublicationForm(instance=publication, prefix=prefix))
     
@@ -726,7 +726,7 @@ class CorporationProvenanceStationDeleteView(DeleteView):
 
     def get_success_url(self):
         item = self.object.item
-        if object.item.manifestation.is_singleton:
+        if item.manifestation.is_singleton:
             return reverse('edwoca:manifestation_provenance', kwargs={'pk': item.id})
         return reverse('edwoca:item_provenance', kwargs={'pk': item.id})
 
