@@ -3,7 +3,7 @@ from .models import ZotItem
 
 class BibIndex(indexes.SearchIndex, indexes.Indexable):
     auto_update = False
-    text = indexes.NgramField(
+    text = indexes.CharField(
             document=True,
             use_template=True
         )

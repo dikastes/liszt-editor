@@ -1,1 +1,6 @@
 {{ object.get_pref_title }}
+{% for item in object.item_set.all %}
+{% if item.current_signature %}
+{{ item.current_signature.signature }}
+{% endif %}
+{% endfor %}
