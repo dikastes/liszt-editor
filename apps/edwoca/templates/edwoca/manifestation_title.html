@@ -300,24 +300,6 @@
         </div>
     {% endfor %}
 
-    <div class="modal" role="dialog" id="title-modal-new">
-        <div class="modal-box w-11/12 max-w-5xl">
-            <h3 class="text-lg font-bold">Titel anlegen</h3>
-            <form method="post" action="{% url 'edwoca:manifestation_title' object.id %}" class="mt-5">
-                {% csrf_token %}
-                {{ new_title_form.management_form }}
-                {{ new_title_form.as_daisy }}
-
-                <div class="flex gap-5 mt-5">
-                    <div class="flex-1"></div>
-                    <input type="submit" name="save_new_title" value="Speichern" class="flex-0 btn btn-primary">
-                    <div class="modal-action flex-0 m-0">
-                        <a href="#" class="btn">X</a>
-                    </div>
-                </div>
-            </form>
-        </div>
-    </div>
 {% endblock %}
 
 {% block content %}
@@ -348,7 +330,7 @@
     </div>
     <div class="flex items-center">
         <div class="flex-1"></div>
-        <a href="#title-modal-new" class="btn flex-0"> Titel hinzufügen </a>
+        <a href="{% url 'edwoca:manifestation_title_add' object.id%}" class="btn flex-0"> Titel hinzufügen </a>
     </div>
 
 </div>

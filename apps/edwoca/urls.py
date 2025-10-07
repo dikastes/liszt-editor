@@ -79,6 +79,7 @@ urlpatterns = [
         path('manifestations/<int:pk>/title_handwriting/<int:title_handwriting_pk>/add_writer/<int:person_pk>', views.manifestation_title_add_handwriting_writer, name = 'manifestation_title_add_handwriting_writer'),
         path('manifestations/<int:pk>/title_handwriting/<int:title_handwriting_pk>/remove_writer', views.manifestation_title_remove_handwriting_writer, name = 'manifestation_title_remove_handwriting_writer'),
         path('manifestations/<int:pk>/title/<int:title_id>/removewriter', views.manifestation_writer_remove, name = 'manifestation_writer_remove'),
+        path('manifestations/<int:pk>/add_title', views.manifestation_title_create, name = 'manifestation_title_add'),
         path('manifestations/<int:pk>/add_dedicatee/<int:person_id>', views.manifestation_add_dedicatee, name = 'manifestation_add_dedicatee'),
         path('manifestations/<int:pk>/remove_dedicatee/<int:dedicatee_id>', views.manifestation_remove_dedicatee, name = 'manifestation_remove_dedicatee'),
         path('manifestations/<int:pk>/relations', views.ManifestationRelationsUpdateView.as_view(), name = 'manifestation_relations'),
