@@ -84,7 +84,5 @@
     {% if not type %}
     {% include 'dmad_on_django/partials/search_form.html' with action_url=request.path hx_get=request.path %}
     {% endif %}
-    <a href="{% url 'dmad_on_django:corporation_create' %}" class="btn btn-primary"> Datensatz anlegen </a>
+    {% include 'dmad_on_django/partials/create_button.html' %}
 {% endblock %}
-
-
