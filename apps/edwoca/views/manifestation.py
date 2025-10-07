@@ -165,7 +165,7 @@ def manifestation_unset_missing(request, pk):
 
 def manifestation_title_create(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
-    ManifestationTitle.objects.create(manifestation=manifestation)
+    ManifestationTitle.objects.create(manifestation=manifestation,title='(neu)')
     return redirect('edwoca:manifestation_title', pk = pk)
 
 def manifestation_title_update(request, pk):
