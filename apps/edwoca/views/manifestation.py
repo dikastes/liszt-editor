@@ -56,11 +56,6 @@ def manifestation_create(request):
     })
 
 
-#class ManifestationUpdateView(EntityMixin, UpdateView):
-    #model = Manifestation
-    #form_class = ManifestationForm
-    #template_name = 'edwoca/manifestation_update.html'
-
 def manifestation_update(request, pk):
     manifestation = Manifestation.objects.get(id=pk)
     context = {
@@ -68,10 +63,9 @@ def manifestation_update(request, pk):
         'entity_type': 'manifestation'
     }
 
+    manifestation_form = ManifestationForm(request.POST or None, instance=manifestation)
     if manifestation.is_singleton:
         item = manifestation.items.first()
-        manifestation_form = ManifestationForm(request.POST or None, instance=manifestation)
-        context['manifestation_form'] = manifestation_form
 
         if 'add_signature' in request.POST:
             data = request.POST.copy()
@@ -92,11 +86,9 @@ def manifestation_update(request, pk):
         context['library_search_form'] = SearchForm()
     else:
         if request.method == 'POST' and 'save_changes' in request.POST:
+            if manifestation_form.is_valid():
+                manifestation_form.save()
             for item in manifestation.items.all():
-                manifestation_form = ManifestationForm(request.POST, instance=item, prefix=f'item_{item.id}')
-                if manifestation_form.is_valid():
-                    manifestation_form.save()
-
                 signature_formset = SignatureFormSet(request.POST, instance=item, prefix=f'signatures_{item.id}')
                 if signature_formset.is_valid():
                     signature_formset.save()
@@ -139,6 +131,7 @@ def manifestation_update(request, pk):
 
         context['item_forms'] = item_forms
         context['new_signature_formset'] = new_signature_formset
+    context['manifestation_form'] = manifestation_form
 
     return render(request, 'edwoca/manifestation_update.html', context)
 
@@ -536,13 +529,6 @@ class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
 class ManifestationCommentUpdateView(SimpleFormView):
     model = Manifestation
     property = 'comment'
-
-
-#class ManifestationPrintUpdateView(EntityMixin, UpdateView):
-    #pass
-    #model = Manifestation
-    #property = 'print'
-
 
 
 def manifestation_print_update(request, pk):

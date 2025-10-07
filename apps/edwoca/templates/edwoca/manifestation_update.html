@@ -30,7 +30,7 @@
 						<div class="flex gap-5">
 							<div class="flex-1"></div>
 							<input type="submit" name="add_signature_{{ item_form.item.id }}" value="Signatur hinzufügen" class="flex-0 btn">
-							<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="flex-0 btn btn-primary">
+							<input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
 							<div class="modal-action flex-0 m-0">
 								<a href="#" class="btn">X</a>
 							</div>
@@ -55,7 +55,7 @@
 					
 					<div class="flex gap-5">
 						<div class="flex-1"></div>
-						<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="flex-0 btn btn-primary">
+						<input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
 						<div class="modal-action flex-0 m-0">
 							<a href="#" class="btn">X</a>
 						</div>
@@ -103,12 +103,12 @@
 				{% endfor %}
 
 				
-				<div class="flex gap-5">
+				<div class="flex">
 					<div class="flex-1"></div>
 					<input type="submit" name="add_signature" value="Signatur hinzufügen" class="flex-0 btn btn-secondary mt-2">
-					<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
 				</div>
 			{% endif %}
+			<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
 		</form>
 
 	{% else %}
@@ -133,6 +133,12 @@
 				</a>
 			{% endif %}
 		{% endif %}
+
+		<form method="post">
+			{% csrf_token %}
+			{{ manifestation_form.as_daisy }}
+			<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
+		</form>
 
 		<h2> Exemplare </h2>
 		{% if object.missing_item %}
