@@ -4,6 +4,8 @@ from django.urls import reverse, reverse_lazy
 from json import dumps, loads
 import requests
 
+from liszt_util.tools import get_model_link
+
 from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
 from .place import Place
 from .geographicareacodes import CorporationGeographicAreaCode
@@ -140,14 +142,14 @@ class Corporation(DisplayableModel):
         table = CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
         
         for pl in self.place.all():
-            table.append(("Wirkungsort", pl))
+            table.append(("Wirkungsort", get_model_link(pl)))
         
         table += GNDSubjectCategory.get_subject_category_table(self)
 
         table.append(("Zeitraum", self.period))
 
         for c in self.category.all():
-            table.append(("Kategorie", c))
+            table.append(("Kategorie", get_model_link(c)))
 
         return table
     
