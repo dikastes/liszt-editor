@@ -254,6 +254,9 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
 
+    def template_item(self):
+        return self.items.get(is_template=True)
+
     def get_pref_title(self):
         #titles = self.titles.all()
 
