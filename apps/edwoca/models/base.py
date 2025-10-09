@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -45,12 +45,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.is_singleton:
             return super().__str__()
 
-        catalog_number = 'o. N.'
-        if self.expressions.count() > 0:
-            catalog_number = self.expressions.all()[0].work_catalog_number
-        if self.expressions.count() > 1:
-            catalog_number += '+'
-
         if self.missing_item:
             return f"{catalog_number} unbekannt {numerus_currens}"
 
@@ -59,8 +53,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             publisher_addition = self.publications.first().plate_number
 
         if self.publications.first() and self.publications.first().publisher:
-            return f"{catalog_number}, {self.publications.first().publisher.get_designator()} {publisher_addition}"
-        return f"{catalog_number}, << Verlag >> {publisher_addition}"
+            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()}"
+        return f"<< Verlag >> {publisher_addition}, {self.get_temp_title()}"
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
@@ -299,13 +293,19 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if RELATED_PRINT_PUBLISHER_KEY in raw_data:
             if raw_data[RELATED_PRINT_PUBLISHER_KEY]:
-                self.publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY])
-            self.plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
+                Publication.objects.create(
+                        manifestation = self,
+                        publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY]),
+                        plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
+                    )
 
         if PUBLISHER_KEY in raw_data:
             if raw_data[PUBLISHER_KEY]:
-                self.publisher = Corporation.fetch_or_get(raw_data[PUBLISHER_KEY])
-            self.plate_number = raw_data[PLATE_NUMBER_KEY]
+                Publication.objects.create(
+                        manifestation = self,
+                        publisher = Corporation.fetch_or_get(raw_data[PUBLISHER_KEY]),
+                        plate_number = raw_data[PLATE_NUMBER_KEY]
+                    )
         if STITCHER_KEY in raw_data and (stitcher := raw_data[STITCHER_KEY]):
             self.stitcher = Corporation.fetch_or_get(stitcher)
 

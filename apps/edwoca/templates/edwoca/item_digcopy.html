@@ -24,6 +24,9 @@
 {% endblock %}
 
 {% block content %}
+
+{% include 'edwoca/partials/item/preview-divs/digcopy_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5">
     <h2 class="card-title mt-0 flex-1"> Digitale Kopien für {{ object }} </h2>
 
@@ -50,4 +53,7 @@
     </div>
 
 </div>
+
+{% include 'edwoca/partials/item/preview-divs/digcopy_epilog.html' %}
+
 {% endblock %}
