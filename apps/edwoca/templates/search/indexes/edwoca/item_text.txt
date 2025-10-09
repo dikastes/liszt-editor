@@ -1,1 +1,4 @@
 {{ object.get_pref_title }}
+{% if object.current_signature %}
+{{ object.current_signature.signature }}
+{% endif %}

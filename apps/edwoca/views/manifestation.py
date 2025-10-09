@@ -136,6 +136,18 @@ def manifestation_update(request, pk):
     return render(request, 'edwoca/manifestation_update.html', context)
 
 
+def manifestation_item_create(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk = pk)
+    Item.objects.create(manifestation = manifestation)
+    return redirect('edwoca:manifestation_relations', pk = pk)
+
+
+def manifestation_item_delete(request, item_id):
+    item = get_object_or_404(Item, pk = item_id)
+    item.delete()
+    return redirect('edwoca:manifestation_relations', pk = item.manifestation.id)
+
+
 def manifestation_set_singleton(request, pk):
     manifestation = Manifestation.objects.get(id = pk)
     manifestation.set_singleton()

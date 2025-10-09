@@ -18,7 +18,7 @@ def item_set_template(request, pk):
     manifestation.items.update(is_template=False)
     item.is_template = True
     item.save()
-    return redirect('edwoca:manifestation_update', pk=manifestation.pk)
+    return redirect('edwoca:manifestation_relations', pk=manifestation.pk)
 
 
 class ItemListView(EdwocaListView):
