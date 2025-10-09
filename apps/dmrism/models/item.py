@@ -72,6 +72,9 @@ class Item(WemiBaseClass):
     def get_current_signature(self):
         return next(self.signatures.filter(status = BaseSignature.Status.CURRENT).iterator(), 'ohne Signatur').__str__()
 
+    def current_signature(self):
+        return self.signatures.filter(status=BaseSignature.Status.CURRENT).first()
+
     def save(self, *args, **kwargs):
         if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
             raise ValidationError("Cannot add another item to a singleton manifestation.")

@@ -2,7 +2,7 @@ from haystack import indexes
 from .models import Work, Expression, Manifestation, Item, Letter
 
 class WorkIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.NgramField(
+    text = indexes.CharField(
             document=True,
             use_template=True
         )
@@ -28,7 +28,7 @@ class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
 
 
 class ExpressionIndex(indexes.SearchIndex, indexes.Indexable):
-    text = indexes.NgramField(
+    text = indexes.CharField(
             document=True,
             use_template=True
         )

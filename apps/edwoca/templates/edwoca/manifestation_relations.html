@@ -1,6 +1,70 @@
 {% extends 'edwoca/base.html' %}
 
+{% block modals %}
+	{% if not object.is_singleton %}
+		{% for item_form in item_forms %}
+			<div class="modal" role="dialog" id="item-modal-{{ item_form.item.id }}">
+				<div class="modal-box">
+					<h3 class="text-lg font-bold">Exemplar bearbeiten</h3>
+					<form method="post">
+						{% csrf_token %}
+						<h3>Signaturen</h3>
 
+						{% comment %}
+							if not every management form is displayed here, there will be trouble in
+							the other forms after a new formset form has been added
+						{% endcomment %}
+						<div class="hidden">
+						{% for item_form in item_forms %}
+							{{ item_form.signature_formset }}
+						{% endfor %}
+						</div>
+
+						{% for form in item_form.signature_formset %}
+							<div class="signature-form">
+								{{ form.as_daisy }}
+							</div>
+						{% endfor %}
+
+						
+						<div class="flex gap-5">
+							<div class="flex-1"></div>
+							<input type="submit" name="add_signature_{{ item_form.item.id }}" value="Signatur hinzufügen" class="flex-0 btn">
+							<input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
+							<div class="modal-action flex-0 m-0">
+								<a href="#" class="btn">X</a>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		{% endfor %}
+		<div class="modal" role="dialog" id="item-modal-new">
+			<div class="modal-box">
+				<h3 class="text-lg font-bold">Exemplar anlegen</h3>
+				<form method="post" action="{% url 'edwoca:manifestation_update' object.id %}">
+					{% csrf_token %}
+					<h3>Signaturen</h3>
+					{{ new_signature_formset.management_form }}
+					{% for form in new_signature_formset %}
+						<div class="signature-form">
+							{{ form.as_daisy }}
+						</div>
+					{% endfor %}
+
+					
+					<div class="flex gap-5">
+						<div class="flex-1"></div>
+						<input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
+						<div class="modal-action flex-0 m-0">
+							<a href="#" class="btn">X</a>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	{% endif %}
+{% endblock %}
 
 {% block content %}
 
@@ -82,6 +146,43 @@
 		{% endif %}
 	</div>
 </div>
+
+{% if not object.is_singleton %}
+	<div class="bg-white border border-base-300 p-5 mb-10">
+		<div class="prose">
+			<h2> Exemplare </h2>
+			{% if object.missing_item %}
+				<p> Alle Exemplare dieses Drucks sind verschollen </p>
+			{% else %}
+				{% for item in object.items.all %}
+					<div class="flex gap-5">
+						<p class="flex-1 m-0">
+							<a href="{% url 'edwoca:item_update' item.id %}">
+								{{ item }}
+								{% if item.is_template %}
+									<span class="badge badge-primary">Vorlage</span>
+								{% endif %}
+							</a>
+						</p>
+						{% if not item.is_template %}
+							<a href="{% url 'edwoca:item_set_template' item.id %}" class="btn flex-0"> Vorlage </a>
+						{% endif %}
+						<form action="{% url 'edwoca:manifestation_item_delete' item.id %}" method="post" class="flex-0">
+							{% csrf_token %}
+							<input type="submit" class="btn btn-primary" value="löschen"/>
+						</form>
+					</div>
+				{% empty %}
+					<p> keine Exemplare </p>
+				{% endfor %}
+				<div class="flex">
+					<div class="flex-1"></div>
+					<a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn flex-0"> neues Exemplar </a>
+				</div>
+			{% endif %}
+		</div>
+	</div>
+{% endif %}
 
 <div class="bg-white border border-base-300 p-5 mt-5">
     <div class="prose">
