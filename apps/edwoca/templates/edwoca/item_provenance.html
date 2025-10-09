@@ -274,6 +274,9 @@
 {% endblock %}
 
 {% block content %}
+
+{% include 'edwoca/partials/item/preview-divs/provenance_prolog.html' %}
+
 <div class="bg-white border border-base-300 p-5">
     <h2 class="card-title mt-0 flex-1"> Provenienz (Personen) </h2>
 
@@ -331,4 +334,7 @@
         <input type="submit" value="Speichern" class="hidden" id="submit-form">
     </form>
 </div>
+
+{% include 'edwoca/partials/item/preview-divs/provenance_epilog.html' %}
+
 {% endblock %}

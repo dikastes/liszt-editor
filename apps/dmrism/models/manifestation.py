@@ -275,6 +275,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         #return '<ohne Titel>'
         return self.__str__()
 
+    def get_temp_title(self):
+        if self.titles.filter(status = Status.TEMPORARY).first():
+            return f", {self.titles.filter(status = Status.TEMPORARY).first().title}"
+        else:
+            return ''
+
     def __str__(self):
         if self.titles.filter(status = Status.TEMPORARY).first():
             temporary_title = f", {self.titles.filter(status = Status.TEMPORARY).first().title}"
@@ -282,7 +288,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             temporary_title = ''
 
         if self.items.count():
-            return self.items.all()[0].get_current_signature() + temporary_title
+            return f"{self.items.all()[0].get_current_signature()},  {self.get_temp_title()}"
 
         return '<Fehler: keine Items>'
 
@@ -399,6 +405,16 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 private_head_comment += [ 'Metronom (RISM): ' + metronom ]
             if textincipit := data.get('031').get('t'):
                 private_head_comment += [ 'Text-Incipit (RISM): ' + textincipit ]
+
+        if data.get('774'):
+            private_head_comment += [
+                    'Untergeordnete Manifestationen (RISM-ID): ' +
+                    ', '.join(
+                        field.get('w').replace('sources/', '') for
+                        field in
+                        data.get_fields('774')
+                    )
+                ]
 
         self.private_head_comment = '\n'.join([self.private_head_comment] + private_head_comment)
 
