@@ -2,7 +2,8 @@ from ..forms.manifestation import *
 from ..forms.item import SignatureFormSet, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
 from ..forms.publication import PublicationForm
 from ..forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
-from ..models import Manifestation as EdwocaManifestation, Letter
+from ..models import Manifestation as EdwocaManifestation, Letter, Expression
+from .base import *
 from ..models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from .base import *
 from bib.models import ZotItem
@@ -396,6 +397,13 @@ class ManifestationRelationsUpdateView(EntityMixin, RelationsUpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
+        
+        expression_search_form = SearchForm(self.request.GET or None, prefix='expression')
+        context['expression_search_form'] = expression_search_form
+        if expression_search_form.is_valid() and expression_search_form.cleaned_data.get('q'):
+            context['query_expression'] = expression_search_form.cleaned_data.get('q')
+            context[f"found_expressions"] = expression_search_form.search().models(Expression)
+
         return context
 
     def post(self, request, *args, **kwargs):
@@ -408,6 +416,20 @@ class ManifestationRelationsUpdateView(EntityMixin, RelationsUpdateView):
             context = self.get_context_data(**kwargs)
             context['relations_comment_form'] = relations_comment_form
             return self.render_to_response(context)
+
+
+def manifestation_expression_add(request, pk, expression_pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    expression = get_object_or_404(Expression, pk=expression_pk)
+    manifestation.expressions.add(expression)
+    return redirect('edwoca:manifestation_relations', pk=pk)
+
+
+def manifestation_expression_remove(request, pk, expression_pk):
+    manifestation = get_object_or_404(Manifestation, pk=pk)
+    expression = get_object_or_404(Expression, pk=expression_pk)
+    manifestation.expressions.remove(expression)
+    return redirect('edwoca:manifestation_relations', pk=pk)
 
 
 class ManifestationHistoryUpdateView(SimpleFormView):

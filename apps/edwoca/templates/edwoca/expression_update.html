@@ -1,6 +1,24 @@
 {% extends 'edwoca/base.html' %}
 
+{% block modals %}
+    {% for form in index_number_forms %}
+        <div class="modal" role="dialog" id="index-number-modal-{{ form.instance.id }}">
+            <div class="modal-box w-11/12 max-w-5xl">
+                <h3 class="text-lg font-bold">Index-Nummer bearbeiten</h3>
+                <form method="post" class="mt-5">
+                    {% csrf_token %}
+                    {{ form.as_daisy }}
+                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-{{ form.instance.id }}">
+                </form>
 
+                <div class="modal-action flex-0 m-0">
+                    <label for="save-button-{{ form.instance.id }}" class="btn btn-primary">Speichern</label>
+                    <a href="#" class="btn">Schließen</a>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endblock %}
 
 {% block content %}
 
@@ -16,8 +34,30 @@
 
 </div>
 
+<div class="bg-white border border-base-300 p-5 mt-5">
+    <h2 class="card-title mt-0 flex-1"> Index-Nummern </h2>
+
+    <div class="mt-5">
+    {% for index_number_form in index_number_forms %}
+        <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
+            <div class="flex-1 m-0">
+                <p class="font-bold">{{ index_number_form.instance.get_index_display }}: {{ index_number_form.instance.number }}</p>
+            </div>
+            <a href="#index-number-modal-{{ index_number_form.instance.id }}" class="btn flex-0"> bearbeiten </a>
+            <form action="{% url 'edwoca:index_number_delete' index_number_form.instance.id %}" method="post" class="flex-0 m-0">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary" value="löschen"/>
+            </form>
+        </div>
+    {% empty %}
+        <p> keine Index-Nummern </p>
+    {% endfor %}
+    </div>
+    <div class="flex items-center">
+        <div class="flex-1"></div>
+        <a href="{% url 'edwoca:index_number_create' object.id%}" class="btn flex-0"> Index-Nummer hinzufügen </a>
+    </div>
+
+</div>
+
 {% endblock %}
-
-
-
-

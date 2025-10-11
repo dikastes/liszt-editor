@@ -45,9 +45,7 @@ class Expression(WeBaseClass):
         )
 
     def __str__(self):
-        if self.get_pref_title():
-            return self.get_pref_title()
-        return '<ohne Titel>'
+        return ' | '.join(str(index_number) for index_number in self.index_numbers.all()) or 'ohne WV-Nr.'
 
 
 class ExpressionTitle(WemiTitle):
@@ -139,6 +137,7 @@ class IndexNumber(models.Model):
         MULLER = 'MULLER', _('Müller/Eckhardt')
         SEARLE = 'SEARLE', _('Searle')
         CHIAPPARI = 'CHIAPPARI', _('Chiappari')
+        LQWV = 'LQWV', _('LQWV')
 
     expression = models.ForeignKey(
             'Expression',
@@ -150,13 +149,16 @@ class IndexNumber(models.Model):
     index = models.CharField(
             max_length=10,
             choices=Indexes,
-            default=Indexes.RAABE
+            default=Indexes.LQWV
         )
     number = models.CharField(
             max_length=10,
             null=True,
             blank=True
         )
+
+    def __str__(self):
+        return f"{self.index}: {self.number}"
 
 
 class Key(models.Model):

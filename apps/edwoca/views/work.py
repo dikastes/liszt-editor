@@ -84,7 +84,7 @@ class WorkRelationsUpdateView(EntityMixin, RelationsUpdateView):
     form_class = RelatedWorkForm
 
 
-class WorkRelatedWorksUpdateView(EntityMixin, UpdateView):
+class WorkReferencesUpdateView(EntityMixin, UpdateView):
     model = Work
     fields = []
     template_name = 'edwoca/work_related_works.html'
@@ -168,3 +168,9 @@ class WorkBibDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('edwoca:work_bibliography', kwargs={'pk': self.object.work.id})
+
+
+def work_expression_create(request, pk):
+    work = get_object_or_404(Work, pk = pk)
+    Expression.objects.create(work = work)
+    return redirect('edwoca:work_relations', pk = pk)

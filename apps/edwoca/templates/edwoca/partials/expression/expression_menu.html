@@ -1,13 +1,5 @@
 <ul class="menu menu-lg">
 	<li>
-	    <a
-		href="{% url 'edwoca:expression_title' object.id %}"
-		{% if 'title' in request.path %}class="active"{% endif %}
-		>
-		Titel
-	    </a>
-	</li>
-	<li>
 	    <a href="{% url 'edwoca:expression_update' object.id %}"
 		{% if 'update' in request.path %}class="active"{% endif %}
 		>

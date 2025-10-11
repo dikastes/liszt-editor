@@ -72,6 +72,56 @@
 
 <div class="bg-white border border-base-300 p-5 mb-10">
 	<div class="prose">
+		<h2> Expressions </h2>
+		<h3> verknüpfte Expressions </h3>
+		<ul>
+		{% for expression in object.expressions.all %}
+			<li>
+				<div class="flex">
+					<a href="{% url 'edwoca:expression_update' expression.id %}" class="flex-1">
+						{{ expression }}
+					</a>
+					<a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-small">
+						entfernen
+					</a>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Expressions verknüpft </em> </span> </li>
+		{% endfor %}
+		</ul>
+
+		<h3> neue Expression verknüpfen </h3>
+
+		<form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get">
+			{{ expression_search_form.q.label_tag }}
+			<input type="text" name="expression-q" class="input input-bordered" value="{% if query_expression %}{{ query_expression }}{% endif %}">
+			<input type="submit" id="submit-form" class="btn" />
+		</form>
+		
+		<ul>
+		{% if query_expression %}
+			{% for found_expression in found_expressions %}
+				<li>
+					<div class="flex">
+						<div class="flex-1">
+							{{ found_expression.object }}
+						</div>
+						<a href="{% url 'edwoca:manifestation_expression_add' object.id found_expression.object.id %}" class="btn btn-small">
+							hinzufügen
+						</a>
+					</div>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+	</div>
+</div><div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
 		<h2> Manifestationen </h2>
 
 		<h3> ausgehende Verknüpfungen </h3>

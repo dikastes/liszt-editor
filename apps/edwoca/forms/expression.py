@@ -213,3 +213,29 @@ MovementFormSet = inlineformset_factory(
         max_num = 100,
         can_delete = True
     )
+
+class IndexNumberForm(ModelForm):
+    def as_daisy(self):
+        form = div()
+        form.add(raw(str(self['expression'])))
+        form.add(raw(str(self['index'])))
+        number_label = label(self['number'].label, _for=self['number'].id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        number_label.add(raw(str(self['number'])))
+        form.add(number_label)
+        return mark_safe(str(form))
+
+    class Meta:
+        model = IndexNumber
+        fields = '__all__'
+        widgets = {
+                'index': Select( attrs = {
+                        'class': 'select w-full select-bordered'
+                    }),
+                'number': TextInput( attrs = {
+                        'class': 'grow w-full'
+                    }),
+                'id': HiddenInput(),
+                'expression': HiddenInput(),
+            }
+
+

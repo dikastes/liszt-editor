@@ -4,7 +4,7 @@
 		href="{% url 'edwoca:work_title' object.id %}"
 		{% if 'title' in request.path %}class="active"{% endif %}
 		>
-		Titel
+		Titelei und Widmung
 	    </a>
 	</li>
 	<li>
@@ -22,17 +22,10 @@
 	    </a>
 	</li>
 	<li>
-	    <a href="{% url 'edwoca:work_contributors' object.id %}"
-		{% if 'contributors' in request.path %}class="active"{% endif %}
+	    <a href="{% url 'edwoca:work_references' object.id %}"
+		{% if 'references' in request.path %}class="active"{% endif %}
 		>
-		Beteiligte
-	    </a>
-	</li>
-	<li>
-	    <a href="{% url 'edwoca:work_relatedworks' object.id %}"
-		{% if 'relatedworks' in request.path %}class="active"{% endif %}
-		>
-		Referenzwerke
+		Referenz
 	    </a>
 	</li>
 	<li>

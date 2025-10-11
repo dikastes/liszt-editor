@@ -1,1 +1,1 @@
-{{ object.get_pref_title }}
+{{ object }}

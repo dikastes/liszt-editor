@@ -1,4 +1,6 @@
 from .base import *
+from ..models import Expression, IndexNumber
+from django.shortcuts import get_object_or_404, render
 from ..forms.expression import *
 from django.forms.models import formset_factory
 from django.shortcuts import redirect
@@ -51,10 +53,50 @@ class ExpressionCreateView(EntityMixin, CreateView):
         return self.render_to_response(context)
 
 
-class ExpressionUpdateView(EntityMixin, UpdateView):
-    model = Expression
-    form_class = ExpressionForm
-    template_name = 'edwoca/expression_update.html'
+
+def expression_update(request, pk):
+    expression = get_object_or_404(Expression, pk=pk)
+    context = {
+        'object': expression,
+        'entity_type': 'expression'
+    }
+
+    if request.method == 'POST':
+        form = ExpressionForm(request.POST, instance=expression)
+        if form.is_valid():
+            form.save()
+
+        for index_number in expression.index_numbers.all():
+            prefix = f'index_number_{index_number.id}'
+            index_number_form = IndexNumberForm(request.POST, instance=index_number, prefix=prefix)
+            if index_number_form.is_valid():
+                index_number_form.save()
+
+        return redirect('edwoca:expression_update', pk=pk)
+    else:
+        form = ExpressionForm(instance=expression)
+        index_number_forms = []
+        for index_number in expression.index_numbers.all():
+            prefix = f'index_number_{index_number.id}'
+            index_number_forms.append(IndexNumberForm(instance=index_number, prefix=prefix))
+
+    context['form'] = form
+    context['index_number_forms'] = index_number_forms
+    return render(request, 'edwoca/expression_update.html', context)
+
+
+def index_number_create(request, pk):
+    expression = get_object_or_404(Expression, pk=pk)
+    IndexNumber.objects.create(expression=expression, number='(neu)')
+    return redirect('edwoca:expression_update', pk=pk)
+
+
+class IndexNumberDeleteView(DeleteView):
+    model = IndexNumber
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:expression_update', kwargs={'pk': self.object.expression.id})
+
 
 
 class ExpressionTitleUpdateView(EntityMixin, TitleUpdateView):
