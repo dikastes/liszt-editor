@@ -155,6 +155,8 @@ class BaseHandwriting(models.Model):
                 return f"[{self.writer.str_with_link()}] ({self.medium})"
             return f"{self.writer.str_with_link()} ({self.medium})"
         except AttributeError:
+            if self.dubious_writer:
+                return f'[{self.writer.__str__()}] ({self.medium})'
             return f'{self.writer.__str__()} ({self.medium})'
 
 class BaseDedication(models.Model):
