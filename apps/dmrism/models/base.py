@@ -150,10 +150,12 @@ class BaseHandwriting(models.Model):
     dubious_writer = models.BooleanField(default = False)
 
     def __str__(self):
-        if self.dubious_writer:
-            return mark_safe(f"[{self.writer.str_with_link()}] ({self.medium})")
-        return mark_safe(f"{self.writer.str_with_link()} ({self.medium})")
-
+        try:
+            if self.dubious_writer:
+                return f"[{self.writer.str_with_link()}] ({self.medium})"
+            return f"{self.writer.str_with_link()} ({self.medium})"
+        except AttributeError:
+            return f'{self.writer.__str__()} ({self.medium})'
 
 class BaseDedication(models.Model):
     class Meta:
