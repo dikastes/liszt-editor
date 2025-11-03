@@ -45,8 +45,9 @@
 {% block content %}
 
 <div class="border bg-white border-base-300 p-5">
-	{% if page_obj.paginator.num_pages > 1 %}
-	    <div class="pagination">
+	<div class="flex">
+	    <div class="pagination flex-1">
+	    {% if page_obj.paginator.num_pages > 1 %}
 		<span class="join mb-5 ml-5">
 		    {% if page_obj.has_previous %}
 			<a href="?page=1&q={{ query }}" class="btn join-item"> &laquo; </a>
@@ -60,12 +61,22 @@
 			<a href="?page={{ page_obj.paginator.num_pages }}&q={{ query }}" class="join-item btn"> &raquo; </a>
 		    {% endif %}
 		</span>
+	    {% endif %}
+	    <div class="prose">
+		    <ul id="result-list" class="list-disc">
+			    {% include 'edwoca/partials/result_list.html' %}
+		    </ul>
 	    </div>
-	{% endif %}
-	<div class="prose">
-		<ul id="result-list" class="list-disc">
-			{% include 'edwoca/partials/result_list.html' %}
-		</ul>
+	    </div>
+	    <div class="stats flex-0">
+	    {% if query %}
+		<div class="stat">
+		    <div class="stat-title">Ergebnis {{ first_result_on_page }} bis {{ last_result_on_page }} von</div>
+		    <div class="stat-value">{{ total_results }}</div>
+		    <div class="stat-desc">für Suche nach <em>{{ query }}</em></div>
+		</div>
+	    {% endif %}
+	    </div>
 	</div>
 </div>
 {% endblock %}

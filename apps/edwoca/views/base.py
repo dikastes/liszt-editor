@@ -75,6 +75,15 @@ class EdwocaSearchView(SearchView):
         context['library_count'] = Library.objects.count()
         context['letter_count'] = Letter.objects.count()
         context['object_list'] = [ result.object for result in context['object_list'] ]
+
+        total_results = context['form'].search().count()
+        current_page = int(self.request.GET.get('page', 1))
+        first_result_on_page = (current_page - 1) * 10 + 1 if total_results > 0 else 0
+        last_result_on_page = first_result_on_page + 9 if first_result_on_page + 9 <= total_results else total_results
+
+        context['total_results'] = total_results
+        context['first_result_on_page'] = first_result_on_page
+        context['last_result_on_page'] = last_result_on_page
         context['list_entity_type'] = self.get_model_name().lower()
         context['query'] = self.request.GET.get('q', '')
 
