@@ -101,3 +101,53 @@ class RelatedWork(RelatedEntity):
 
 class WorkTitle(WemiTitle):
     work = models.ForeignKey('Work', on_delete=models.CASCADE, related_name='titles')
+
+
+class BaseWorkReference(models.Model):
+    class Meta:
+        abstract = True
+
+    work = models.ForeignKey(
+            'Work',
+            on_delete = models.CASCADE
+        )
+
+
+class WorkWorkReference(BaseWorkReference):
+    reference_work = models.ForeignKey(
+            'dmad.Work',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class PersonWorkReference(BaseWorkReference):
+    person = models.ForeignKey(
+            'dmad.Person',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class PlaceWorkReference(BaseWorkReference):
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class SubjectTermWorkReference(BaseWorkReference):
+    subject_term = models.ForeignKey(
+            'dmad.SubjectTerm',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class CorporationWorkReference(BaseWorkReference):
+    corporation = models.ForeignKey(
+            'dmad.Corporation',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )

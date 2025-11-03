@@ -1,5 +1,6 @@
 from .base import *
 from ..forms.work import *
+from dmad_on_django.models import Work as DmadWork, Person, Place, Corporation, SubjectTerm
 from bib.models import ZotItem
 from django.forms.models import formset_factory
 from django.shortcuts import redirect
@@ -84,12 +85,6 @@ class WorkRelationsUpdateView(EntityMixin, RelationsUpdateView):
     form_class = RelatedWorkForm
 
 
-class WorkReferencesUpdateView(EntityMixin, UpdateView):
-    model = Work
-    fields = []
-    template_name = 'edwoca/work_related_works.html'
-
-
 class RelatedWorkAddView(RelatedEntityAddView):
     template_name = 'edwoca/work_relations.html'
     model = RelatedWork
@@ -100,6 +95,41 @@ class RelatedWorkRemoveView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('edwoca:work_relations', kwargs={'pk': self.object.source_work.id})
+
+
+class ReferenceWorkRemoveView(DeleteView):
+    model = WorkWorkReference
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_references', kwargs={'pk': self.object.work.id})
+
+
+class ReferencePersonRemoveView(DeleteView):
+    model = PersonWorkReference
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_references', kwargs={'pk': self.object.work.id})
+
+
+class ReferenceCorporationRemoveView(DeleteView):
+    model = CorporationWorkReference
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_references', kwargs={'pk': self.object.work.id})
+
+
+class ReferencePlaceRemoveView(DeleteView):
+    model = PlaceWorkReference
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_references', kwargs={'pk': self.object.work.id})
+
+
+class ReferenceSubjectTermRemoveView(DeleteView):
+    model = SubjectTermWorkReference
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:work_references', kwargs={'pk': self.object.work.id})
 
 
 class WorkSearchView(EdwocaSearchView):
@@ -174,3 +204,65 @@ def work_expression_create(request, pk):
     work = get_object_or_404(Work, pk = pk)
     Expression.objects.create(work = work)
     return redirect('edwoca:work_relations', pk = pk)
+
+
+class WorkReferencesUpdateView(EntityMixin, UpdateView):
+    model = Work
+    fields = []
+    template_name = 'edwoca/work_references.html'
+    reference_models = { 
+            'work': DmadWork,
+            'person': Person,
+            'corporation': Corporation,
+            'place': Place,
+            'subject_term': SubjectTerm,
+        }
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['show_search_forms'] = True
+        for reference_model in self.reference_models:
+            search_form = SearchForm(self.request.GET or None, prefix = f'{reference_model}_search')
+            context[f'{reference_model}_searchform'] = search_form
+
+            if search_form.is_valid() and search_form.cleaned_data.get('q'):
+                context[f'{reference_model}_query'] = search_form.cleaned_data.get('q')
+                context[f'found_{reference_model}s'] = search_form.search().models(self.reference_models[reference_model])
+
+        return context
+
+
+def reference_work_add(request, pk, target_reference_work):
+    work = get_object_or_404(Work, pk = pk)
+    reference_work = get_object_or_404(DmadWork, pk = target_reference_work)
+    WorkWorkReference.objects.create(work = work, reference_work = reference_work)
+    return redirect('edwoca:work_references', pk = pk)
+
+
+def reference_person_add(request, pk, target_reference_person):
+    work = get_object_or_404(Work, pk = pk)
+    person = get_object_or_404(Person, pk = target_reference_person)
+    PersonWorkReference.objects.create(work = work, person = person)
+    return redirect('edwoca:work_references', pk = pk)
+
+
+def reference_corporation_add(request, pk, target_reference_corporation):
+    work = get_object_or_404(Work, pk = pk)
+    corporation = get_object_or_404(Corporation, pk = target_reference_corporation)
+    CorporationWorkReference.objects.create(work = work, corporation = corporation)
+    return redirect('edwoca:work_references', pk = pk)
+
+
+def reference_place_add(request, pk, target_reference_place):
+    work = get_object_or_404(Work, pk = pk)
+    place = get_object_or_404(Place, pk = target_reference_place)
+    PlaceWorkReference.objects.create(work = work, place = place)
+    return redirect('edwoca:work_references', pk = pk)
+
+
+def reference_subjectterm_add(request, pk, target_reference_subjectterm):
+    work = get_object_or_404(Work, pk = pk)
+    subject_term = get_object_or_404(SubjectTerm, pk = target_reference_subjectterm)
+    SubjectTermWorkReference.objects.create(work = work, subject_term = subject_term)
+    return redirect('edwoca:work_references', pk = pk)
