@@ -28,8 +28,9 @@ class EdwocaListView(ListView):
         context['form'] = SearchForm()
         context['work_count'] = Work.objects.count()
         context['expression_count'] = Expression.objects.count()
-        context['manifestation_count'] = Manifestation.objects.count()
-        context['item_count'] = Item.objects.count()
+        context['manifestation_count'] = Manifestation.objects.filter(is_singleton = False).count()
+        context['singleton_count'] = Manifestation.objects.filter(is_singleton = True).count()
+        context['item_count'] = Item.objects.filter(manifestation__is_singleton = False).count()
         context['library_count'] = Library.objects.count()
         context['letter_count'] = Letter.objects.count()
         context['list_entity_type'] = self.model.__name__.lower()
@@ -70,8 +71,9 @@ class EdwocaSearchView(SearchView):
 
         context['work_count'] = Work.objects.count()
         context['expression_count'] = Expression.objects.count()
-        context['manifestation_count'] = Manifestation.objects.count()
-        context['item_count'] = Item.objects.count()
+        context['manifestation_count'] = Manifestation.objects.filter(is_singleton = False).count()
+        context['singleton_count'] = Manifestation.objects.filter(is_singleton = True).count()
+        context['item_count'] = Item.objects.filter(manifestation__is_singleton = False).count()
         context['library_count'] = Library.objects.count()
         context['letter_count'] = Letter.objects.count()
         context['object_list'] = [ result.object for result in context['object_list'] ]
