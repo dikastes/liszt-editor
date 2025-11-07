@@ -315,7 +315,7 @@
             <div class="flex-1 m-0">
                 <p class="font-bold">{{ title.title }}</p>
                 <p class="text-sm">
-                    {{ title.render_summary }}
+                    {{ title.render_summary | safe }}
                 </p>
             </div>
             <a href="#title-modal-{{ title.id }}" class="btn flex-0"> bearbeiten </a>

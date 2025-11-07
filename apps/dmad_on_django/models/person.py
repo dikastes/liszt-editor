@@ -235,6 +235,9 @@ class Person(DisplayableModel):
         lobid_response = requests.get(lobid_url)
         return lobid_response.json()
 
+    def str_with_link(self):
+        return get_model_link(self)
+
     def __str__(self):
         if self.gnd_id:
             return f'{self.gnd_id}: {self.get_default_name()}'

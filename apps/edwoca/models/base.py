@@ -593,7 +593,6 @@ class ManifestationTitle(DmRismManifestationTitle):
 
         return manifestation_title
 
-
 class Item (EdwocaUpdateUrlMixin, DmRismItem):
     class Meta:
         proxy = True
