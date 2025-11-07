@@ -7,14 +7,12 @@
 <div class="bg-white border border-base-300 p-5">
 	<h2 class="card-title mt-0"> {{ object }} bearbeiten </h2>
 
-	<form method="post">
-		{% csrf_token %}
-		{{ form.as_daisy }}
-
-		<input id="submit-form" type="submit" value="{{ button_label }}" class="hidden">
-	</form>
-	
-	<div>
+	        <form method="post">
+	            {% csrf_token %}
+	            {{ form.as_daisy }}
+	    
+	            <input id="submit-form" type="submit" value="{{ button_label }}" class="hidden">
+	        </form>	<div>
 		ToDo: WV-Konkordanz
 	</div>
 </div>

@@ -277,7 +277,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
     def get_temp_title(self):
         if self.titles.filter(status = Status.TEMPORARY).first():
-            return f", {self.titles.filter(status = Status.TEMPORARY).first().title}"
+            return self.titles.filter(status = Status.TEMPORARY).first().title
         else:
             return ''
 

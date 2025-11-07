@@ -1,8 +1,9 @@
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe
 from dominate.tags import div, label, span
 from dominate.util import raw
+from dmad_on_django.forms import SearchForm
 
 
 class SimpleFormMixin:
@@ -158,3 +159,7 @@ class BaseBibForm(ModelForm):
         form.add(bib_container)
 
         return mark_safe(str(form))
+
+
+class EdwocaSearchForm(SearchForm):
+    q = CharField(required=False, widget=TextInput())

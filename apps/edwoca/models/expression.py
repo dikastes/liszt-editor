@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status
-from dmrism.models import BaseContributor, BaseBib, RelatedEntity
+from dmrism.models import BaseContributor, BaseBib, RelatedEntity, BasePersonDedication, BaseCorporationDedication
 
 
 class Expression(WeBaseClass):
@@ -203,4 +203,18 @@ class Key(models.Model):
             max_length=2,
             choices=Mode,
             default=Mode.MAJOR
+        )
+
+
+class ExpressionPersonDedication(BasePersonDedication):
+    expression = models.ForeignKey(
+            'Expression',
+            on_delete = models.CASCADE
+        )
+
+
+class ExpressionCorporationDedication(BaseCorporationDedication):
+    expression = models.ForeignKey(
+            'Expression',
+            on_delete = models.CASCADE
         )

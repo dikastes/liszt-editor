@@ -13,7 +13,7 @@
 			<li>
 				<div class="flex">
 					{{ work_bib.bib }}
-					<form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_bib_remove' work_bib.id %}" class="flex-0">
+					<form method="post" action="{% url 'edwoca:work_bib_remove' work_bib.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>
@@ -28,7 +28,7 @@
 
 		{% if show_zotitem_search_form == True %}
 
-		<form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
+		<form action="{% url 'edwoca:work_bibliography' object.id %}" method="get" class="flex gap-5">
 			<label class="input input-bordered flex items-center gap-2 flex-1">
 				Literatur
 				{{ zotitem_searchform.q }}
@@ -41,7 +41,7 @@
 		{% if zotitem_query %}
 			{% for found_bib in found_bibs %}
 				<li>
-					<form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_bib_add' object.id found_bib.object.pk %}">
+					<form method="POST" action="{% url 'edwoca:work_bib_add' object.id found_bib.object.pk %}">
 						{% csrf_token %}
 						<input type="submit" value="{{ found_bib.object }}" class="cursor-pointer">
 					</form>
@@ -63,7 +63,7 @@
 			<li>
 				<div class="flex">
 					{{ letter }}
-					<form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_letter_remove' object.id letter.id %}" class="flex-0">
+					<form method="post" action="{% url 'edwoca:work_letter_remove' object.id letter.id %}" class="flex-0">
 						{% csrf_token %}
 						<input type="submit" class="btn btn-small" value="entfernen">
 					</form>
@@ -78,7 +78,7 @@
 
 		{% if show_letter_search_form == True %}
 
-		<form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
+		<form action="{% url 'edwoca:work_bibliography' object.id %}" method="get" class="flex gap-5">
 			<label class="input input-bordered flex items-center gap-2 flex-1">
 				Brief
 				{{ letter_searchform.q }}
@@ -91,7 +91,7 @@
 		{% if letter_query %}
 			{% for found_letter in found_letters %}
 				<li>
-					<form method="POST" action="{% url 'edwoca:manifestation_letter_add' object.id found_letter.object.pk %}">
+					<form method="POST" action="{% url 'edwoca:work_letter_add' object.id found_letter.object.pk %}>
 						{% csrf_token %}
 						<input type="submit" value="{{ found_letter.object }}" class="cursor-pointer">
 					</form>

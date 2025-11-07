@@ -56,7 +56,10 @@
                     {% endfor %}
                 </div>
                 <div class="flex-0">
-                    <a href="{% url 'edwoca:manifestation_publication_delete' form.instance.id %}" class="btn">Löschen</a>
+                    <form action="{% url 'edwoca:manifestation_publication_delete' form.instance.id %}" method="POST">
+                        {% csrf_token %}
+                        <input type="submit" class="btn" value="Löschen" />
+                    </form>
                 </div>
             </form>
         {% endfor %}

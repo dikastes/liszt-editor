@@ -12,8 +12,8 @@
     {% block modals %}
     {% endblock %}
 
-    <body hx-ext="preload">
-	<div class="container w-full max-w-7xl mx-auto flex flex-col min-h-screen">
+    <body>
+	<div class="container w-full max-w-7xl mx-auto flex flex-col min-h-screen h-screen">
 	    <div class="navbar bg-white border border-base-300 mb-10 flex flex-0 p-0">
 		<div class="flex-none min-h-inherit">
 		    {% render_main_navbar_link %}
@@ -27,12 +27,12 @@
 		    {% endblock %}
 		</div>
 	    </div>
-	    <div class="flex gap-10 flex-1">
+	    <div class="flex gap-10 flex-1 overflow-hidden">
 		<div class="flex-0">
 		    {% block menu %}
 		    {% endblock %}
 		</div>
-		<div class="flex-1 min-w-0">
+		<div class="flex-1 min-w-0 overflow-auto">
 		    {% block content %}
 		    {% endblock %}
 		</div>

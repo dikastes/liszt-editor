@@ -10,6 +10,11 @@ from django.utils.safestring import mark_safe
 class WorkForm(ModelForm):
     class Meta:
         model = Work
+        fields = []
+
+class WorkIdentificationForm(ModelForm):
+    class Meta:
+        model = Work
         fields = ['work_catalog_number', 'gnd_id']
         widgets = {
                 'work_catalog_number': TextInput( attrs = {
@@ -101,5 +106,3 @@ WorkTitleFormSet = inlineformset_factory(
         max_num = 100,
         can_delete = True
     )
-
-

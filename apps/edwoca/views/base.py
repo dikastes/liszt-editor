@@ -28,8 +28,9 @@ class EdwocaListView(ListView):
         context['form'] = SearchForm()
         context['work_count'] = Work.objects.count()
         context['expression_count'] = Expression.objects.count()
-        context['manifestation_count'] = Manifestation.objects.count()
-        context['item_count'] = Item.objects.count()
+        context['manifestation_count'] = Manifestation.objects.filter(is_singleton = False).count()
+        context['singleton_count'] = Manifestation.objects.filter(is_singleton = True).count()
+        context['item_count'] = Item.objects.filter(manifestation__is_singleton = False).count()
         context['library_count'] = Library.objects.count()
         context['letter_count'] = Letter.objects.count()
         context['list_entity_type'] = self.model.__name__.lower()
@@ -70,11 +71,21 @@ class EdwocaSearchView(SearchView):
 
         context['work_count'] = Work.objects.count()
         context['expression_count'] = Expression.objects.count()
-        context['manifestation_count'] = Manifestation.objects.count()
-        context['item_count'] = Item.objects.count()
+        context['manifestation_count'] = Manifestation.objects.filter(is_singleton = False).count()
+        context['singleton_count'] = Manifestation.objects.filter(is_singleton = True).count()
+        context['item_count'] = Item.objects.filter(manifestation__is_singleton = False).count()
         context['library_count'] = Library.objects.count()
         context['letter_count'] = Letter.objects.count()
         context['object_list'] = [ result.object for result in context['object_list'] ]
+
+        total_results = context['form'].search().count()
+        current_page = int(self.request.GET.get('page', 1))
+        first_result_on_page = (current_page - 1) * 10 + 1 if total_results > 0 else 0
+        last_result_on_page = first_result_on_page + 9 if first_result_on_page + 9 <= total_results else total_results
+
+        context['total_results'] = total_results
+        context['first_result_on_page'] = first_result_on_page
+        context['last_result_on_page'] = last_result_on_page
         context['list_entity_type'] = self.get_model_name().lower()
         context['query'] = self.request.GET.get('q', '')
 

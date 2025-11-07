@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status
-from dmrism.models import BaseContributor, BaseBib, RelatedEntity
+from dmrism.models import BaseContributor, BaseBib, RelatedEntity, BasePersonDedication, BaseCorporationDedication
 
 
 class Work(WeBaseClass):
@@ -101,3 +101,67 @@ class RelatedWork(RelatedEntity):
 
 class WorkTitle(WemiTitle):
     work = models.ForeignKey('Work', on_delete=models.CASCADE, related_name='titles')
+
+
+class BaseWorkReference(models.Model):
+    class Meta:
+        abstract = True
+
+    work = models.ForeignKey(
+            'Work',
+            on_delete = models.CASCADE
+        )
+
+
+class WorkWorkReference(BaseWorkReference):
+    reference_work = models.ForeignKey(
+            'dmad.Work',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class PersonWorkReference(BaseWorkReference):
+    person = models.ForeignKey(
+            'dmad.Person',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class PlaceWorkReference(BaseWorkReference):
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class SubjectTermWorkReference(BaseWorkReference):
+    subject_term = models.ForeignKey(
+            'dmad.SubjectTerm',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class CorporationWorkReference(BaseWorkReference):
+    corporation = models.ForeignKey(
+            'dmad.Corporation',
+            on_delete = models.CASCADE,
+            related_name = 'referencing_works'
+        )
+
+
+class WorkPersonDedication(BasePersonDedication):
+    work = models.ForeignKey(
+            'Work',
+            on_delete = models.CASCADE
+        )
+
+
+class WorkCorporationDedication(BaseCorporationDedication):
+    work = models.ForeignKey(
+            'Work',
+            on_delete = models.CASCADE
+        )

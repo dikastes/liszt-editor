@@ -2,7 +2,7 @@
 
 
 {% block menu %}
-<ul class="menu menu-lg">
+<ul class="menu">
 	<li>
 	    <a href="{% url 'edwoca:work_search' %}"
 		{% if list_entity_type == 'work' %} class="active" {% endif %}>
@@ -12,19 +12,25 @@
 	<li>
 	    <a href="{% url 'edwoca:expression_search' %}"
 		{% if list_entity_type == 'expression' %} class="active" {% endif %}>
-		Expressionen <span class="badge"> {{ expression_count }} </span>
+		Fassungen <span class="badge"> {{ expression_count }} </span> <br>
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:singleton_search' %}"
+		{% if list_entity_type == 'singleton' %} class="active" {% endif %}>
+		Handschriften <span class="badge"> {{ singleton_count }} </span>
 	    </a>
 	</li>
 	<li>
 	    <a href="{% url 'edwoca:manifestation_search' %}"
 		{% if list_entity_type == 'manifestation' %} class="active" {% endif %}>
-		Manifestationen <span class="badge"> {{ manifestation_count }} </span>
+		Drucke <span class="badge"> {{ manifestation_count }} </span>
 	    </a>
 	</li>
 	<li>
 	    <a href="{% url 'edwoca:item_search' %}"
 		{% if list_entity_type == 'item' %} class="active" {% endif %}>
-		Exemplare <span class="badge"> {{ item_count }} </span>
+		Druckexemplare <span class="badge"> {{ item_count }} </span>
 	    </a>
 	</li>
 	<li>
@@ -45,8 +51,9 @@
 {% block content %}
 
 <div class="border bg-white border-base-300 p-5">
-	{% if page_obj.paginator.num_pages > 1 %}
-	    <div class="pagination">
+	<div class="flex">
+	    <div class="pagination flex-1">
+	    {% if page_obj.paginator.num_pages > 1 %}
 		<span class="join mb-5 ml-5">
 		    {% if page_obj.has_previous %}
 			<a href="?page=1&q={{ query }}" class="btn join-item"> &laquo; </a>
@@ -60,12 +67,22 @@
 			<a href="?page={{ page_obj.paginator.num_pages }}&q={{ query }}" class="join-item btn"> &raquo; </a>
 		    {% endif %}
 		</span>
+	    {% endif %}
+	    <div class="prose">
+		    <ul id="result-list" class="list-disc">
+			    {% include 'edwoca/partials/result_list.html' %}
+		    </ul>
 	    </div>
-	{% endif %}
-	<div class="prose">
-		<ul id="result-list" class="list-disc">
-			{% include 'edwoca/partials/result_list.html' %}
-		</ul>
+	    </div>
+	    <div class="stats flex-0 h-32">
+	    {% if query %}
+		<div class="stat">
+		    <div class="stat-title">Ergebnis {{ first_result_on_page }} bis {{ last_result_on_page }} von</div>
+		    <div class="stat-value">{{ total_results }}</div>
+		    <div class="stat-desc">für Suche nach <em>{{ query }}</em></div>
+		</div>
+	    {% endif %}
+	    </div>
 	</div>
 </div>
 {% endblock %}

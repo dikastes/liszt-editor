@@ -36,6 +36,15 @@
 			Datierung und Ort
 		    </a>
 		</li>
+		{% if not object.is_singleton %}
+			<li>
+			    <a href="{% url 'edwoca:manifestation_print' object.id %}"
+				{% if 'print' in request.path %}class="active"{% endif %}
+				>
+				Verlag und Druckspezifika
+			    </a>
+			</li>
+		{% endif %}
 		{% if object.is_singleton %}
 			<li>
 			    <a href="{% url 'edwoca:manifestation_provenance' object.id %}"
@@ -44,20 +53,11 @@
 				Provenienz
 			    </a>
 			</li>
-		{% endif %}
-		<li>
-		    <a href="{% url 'edwoca:manifestation_print' object.id %}"
-			{% if 'print' in request.path %}class="active"{% endif %}
-			>
-			Verlag und Druckspezifika
-		    </a>
-		</li>
-		{% if object.is_singleton %}
 			<li>
 			    <a href="{% url 'edwoca:manifestation_manuscript' object.id %}"
 				{% if 'manuscript' in request.path %}class="active"{% endif %}
 				>
-				Manuskriptspezifika
+				handschriftliche Eintragungen
 			    </a>
 			</li>
 		{% endif %}
@@ -73,7 +73,7 @@
 			    <a href="{% url 'edwoca:manifestation_digital_copy' object.id %}"
 				{% if 'digcopy' in request.path %}class="active"{% endif %}
 				>
-				Digitalisat
+				Digitalisate
 			    </a>
 			</li>
 		{% endif %}

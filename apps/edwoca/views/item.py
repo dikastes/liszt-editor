@@ -1,12 +1,13 @@
 from .base import *
 from ..forms.item import *
 from ..forms.dedication import ItemPersonDedicationForm, ItemCorporationDedicationForm
+from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
-from ..models import Item as EdwocaItem
-from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, ItemDigitalCopy, ItemPersonDedication, ItemCorporationDedication
+from ..models import Item as EdwocaItem, ItemModification, ModificationHandwriting, Work, Expression, Manifestation
+from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, ItemDigitalCopy, ItemPersonDedication, ItemCorporationDedication, ItemHandwriting
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Person, Corporation, Place
 from bib.models import ZotItem
@@ -24,9 +25,17 @@ def item_set_template(request, pk):
 class ItemListView(EdwocaListView):
     model = EdwocaItem
 
+    def get_queryset(self):
+        return super().get_queryset().filter(manifestation__is_singleton = False)
+
 
 class ItemSearchView(EdwocaSearchView):
     model = EdwocaItem
+
+    def get_queryset(self):
+        #qs = super().get_queryset()
+        #breakpoint()
+        return super().get_queryset().filter(manifestation_is_singleton = False)
 
 
 def item_update(request, pk):
@@ -427,9 +436,30 @@ def item_manuscript_update(request, pk):
                 handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
+            
+            for modification in item.modifications.all():
+                prefix = f'modification_{modification.id}'
+                modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
+                if modification_form.is_valid():
+                    modification_form.save()
+
+                for handwriting in modification.handwritings.all():
+                    prefix = f'modification_handwriting_{handwriting.id}'
+                    handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                    if handwriting_form.is_valid():
+                        handwriting_form.save()
 
         if 'add_handwriting' in request.POST:
             ItemHandwriting.objects.create(item=item)
+
+        if 'add_modification' in request.POST:
+            ItemModification.objects.create(item=item)
+
+        if 'add_modification_handwriting' in request.POST:
+            modification_id = request.POST.get('add_modification_handwriting')
+            modification = get_object_or_404(ItemModification, pk=modification_id)
+            ModificationHandwriting.objects.create(modification=modification)
+            return redirect('edwoca:item_manuscript', pk=pk)
 
         return redirect('edwoca:item_manuscript', pk=pk)
 
@@ -441,6 +471,23 @@ def item_manuscript_update(request, pk):
             handwriting_forms.append(ItemHandwritingForm(instance=handwriting, prefix=prefix))
         context['handwriting_forms'] = handwriting_forms
 
+        modifications = []
+        for modification in item.modifications.all():
+            prefix = f'modification_{modification.id}'
+            modification_form = ItemModificationForm(instance=modification, prefix=prefix)
+            
+            handwriting_forms = []
+            for handwriting in modification.handwritings.all():
+                prefix = f'modification_handwriting_{handwriting.id}'
+                handwriting_forms.append(ModificationHandwritingForm(instance=handwriting, prefix=prefix))
+            
+            modifications.append({
+                'form': modification_form,
+                'handwriting_forms': handwriting_forms
+            })
+
+        context['modifications'] = modifications
+
     context['form'] = form
     search_form = SearchForm(request.GET or None)
     context['search_form'] = search_form
@@ -451,6 +498,52 @@ def item_manuscript_update(request, pk):
 
     if request.GET.get('handwriting_id'):
         context['handwriting_id'] = int(request.GET.get('handwriting_id'))
+
+    if request.GET.get('add_handwriting_for_modification'):
+        context['add_handwriting_for_modification'] = True
+        context['modification_id'] = int(request.GET.get('modification_id'))
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_persons"] = search_form.search().models(Person)
+
+    if request.GET.get('modification_handwriting_id'):
+        context['modification_handwriting_id'] = int(request.GET.get('modification_handwriting_id'))
+
+    # Search forms for modifications
+    q_work = request.GET.get('work-q')
+    q_expression = request.GET.get('expression-q')
+    q_manifestation = request.GET.get('manifestation-q')
+
+    if q_work:
+        work_search_form = SearchForm(request.GET, prefix='work')
+        if work_search_form.is_valid():
+            context['query_work'] = work_search_form.cleaned_data.get('q')
+            context['found_works'] = work_search_form.search().models(Work)
+    else:
+        work_search_form = SearchForm(prefix='work')
+
+    if q_expression:
+        expression_search_form = SearchForm(request.GET, prefix='expression')
+        if expression_search_form.is_valid():
+            context['query_expression'] = expression_search_form.cleaned_data.get('q')
+            context['found_expressions'] = expression_search_form.search().models(Expression)
+    else:
+        expression_search_form = SearchForm(prefix='expression')
+
+    if q_manifestation:
+        manifestation_search_form = SearchForm(request.GET, prefix='manifestation')
+        if manifestation_search_form.is_valid():
+            context['query_manifestation'] = manifestation_search_form.cleaned_data.get('q')
+            context['found_manifestations'] = manifestation_search_form.search().models(Manifestation)
+    else:
+        manifestation_search_form = SearchForm(prefix='manifestation')
+
+    context['work_search_form'] = work_search_form
+    context['expression_search_form'] = expression_search_form
+    context['manifestation_search_form'] = manifestation_search_form
+
+    if request.GET.get('modification_id'):
+        context['modification_id'] = int(request.GET.get('modification_id'))
 
     return render(request, 'edwoca/item_manuscript.html', context)
 
@@ -475,3 +568,67 @@ class ItemHandwritingDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.item.id})
+
+class ItemModificationDeleteView(DeleteView):
+    model = ItemModification
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.item.id})
+
+class ModificationHandwritingDeleteView(DeleteView):
+    model = ModificationHandwriting
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.modification.item.id})
+
+def modification_add_handwriting_writer(request, handwriting_pk, person_pk):
+    handwriting = get_object_or_404(ModificationHandwriting, pk=handwriting_pk)
+    person = get_object_or_404(Person, pk=person_pk)
+    handwriting.writer = person
+    handwriting.save()
+    return redirect('edwoca:item_manuscript', pk=handwriting.modification.item.id)
+
+def modification_remove_handwriting_writer(request, handwriting_pk):
+    handwriting = get_object_or_404(ModificationHandwriting, pk=handwriting_pk)
+    handwriting.writer = None
+    handwriting.save()
+    return redirect('edwoca:item_manuscript', pk=handwriting.modification.item.id)
+
+def modification_add_related_work(request, modification_pk, work_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    work = get_object_or_404(Work, pk=work_pk)
+    modification.related_work = work
+    modification.save()
+    return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+def modification_remove_related_work(request, modification_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    modification.related_work = None
+    modification.save()
+    return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+def modification_add_related_expression(request, modification_pk, expression_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    expression = get_object_or_404(Expression, pk=expression_pk)
+    modification.related_expression = expression
+    modification.save()
+    return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+def modification_remove_related_expression(request, modification_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    modification.related_expression = None
+    modification.save()
+    return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+def modification_add_related_manifestation(request, modification_pk, manifestation_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    manifestation = get_object_or_404(Manifestation, pk=manifestation_pk)
+    modification.related_manifestation = manifestation
+    modification.save()
+    return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+def modification_remove_related_manifestation(request, modification_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    modification.related_manifestation = None
+    modification.save()
+    return redirect('edwoca:item_manuscript', pk=modification.item.id)

@@ -1,85 +1,19 @@
 {% extends 'edwoca/base.html' %}
 
-{% block modals %}
-	{% if not object.is_singleton %}
-		{% for item_form in item_forms %}
-			<div class="modal" role="dialog" id="item-modal-{{ item_form.item.id }}">
-				<div class="modal-box">
-					<h3 class="text-lg font-bold">Exemplar bearbeiten</h3>
-					<form method="post">
-						{% csrf_token %}
-						<h3>Signaturen</h3>
-
-						{% comment %}
-							if not every management form is displayed here, there will be trouble in
-							the other forms after a new formset form has been added
-						{% endcomment %}
-						<div class="hidden">
-						{% for item_form in item_forms %}
-							{{ item_form.signature_formset }}
-						{% endfor %}
-						</div>
-
-						{% for form in item_form.signature_formset %}
-							<div class="signature-form">
-								{{ form.as_daisy }}
-							</div>
-						{% endfor %}
-
-						
-						<div class="flex gap-5">
-							<div class="flex-1"></div>
-							<input type="submit" name="add_signature_{{ item_form.item.id }}" value="Signatur hinzufügen" class="flex-0 btn">
-							<input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
-							<div class="modal-action flex-0 m-0">
-								<a href="#" class="btn">X</a>
-							</div>
-						</div>
-					</form>
-				</div>
-			</div>
-		{% endfor %}
-		<div class="modal" role="dialog" id="item-modal-new">
-			<div class="modal-box">
-				<h3 class="text-lg font-bold">Exemplar anlegen</h3>
-				<form method="post" action="{% url 'edwoca:manifestation_update' object.id %}">
-					{% csrf_token %}
-					<h3>Signaturen</h3>
-					{{ new_signature_formset.management_form }}
-					{% for form in new_signature_formset %}
-						<div class="signature-form">
-							{{ form.as_daisy }}
-						</div>
-					{% endfor %}
-
-					
-					<div class="flex gap-5">
-						<div class="flex-1"></div>
-						<input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
-						<div class="modal-action flex-0 m-0">
-							<a href="#" class="btn">X</a>
-						</div>
-					</div>
-				</form>
-			</div>
-		</div>
-	{% endif %}
-{% endblock %}
-
 {% block content %}
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
 
 <div class="bg-white border border-base-300 p-5 mb-10">
 	<div class="prose">
-		<h2> Expressions </h2>
-		<h3> verknüpfte Expressions </h3>
+		<h2> Referenzwerke </h2>
+		<h3> verknüpfte Referenzwerke </h3>
 		<ul>
-		{% for expression in object.expressions.all %}
+		{% for work in object.work_work_references.all %}
 			<li>
 				<div class="flex">
 					<a href="{% url 'edwoca:expression_update' expression.id %}" class="flex-1">
-						{{ expression }}
+						{{ work }}
 					</a>
 					<a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-small">
 						entfernen
@@ -87,11 +21,11 @@
 				</div>
 			</li>
 		{% empty %}
-			<li> <em> keine Expressions verknüpft </em> </span> </li>
+			<li> <em> keine Referenzwerke verknüpft </em> </span> </li>
 		{% endfor %}
 		</ul>
 
-		<h3> neue Expression verknüpfen </h3>
+		<h3> neues Referenzwerk verknüpfen </h3>
 
 		<form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get">
 			{{ expression_search_form.q.label_tag }}
@@ -188,7 +122,7 @@
 
 		<form method="post">
 			{% csrf_token %}
-			{{ target_related_manifestation }} mit {{ object }} verknüpfen als:
+			{{ object }} mit {{ object }} verknüpfen als:
 			{{ form }}
 			<input type="submit" id="submit-form" class="btn" />
 		</form>

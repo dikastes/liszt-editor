@@ -1,0 +1,260 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Bezugswerke </h2>
+
+		<ul>
+		{% for work_reference in object.workworkreference_set.all %}
+			<li>
+				<div class="flex">
+					<span class="flex-1">
+						{{ work_reference.reference_work }}
+					</span>
+					<form method="post" action="{% url 'edwoca:reference_work_remove' work_reference.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Werke verknüpft </em> </li>
+		{% endfor %}
+		</ul>
+
+		<form action="{% url 'edwoca:work_references' object.id %}" method="get">
+			<div class="label">
+				<span class="label-text"> neues Werk verknüpfen </span>
+			</div>
+
+			<div class="flex gap-5">
+				{{ work_searchform.q }}
+				<input type="submit" id="submit-form" class="btn" />
+			</div>
+		</form>
+		
+		<ul>
+		{% if work_query %}
+			{% for found_work in found_works %}
+				<li>
+					<a href="{% url 'edwoca:reference_work_add' object.id found_work.object.id %}">
+						{{ found_work.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Bezugspersonen </h2>
+
+		<ul>
+		{% for person_reference in object.personworkreference_set.all %}
+			<li>
+				<div class="flex">
+					<span class="flex-1">
+						{{ person_reference.person }}
+					</span>
+					<form method="post" action="{% url 'edwoca:reference_person_remove' person_reference.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Werke verknüpft </em> </li>
+		{% endfor %}
+		</ul>
+
+		<form action="{% url 'edwoca:work_references' object.id %}" method="get">
+			<div class="label">
+				<span class="label-text"> neue Person verknüpfen </span>
+			</div>
+
+			<div class="flex gap-5">
+				{{ person_searchform.q }}
+				<input type="submit" id="submit-form" class="btn" />
+			</div>
+		</form>
+		
+		<ul>
+		{% if person_query %}
+			{% for found_person in found_persons %}
+				<li>
+					<a href="{% url 'edwoca:reference_person_add' object.id found_person.object.id %}">
+						{{ found_person.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Bezugskörperschaften </h2>
+
+		<ul>
+		{% for corporation_reference in object.corporationworkreference_set.all %}
+			<li>
+				<div class="flex">
+					<span class="flex-1">
+						{{ corporation_reference.corporation }}
+					</span>
+					<form method="post" action="{% url 'edwoca:reference_corporation_remove' corporation_reference.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Werke verknüpft </em> </li>
+		{% endfor %}
+		</ul>
+
+		<form action="{% url 'edwoca:work_references' object.id %}" method="get">
+			<div class="label">
+				<span class="label-text"> neue Körperschaft verknüpfen </span>
+			</div>
+
+			<div class="flex gap-5">
+				{{ corporation_searchform.q }}
+				<input type="submit" id="submit-form" class="btn" />
+			</div>
+		</form>
+
+		<ul>
+		{% if corporation_query %}
+			{% for found_corporation in found_corporations %}
+				<li>
+					<a href="{% url 'edwoca:reference_corporation_add' object.id found_corporation.object.id %}">
+						{{ found_corporation.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Bezugsort </h2>
+
+		<ul>
+		{% for place_reference in object.placeworkreference_set.all %}
+			<li>
+				<div class="flex">
+					<span class="flex-1">
+						{{ place_reference.place }}
+					</span>
+					<form method="post" action="{% url 'edwoca:reference_place_remove' place_reference.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Werke verknüpft </em> </li>
+		{% endfor %}
+		</ul>
+
+		<form action="{% url 'edwoca:work_references' object.id %}" method="get">
+			<div class="label">
+				<span class="label-text"> neuen Ort verknüpfen </span>
+			</div>
+
+			<div class="flex gap-5">
+				{{ place_searchform.q }}
+				<input type="submit" id="submit-form" class="btn" />
+			</div>
+		</form>
+
+		<ul>
+		{% if place_query %}
+			{% for found_place in found_places %}
+				<li>
+					<a href="{% url 'edwoca:reference_place_add' object.id found_place.object.id %}">
+						{{ found_place.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+	</div>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Bezugssachschlagworte </h2>
+
+		<ul>
+		{% for subjectterm_reference in object.subjecttermworkreference_set.all %}
+			<li>
+				<div class="flex">
+					<span class="flex-1">
+						{{ subjectterm_reference.subject_term }}
+					</span>
+					<form method="post" action="{% url 'edwoca:reference_subjectterm_remove' subjectterm_reference.id %}" class="flex-0">
+						{% csrf_token %}
+						<input type="submit" class="btn btn-small" value="entfernen">
+					</form>
+				</div>
+			</li>
+		{% empty %}
+			<li> <em> keine Werke verknüpft </em> </li>
+		{% endfor %}
+		</ul>
+
+		<form action="{% url 'edwoca:work_references' object.id %}" method="get">
+			<div class="label">
+				<span class="label-text"> neues Schlagwort verknüpfen </span>
+			</div>
+
+			<div class="flex gap-5">
+				{{ subject_term_searchform.q }}
+				<input type="submit" id="submit-form" class="btn" />
+			</div>
+		</form>
+
+		<ul>
+		{% if subject_term_query %}
+			{% for found_subjectterm in found_subject_terms %}
+				<li>
+					<a href="{% url 'edwoca:reference_subjectterm_add' object.id found_subjectterm.object.id %}">
+						{{ found_subjectterm.object }}
+					</a>
+				</li>
+			{% empty %}
+				<li> <em> keine Suchergebnisse </em> </li>
+			{% endfor %}
+		{% else %}
+			<li> <em> bitte Suchbegriff eingeben </em> </li>
+		{% endif %}
+		</ul>
+	</div>
+</div>
+
+{% endblock %}

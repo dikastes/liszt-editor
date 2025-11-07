@@ -8,7 +8,7 @@
 		{% csrf_token %}
 		{{ item_form.as_daisy }}
 
-                <h3 class="text-lg font-bold mt-5">Signaturen</h3>
+                <h3 class="text-lg font-bold mt-5">Standorte</h3>
                 {{ signature_formset.management_form }}
                 {% for form in signature_formset %}
                     {{ form.as_daisy }}
@@ -17,7 +17,7 @@
                 <div class="flex">
                         <div class="flex-1"></div>
                         <div class="flex-0">
-                                <input type="submit" name="add_signature" value="Signatur hinzufügen" class="btn btn-secondary mt-2">
+                                <input type="submit" name="add_signature" value="Standort hinzufügen" class="btn btn-secondary mt-2">
                                 <input type="submit" value="Speichern" class="hidden" id="submit-form">
                         </div>
                 </div>
