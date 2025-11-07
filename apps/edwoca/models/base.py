@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -823,3 +823,58 @@ class Letter(models.Model):
                 receiver = 'unbekannt'
 
         return f'{sender} an {receiver}, {self.period}'
+
+
+class ItemModification(models.Model):
+    class ModificationType(models.TextChoices):
+        ARRANGEMENT = 'AR', _('Arrangement')
+        TRANSCRIPTION = 'TR', _('Transcription')
+        REVISION = 'RV', _('Revision')
+
+    item = models.ForeignKey(
+            'dmrism.Item',
+            related_name = 'modifications',
+            on_delete = models.CASCADE
+        )
+    related_manifestation = models.ForeignKey(
+            'dmrism.Manifestation',
+            related_name = 'relating_modifications',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    related_expression = models.ForeignKey(
+            'Expression',
+            related_name = 'relating_modifications',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    related_work = models.ForeignKey(
+            'Work',
+            related_name = 'relating_modifications',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    period = models.ForeignKey(
+            'dmad.Period',
+            related_name = 'modification',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    note = models.TextField(
+            null = True,
+            blank = True
+        )
+    modification_type = models.CharField(
+            max_length = 2,
+            choices = ModificationType,
+            default = None,
+            null = True
+        )
+
+
+class ModificationHandwriting(BaseHandwriting):
+    modification = models.ForeignKey(
+            'ItemModification',
+            related_name = 'handwritings',
+            on_delete = models.CASCADE
+        )
