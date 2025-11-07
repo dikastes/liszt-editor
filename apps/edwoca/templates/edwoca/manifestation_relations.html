@@ -188,7 +188,7 @@
 
 		<form method="post">
 			{% csrf_token %}
-			{{ object }} mit {{ object }} verknüpfen als:
+			{{ target_related_manifestation }} mit {{ object }} verknüpfen als:
 			{{ form }}
 			<input type="submit" id="submit-form" class="btn" />
 		</form>

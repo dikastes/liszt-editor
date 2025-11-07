@@ -1,0 +1,36 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+<div class="bg-white border border-base-300 p-5">
+	<div class="prose">
+		<h2> !Mockup! Besetzung </h2>
+
+		<h3> Besetzungen </h3>
+
+		<div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
+		    <div class="flex-1 m-0">
+			<p class="font-bold"> Kammerorchester </p>
+			<p class="text-sm">
+				Violine, Viola (2), Cello
+			</p>
+		    </div>
+		    <a href="#title-modal-{{ title.id }}" class="btn flex-0"> bearbeiten </a>
+		    <a type="submit" class="btn btn-primary" value="löschen"> löschen </a>
+		</div>
+
+		<div class="form-control">
+			<label class="label">
+				<span class="label-text"> Kommentar </span>
+			</label>
+			<textarea class="textarea textarea-bordered h-24"></textarea>
+		</div>
+
+	</div>
+</div>
+
+{% endblock %}
+
+
+
+

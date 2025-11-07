@@ -27,7 +27,7 @@
 			{% if object.missing_item %}
 				<p> Dieses Manuskript ist verschollen. </p>
 			{% else %}
-				<h3>Signaturen</h3>
+				<h3>Standorte</h3>
 				{{ signature_formset.management_form }}
 				{% for form in signature_formset %}
 					<div class="signature-form">
@@ -38,7 +38,7 @@
 				
 				<div class="flex">
 					<div class="flex-1"></div>
-					<input type="submit" name="add_signature" value="Signatur hinzufügen" class="flex-0 btn btn-secondary mt-2">
+					<input type="submit" name="add_signature" value="Standort hinzufügen" class="flex-0 btn btn-secondary mt-2">
 				</div>
 			{% endif %}
 			<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
@@ -73,7 +73,7 @@
 			<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
 		</form>
 
-		<h3>Signaturen Vorlageexemplar</h3>
+		<h3>Vorlageexemplar</h3>
 		{% for signature in object.template_item.signatures.all %}
 			<div class="signature-form">
 				<div class="flex gap-10 mb-5">
