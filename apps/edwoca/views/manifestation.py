@@ -22,9 +22,48 @@ from dmrism.models.manifestation import ManifestationBib
 class ManifestationListView(EdwocaListView):
     model = EdwocaManifestation
 
+    def get_queryset(self):
+        return super().get_queryset().filter(is_singleton = False)
+
 
 class ManifestationSearchView(EdwocaSearchView):
     model = EdwocaManifestation
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_singleton = False)
+
+
+class SingletonListView(EdwocaListView):
+    model = EdwocaManifestation
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_singleton = True)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_entity_type'] = 'singleton'
+        return context
+
+
+class SingletonSearchView(EdwocaSearchView):
+    model = EdwocaManifestation
+
+    def get_queryset(self):
+        return super().get_queryset().filter(is_singleton = True)
+
+    def get(self, request, *args, **kwargs):
+        query = request.GET.get('q', '')
+
+        # redirect to list view if empty query
+        if not query or query == '':
+            return redirect(f'edwoca:singleton_list')
+
+        return super().get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['list_entity_type'] = 'singleton'
+        return context
 
 
 def manifestation_create(request):
@@ -397,12 +436,11 @@ class ManifestationRelationsUpdateView(EntityMixin, RelationsUpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
-        
         expression_search_form = SearchForm(self.request.GET or None, prefix='expression')
         context['expression_search_form'] = expression_search_form
         if expression_search_form.is_valid() and expression_search_form.cleaned_data.get('q'):
             context['query_expression'] = expression_search_form.cleaned_data.get('q')
-            context[f"found_expressions"] = expression_search_form.search().models(Expression)
+            context['found_expressions'] = expression_search_form.search().models(Expression)
 
         return context
 
@@ -504,7 +542,7 @@ def manifestation_remove_stitcher(request, pk):
 
 class ManifestationBibAddView(FormView):
     def post(self, request, *args, **kwargs):
-        manifestation_.id = self.kwargs['pk']
+        manifestation_id = self.kwargs['pk']
         zotitem_key = self.kwargs['zotitem_key']
         manifestation = Manifestation.objects.get(pk=manifestation_id)
         zotitem = ZotItem.objects.get(zot_key=zotitem_key)
@@ -581,7 +619,7 @@ def manifestation_print_update(request, pk):
             Publication.objects.create(manifestation=manifestation)
             return redirect('edwoca:manifestation_print', pk=pk)
 
-        for publication in manifestation.publication_set.all():
+        for publication in manifestation.publications.all():
             prefix = f'publication_{publication.id}'
             form = PublicationForm(request.POST, instance=publication, prefix=prefix)
             if form.is_valid():
