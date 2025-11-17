@@ -119,6 +119,7 @@ urlpatterns = [
         path('item/<int:pk>/provenance/corporation/<int:cps_id>/remove_owner/', views.corporation_provenance_remove_owner, name='corporation_provenance_remove_owner'),
         path('item/<int:pk>/provenance/corporation/<int:cps_id>/remove_bib/', views.corporation_provenance_remove_bib, name='corporation_provenance_remove_bib'),
         path('item/<int:pk>/provenance/corporation/<int:cps_id>/add_letter/<int:letter_pk>/', views.corporation_provenance_add_letter, name='corporation_provenance_add_letter'),
+        path('item/<int:pk>/<str:direction>/swap', views.item_swap_view, name='item_swap_order'),
         path('item/<int:pk>/provenance/corporation/<int:cps_id>/remove_letter/<int:letter_pk>/', views.corporation_provenance_remove_letter, name='corporation_provenance_remove_letter'),
         path('manifestations/<int:pk>/bibliography', views.ManifestationBibliographyUpdateView.as_view(), name = 'manifestation_bibliography'),
         path('manifestations/<int:pk>/bibliography/addbib/<str:zotitem_key>', views.ManifestationBibAddView.as_view(), name = 'manifestation_bib_add'),

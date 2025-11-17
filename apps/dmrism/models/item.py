@@ -5,8 +5,10 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from liszt_util.models import Sortable
 
-class Item(WemiBaseClass):
+
+class Item(Sortable, WemiBaseClass):
     rism_id = models.CharField(
             max_length=20,
             null = True,
@@ -78,6 +80,17 @@ class Item(WemiBaseClass):
     def save(self, *args, **kwargs):
         if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
             raise ValidationError("Cannot add another item to a singleton manifestation.")
+        
+        if self.pk is None:
+            max_index = (
+                Item.objects
+                .filter(manifestation=self.manifestation)
+                .aggregate(models.Max('order_index'))['order_index__max']
+            )
+
+            if max_index is not None:
+                self.order_index = max_index + 1
+
         super().save(*args, **kwargs)
 
     class Meta:
@@ -88,6 +101,8 @@ class Item(WemiBaseClass):
                 name='unique_template_item_per_manifestation'
             )
         ]
+        ordering = ['manifestation', 'order_index']
+        unique_together = ('manifestation', 'order_index')
 
 
 class Library(models.Model):

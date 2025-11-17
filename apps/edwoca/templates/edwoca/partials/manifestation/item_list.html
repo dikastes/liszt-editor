@@ -1,0 +1,50 @@
+{% load static %}
+{% load i18n %}
+
+{% for item in object.items.all %}
+    <div class="flex gap-3 items-center mb-2">
+        
+        <div class="flex flex-0 gap-1"> 
+            {% url 'edwoca:item_swap_order' pk=item.id direction='up' as swap_up_url %}
+            <form hx-post="{{ swap_up_url }}" 
+                  hx-target="#item-list-container" 
+                  hx-swap="innerHTML" 
+                  class="flex-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="Nach oben verschieben">
+                    ↑ Auf
+                </button>
+            </form>
+            
+            {% url 'edwoca:item_swap_order' pk=item.id direction='down' as swap_down_url %}
+            <form hx-post="{{ swap_down_url }}" 
+                  hx-target="#item-list-container" 
+                  hx-swap="innerHTML" 
+                  class="flex-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="Nach unten verschieben">
+                    ↓ Ab
+                </button>
+            </form>
+        </div>
+        
+        <p class="flex-1 m-0">
+            <a href="{% url 'edwoca:item_update' item.id %}" class="font-semibold">
+                {{ item }}
+                {% if item.is_template %}
+                    <span class="badge badge-primary badge-sm ml-2">Vorlage</span>
+                {% endif %}
+            </a>
+        </p>
+        
+        {% if not item.is_template %}
+            <a href="{% url 'edwoca:item_set_template' item.id %}" class="btn btn-sm flex-0 ml-2"> Vorlage </a>
+        {% endif %}
+        <form action="{% url 'edwoca:manifestation_item_delete' item.id %}" method="post" class="flex-0 ml-2">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-sm btn-error" value="löschen"/>
+        </form>
+    </div>
+{% empty %}
+    <p> keine Exemplare </p>
+{% endfor %}
