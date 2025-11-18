@@ -69,6 +69,9 @@ def item_swap_view(request, pk, direction):
 
     item = get_object_or_404(EdwocaItem, pk=pk)
     success = swap_order(item, 'manifestation', direction)
+    if not success:
+        messages.error(request, "Element steht am Anfang oder Ende der Liste")
+        
     manifestation = item.manifestation
 
     context = {'object': manifestation}
