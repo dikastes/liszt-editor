@@ -59,7 +59,7 @@ class Expression(Sortable,WeBaseClass):
 
             if max_index is not None:
                 self.order_index = max_index+1
-        super().save(self, *args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         ordering = ['work', 'order_index']
