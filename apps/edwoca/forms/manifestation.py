@@ -5,11 +5,13 @@ from django.conf import settings
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
-from dmad_on_django.models import Period
+from dmad_on_django.models import Period, Corporation
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting
 from dominate.tags import div, label, span
 from dominate.util import raw
+from liszt_util.forms.forms import GenericAsDaisyMixin
+from liszt_util.forms.layouts import Layouts
 
 
 class ManifestationForm(ModelForm):
@@ -319,9 +321,6 @@ ManifestationTitleFormSet = inlineformset_factory(
     )
 
 
-
-
-
 class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
@@ -334,39 +333,162 @@ class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
 
 
 class ManifestationCreateForm(forms.Form):
-    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False)
-    signature = forms.CharField(label='Signatur', max_length=255)
-    library = forms.ModelChoiceField(queryset=Library.objects.all(), label='Bibliothek', empty_label="Bibliothek auswählen", widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
-
-
-class ManifestationTitleHandwritingForm(ModelForm):
-    class Meta:
-        model = ManifestationTitleHandwriting
-        fields = ['medium', 'manifestation_title', 'dubious_writer']
-        widgets = {
-            'medium': TextInput(attrs={'class': 'w-full'}),
-            'manifestation_title': HiddenInput(),
-            'dubious_writer': CheckboxInput(attrs={'class': 'toggle'}),
+    kwargs = {
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': 'select select-bordered'
+            }
         }
+    read_only_fields = ['publisher']
+    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
+    plate_number = forms.CharField(label='Plattennummer', max_length=50, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
+    source_type = forms.ChoiceField(label='Quellentyp', choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label='Verlag', empty_label="Bibliothek auswählen", widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+
+    def __init__(self, *args, **kwargs):
+        self.publisher_instance = kwargs.pop('publisher', None)
+        super().__init__(*args, **kwargs)
+        if self.publisher_instance:
+            self.initial['publisher'] = self.publisher_instance
+            self.fields['publisher'].queryset = Corporation.objects.filter(pk=self.publisher_instance.pk)
+            self.fields['publisher'].widget.attrs['disabled'] = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.publisher_instance:
+            cleaned_data['publisher'] = self.publisher_instance
+        return cleaned_data
 
     def as_daisy(self):
-        form = div(cls='flex flex-col gap-5')
+        form = div(cls='mb-10')
 
-        # Fields for the palette
-        palette = div(cls='flex flex-wrap gap-5')
+        # Temporary Title
+        temporary_title_field = self['temporary_title']
+        temporary_title_container = label(cls='form-control w-full')
+        temporary_title_label = div(cls='label')
+        temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
+        temporary_title_container.add(temporary_title_label)
+        temporary_title_container.add(raw(str(temporary_title_field)))
+        if temporary_title_field.errors:
+            temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
+        form.add(temporary_title_container)
 
-        medium_field = self['medium']
-        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2 flex-1')
-        medium_label.add(raw(str(medium_field)))
-        palette.add(medium_label)
+        # Publisher
+        publisher_field = self['publisher']
+        publisher_container = label(cls='form-control w-full')
+        publisher_label = div(cls='label')
+        publisher_label.add(span(publisher_field.label, cls='label-text'))
+        publisher_container.add(publisher_label)
+        publisher_container.add(raw(str(publisher_field)))
+        if publisher_field.errors:
+            publisher_container.add(div(span(publisher_field.errors, cls='text-primary text-sm'), cls='label'))
+        form.add(publisher_container)
+        
+        # Plate Number
+        plate_number_field = self['plate_number']
+        plate_number_container = label(cls='form-control w-full')
+        plate_number_label = div(cls='label')
+        plate_number_label.add(span(plate_number_field.label, cls='label-text'))
+        plate_number_container.add(plate_number_label)
+        plate_number_container.add(raw(str(plate_number_field)))
+        if plate_number_field.errors:
+            plate_number_container.add(div(span(plate_number_field.errors, cls='text-primary text-sm'), cls='label'))
+        form.add(plate_number_container)
 
-        dubious_writer_field = self['dubious_writer']
-        dubious_writer_label = label(_for=dubious_writer_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')
-        dubious_writer_label.add(span(dubious_writer_field.label, cls='label-text'))
-        dubious_writer_label.add(raw(str(dubious_writer_field)))
-        palette.add(dubious_writer_label)
+        # Source Type
+        source_type_field = self['source_type']
+        source_type_container = label(cls='form-control w-full')
+        source_type_label = div(cls='label')
+        source_type_label.add(span(source_type_field.label, cls='label-text'))
+        source_type_container.add(source_type_label)
+        source_type_container.add(raw(str(source_type_field)))
+        if source_type_field.errors:
+            source_type_container.add(div(span(source_type_field.errors, cls='text-primary text-sm'), cls='label'))
+        form.add(source_type_container)
 
-        form.add(palette)
-        form.add(raw(str(self['manifestation_title'])))
+        # Date Fields
+        not_before_field = self['not_before']
+        not_after_field = self['not_after']
+        display_field = self['display']
+
+        not_before_container = label(cls='form-control')
+        not_before_label = div(not_before_field.label, cls='label-text')
+        not_before_selects = div(cls='flex')
+        not_before_selects.add(raw(str(not_before_field)))
+        not_before_container.add(not_before_label)
+        not_before_container.add(not_before_selects)
+        if not_before_field.errors:
+            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
+
+        not_after_container = label(cls='form-control')
+        not_after_label = div(not_after_field.label, cls='label-text')
+        not_after_selects = div(cls='flex')
+        not_after_selects.add(raw(str(not_after_field)))
+        not_after_container.add(not_after_label)
+        not_after_container.add(not_after_selects)
+        if not_after_field.errors:
+            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
+
+        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container.add(raw(str(display_field)))
+        if display_field.errors:
+            display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
+
+        period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        period_palette.add(not_before_container)
+        period_palette.add(not_after_container)
+        form.add(period_palette)
+        form.add(display_container)
 
         return mark_safe(str(form))
+
+
+
+
+
+class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
+    layout = Layouts.LABEL_OUTSIDE
+    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False)
+    source_type = forms.ChoiceField(label='Quellentyp', choices=Manifestation.SourceType.choices)
+    library = forms.ModelChoiceField(queryset=Library.objects.all(), label='Bibliothek', empty_label="Bibliothek auswählen")
+    signature = forms.CharField(label='Signatur', max_length=255)
+
+    def as_daisy(self):
+        root = div(cls="flex flex-col gap-5")
+        
+        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette1.add(self._render_field('temporary_title'))
+        palette1.add(self._render_field('source_type'))
+        root.add(palette1)
+        
+        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette2.add(self._render_field('library'))
+        palette2.add(self._render_field('signature'))
+        root.add(palette2)
+        
+        return mark_safe(root.render())
+    
+    def _render_field(self, field_name):
+        field = self[field_name]
+        widget = field.field.widget
+        wrap = label(cls="form-control w-full")
+        top = div(cls="label")
+        top.add(span((field.label or field.name), cls="label-text"))
+        if field.help_text:
+            top.add(span(field.help_text, cls="label-text-alt"))
+        wrap.add(top)
+        
+        cls = "input input-bordered w-full"
+        if isinstance(widget, forms.Select):
+            cls = "select select-bordered w-full"
+        
+        wrap.add(raw(field.as_widget(attrs={"class" : cls})))
+        return wrap
+
+
+class ManifestationTitleHandwritingForm(HandwritingForm):
+    class Meta(HandwritingForm.Meta):
+        model = ManifestationTitleHandwriting

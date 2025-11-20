@@ -12,7 +12,7 @@
 	<li>
 	    <a href="{% url 'edwoca:expression_search' %}"
 		{% if list_entity_type == 'expression' %} class="active" {% endif %}>
-		Fassungen <span class="badge"> {{ expression_count }} </span> <br>
+		Fassungen <span class="badge"> {{ expression_count }} </span>
 	    </a>
 	</li>
 	<li>
@@ -31,6 +31,12 @@
 	    <a href="{% url 'edwoca:item_search' %}"
 		{% if list_entity_type == 'item' %} class="active" {% endif %}>
 		Druckexemplare <span class="badge"> {{ item_count }} </span>
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:composite_search' %}"
+		{% if list_entity_type == 'composite' %} class="active" {% endif %}>
+		Konvolute <span class="badge"> {{ composite_count }} </span>
 	    </a>
 	</li>
 	<li>
@@ -99,7 +105,13 @@
 		<a href="{% url 'edwoca:work_create' %}">Werk</a>
 	    </li>
 	    <li>
-		<a href="{% url 'edwoca:manifestation_create' %}">Manifestation</a>
+		<a href="{% url 'edwoca:singleton_create' %}">Manuskript</a>
+	    </li>
+	    <li>
+		<a href="{% url 'edwoca:manifestation_create' %}">Druck</a>
+	    </li>
+	    <li>
+		<a href="{% url 'edwoca:composite_create' %}">Konvolut</a>
 	    </li>
 	    <li>
 		<a href="{% url 'edwoca:library_create' %}">Bibliothek</a>

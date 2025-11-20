@@ -1,6 +1,10 @@
 {% extends 'edwoca/base.html' %}
 {% load edwoca_extras %}
 
+{% block modals %}
+
+{% endblock %}
+
 {% block content %}
 
 {% include 'edwoca/partials/item/preview-divs/manuscript_prolog.html' %}
@@ -16,265 +20,172 @@
     </form>
 
     <div class="mt-5">
-        <h3 class="text-lg font-bold mb-5">Handschriften</h3>
-        {% for form in handwriting_forms %}
-            <div class="flex gap-5 items-center mb-5 rounded-lg">
-                <form method="post" class="flex-1 flex gap-5 m-0">
-                    {% csrf_token %}
-                    <div class="flex-1">
-                        {{ form.as_daisy }}
-                    </div>
-                    <input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-secondary">
-                </form>
-                <form action="{% url 'edwoca:item_handwriting_delete' form.instance.id %}" method="post" class="flex-0 m-0">
-                    {% csrf_token %}
-                    <input type="submit" class="btn btn-primary" value="löschen"/>
-                </form>
-            </div>
-            {% if form.instance.writer %}
-                <div class="flex gap-5 items-center mb-10">
-                    <label class="input input-bordered flex-1 flex items-center gap-2">
-                        Schreiber
-                        <input type="text" class="grow" disabled value="{{ form.instance.writer }}" />
-                    </label>
-                    <a class="btn" href="{% url 'edwoca:item_remove_handwriting_writer' object.id form.instance.id %}">Entfernen</a>
-                </div>
-            {% else %}
-                <div class="mt-2">
-                    <div class="items-center">
-                        <form action="{% url 'edwoca:item_manuscript' object.id %}" method="get" class="flex gap-5">
-                            <label class="input input-bordered flex items-center gap-2 flex-1">
-                                Schreiber
-                                {{ search_form.q }}
-                            </label>
-                            <input type="hidden" name="handwriting_id" value="{{ form.instance.id }}">
-                            <input type="submit" class="btn flex-0" value="Suchen"/>
-                        </form>
-                    </div>
-                    {% if search_form.is_valid and search_form.cleaned_data.q and handwriting_id == form.instance.id %}
-                        <ul>
-                        {% for person in found_persons %}
-                            <li>
-                                <a href="{% url 'edwoca:item_add_handwriting_writer' object.id form.instance.id person.pk %}">{{ person.object }}</a>
-                            </li>
-                        {% empty %}
-                            <li>Keine Suchergebnisse</li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
-                </div>
-            {% endif %}
-        {% endfor %}
-        <form method="post">
-            {% csrf_token %}
-            <input type="submit" name="add_handwriting" value="Handschrift hinzufügen" class="btn btn-secondary mt-3">
-        </form>
-    </div>
-
-    <div class="mt-5">
-        <h3 class="text-lg font-bold mb-5">Modifikationen</h3>
+        <h3 class="text-lg font-bold mb-5 prose">Modifikationen</h3>
         {% for modification in modifications %}
             <div class="border border-base-300 p-5 mb-5 rounded-lg">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="flex gap-5">
-                        <div class="form-control flex-1">
-                            <label class="label">
-                                <span class="label-text">{{ modification.form.not_before.label }}</span>
-                            </label>
-                            <div class="flex gap-2">
-                                {{ modification.form.not_before }}
+                <div class="prose">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="flex gap-5">
+                            <div class="form-control flex-1">
+                                <label class="label">
+                                    <span class="label-text">{{ modification.form.not_before.label }}</span>
+                                </label>
+                                <div class="flex gap-2">
+                                    {{ modification.form.not_before }}
+                                </div>
+                            </div>
+                            <div class="form-control flex-1">
+                                <label class="label">
+                                    <span class="label-text">{{ modification.form.not_after.label }}</span>
+                                </label>
+                                <div class="flex gap-2">
+                                    {{ modification.form.not_after }}
+                                </div>
                             </div>
                         </div>
-                        <div class="form-control flex-1">
+                        <div class="form-control w-full">
                             <label class="label">
-                                <span class="label-text">{{ modification.form.not_after.label }}</span>
+                                <span class="label-text">{{ modification.form.display.label }}</span>
                             </label>
-                            <div class="flex gap-2">
-                                {{ modification.form.not_after }}
-                            </div>
+                            {{ modification.form.display }}
                         </div>
-                    </div>
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text">{{ modification.form.display.label }}</span>
-                        </label>
-                        {{ modification.form.display }}
-                    </div>
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text">{{ modification.form.note.label }}</span>
-                        </label>
-                        {{ modification.form.note }}
-                    </div>
-                    <div class="form-control w-full">
-                        <label class="label">
-                            <span class="label-text">{{ modification.form.modification_type.label }}</span>
-                        </label>
-                        {{ modification.form.modification_type }}
-                    </div>
-                    <div class="flex justify-end gap-3 mt-3">
-                        <input type="submit" name="save_changes" value="Speichern" class="btn btn-secondary">
-                        <form action="{% url 'edwoca:item_modification_delete' modification.form.instance.id %}" method="post" class="m-0">
-                            {% csrf_token %}
-                            <input type="submit" class="btn btn-primary" value="Löschen"/>
-                        </form>
-                    </div>
-                </form>
+                        <div class="form-control w-full">
+                            <label class="label">
+                                <span class="label-text">{{ modification.form.note.label }}</span>
+                            </label>
+                            {{ modification.form.note }}
+                        </div>
+                        <div class="form-control w-full">
+                            <label class="label">
+                                <span class="label-text">{{ modification.form.modification_type.label }}</span>
+                            </label>
+                            {{ modification.form.modification_type }}
+                        </div>
+                        <div class="flex justify-end gap-3 mt-3">
+                            <input type="submit" name="save_changes" value="Speichern" class="btn btn-secondary">
+                        </div>
+                    </form>
 
-                <div class="mt-5">
-                    <h4 class="text-md font-bold mb-5">Handschriften der Modifikation</h4>
-                    {% for handwriting_form in modification.handwriting_forms %}
-                        <div id="handwriting-modal-{{ handwriting_form.instance.id }}" class="modal">
-                            <div class="modal-box w-11/12 max-w-5xl">
-                                <h3 class="font-bold text-lg">Handschrift bearbeiten</h3>
+                    <div class="mt-5">
+                        <h4 class="text-md font-bold mb-5">Handschriften der Modifikation</h4>
+                            {% for form in modification.handwriting_forms %}
                                 <div class="flex gap-5 items-center mb-5 rounded-lg">
                                     <form method="post" class="flex-1 flex gap-5 m-0">
                                         {% csrf_token %}
                                         <div class="flex-1">
-                                            <div class="form-control">
-                                                <label class="label">
-                                                    <span class="label-text">{{ handwriting_form.medium.label }}</span>
-                                                </label>
-                                                {{ handwriting_form.medium }}
-                                            </div>
-                                            <div class="form-control">
-                                                <label class="label cursor-pointer">
-                                                    <span class="label-text">{{ handwriting_form.dubious_writer.label }}</span> 
-                                                    {{ handwriting_form.dubious_writer }}
-                                                </label>
-                                            </div>
-                                            {{ handwriting_form.modification }}
+                                            {{ form.as_daisy }}
                                         </div>
                                         <input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-secondary">
                                     </form>
-                                    <form action="{% url 'edwoca:modification_handwriting_delete' handwriting_form.instance.id %}" method="post" class="flex-0 m-0">
+                                    <form action="{% url 'edwoca:modification_handwriting_delete' form.instance.id %}" method="post" class="flex-0 m-0">
                                         {% csrf_token %}
                                         <input type="submit" class="btn btn-primary" value="löschen"/>
                                     </form>
                                 </div>
-                                {% if handwriting_form.instance.writer %}
+                                {% if form.instance.writer %}
                                     <div class="flex gap-5 items-center mb-10">
                                         <label class="input input-bordered flex-1 flex items-center gap-2">
                                             Schreiber
-                                            <input type="text" class="grow" disabled value="{{ handwriting_form.instance.writer }}" />
+                                            <input type="text" class="grow" disabled value="{{ form.instance.writer }}" />
                                         </label>
-                                        <a class="btn" href="{% url 'edwoca:modification_remove_handwriting_writer' handwriting_form.instance.id %}">Entfernen</a>
+                                        <a class="btn" href="{% url 'edwoca:modification_remove_handwriting_writer' form.instance.id %}">Entfernen</a>
                                     </div>
                                 {% else %}
                                     <div class="mt-2">
                                         <div class="items-center">
-                                            <form method="get" class="flex gap-5">
+                                            <form action="{% url 'edwoca:item_manuscript' object.id %}" method="get" class="flex gap-5">
                                                 <label class="input input-bordered flex items-center gap-2 flex-1">
                                                     Schreiber
-                                                    <input type="text" name="q" class="grow" />
+                                                    {{ search_form.q }}
                                                 </label>
-                                                <input type="hidden" name="modification_handwriting_id" value="{{ handwriting_form.instance.id }}">
+                                                <input type="hidden" name="handwriting_id" value="{{ form.instance.id }}">
                                                 <input type="submit" class="btn flex-0" value="Suchen"/>
                                             </form>
                                         </div>
-                                        {# Search results #}
+                                        {% if search_form.is_valid and search_form.cleaned_data.q and handwriting_id == form.instance.id %}
+                                            <ul>
+                                            {% for person in modification_found_persons %}
+                                                <li>
+                                                    <a href="{% url 'edwoca:modification_add_handwriting_writer' form.instance.id person.pk %}">{{ person.object }}</a>
+                                                </li>
+                                            {% empty %}
+                                                <li>Keine Suchergebnisse</li>
+                                            {% endfor %}
+                                            </ul>
+                                        {% endif %}
                                     </div>
                                 {% endif %}
-                                <div class="modal-action">
-                                    <a href="#" class="btn">Schließen</a>
-                                </div>
+                        {% endfor %}
+
+                        <form method="post">
+                            {% csrf_token %}
+                            <button type="submit" name="add_modification_handwriting" value="{{ modification.form.instance.id }}" class="btn btn-secondary mt-3">Handschrift hinzufügen</button>
+                        </form>
+                    </div>
+
+                    <div class="mt-5">
+                        <h4 class="text-md font-bold mb-5">Beziehungen</h4>
+                        {% if modification.form.instance.related_work %}
+                            <div class="flex gap-5 items-center mb-10">
+                                <a href="{% url 'edwoca:work_relations' modification.form.instance.related_work.id %}" class="flex-1">
+                                    {{ modification.form.instance.related_work }}
+                                </a>
+                                <a class="btn flex-0" href="{% url 'edwoca:modification_remove_related_work' modification.form.instance.id %}">Entfernen</a>
                             </div>
-                        </div>
-                        <a href="#handwriting-modal-{{ handwriting_form.instance.id }}" class="btn">Bearbeiten</a>
-                    {% endfor %}
-
-                    <form method="post">
-                        {% csrf_token %}
-                        <button type="submit" name="add_modification_handwriting" value="{{ modification.form.instance.id }}" class="btn btn-secondary mt-3">Handschrift hinzufügen</button>
-                    </form>
-                </div>
-
-                <div class="mt-5">
-                    <h4 class="text-md font-bold mb-5">Beziehungen</h4>
-                    {% if modification.form.instance.related_work %}
-                        <div class="flex gap-5 items-center mb-10">
-                            <label class="input input-bordered flex-1 flex items-center gap-2">
-                                Werk
-                                <input type="text" class="grow" disabled value="{{ modification.form.instance.related_work }}" />
-                            </label>
-                            <a class="btn" href="{% url 'edwoca:modification_remove_related_work' modification.form.instance.id %}">Entfernen</a>
-                        </div>
-                    {% else %}
-                        <form method="get" class="flex gap-5">
-                            <label class="input input-bordered flex items-center gap-2 flex-1">
-                                Werk
-                                <input type="text" name="work-q" class="grow" />
-                            </label>
-                            <input type="hidden" name="modification_id" value="{{ modification.form.instance.id }}">
-                            <input type="submit" value="Suchen" class="btn">
-                        </form>
-                        {% if query_work and modification_id == modification.form.instance.id %}
-                            <ul>
-                            {% for work in found_works %}
-                                <li><a href="{% url 'edwoca:modification_add_related_work' modification.form.instance.id work.object.id %}">{{ work.object }}</a></li>
-                            {% empty %}
-                                <li>Keine Suchergebnisse</li>
-                            {% endfor %}
-                            </ul>
+                        {% else %}
+                            <form method="get" class="flex gap-5">
+                                <label class="input input-bordered flex items-center gap-2 flex-1">
+                                    Werk
+                                    <input type="text" name="work-q" class="grow" />
+                                </label>
+                                <input type="hidden" name="modification_id" value="{{ modification.form.instance.id }}">
+                                <input type="submit" value="Suchen" class="btn">
+                            </form>
+                            {% if query_work and modification_id == modification.form.instance.id %}
+                                <ul>
+                                {% for work in found_works %}
+                                    <li><a href="{% url 'edwoca:modification_add_related_work' modification.form.instance.id work.object.id %}">{{ work.object }}</a></li>
+                                {% empty %}
+                                    <li>Keine Suchergebnisse</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
 
-                    {% if modification.form.instance.related_expression %}
-                        <div class="flex gap-5 items-center mb-10">
-                            <label class="input input-bordered flex-1 flex items-center gap-2">
-                                Expression
-                                <input type="text" class="grow" disabled value="{{ modification.form.instance.related_expression }}" />
-                            </label>
-                            <a class="btn" href="{% url 'edwoca:modification_remove_related_expression' modification.form.instance.id %}">Entfernen</a>
-                        </div>
-                    {% else %}
-                        <form method="get" class="flex gap-5 mt-2">
-                            <label class="input input-bordered flex items-center gap-2 flex-1">
-                                Expression
-                                <input type="text" name="expression-q" class="grow" />
-                            </label>
-                            <input type="hidden" name="modification_id" value="{{ modification.form.instance.id }}">
-                            <input type="submit" value="Suchen" class="btn">
-                        </form>
-                        {% if query_expression and modification_id == modification.form.instance.id %}
-                            <ul>
-                            {% for expression in found_expressions %}
-                                <li><a href="{% url 'edwoca:modification_add_related_expression' modification.form.instance.id expression.object.id %}">{{ expression.object }}</a></li>
-                            {% empty %}
-                                <li>Keine Suchergebnisse</li>
-                            {% endfor %}
-                            </ul>
+                        {% if modification.form.instance.related_expression %}
+                            <div class="flex gap-5 items-center mb-10">
+                                <a href="{% url 'edwoca:expression_relations' modification.form.instance.related_expression.id %}" class="flex-1">
+                                    {{ modification.form.instance.related_expression }}
+                                </a>
+                                <a class="btn flex-0" href="{% url 'edwoca:modification_remove_related_expression' modification.form.instance.id %}">Entfernen</a>
+                            </div>
+                        {% else %}
+                            <form method="get" class="flex gap-5 mt-2">
+                                <label class="input input-bordered flex items-center gap-2 flex-1">
+                                    Expression
+                                    <input type="text" name="expression-q" class="grow" />
+                                </label>
+                                <input type="hidden" name="modification_id" value="{{ modification.form.instance.id }}">
+                                <input type="submit" value="Suchen" class="btn">
+                            </form>
+                            {% if query_expression and modification_id == modification.form.instance.id %}
+                                <ul>
+                                {% for expression in found_expressions %}
+                                    <li><a href="{% url 'edwoca:modification_add_related_expression' modification.form.instance.id expression.object.id %}">{{ expression.object }}</a></li>
+                                {% empty %}
+                                    <li>Keine Suchergebnisse</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-
-                    {% if modification.form.instance.related_manifestation %}
-                        <div class="flex gap-5 items-center mb-10">
-                            <label class="input input-bordered flex-1 flex items-center gap-2">
-                                Manifestation
-                                <input type="text" class="grow" disabled value="{{ modification.form.instance.related_manifestation }}" />
-                            </label>
-                            <a class="btn" href="{% url 'edwoca:modification_remove_related_manifestation' modification.form.instance.id %}">Entfernen</a>
-                        </div>
-                    {% else %}
-                        <form method="get" class="flex gap-5 mt-2">
-                            <label class="input input-bordered flex items-center gap-2 flex-1">
-                                Manifestation
-                                <input type="text" name="manifestation-q" class="grow" />
-                            </label>
-                            <input type="hidden" name="modification_id" value="{{ modification.form.instance.id }}">
-                            <input type="submit" value="Suchen" class="btn">
+                    </div>
+                    <div class="flex justify-end gap-3 mt-3">
+                        <form action="{% url 'edwoca:modification_delete' modification.form.instance.id %}" method="post" class="m-0">
+                            {% csrf_token %}
+                            <input type="submit" class="btn btn-primary" value="Löschen"/>
                         </form>
-                        {% if query_manifestation and modification_id == modification.form.instance.id %}
-                            <ul>
-                            {% for manifestation in found_manifestations %}
-                                <li><a href="{% url 'edwoca:modification_add_related_manifestation' modification.form.instance.id manifestation.object.id %}">{{ manifestation.object }}</a></li>
-                            {% empty %}
-                                <li>Keine Suchergebnisse</li>
-                            {% endfor %}
-                            </ul>
-                        {% endif %}
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         {% endfor %}

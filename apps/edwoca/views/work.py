@@ -1,13 +1,13 @@
 from .base import *
 from ..models.work import *
-from ..forms.work import WorkForm, WorkTitleFormSet, WorkIdentificationForm, RelatedWorkForm, WorkContributorForm, WorkBibForm
+from ..forms.work import WorkForm, WorkTitleForm, WorkTitleFormSet, WorkCreateForm, WorkIdentificationForm, RelatedWorkForm, WorkContributorForm, WorkBibForm
 from ..forms.dedication import WorkPersonDedicationForm, WorkCorporationDedicationForm
-from dmad_on_django.models import Work as DmadWork, Person, Place, Corporation, SubjectTerm
+from dmad_on_django.models import Work as DmadWork, Person, Place, Corporation, SubjectTerm, Status
 from edwoca.forms import EdwocaSearchForm
 from bib.models import ZotItem
 from ..models.base import Letter
 from django.forms.models import formset_factory
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, ModelFormMixin
@@ -17,43 +17,24 @@ class WorkListView(EdwocaListView):
     model = Work
 
 
-class WorkCreateView(CreateView):
-    model = Work
-    form_class = WorkForm
-    template_name = 'edwoca/create.html'
+def work_create(request):
+    if request.method == 'POST':
+        form = WorkCreateForm(request.POST)
+        if form.is_valid():
+            work = Work.objects.create()
+            if form.cleaned_data.get('temporary_title'):
+                WorkTitle.objects.create(
+                    work=work,
+                    title=form.cleaned_data['temporary_title'],
+                    status=Status.TEMPORARY
+                )
+            return redirect('edwoca:work_update', pk=work.pk)
+    else:
+        form = WorkCreateForm()
 
-    def get_success_url(self):
-        return reverse_lazy('edwoca:work_update', kwargs = {'pk': self.object.id})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'title_formset' not in context:
-            if self.request.POST:
-                context['title_formset'] = WorkTitleFormSet(self.request.POST, self.request.FILES)
-            else:
-                WorkTitleFormSet.can_delete = False
-                context['title_form_set'] = WorkTitleFormSet()
-        context['view_title'] = f"Neues Werk anlegen"
-        context['button_label'] = "speichern"
-        context['return_target'] = 'edwoca:index'
-        context['return_pk'] = None
-        return context
-
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        title_formset = WorkTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
-
-        if title_formset.is_valid():
-            self.object.save()
-            title_formset.save()
-            return redirect(self.get_success_url())
-        else:
-            self.object = None # Reset object so get_context_data doesn't try to use it for instance
-            return self.form_invalid(form, title_formset=title_formset)
-
-    def form_invalid(self, form, title_formset=None):
-        context = self.get_context_data(form=form, title_formset=title_formset)
-        return self.render_to_response(context)
+    return render(request, 'edwoca/create_work.html', {
+        'form': form,
+    })
 
 
 class WorkUpdateView(EntityMixin, UpdateView):

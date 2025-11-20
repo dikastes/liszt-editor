@@ -95,8 +95,29 @@
 	</div>
 </div>
 
+<div class="bg-white border border-base-300 p-5 mb-10">
+	<div class="prose">
+		<h2> Bearbeitungsschichten </h2>
+		<em> Bearbeitungsschichten, die auf diese Manifestation verweisen, erscheinen hier </em>
+		<ul>
+		{% for modification in object.relating_modifications.all %}
+			<li>
+				{% if modification.item.manifestation.is_singleton %}
+					<a href="{% url 'edwoca:manifestation_manuscript' modification.item.manifestation.id %}" class="flex-1">
+						{{ modification.item.manifestation }} &ndash; {{ modification }}
+					</a>
+				{% else %}
+					<a href="{% url 'edwoca:item_manuscript' modification.item.id %}" class="flex-1">
+						{{ modification.item }} &ndash; {{ modification }}
+					</a>
+				{% endif %}
+			</li>
+		{% empty %}
+			<li> <em> keine eingehenden Verknüpfungen </em> </li>
+		{% endfor %}
+		</ul>
+
+	</div>
+</div>
+
 {% endblock %}
-
-
-
-
