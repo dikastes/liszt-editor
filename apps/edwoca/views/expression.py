@@ -188,4 +188,6 @@ class ExpressionDeleteView(EntityMixin, DeleteView):
     template_name = 'edwoca/simple_form.html'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_update', kwargs={'pk': self.object.work.id})
+        if self.object.work:
+            return reverse_lazy('edwoca:work_update', kwargs={'pk': self.object.work.id})
+        return reverse_lazy('edwoca:expression_list')

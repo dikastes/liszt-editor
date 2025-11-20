@@ -771,7 +771,8 @@ class Letter(models.Model):
         )
     edition = models.ManyToManyField(
             'bib.ZotItem',
-            related_name = 'edited_letters'
+            related_name = 'edited_letters',
+            through = 'LetterMentioning'
         )
     category = models.CharField(
             max_length = 1,
@@ -824,6 +825,21 @@ class Letter(models.Model):
         return f'{sender} an {receiver}, {self.period}'
 
 
+class LetterMentioning(models.Model):
+    letter = models.ForeignKey(
+            'Letter',
+            on_delete = models.CASCADE
+        )
+    bib = models.ForeignKey(
+            'bib.ZotItem',
+            on_delete = models.CASCADE
+        )
+    pages = models.CharField(
+            max_length = 20,
+            null = True,
+            blank = True
+        )
+
 class ItemModification(models.Model):
     class ModificationType(models.TextChoices):
         ARRANGEMENT = 'AR', _('Arrangement')
@@ -834,12 +850,6 @@ class ItemModification(models.Model):
             'dmrism.Item',
             related_name = 'modifications',
             on_delete = models.CASCADE
-        )
-    related_manifestation = models.ForeignKey(
-            'dmrism.Manifestation',
-            related_name = 'relating_modifications',
-            on_delete = models.SET_NULL,
-            null = True
         )
     related_expression = models.ForeignKey(
             'Expression',
@@ -870,6 +880,14 @@ class ItemModification(models.Model):
             null = True
         )
 
+    def __str__(self):
+        if handwriting := self.handwritings.first():
+            if handwriting.dubious_writer:
+                return f"{self.period} [{handwriting.writer.__str__()}] ({handwriting.medium})"
+            return f"{self.period} ({handwriting.writer.__str__()}, {handwriting.medium})"
+        else:
+            return f"{self.period} <Handschrift>"
+
 
 class ModificationHandwriting(BaseHandwriting):
     modification = models.ForeignKey(
@@ -877,3 +895,5 @@ class ModificationHandwriting(BaseHandwriting):
             related_name = 'handwritings',
             on_delete = models.CASCADE
         )
+
+

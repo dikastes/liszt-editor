@@ -1,3 +1,4 @@
+from .base import *
 from django import forms
 from django.conf import settings
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
@@ -49,12 +50,6 @@ class ItemModificationForm(ModelForm):
 
         return modification_instance
 
-class ModificationHandwritingForm(ModelForm):
-    class Meta:
+class ModificationHandwritingForm(HandwritingForm):
+    class Meta(HandwritingForm.Meta):
         model = ModificationHandwriting
-        fields = ['medium', 'modification', 'dubious_writer']
-        widgets = {
-            'medium': TextInput(attrs={'class': 'w-full'}),
-            'modification': HiddenInput(),
-            'dubious_writer': CheckboxInput(attrs={'class': 'toggle'}),
-        }

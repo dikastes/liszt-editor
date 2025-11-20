@@ -149,7 +149,7 @@ class BaseHandwriting(models.Model):
         )
     dubious_writer = models.BooleanField(default = False)
 
-    def __str__(self):
+    def str_with_link(self):
         try:
             if self.dubious_writer:
                 return f"[{self.writer.str_with_link()}] ({self.medium})"
@@ -158,6 +158,12 @@ class BaseHandwriting(models.Model):
             if self.dubious_writer:
                 return f'[{self.writer.__str__()}] ({self.medium})'
             return f'{self.writer.__str__()} ({self.medium})'
+
+    def __str__(self):
+        if self.dubious_writer:
+            return f"[{self.writer.__str__()}] ({self.medium})"
+        return f"{self.writer.__str__()} ({self.medium})"
+
 
 class BaseDedication(models.Model):
     class Meta:

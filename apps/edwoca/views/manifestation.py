@@ -1,8 +1,9 @@
 from ..forms.manifestation import *
 from ..forms.item import SignatureFormSet, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
+from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
 from ..forms.publication import PublicationForm
 from ..forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
-from ..models import Manifestation as EdwocaManifestation, Letter, Expression
+from ..models import Manifestation as EdwocaManifestation, Letter, Expression, Work, ItemModification, ModificationHandwriting
 from .base import *
 from ..models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from .base import *
@@ -66,12 +67,15 @@ class SingletonSearchView(EdwocaSearchView):
         return context
 
 
-def manifestation_create(request):
+def singleton_create(request):
     if request.method == 'POST':
-        form = ManifestationCreateForm(request.POST)
+        form = SingletonCreateForm(request.POST)
         if form.is_valid():
-            manifestation = EdwocaManifestation.objects.create()
-            if form.cleaned_data['temporary_title']:
+            manifestation = EdwocaManifestation.objects.create(
+                is_singleton=True,
+                source_type=form.cleaned_data.get('source_type')
+            )
+            if form.cleaned_data.get('temporary_title'):
                 ManifestationTitle.objects.create(
                     manifestation=manifestation,
                     title=form.cleaned_data['temporary_title'],
@@ -89,11 +93,49 @@ def manifestation_create(request):
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
     else:
-        form = ManifestationCreateForm()
+        form = SingletonCreateForm()
 
-    return render(request, 'edwoca/create_manifestation.html', {
+    return render(request, 'edwoca/create_singleton.html', {
         'form': form,
     })
+
+
+def manifestation_create(request, publisher_pk=None):
+    publisher = get_object_or_404(Corporation, pk=publisher_pk) if publisher_pk else None
+
+    if request.method == 'POST':
+        if not publisher:
+            # handle error, maybe redirect to search page
+            return redirect('edwoca:manifestation_create')
+
+        form = ManifestationCreateForm(request.POST, publisher=publisher)
+        if form.is_valid():
+            manifestation = EdwocaManifestation.objects.create()
+            manifestation.publisher = form.cleaned_data.get('publisher')
+            manifestation.plate_number = form.cleaned_data.get('plate_number')
+            manifestation.source_type = form.cleaned_data.get('source_type')
+            manifestation.save()
+
+            if form.cleaned_data.get('temporary_title'):
+                ManifestationTitle.objects.create(
+                    manifestation=manifestation,
+                    title=form.cleaned_data['temporary_title'],
+                    status=Status.TEMPORARY
+                )
+            return redirect('edwoca:manifestation_update', pk=manifestation.pk)
+    else:
+        form = ManifestationCreateForm(initial = {'publisher':publisher}) if publisher else None
+
+    context = {'form': form}
+    if not publisher:
+        if request.GET.get('q'):
+            search_form = SearchForm(request.GET)
+            context['search_form'] = search_form
+            context['publisher_list'] = search_form.search().models(Corporation)
+        else:
+            context['search_form'] = SearchForm()
+
+    return render(request, 'edwoca/create_manifestation.html', context)
 
 
 def manifestation_update(request, pk):
@@ -571,6 +613,7 @@ def manifestation_letter_remove(request, pk, letter_pk):
     return redirect('edwoca:manifestation_bibliography', pk=pk)
 
 
+# this doesn't seem to need a manifestationbibform!
 class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
     model = Manifestation
     form_class = ManifestationBibForm
@@ -827,8 +870,29 @@ def manifestation_manuscript_update(request, pk):
                 if handwriting_form.is_valid():
                     handwriting_form.save()
 
+            for modification in item.modifications.all():
+                prefix = f'modification_{modification.id}'
+                modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
+                if modification_form.is_valid():
+                    modification_form.save()
+
+                for handwriting in modification.handwritings.all():
+                    prefix = f'modification_handwriting_{handwriting.id}'
+                    handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                    if handwriting_form.is_valid():
+                        handwriting_form.save()
+
         if 'add_handwriting' in request.POST:
             ItemHandwriting.objects.create(item=item)
+
+        if 'add_modification' in request.POST:
+            ItemModification.objects.create(item=item)
+
+        if 'add_modification_handwriting' in request.POST:
+            modification_id = request.POST.get('add_modification_handwriting')
+            modification = get_object_or_404(ItemModification, pk=modification_id)
+            ModificationHandwriting.objects.create(modification=modification)
+            return redirect('edwoca:manifestation_manuscript', pk=pk)
 
         return redirect('edwoca:manifestation_manuscript', pk=pk)
 
@@ -840,6 +904,23 @@ def manifestation_manuscript_update(request, pk):
             handwriting_forms.append(ItemHandwritingForm(instance=handwriting, prefix=prefix))
         context['handwriting_forms'] = handwriting_forms
 
+        modifications = []
+        for modification in item.modifications.all():
+            prefix = f'modification_{modification.id}'
+            modification_form = ItemModificationForm(instance=modification, prefix=prefix)
+            
+            handwriting_forms = []
+            for handwriting in modification.handwritings.all():
+                prefix = f'modification_handwriting_{handwriting.id}'
+                handwriting_forms.append(ModificationHandwritingForm(instance=handwriting, prefix=prefix))
+            
+            modifications.append({
+                'form': modification_form,
+                'handwriting_forms': handwriting_forms
+            })
+
+        context['modifications'] = modifications
+
     context['form'] = form
     search_form = SearchForm(request.GET or None)
     context['search_form'] = search_form
@@ -850,6 +931,52 @@ def manifestation_manuscript_update(request, pk):
 
     if request.GET.get('handwriting_id'):
         context['handwriting_id'] = int(request.GET.get('handwriting_id'))
+
+    if request.GET.get('add_handwriting_for_modification'):
+        context['add_handwriting_for_modification'] = True
+        context['modification_id'] = int(request.GET.get('modification_id'))
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_persons"] = search_form.search().models(Person)
+
+    if request.GET.get('modification_handwriting_id'):
+        context['modification_handwriting_id'] = int(request.GET.get('modification_handwriting_id'))
+
+    # Search forms for modifications
+    q_work = request.GET.get('work-q')
+    q_expression = request.GET.get('expression-q')
+    q_manifestation = request.GET.get('manifestation-q')
+
+    if q_work:
+        work_search_form = SearchForm(request.GET, prefix='work')
+        if work_search_form.is_valid():
+            context['query_work'] = work_search_form.cleaned_data.get('q')
+            context['found_works'] = work_search_form.search().models(Work)
+    else:
+        work_search_form = SearchForm(prefix='work')
+
+    if q_expression:
+        expression_search_form = SearchForm(request.GET, prefix='expression')
+        if expression_search_form.is_valid():
+            context['query_expression'] = expression_search_form.cleaned_data.get('q')
+            context['found_expressions'] = expression_search_form.search().models(Expression)
+    else:
+        expression_search_form = SearchForm(prefix='expression')
+
+    if q_manifestation:
+        manifestation_search_form = SearchForm(request.GET, prefix='manifestation')
+        if manifestation_search_form.is_valid():
+            context['query_manifestation'] = manifestation_search_form.cleaned_data.get('q')
+            context['found_manifestations'] = manifestation_search_form.search().models(Manifestation)
+    else:
+        manifestation_search_form = SearchForm(prefix='manifestation')
+
+    context['work_search_form'] = work_search_form
+    context['expression_search_form'] = expression_search_form
+    context['manifestation_search_form'] = manifestation_search_form
+
+    if request.GET.get('modification_id'):
+        context['modification_id'] = int(request.GET.get('modification_id'))
 
     return render(request, 'edwoca/manifestation_manuscript.html', context)
 
@@ -869,12 +996,65 @@ def manifestation_remove_handwriting_writer(request, pk, handwriting_pk):
     return redirect('edwoca:manifestation_manuscript', pk=pk)
 
 
+class ModificationHandwritingDeleteView(DeleteView):
+    model = ModificationHandwriting
+
+    def get_success_url(self):
+        if self.object.modification.item.manifestation.is_singleton:
+            return reverse_lazy('edwoca:manifestation_manuscript', kwargs={'pk': self.object.modification.item.manifestation.id})
+        else:
+            return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.modification.item.item.id})
+
+
+def modification_add_related_work(request, modification_pk, work_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    work = get_object_or_404(Work, pk=work_pk)
+    modification.related_work = work
+    modification.save()
+    if modification.item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_manuscript', pk=modification.item.manifestation.id)
+    else:
+        return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+
+def modification_remove_related_work(request, modification_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    modification.related_work = None
+    modification.save()
+    if modification.item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_manuscript', pk=modification.item.manifestation.id)
+    else:
+        return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+
+def modification_add_related_expression(request, modification_pk, expression_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    expression = get_object_or_404(Expression, pk=expression_pk)
+    modification.related_expression = expression
+    modification.save()
+    if modification.item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_manuscript', pk=modification.item.manifestation.id)
+    else:
+        return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+
+def modification_remove_related_expression(request, modification_pk):
+    modification = get_object_or_404(ItemModification, pk=modification_pk)
+    modification.related_expression = None
+    modification.save()
+    if modification.item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_manuscript', pk=modification.item.manifestation.id)
+    else:
+        return redirect('edwoca:item_manuscript', pk=modification.item.id)
+
+
 def person_provenance_add_owner(request, pk, pps_id, person_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     person = get_object_or_404(Person, pk=person_id)
     pps.owner = person
     pps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
+
 
 
 def person_provenance_add_bib(request, pk, pps_id, bib_id):

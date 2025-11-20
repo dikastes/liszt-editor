@@ -430,12 +430,6 @@ def item_manuscript_update(request, pk):
             form = ItemManuscriptForm(request.POST, instance=item)
             if form.is_valid():
                 form.save()
-
-            for handwriting in item.handwritings.all():
-                prefix = f'handwriting_{handwriting.id}'
-                handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
-                if handwriting_form.is_valid():
-                    handwriting_form.save()
             
             for modification in item.modifications.all():
                 prefix = f'modification_{modification.id}'
@@ -448,9 +442,6 @@ def item_manuscript_update(request, pk):
                     handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
                     if handwriting_form.is_valid():
                         handwriting_form.save()
-
-        if 'add_handwriting' in request.POST:
-            ItemHandwriting.objects.create(item=item)
 
         if 'add_modification' in request.POST:
             ItemModification.objects.create(item=item)
@@ -465,12 +456,6 @@ def item_manuscript_update(request, pk):
 
     else:
         form = ItemManuscriptForm(instance=item)
-        handwriting_forms = []
-        for handwriting in item.handwritings.all():
-            prefix = f'handwriting_{handwriting.id}'
-            handwriting_forms.append(ItemHandwritingForm(instance=handwriting, prefix=prefix))
-        context['handwriting_forms'] = handwriting_forms
-
         modifications = []
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
@@ -569,66 +554,32 @@ class ItemHandwritingDeleteView(DeleteView):
     def get_success_url(self):
         return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.item.id})
 
-class ItemModificationDeleteView(DeleteView):
+class ModificationDeleteView(DeleteView):
     model = ItemModification
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.item.id})
+        if self.object.item.manifestation.is_singleton:
+            return reverse_lazy('edwoca:manifestation_manuscript', kwargs={'pk': self.object.item.manfestation.id})
+        else:
+            return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.item.id})
 
-class ModificationHandwritingDeleteView(DeleteView):
-    model = ModificationHandwriting
-
-    def get_success_url(self):
-        return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.modification.item.id})
 
 def modification_add_handwriting_writer(request, handwriting_pk, person_pk):
     handwriting = get_object_or_404(ModificationHandwriting, pk=handwriting_pk)
     person = get_object_or_404(Person, pk=person_pk)
     handwriting.writer = person
     handwriting.save()
-    return redirect('edwoca:item_manuscript', pk=handwriting.modification.item.id)
+    if handwriting.modification.item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_manuscript', pk=handwriting.modification.item.manifestation.id)
+    else:
+        return redirect('edwoca:item_manuscript', pk=handwriting.modification.item.id)
+
 
 def modification_remove_handwriting_writer(request, handwriting_pk):
     handwriting = get_object_or_404(ModificationHandwriting, pk=handwriting_pk)
     handwriting.writer = None
     handwriting.save()
-    return redirect('edwoca:item_manuscript', pk=handwriting.modification.item.id)
-
-def modification_add_related_work(request, modification_pk, work_pk):
-    modification = get_object_or_404(ItemModification, pk=modification_pk)
-    work = get_object_or_404(Work, pk=work_pk)
-    modification.related_work = work
-    modification.save()
-    return redirect('edwoca:item_manuscript', pk=modification.item.id)
-
-def modification_remove_related_work(request, modification_pk):
-    modification = get_object_or_404(ItemModification, pk=modification_pk)
-    modification.related_work = None
-    modification.save()
-    return redirect('edwoca:item_manuscript', pk=modification.item.id)
-
-def modification_add_related_expression(request, modification_pk, expression_pk):
-    modification = get_object_or_404(ItemModification, pk=modification_pk)
-    expression = get_object_or_404(Expression, pk=expression_pk)
-    modification.related_expression = expression
-    modification.save()
-    return redirect('edwoca:item_manuscript', pk=modification.item.id)
-
-def modification_remove_related_expression(request, modification_pk):
-    modification = get_object_or_404(ItemModification, pk=modification_pk)
-    modification.related_expression = None
-    modification.save()
-    return redirect('edwoca:item_manuscript', pk=modification.item.id)
-
-def modification_add_related_manifestation(request, modification_pk, manifestation_pk):
-    modification = get_object_or_404(ItemModification, pk=modification_pk)
-    manifestation = get_object_or_404(Manifestation, pk=manifestation_pk)
-    modification.related_manifestation = manifestation
-    modification.save()
-    return redirect('edwoca:item_manuscript', pk=modification.item.id)
-
-def modification_remove_related_manifestation(request, modification_pk):
-    modification = get_object_or_404(ItemModification, pk=modification_pk)
-    modification.related_manifestation = None
-    modification.save()
-    return redirect('edwoca:item_manuscript', pk=modification.item.id)
+    if handwriting.modification.item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_manuscript', pk=handwriting.modification.item.manifestation.id)
+    else:
+        return redirect('edwoca:manifestation_manuscript', pk=handwriting.modification.item.id)
