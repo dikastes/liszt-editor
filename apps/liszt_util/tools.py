@@ -34,6 +34,7 @@ def get_model_link(model):
         f'{model}</a>'
     )
     )
+    
 def swap_order(obj, group_field_name, direction):
     
     ModelClass = obj.__class__
