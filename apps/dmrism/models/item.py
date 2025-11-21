@@ -45,6 +45,8 @@ class Item(Sortable, WemiBaseClass):
             null = True
         )
 
+    _group_field_name = 'manifestation'
+
     def render_handwritings(self):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings)
 

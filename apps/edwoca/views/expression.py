@@ -97,7 +97,7 @@ def index_number_create(request, pk):
 @require_POST
 def expression_swap_view(request, pk, direction):
     expression = get_object_or_404(Expression, pk=pk)
-    success = swap_order(expression, "work", direction)
+    success = swap_order(expression, direction)
 
     if not success:
         messages.error(request, "Element steht am Anfang oder Ende der Liste")

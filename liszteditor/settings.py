@@ -55,7 +55,7 @@ INSTALLED_APPS = [
     'bib',
     'django.forms',
     'dmrism',
-    'edwoca',
+    'edwoca.apps.EdwocaConfig',
     'dmad_on_django'
 ]
 

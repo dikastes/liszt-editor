@@ -2,6 +2,7 @@ from json import dumps, loads
 from django.db import transaction
 from django.db.models import Max
 from django.utils.safestring import mark_safe
+from .models import Sortable
 
 class RenderRawJSONMixin:
     def render_raw(self):
@@ -35,10 +36,15 @@ def get_model_link(model):
     )
     )
     
-def swap_order(obj, group_field_name, direction):
-    
+def swap_order(obj, direction) -> bool:  
+
     ModelClass = obj.__class__
+
+    if not issubclass(ModelClass, Sortable):
+        return False
+
     current_index = obj.order_index
+    group_field_name = obj._group_field_name
     
     try:
         group_value = getattr(obj, group_field_name)

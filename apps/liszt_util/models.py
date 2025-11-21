@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Max
+from abc import ABC, abstractproperty
 
 # Create your models here.
 class Sortable(models.Model):
@@ -8,6 +9,10 @@ class Sortable(models.Model):
         db_index=True,
         verbose_name="Sortier-Index"
     )
+    
+    @abstractproperty
+    def _group_field_name(self):
+        pass
 
     def save(self,*args, **kwargs):
         if self.order_index is None:

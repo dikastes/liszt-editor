@@ -45,6 +45,8 @@ class Expression(Sortable,WeBaseClass):
             related_name = 'expressions'
         )
 
+    _group_field_name = 'work'
+
     def __str__(self):
         return ' | '.join(str(index_number) for index_number in self.index_numbers.all()) or 'ohne WV-Nr.'
 
