@@ -1,3 +1,4 @@
+from django.forms import inlineformset_factory
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
 from django.views.generic import ListView
@@ -6,10 +7,10 @@ from django.db.models import Case, When
 from liszt_util.forms import SearchForm
 from dmad_on_django.models import Person, Status, Corporation, Place
 from bib.models import ZotItem
-from ..forms import LetterForm
+from ..forms import LetterForm, LetterMentioningForm
 from liszt_util.tools import snake_to_camel_case, camel_to_snake_case
 from haystack.generic_views import SearchView
-from ..models import Work, Expression, Manifestation, Item, Letter
+from ..models import Work, Expression, Manifestation, Item, Letter, LetterMentioning
 from dmrism.models import Library
 from edwoca import forms as edwoca_forms
 from edwoca import models as edwoca_models
@@ -300,6 +301,7 @@ class LetterDeleteView(DeleteView):
 
 def letter_update(request, pk):
     letter = get_object_or_404(Letter, pk=pk)
+    LetterMentioningFormSet = inlineformset_factory(Letter, LetterMentioning, form=LetterMentioningForm, extra=0)
     context = {
         'object': letter,
         'entity_type': 'letter'
@@ -307,13 +309,17 @@ def letter_update(request, pk):
 
     if request.method == 'POST':
         form = LetterForm(request.POST, instance=letter)
-        if form.is_valid():
+        formset = LetterMentioningFormSet(request.POST, instance=letter)
+        if form.is_valid() and formset.is_valid():
             form.save()
+            formset.save()
             return redirect('edwoca:letter_update', pk=pk)
     else:
         form = LetterForm(instance=letter)
+        formset = LetterMentioningFormSet(instance=letter)
 
     context['form'] = form
+    context['formset'] = formset
 
     # Search forms
     q_sender_person = request.GET.get('sender-person-q')

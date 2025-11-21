@@ -229,14 +229,22 @@
 
     <div>
         <h3 class="text-lg font-bold">Editionen</h3>
-        {% for edition in object.edition.all %}
-            <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
-                <div class="flex-1 m-0">
-                    <p class="font-bold">{{ edition }}</p>
+        <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            {% for form in formset %}
+                <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
+                    <div class="flex-1 m-0">
+                        <p class="font-bold">{{ form.instance.bib }}</p>
+                    </div>
+                    <div class="flex-1 m-0">
+                        {{ form.pages }}
+                    </div>
+                    <a href="{% url 'edwoca:letter_remove_edition' object.id form.instance.bib.id %}" class="btn flex-0"> Entfernen </a>
                 </div>
-                <a href="{% url 'edwoca:letter_remove_edition' object.id edition.id %}" class="btn flex-0"> Entfernen </a>
-            </div>
-        {% endfor %}
+            {% endfor %}
+            <input type="submit" value="Seitenzahlen speichern" class="btn btn-primary mt-3">
+        </form>
         <div class="mb-10">
             <div class="items-center">
                 <form method="get" class="flex gap-5">
