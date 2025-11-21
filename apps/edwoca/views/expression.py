@@ -8,6 +8,7 @@ from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.decorators.http import require_POST
+from django.contrib import messages
 
 from liszt_util.tools import swap_order
 
@@ -99,13 +100,17 @@ def expression_swap_view(request, pk, direction):
     success = swap_order(expression, "work", direction)
 
     if not success:
-        pass
+        messages.error(request, "Element steht am Anfang oder Ende der Liste")
     
     work = expression.work
 
     context = {'object': work}
     
-    return
+    return render(
+        request,
+        'edwoca/partials/work/expression_list.html',
+        context
+    )
 
 class IndexNumberDeleteView(DeleteView):
     model = IndexNumber

@@ -85,6 +85,7 @@ urlpatterns = [
         path('expressions/<int:pk>/mediumofperformance', views.ExpressionMediumofperformanceUpdateView.as_view(), name = 'expression_mediumofperformance'),
         path('expressions/<int:pk>/movements', views.ExpressionMovementsUpdateView.as_view(), name = 'expression_movements'),
         path('expressions/<int:pk>/comment', views.ExpressionCommentUpdateView.as_view(), name = 'expression_comment'),
+        path('expressions/<int:pk>/<str:direction>/swap', views.expression_swap_view, name='expression_swap_order'),
         #path('expressions/<int:work_id>/createexpression', views.ExpressionCreateView.as_view(), name = 'expression_create'),
         path('work/<int:pk>/createexpression', views.work_expression_create, name = 'expression_create'),
         path('expressions/<int:pk>/delete', views.ExpressionDeleteView.as_view(), name = 'expression_delete'),
