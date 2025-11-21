@@ -2,12 +2,19 @@ from .base import *
 from ..models.work import *
 from dominate.tags import div, label, span
 from dominate.util import raw
+from django import forms
+from liszt_util.forms.forms import GenericAsDaisyMixin
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea
 from django.forms.models import inlineformset_factory, formset_factory
 from django.utils.safestring import mark_safe
 
 
 class WorkForm(ModelForm):
+    class Meta:
+        model = Work
+        fields = []
+
+class WorkIdentificationForm(ModelForm):
     class Meta:
         model = Work
         fields = ['work_catalog_number', 'gnd_id']
@@ -102,4 +109,5 @@ WorkTitleFormSet = inlineformset_factory(
         can_delete = True
     )
 
-
+class WorkCreateForm(GenericAsDaisyMixin, forms.Form):
+    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=True, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))

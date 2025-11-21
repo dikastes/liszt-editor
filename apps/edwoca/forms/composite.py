@@ -1,17 +1,16 @@
 from .base import *
+from ..models.composite import *
 from bib.models import ZotItem
 from django import forms
 from django.conf import settings
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
-from dmad_on_django.models import Period, Corporation
+from dmad_on_django.models import Period
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting
 from dominate.tags import div, label, span
 from dominate.util import raw
-from liszt_util.forms.forms import GenericAsDaisyMixin
-from liszt_util.forms.layouts import Layouts
 
 
 class ManifestationForm(ModelForm):
@@ -101,14 +100,7 @@ class ManifestationCommentForm(CommentForm):
             })
 
 
-class ManifestationBibForm(BaseBibForm):
-    class Meta(BaseBibForm.Meta):
-        model = ManifestationBib
-        fields = BaseBibForm.Meta.fields + [ 'manifestation' ]
-        widgets = dict(BaseBibForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
-
-
-class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
+class CompositeHistoryForm(ModelForm, SimpleFormMixin):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
@@ -120,13 +112,10 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
-        model = Manifestation
-        fields = ['history', 'id', 'date_diplomatic', 'private_history_comment']
+        model = Composite
+        fields = ['history', 'id', 'private_history_comment']
         widgets = {
                 'history': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
-                    }),
-                'date_diplomatic': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     }),
                 'private_history_comment': Textarea( attrs = {
@@ -142,25 +131,25 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
             self.fields['display'].initial = self.instance.period.display
 
     def save(self, commit=True):
-        manifestation_instance = super().save(commit=False)
+        composite_instance = super().save(commit=False)
 
         # Ensure period exists or create it
-        if not manifestation_instance.period:
-            manifestation_instance.period = Period()
+        if not composite_instance.period:
+            composite_instance.period = Period()
 
-        period_instance = manifestation_instance.period
+        period_instance = composite_instance.period
         period_instance.not_before = self.cleaned_data['not_before']
         period_instance.not_after = self.cleaned_data['not_after']
         period_instance.display = self.cleaned_data['display']
 
         if commit:
             period_instance.save()
-            manifestation_instance.save()
+            composite_instance.save()
         else:
             self._pending_save_period = period_instance
-            self._pending_save_manifestation = manifestation_instance
+            self._pending_save_composite = composite_instance
 
-        return manifestation_instance
+        return composite_instance
 
     def as_daisy(self):
         form = div(cls='mb-10')
@@ -193,13 +182,13 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        date_diplomatic_field = self['date_diplomatic']
-        date_diplomatic_wrap = label(cls='form-control')
-        date_diplomatic_label = div(cls='label')
-        date_diplomatic_span = span(date_diplomatic_field.label, cls='label-text')
-        date_diplomatic_label.add(date_diplomatic_span)
-        date_diplomatic_wrap.add(date_diplomatic_label)
-        date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
+        #date_diplomatic_field = self['date_diplomatic']
+        #date_diplomatic_wrap = label(cls='form-control')
+        #date_diplomatic_label = div(cls='label')
+        #date_diplomatic_span = span(date_diplomatic_field.label, cls='label-text')
+        #date_diplomatic_label.add(date_diplomatic_span)
+        #date_diplomatic_wrap.add(date_diplomatic_label)
+        #date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
 
         #history_wrap = label(cls='form-control')
         #history_label = div(cls='label')
@@ -215,7 +204,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
 
         form.add(period_palette)
         form.add(display_container)
-        form.add(date_diplomatic_wrap)
+        #form.add(date_diplomatic_wrap)
 
         private_history_comment_field = self['private_history_comment']
         private_history_comment_wrap = label(cls='form-control')
@@ -321,6 +310,9 @@ ManifestationTitleFormSet = inlineformset_factory(
     )
 
 
+
+
+
 class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
@@ -333,160 +325,9 @@ class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
 
 
 class ManifestationCreateForm(forms.Form):
-    kwargs = {
-            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
-            'attrs': {
-                'class': 'select select-bordered'
-            }
-        }
-    read_only_fields = ['publisher']
-    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
-    plate_number = forms.CharField(label='Plattennummer', max_length=50, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
-    source_type = forms.ChoiceField(label='Quellentyp', choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
-    publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label='Verlag', empty_label="Bibliothek auswählen", widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
-
-    def __init__(self, *args, **kwargs):
-        self.publisher_instance = kwargs.pop('publisher', None)
-        super().__init__(*args, **kwargs)
-        if self.publisher_instance:
-            self.initial['publisher'] = self.publisher_instance
-            self.fields['publisher'].queryset = Corporation.objects.filter(pk=self.publisher_instance.pk)
-            self.fields['publisher'].widget.attrs['disabled'] = True
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if self.publisher_instance:
-            cleaned_data['publisher'] = self.publisher_instance
-        return cleaned_data
-
-    def as_daisy(self):
-        form = div(cls='mb-10')
-
-        # Temporary Title
-        temporary_title_field = self['temporary_title']
-        temporary_title_container = label(cls='form-control w-full')
-        temporary_title_label = div(cls='label')
-        temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
-        temporary_title_container.add(temporary_title_label)
-        temporary_title_container.add(raw(str(temporary_title_field)))
-        if temporary_title_field.errors:
-            temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(temporary_title_container)
-
-        # Publisher
-        publisher_field = self['publisher']
-        publisher_container = label(cls='form-control w-full')
-        publisher_label = div(cls='label')
-        publisher_label.add(span(publisher_field.label, cls='label-text'))
-        publisher_container.add(publisher_label)
-        publisher_container.add(raw(str(publisher_field)))
-        if publisher_field.errors:
-            publisher_container.add(div(span(publisher_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(publisher_container)
-        
-        # Plate Number
-        plate_number_field = self['plate_number']
-        plate_number_container = label(cls='form-control w-full')
-        plate_number_label = div(cls='label')
-        plate_number_label.add(span(plate_number_field.label, cls='label-text'))
-        plate_number_container.add(plate_number_label)
-        plate_number_container.add(raw(str(plate_number_field)))
-        if plate_number_field.errors:
-            plate_number_container.add(div(span(plate_number_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(plate_number_container)
-
-        # Source Type
-        source_type_field = self['source_type']
-        source_type_container = label(cls='form-control w-full')
-        source_type_label = div(cls='label')
-        source_type_label.add(span(source_type_field.label, cls='label-text'))
-        source_type_container.add(source_type_label)
-        source_type_container.add(raw(str(source_type_field)))
-        if source_type_field.errors:
-            source_type_container.add(div(span(source_type_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(source_type_container)
-
-        # Date Fields
-        not_before_field = self['not_before']
-        not_after_field = self['not_after']
-        display_field = self['display']
-
-        not_before_container = label(cls='form-control')
-        not_before_label = div(not_before_field.label, cls='label-text')
-        not_before_selects = div(cls='flex')
-        not_before_selects.add(raw(str(not_before_field)))
-        not_before_container.add(not_before_label)
-        not_before_container.add(not_before_selects)
-        if not_before_field.errors:
-            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        not_after_container = label(cls='form-control')
-        not_after_label = div(not_after_field.label, cls='label-text')
-        not_after_selects = div(cls='flex')
-        not_after_selects.add(raw(str(not_after_field)))
-        not_after_container.add(not_after_label)
-        not_after_container.add(not_after_selects)
-        if not_after_field.errors:
-            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        display_container.add(raw(str(display_field)))
-        if display_field.errors:
-            display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        period_palette.add(not_before_container)
-        period_palette.add(not_after_container)
-        form.add(period_palette)
-        form.add(display_container)
-
-        return mark_safe(str(form))
-
-
-
-
-
-class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
-    layout = Layouts.LABEL_OUTSIDE
     temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False)
-    source_type = forms.ChoiceField(label='Quellentyp', choices=Manifestation.SourceType.choices)
-    library = forms.ModelChoiceField(queryset=Library.objects.all(), label='Bibliothek', empty_label="Bibliothek auswählen")
     signature = forms.CharField(label='Signatur', max_length=255)
-
-    def as_daisy(self):
-        root = div(cls="flex flex-col gap-5")
-        
-        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette1.add(self._render_field('temporary_title'))
-        palette1.add(self._render_field('source_type'))
-        root.add(palette1)
-        
-        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette2.add(self._render_field('library'))
-        palette2.add(self._render_field('signature'))
-        root.add(palette2)
-        
-        return mark_safe(root.render())
-    
-    def _render_field(self, field_name):
-        field = self[field_name]
-        widget = field.field.widget
-        wrap = label(cls="form-control w-full")
-        top = div(cls="label")
-        top.add(span((field.label or field.name), cls="label-text"))
-        if field.help_text:
-            top.add(span(field.help_text, cls="label-text-alt"))
-        wrap.add(top)
-        
-        cls = "input input-bordered w-full"
-        if isinstance(widget, forms.Select):
-            cls = "select select-bordered w-full"
-        
-        wrap.add(raw(field.as_widget(attrs={"class" : cls})))
-        return wrap
+    library = forms.ModelChoiceField(queryset=Library.objects.all(), label='Bibliothek', empty_label="Bibliothek auswählen", widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
 
 
 class ManifestationTitleHandwritingForm(HandwritingForm):

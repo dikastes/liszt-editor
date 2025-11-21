@@ -1,8 +1,9 @@
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe
 from dominate.tags import div, label, span
 from dominate.util import raw
+from dmad_on_django.forms import SearchForm
 
 
 class SimpleFormMixin:
@@ -156,5 +157,39 @@ class BaseBibForm(ModelForm):
         bib_container.add(raw(str(bib_field)))
 
         form.add(bib_container)
+
+        return mark_safe(str(form))
+
+
+class EdwocaSearchForm(SearchForm):
+    q = CharField(required=False, widget=TextInput())
+
+
+class HandwritingForm(ModelForm):
+    class Meta:
+        fields = ['medium', 'dubious_writer']
+        widgets = {
+                'medium': TextInput( attrs = {
+                        'class': 'grow'
+                    }),
+                'dubious_writer': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='flex gap-5') # Add flex and gap classes to the main form div
+        medium_field = self['medium']
+        dubious_writer_field = self['dubious_writer']
+
+        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2 flex-1') # Add flex-1 to medium label
+        medium_label.add(raw(str(medium_field)))
+
+        dubious_writer_label = label(_for=dubious_writer_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')
+        dubious_writer_label.add(span(dubious_writer_field.label, cls='label-text'))
+        dubious_writer_label.add(raw(str(dubious_writer_field)))
+
+        form.add(medium_label)
+        form.add(dubious_writer_label)
 
         return mark_safe(str(form))

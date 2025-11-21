@@ -177,6 +177,8 @@ EDWOCA_FIXED_DATES = {
         }
     }
 
+EDITOR_MODE = 'test'
+
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'
 HAYSTACK_CONNECTIONS = {

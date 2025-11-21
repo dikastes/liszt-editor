@@ -1,9 +1,13 @@
 from .base import *
-from ..forms.work import *
-from dmad_on_django.models import Work as DmadWork, Person, Place, Corporation, SubjectTerm
+from ..models.work import *
+from ..forms.work import WorkForm, WorkTitleForm, WorkTitleFormSet, WorkCreateForm, WorkIdentificationForm, RelatedWorkForm, WorkContributorForm, WorkBibForm
+from ..forms.dedication import WorkPersonDedicationForm, WorkCorporationDedicationForm
+from dmad_on_django.models import Work as DmadWork, Person, Place, Corporation, SubjectTerm, Status
+from edwoca.forms import EdwocaSearchForm
 from bib.models import ZotItem
+from ..models.base import Letter
 from django.forms.models import formset_factory
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, ModelFormMixin
@@ -13,43 +17,24 @@ class WorkListView(EdwocaListView):
     model = Work
 
 
-class WorkCreateView(CreateView):
-    model = Work
-    form_class = WorkForm
-    template_name = 'edwoca/create.html'
+def work_create(request):
+    if request.method == 'POST':
+        form = WorkCreateForm(request.POST)
+        if form.is_valid():
+            work = Work.objects.create()
+            if form.cleaned_data.get('temporary_title'):
+                WorkTitle.objects.create(
+                    work=work,
+                    title=form.cleaned_data['temporary_title'],
+                    status=Status.TEMPORARY
+                )
+            return redirect('edwoca:work_update', pk=work.pk)
+    else:
+        form = WorkCreateForm()
 
-    def get_success_url(self):
-        return reverse_lazy('edwoca:work_update', kwargs = {'pk': self.object.id})
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        if 'title_formset' not in context:
-            if self.request.POST:
-                context['title_formset'] = WorkTitleFormSet(self.request.POST, self.request.FILES)
-            else:
-                WorkTitleFormSet.can_delete = False
-                context['title_form_set'] = WorkTitleFormSet()
-        context['view_title'] = f"Neues Werk anlegen"
-        context['button_label'] = "speichern"
-        context['return_target'] = 'edwoca:index'
-        context['return_pk'] = None
-        return context
-
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        title_formset = WorkTitleFormSet(self.request.POST, self.request.FILES, instance=self.object)
-
-        if title_formset.is_valid():
-            self.object.save()
-            title_formset.save()
-            return redirect(self.get_success_url())
-        else:
-            self.object = None # Reset object so get_context_data doesn't try to use it for instance
-            return self.form_invalid(form, title_formset=title_formset)
-
-    def form_invalid(self, form, title_formset=None):
-        context = self.get_context_data(form=form, title_formset=title_formset)
-        return self.render_to_response(context)
+    return render(request, 'edwoca/create_work.html', {
+        'form': form,
+    })
 
 
 class WorkUpdateView(EntityMixin, UpdateView):
@@ -74,9 +59,86 @@ class WorkTitleUpdateView(EntityMixin, TitleUpdateView):
     model = Work
     form_class = WorkTitleFormSet
     formset_property = 'titles'
+    template_name = 'edwoca/work_title.html'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_title', kwargs = {'pk': self.object.id})
+        return reverse_lazy('edwoca:work_title', kwargs = {'pk': self.get_object().id})
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        formset = self.get_form_class()(request.POST, request.FILES, instance=self.object)
+        identification_form = WorkIdentificationForm(request.POST, instance=self.object)
+
+        if formset.is_valid() and identification_form.is_valid():
+            formset.save()
+            identification_form.save()
+
+            # Handle existing PersonDedication forms
+            for person_dedication in self.object.workpersondedication_set.all():
+                prefix = f'person_dedication_{person_dedication.id}'
+                form = WorkPersonDedicationForm(request.POST, instance=person_dedication, prefix=prefix)
+                if form.is_valid():
+                    form.save()
+
+            # Handle existing CorporationDedication forms
+            for corporation_dedication in self.object.workcorporationdedication_set.all():
+                prefix = f'corporation_dedication_{corporation_dedication.id}'
+                form = WorkCorporationDedicationForm(request.POST, instance=corporation_dedication, prefix=prefix)
+                if form.is_valid():
+                    form.save()
+
+            return self.form_valid(formset)
+        else:
+            return self.form_invalid(formset, identification_form=identification_form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if 'identification_form' not in kwargs:
+            context['identification_form'] = WorkIdentificationForm(instance=self.object)
+
+        # Initialize forms for existing PersonDedication
+        person_dedication_forms = []
+        for person_dedication in self.object.workpersondedication_set.all():
+            prefix = f'person_dedication_{person_dedication.id}'
+            person_dedication_forms.append(WorkPersonDedicationForm(instance=person_dedication, prefix=prefix))
+        context['person_dedication_forms'] = person_dedication_forms
+
+        # Initialize forms for existing CorporationDedication
+        corporation_dedication_forms = []
+        for corporation_dedication in self.object.workcorporationdedication_set.all():
+            prefix = f'corporation_dedication_{corporation_dedication.id}'
+            corporation_dedication_forms.append(WorkCorporationDedicationForm(instance=corporation_dedication, prefix=prefix))
+        context['corporation_dedication_forms'] = corporation_dedication_forms
+
+        q_dedicatee = self.request.GET.get('dedicatee-q')
+        q_place = self.request.GET.get('place-q')
+
+        if q_dedicatee:
+            dedicatee_search_form = EdwocaSearchForm(self.request.GET, prefix='dedicatee')
+            if dedicatee_search_form.is_valid():
+                context['query_dedicatee'] = dedicatee_search_form.cleaned_data.get('q')
+                context['found_persons'] = dedicatee_search_form.search().models(Person)
+                context['found_corporations'] = dedicatee_search_form.search().models(Corporation)
+        else:
+            dedicatee_search_form = EdwocaSearchForm(prefix='dedicatee')
+
+        if q_place:
+            place_search_form = EdwocaSearchForm(self.request.GET, prefix='place')
+            if place_search_form.is_valid():
+                context['query_place'] = place_search_form.cleaned_data.get('q')
+                context['found_places'] = place_search_form.search().models(Place)
+        else:
+            place_search_form = EdwocaSearchForm(prefix='place')
+
+        context['dedicatee_search_form'] = dedicatee_search_form
+        context['place_search_form'] = place_search_form
+
+        if self.request.GET.get('person_dedication_id'):
+            context['person_dedication_id'] = int(self.request.GET.get('person_dedication_id'))
+        if self.request.GET.get('corporation_dedication_id'):
+            context['corporation_dedication_id'] = int(self.request.GET.get('corporation_dedication_id'))
+
+        return context
 
 
 class WorkRelationsUpdateView(EntityMixin, RelationsUpdateView):
@@ -168,13 +230,24 @@ class WorkBibliographyUpdateView(EntityMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        search_form = SearchForm(self.request.GET or None)
-        context['searchform'] = search_form
-        context['show_search_form'] = True
+        
+        zotitem_search_form = EdwocaSearchForm(self.request.GET or None, prefix='zotitem')
+        context['zotitem_searchform'] = zotitem_search_form
+        context['show_zotitem_search_form'] = True
 
-        if search_form.is_valid() and search_form.cleaned_data.get('q'):
-            context['query'] = search_form.cleaned_data.get('q')
-            context[f"found_bibs"] = search_form.search().models(ZotItem)
+        if zotitem_search_form.is_valid() and zotitem_search_form.cleaned_data.get('q'):
+            context['zotitem_query'] = zotitem_search_form.cleaned_data.get('q')
+            context[f"found_bibs"] = zotitem_search_form.search().models(ZotItem)
+
+        letter_search_form = EdwocaSearchForm(self.request.GET or None, prefix='letter')
+        context['letter_searchform'] = letter_search_form
+        context['show_letter_search_form'] = True
+
+        if letter_search_form.is_valid() and letter_search_form.cleaned_data.get('q'):
+            context['letter_query'] = letter_search_form.cleaned_data.get('q')
+            context[f"found_letters"] = letter_search_form.search().models(Letter)
+
+        context['entity_type'] = 'work'
         return context
 
 
@@ -223,7 +296,7 @@ class WorkReferencesUpdateView(EntityMixin, UpdateView):
 
         context['show_search_forms'] = True
         for reference_model in self.reference_models:
-            search_form = SearchForm(self.request.GET or None, prefix = f'{reference_model}_search')
+            search_form = EdwocaSearchForm(self.request.GET or None, prefix = f'{reference_model}_search')
             context[f'{reference_model}_searchform'] = search_form
 
             if search_form.is_valid() and search_form.cleaned_data.get('q'):
@@ -266,3 +339,88 @@ def reference_subjectterm_add(request, pk, target_reference_subjectterm):
     subject_term = get_object_or_404(SubjectTerm, pk = target_reference_subjectterm)
     SubjectTermWorkReference.objects.create(work = work, subject_term = subject_term)
     return redirect('edwoca:work_references', pk = pk)
+
+def work_person_dedication_add(request, pk):
+    work = get_object_or_404(Work, pk=pk)
+    WorkPersonDedication.objects.create(work=work)
+    return redirect('edwoca:work_title', pk=pk)
+
+def work_corporation_dedication_add(request, pk):
+    work = get_object_or_404(Work, pk=pk)
+    WorkCorporationDedication.objects.create(work=work)
+    return redirect('edwoca:work_title', pk=pk)
+
+
+def work_person_dedication_delete(request, pk):
+    dedication = get_object_or_404(WorkPersonDedication, pk=pk)
+    work_pk = dedication.work.pk
+    dedication.delete()
+    return redirect('edwoca:work_title', pk=work_pk)
+
+def work_corporation_dedication_delete(request, pk):
+    dedication = get_object_or_404(WorkCorporationDedication, pk=pk)
+    work_pk = dedication.work.pk
+    dedication.delete()
+    return redirect('edwoca:work_title', pk=work_pk)
+
+def work_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
+    dedication = get_object_or_404(WorkPersonDedication, pk=dedication_id)
+    person = get_object_or_404(Person, pk=person_id)
+    dedication.dedicatee = person
+    dedication.save()
+    return redirect('edwoca:work_title', pk=pk)
+
+def work_person_dedication_remove_dedicatee(request, pk, dedication_id):
+    dedication = get_object_or_404(WorkPersonDedication, pk=dedication_id)
+    dedication.dedicatee = None
+    dedication.save()
+    return redirect('edwoca:work_title', pk=pk)
+
+def work_corporation_dedication_add_dedicatee(request, pk, dedication_id, corporation_id):
+    dedication = get_object_or_404(WorkCorporationDedication, pk=dedication_id)
+    corporation = get_object_or_404(Corporation, pk=corporation_id)
+    dedication.dedicatee = corporation
+    dedication.save()
+    return redirect('edwoca:work_title', pk=pk)
+
+def work_corporation_dedication_remove_dedicatee(request, pk, dedication_id):
+    dedication = get_object_or_404(WorkCorporationDedication, pk=dedication_id)
+    dedication.dedicatee = None
+    dedication.save()
+    return redirect('edwoca:work_title', pk=pk)
+
+def work_dedication_add_place(request, pk, dedication_id, place_id):
+    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
+    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
+    try:
+        dedication = WorkPersonDedication.objects.get(pk=dedication_id)
+    except WorkPersonDedication.DoesNotExist:
+        dedication = get_object_or_404(WorkCorporationDedication, pk=dedication_id)
+    place = get_object_or_404(Place, pk=place_id)
+    dedication.place = place
+    dedication.save()
+    return redirect('edwoca:work_title', pk=pk)
+
+
+def work_dedication_remove_place(request, pk, dedication_id):
+    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
+    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
+    try:
+        dedication = WorkPersonDedication.objects.get(pk=dedication_id)
+    except WorkPersonDedication.DoesNotExist:
+        dedication = get_object_or_404(WorkCorporationDedication, pk=dedication_id)
+    dedication.place = None
+    dedication.save()
+    return redirect('edwoca:work_title', pk=pk)
+
+def work_letter_add(request, pk, letter_pk):
+    work = get_object_or_404(Work, pk=pk)
+    letter = get_object_or_404(Letter, pk=letter_pk)
+    work.letters.add(letter)
+    return redirect('edwoca:work_bibliography', pk=pk)
+
+def work_letter_remove(request, pk, letter_pk):
+    work = get_object_or_404(Work, pk=pk)
+    letter = get_object_or_404(Letter, pk=letter_pk)
+    work.letters.remove(letter)
+    return redirect('edwoca:work_bibliography', pk=pk)

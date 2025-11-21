@@ -25,12 +25,32 @@
 <div class="bg-white border border-base-300 p-5">
 	<h2 class="card-title mt-0"> {{ object }} bearbeiten </h2>
 
+            <div class="input ipnut-bordered">
+                Ergänzung LQWV-Nr.
+            </div>
+
+            <div class="input ipnut-bordered">
+                GND-ID
+            </div>
+
+            <div class="flex gap-5">
+                <div class="input ipnut-bordered">
+                    102A
+                </div>
+                <div class="input ipnut-bordered">
+                    RAABE
+                </div>
+            </div>
+
+            <a class="btn"> WV-Nummer hinzufügen </a>
+        {% comment %}
 	<form method="post">
 		{% csrf_token %}
 		{{ form.as_daisy }}
 
 		<input id="submit-form" type="submit" value="{{ button_label }}" class="hidden">
 	</form>
+        {% endcomment %}
 
 </div>
 

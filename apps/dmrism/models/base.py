@@ -1,6 +1,7 @@
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.utils.safestring import mark_safe
 
 
 class WemiBaseClass(models.Model):
@@ -147,6 +148,16 @@ class BaseHandwriting(models.Model):
             blank = True
         )
     dubious_writer = models.BooleanField(default = False)
+
+    def str_with_link(self):
+        try:
+            if self.dubious_writer:
+                return f"[{self.writer.str_with_link()}] ({self.medium})"
+            return f"{self.writer.str_with_link()} ({self.medium})"
+        except AttributeError:
+            if self.dubious_writer:
+                return f'[{self.writer.__str__()}] ({self.medium})'
+            return f'{self.writer.__str__()} ({self.medium})'
 
     def __str__(self):
         if self.dubious_writer:

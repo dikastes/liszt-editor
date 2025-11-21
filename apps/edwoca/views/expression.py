@@ -119,6 +119,7 @@ class ExpressionTitleUpdateView(EntityMixin, TitleUpdateView):
     model = Expression
     form_class = ExpressionTitleFormSet
     formset_property = 'titles'
+    template_name = 'edwoca/expression_title.html'
 
     def get_success_url(self):
         return reverse_lazy('edwoca:expression_title', kwargs = {'pk': self.object.id})
@@ -168,11 +169,15 @@ class ExpressionHistoryUpdateView(EntityMixin, UpdateView):
 
 
 class ExpressionCategorisationUpdateView(EntityMixin, UpdateView):
-    pass
+    template_name = 'edwoca/expression_categorisation.html'
+    model = Expression
+    fields = []
 
 
 class ExpressionMediumofperformanceUpdateView(EntityMixin, UpdateView):
-    pass
+    template_name = 'edwoca/expression_mediumofperformance.html'
+    model = Expression
+    fields = []
 
 
 class ExpressionMovementsUpdateView(EntityMixin, FormsetUpdateView):
@@ -199,4 +204,6 @@ class ExpressionDeleteView(EntityMixin, DeleteView):
     template_name = 'edwoca/simple_form.html'
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:work_update', kwargs={'pk': self.object.work.id})
+        if self.object.work:
+            return reverse_lazy('edwoca:work_update', kwargs={'pk': self.object.work.id})
+        return reverse_lazy('edwoca:expression_list')

@@ -20,6 +20,13 @@
 		</form>
 	{% endif %}
 
+	{% if list_entity_type == 'singleton' %}
+		<form action="{% url 'edwoca:singleton_search' %}" method="get" class="m-0">
+			{{ form.q }}
+			<input type="submit" class="btn">
+		</form>
+	{% endif %}
+
 	{% if list_entity_type == 'item' %}
 		<form action="{% url 'edwoca:item_search' %}" method="get" class="m-0">
 			{{ form.q }}

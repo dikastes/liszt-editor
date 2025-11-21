@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status
-from dmrism.models import BaseContributor, BaseBib, RelatedEntity
+from dmrism.models import BaseContributor, BaseBib, RelatedEntity, BasePersonDedication, BaseCorporationDedication
 
 
 class Work(WeBaseClass):
@@ -150,4 +150,18 @@ class CorporationWorkReference(BaseWorkReference):
             'dmad.Corporation',
             on_delete = models.CASCADE,
             related_name = 'referencing_works'
+        )
+
+
+class WorkPersonDedication(BasePersonDedication):
+    work = models.ForeignKey(
+            'Work',
+            on_delete = models.CASCADE
+        )
+
+
+class WorkCorporationDedication(BaseCorporationDedication):
+    work = models.ForeignKey(
+            'Work',
+            on_delete = models.CASCADE
         )

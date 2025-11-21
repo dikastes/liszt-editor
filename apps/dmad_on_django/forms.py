@@ -16,7 +16,8 @@ formWidgets = {
             })
     }
 
-class SearchForm(SearchForm):
+class SearchForm(GenericAsDaisyMixin, SearchForm):
+    layout = Layouts.LABEL_INSIDE
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -30,6 +31,7 @@ class SearchForm(SearchForm):
 
 class DmadUpdateForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
+
 
 class DmadCreateForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE

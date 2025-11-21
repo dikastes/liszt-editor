@@ -2,7 +2,7 @@
 
 
 {% block menu %}
-<ul class="menu menu-lg">
+<ul class="menu">
 	<li>
 	    <a href="{% url 'edwoca:work_search' %}"
 		{% if list_entity_type == 'work' %} class="active" {% endif %}>
@@ -12,19 +12,31 @@
 	<li>
 	    <a href="{% url 'edwoca:expression_search' %}"
 		{% if list_entity_type == 'expression' %} class="active" {% endif %}>
-		Expressionen <span class="badge"> {{ expression_count }} </span>
+		Fassungen <span class="badge"> {{ expression_count }} </span>
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:singleton_search' %}"
+		{% if list_entity_type == 'singleton' %} class="active" {% endif %}>
+		Handschriften <span class="badge"> {{ singleton_count }} </span>
 	    </a>
 	</li>
 	<li>
 	    <a href="{% url 'edwoca:manifestation_search' %}"
 		{% if list_entity_type == 'manifestation' %} class="active" {% endif %}>
-		Manifestationen <span class="badge"> {{ manifestation_count }} </span>
+		Drucke <span class="badge"> {{ manifestation_count }} </span>
 	    </a>
 	</li>
 	<li>
 	    <a href="{% url 'edwoca:item_search' %}"
 		{% if list_entity_type == 'item' %} class="active" {% endif %}>
-		Exemplare <span class="badge"> {{ item_count }} </span>
+		Druckexemplare <span class="badge"> {{ item_count }} </span>
+	    </a>
+	</li>
+	<li>
+	    <a href="{% url 'edwoca:composite_search' %}"
+		{% if list_entity_type == 'composite' %} class="active" {% endif %}>
+		Konvolute <span class="badge"> {{ composite_count }} </span>
 	    </a>
 	</li>
 	<li>
@@ -68,7 +80,7 @@
 		    </ul>
 	    </div>
 	    </div>
-	    <div class="stats flex-0">
+	    <div class="stats flex-0 h-32">
 	    {% if query %}
 		<div class="stat">
 		    <div class="stat-title">Ergebnis {{ first_result_on_page }} bis {{ last_result_on_page }} von</div>
@@ -93,7 +105,13 @@
 		<a href="{% url 'edwoca:work_create' %}">Werk</a>
 	    </li>
 	    <li>
-		<a href="{% url 'edwoca:manifestation_create' %}">Manifestation</a>
+		<a href="{% url 'edwoca:singleton_create' %}">Manuskript</a>
+	    </li>
+	    <li>
+		<a href="{% url 'edwoca:manifestation_create' %}">Druck</a>
+	    </li>
+	    <li>
+		<a href="{% url 'edwoca:composite_create' %}">Konvolut</a>
 	    </li>
 	    <li>
 		<a href="{% url 'edwoca:library_create' %}">Bibliothek</a>

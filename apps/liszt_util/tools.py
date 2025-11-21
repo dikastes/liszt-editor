@@ -1,6 +1,7 @@
 from json import dumps, loads
 from django.db import transaction
 from django.db.models import Max
+from django.utils.safestring import mark_safe
 
 class RenderRawJSONMixin:
     def render_raw(self):
@@ -27,7 +28,7 @@ def get_model_link(model):
         return "—"
     if not hasattr(model, 'get_absolute_url'):
         raise NotImplementedError("model does not implement get_absolute_url")
-    return (
+    return mark_safe((
         f'<a href="{model.get_absolute_url()}" '
         f'class=link link-primary>'
         f'{model}</a>'
@@ -85,3 +86,4 @@ def swap_order(obj, group_field_name, direction):
         ModelClass.objects.filter(pk=obj.pk).update(order_index=neighbour_index)
         
     return True
+    )

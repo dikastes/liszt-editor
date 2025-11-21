@@ -19,6 +19,7 @@ class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
             document=True,
             use_template=True
         )
+    is_singleton = indexes.BooleanField(model_attr = 'is_singleton')
 
     def get_model(self):
         return Manifestation
@@ -45,6 +46,7 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
             document=True,
             use_template=True
         )
+    manifestation_is_singleton = indexes.BooleanField(model_attr = 'manifestation__is_singleton')
 
     def get_model(self):
         return Item

@@ -1,6 +1,7 @@
 {% load static %}
 {% load django_htmx %}
 {% load navigation_tags %}
+{% load editor_mode %}
 
 <html data-theme="liszt">
     <head>
@@ -14,18 +15,21 @@
 
     <body>
 	<div class="container w-full max-w-7xl mx-auto flex flex-col min-h-screen h-screen">
-	    <div class="navbar bg-white border border-base-300 mb-10 flex flex-0 p-0">
-		<div class="flex-none min-h-inherit">
-		    {% render_main_navbar_link %}
+	    <div class="mb-10 border border-base-300">
+		<div class="navbar bg-white flex flex-0 p-0">
+		    <div class="flex-none min-h-inherit">
+			{% render_main_navbar_link %}
+		    </div>
+		    <div class="flex-1 text-lg text-gray-600">
+			{% block navbar_title %}
+			{% endblock %}
+		    </div>
+		    <div class="flex-none gap-2 min-h-inherit border-r-0">
+			{% block navbar_extras %}
+			{% endblock %}
+		    </div>
 		</div>
-		<div class="flex-1 text-lg text-gray-600">
-		    {% block navbar_title %}
-		    {% endblock %}
-		</div>
-		<div class="flex-none gap-2 min-h-inherit border-r-0">
-		    {% block navbar_extras %}
-		    {% endblock %}
-		</div>
+		{% render_editor_mode_warning %}
 	    </div>
 	    <div class="flex gap-10 flex-1 overflow-hidden">
 		<div class="flex-0">

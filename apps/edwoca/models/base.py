@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -593,7 +593,6 @@ class ManifestationTitle(DmRismManifestationTitle):
 
         return manifestation_title
 
-
 class Item (EdwocaUpdateUrlMixin, DmRismItem):
     class Meta:
         proxy = True
@@ -772,7 +771,8 @@ class Letter(models.Model):
         )
     edition = models.ManyToManyField(
             'bib.ZotItem',
-            related_name = 'edited_letters'
+            related_name = 'edited_letters',
+            through = 'LetterMentioning'
         )
     category = models.CharField(
             max_length = 1,
@@ -823,3 +823,77 @@ class Letter(models.Model):
                 receiver = 'unbekannt'
 
         return f'{sender} an {receiver}, {self.period}'
+
+
+class LetterMentioning(models.Model):
+    letter = models.ForeignKey(
+            'Letter',
+            on_delete = models.CASCADE
+        )
+    bib = models.ForeignKey(
+            'bib.ZotItem',
+            on_delete = models.CASCADE
+        )
+    pages = models.CharField(
+            max_length = 20,
+            null = True,
+            blank = True
+        )
+
+class ItemModification(models.Model):
+    class ModificationType(models.TextChoices):
+        ARRANGEMENT = 'AR', _('Arrangement')
+        TRANSCRIPTION = 'TR', _('Transcription')
+        REVISION = 'RV', _('Revision')
+
+    item = models.ForeignKey(
+            'dmrism.Item',
+            related_name = 'modifications',
+            on_delete = models.CASCADE
+        )
+    related_expression = models.ForeignKey(
+            'Expression',
+            related_name = 'relating_modifications',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    related_work = models.ForeignKey(
+            'Work',
+            related_name = 'relating_modifications',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    period = models.ForeignKey(
+            'dmad.Period',
+            related_name = 'modification',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    note = models.TextField(
+            null = True,
+            blank = True
+        )
+    modification_type = models.CharField(
+            max_length = 2,
+            choices = ModificationType,
+            default = None,
+            null = True
+        )
+
+    def __str__(self):
+        if handwriting := self.handwritings.first():
+            if handwriting.dubious_writer:
+                return f"{self.period} [{handwriting.writer.__str__()}] ({handwriting.medium})"
+            return f"{self.period} ({handwriting.writer.__str__()}, {handwriting.medium})"
+        else:
+            return f"{self.period} <Handschrift>"
+
+
+class ModificationHandwriting(BaseHandwriting):
+    modification = models.ForeignKey(
+            'ItemModification',
+            related_name = 'handwritings',
+            on_delete = models.CASCADE
+        )
+
+

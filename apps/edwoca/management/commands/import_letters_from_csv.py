@@ -1,0 +1,83 @@
+from ...models.base import Letter, LetterMentioning
+from bib.models import ZotItem
+from django.core.management.base import BaseCommand, CommandError
+from dmad_on_django.models import Person, Corporation, Place, Period
+from pylobid.pylobid import GNDNotFoundError, GNDIdError
+from csv import DictReader
+import datetime
+
+class Command(BaseCommand):
+    help = "Sepcify a file to import works from."
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+                'file_name',
+                nargs=1,
+                type=str,
+                help='Path to a file containing CSV encoded manifestation data.'
+            )
+
+    def handle(self, *args, **options):
+        with open(options['file_name'][0]) as file:
+            reader = list(DictReader(file))
+            total = len(reader)
+            for i, row in enumerate(reader):
+                print(f'{str(i+1)} von {total}')
+                print(f'{row["Absender Person"]}{row["Absender Körperschaft"]} an {row["Adressat Person"]}{row["Adressat Körperschaft"]}')
+
+                sender_person = None
+                if (sender_person_id := row["GND Absender Person"]):
+                    sender_person = Person.fetch_or_get(sender_person_id)
+                sender_corporation = None
+                if (sender_corporation_id := row["GND Absender Körperschaft"]):
+                    sender_corporation = Corporation.fetch_or_get(sender_corporation_id)
+                sender_place = None
+                if (sender_place_id := row["Absendeort_GND"]):
+                    sender_place = Place.fetch_or_get(sender_place_id)
+
+                receiver_person = None
+                if (receiver_person_id := row["GND Adressat Person"]):
+                    receiver_person = Person.fetch_or_get(receiver_person_id)
+                receiver_corporation = None
+                if (receiver_corporation_id := row["GND Adressat Körperschaft"]):
+                    receiver_corporation = Corporation.fetch_or_get(receiver_corporation_id)
+                receiver_place = None
+                if (receiver_place_id := row["Absendeort_GND"]):
+                    receiver_place = Place.fetch_or_get(receiver_place_id)
+
+                display = row['Datierung (standardisiert)']
+                not_before = row['Datierung maschinenlesbar Teil 1']
+                if not_before:
+                    parsed_not_before = datetime.datetime.strptime(not_before, '%d.%m.%Y')
+                not_after = row['Datierung maschinenlesbar Teil 2']
+                if not_after:
+                    parsed_not_after = datetime.datetime.strptime(not_after, '%d.%m.%Y')
+                inferred = False if 'Vorlage' in row['Datierung Checkbox'] else True
+                comment = '\n'.join([row['Kommentar (intern)'], row['Bemerkungen']])
+
+                proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
+                proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
+                if not proof:
+                    print(f"{proof_title} not found")
+                    continue
+
+                period = Period.objects.create(
+                        not_before = parsed_not_before,
+                        not_after = parsed_not_after,
+                        display = display
+                    )
+                letter = Letter.objects.create(
+                        receiver_person = receiver_person,
+                        receiver_corporation = receiver_corporation,
+                        receiver_place = receiver_place,
+                        sender_person = sender_person,
+                        sender_corporation = sender_corporation,
+                        sender_place = sender_place,
+                        period = period,
+                        comment = comment
+                    )
+                LetterMentioning.objects.create(
+                        bib = proof,
+                        pages = proof_page if len(proof_page) else '',
+                        letter = letter
+                    )
