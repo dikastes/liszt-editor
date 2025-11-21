@@ -559,7 +559,7 @@ class ModificationDeleteView(DeleteView):
 
     def get_success_url(self):
         if self.object.item.manifestation.is_singleton:
-            return reverse_lazy('edwoca:manifestation_manuscript', kwargs={'pk': self.object.item.manfestation.id})
+            return reverse_lazy('edwoca:manifestation_manuscript', kwargs={'pk': self.object.item.manifestation.id})
         else:
             return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.item.id})
 

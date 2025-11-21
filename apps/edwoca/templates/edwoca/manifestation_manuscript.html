@@ -235,7 +235,7 @@
                         {% endif %}
                     </div>
                     <div class="flex justify-end gap-3 mt-3">
-                        <form action="{% url 'edwoca:manifestation_modification_delete' modification.form.instance.id %}" method="post" class="m-0">
+                        <form action="{% url 'edwoca:modification_delete' modification.form.instance.id %}" method="post" class="m-0">
                             {% csrf_token %}
                             <input type="submit" class="btn btn-primary" value="Löschen"/>
                         </form>

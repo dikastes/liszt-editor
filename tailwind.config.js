@@ -7,6 +7,7 @@ module.exports = {
     "./apps/**/templates/**/*.js",
   ],
   safelist: [
+    'text-primary-content',
     'items-center',
     'form-control',
     'label',
