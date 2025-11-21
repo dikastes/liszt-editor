@@ -19,10 +19,9 @@ class ItemModificationForm(ModelForm):
 
     class Meta:
         model = ItemModification
-        fields = ['note', 'modification_type']
+        fields = ['note']
         widgets = {
             'note': Textarea(attrs={'class': 'textarea textarea-bordered w-full'}),
-            'modification_type': Select(attrs={'class': 'select select-bordered w-full'}),
         }
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +36,7 @@ class ItemModificationForm(ModelForm):
 
         if not modification_instance.period:
             modification_instance.period = Period.objects.create()
-        
+
         period_instance = modification_instance.period
         period_instance.not_before = self.cleaned_data['not_before']
         period_instance.not_after = self.cleaned_data['not_after']

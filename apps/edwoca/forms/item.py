@@ -125,8 +125,12 @@ NewItemSignatureFormSet = inlineformset_factory(
 class ItemCommentForm(CommentForm):
     class Meta:
         model = Item
-        fields = CommentForm.Meta.fields
-        widgets = CommentForm.Meta.widgets
+        fields = CommentForm.Meta.fields + ['taken_information']
+        widgets = dict(CommentForm.Meta.widgets, **{
+                'taken_information': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            })
 
 
 class ItemContributorForm(ContributorForm):

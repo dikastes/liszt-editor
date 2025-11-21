@@ -45,7 +45,10 @@ class Expression(WeBaseClass):
         )
 
     def __str__(self):
-        return ' | '.join(str(index_number) for index_number in self.index_numbers.all()) or 'ohne WV-Nr.'
+        #return ' | '.join(str(index_number) for index_number in self.index_numbers.all()) or 'ohne WV-Nr.'
+        if temp_titles := self.titles.filter(status = Status.TEMPORARY):
+            return temp_titles.first().title
+        return '<ohne Titel>'
 
 
 class ExpressionTitle(WemiTitle):

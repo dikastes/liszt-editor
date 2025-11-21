@@ -19,6 +19,8 @@ python manage.py import_gnd_ids "${CSV_PATH_PREFIX}gnd_ids.csv"
 echo importing additional gnd ids
 python manage.py import_gnd_ids "${CSV_PATH_PREFIX}additional_gnd_ids.csv"
 echo importing letters
-python manage.py import_letters_from-csv "${CSV_PATH_PREFIX}liszt_letter.csv"
+python manage.py import_letters_from_csv "${CSV_PATH_PREFIX}liszt_letter.csv"
 echo importing works and expressions
 python manage.py import_works_from_csv "${CSV_PATH_PREFIX}liszt_work.csv"
+echo rebuilding index
+python manage.py rebuild_index --noinput

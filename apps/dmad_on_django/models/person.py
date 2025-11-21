@@ -136,8 +136,7 @@ class Person(DisplayableModel):
                 activity_place = Place.fetch_or_get(place['id'])
                 activity_place.save()
                 self.activity_places.add(activity_place)
-                
-        
+
         self.professions.clear()
         if 'professionOrOccupation' in pl_person.ent_dict:
             for profession in pl_person.ent_dict['professionOrOccupation']:
@@ -146,7 +145,6 @@ class Person(DisplayableModel):
                     continue
                 profession.save()
                 self.professions.add(profession)
-                
 
         self.names.all().delete()
         pref_name = PersonName()
@@ -203,9 +201,8 @@ class Person(DisplayableModel):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
         return 'ohne Name'
-    
+
     def get_table(self):
-            
             rows = [
             ("Geschlecht", self.gender),
             ("Geburtsort", get_model_link(self.birth_place)),
@@ -213,7 +210,7 @@ class Person(DisplayableModel):
             ("Geburtsdatum", self.birth_date),
             ("Sterbedatum", self.death_date)
             ]
-            
+
             for profession in self.professions.all():
                 rows.append(("Beruf", get_model_link(profession)))
 
@@ -225,10 +222,10 @@ class Person(DisplayableModel):
             GNDSubjectCategory.get_subject_category_table(self)
 
             return rows
-    
+
     def get_overview_title(self):
         return "Biografie"
-        
+
     @staticmethod
     def search(search_string):
         lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:Person)&size=5&format=json:suggest"

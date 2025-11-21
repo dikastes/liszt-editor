@@ -42,6 +42,10 @@ class Item(WemiBaseClass):
             blank = True,
             null = True
         )
+    taken_information = models.TextField(
+            blank = True,
+            null = True
+        )
 
     def render_handwritings(self):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings)

@@ -55,12 +55,6 @@ class Command(BaseCommand):
                 inferred = False if 'Vorlage' in row['Datierung Checkbox'] else True
                 comment = '\n'.join([row['Kommentar (intern)'], row['Bemerkungen']])
 
-                proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
-                proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
-                if not proof:
-                    print(f"{proof_title} not found")
-                    continue
-
                 period = Period.objects.create(
                         not_before = parsed_not_before,
                         not_after = parsed_not_after,
@@ -76,8 +70,15 @@ class Command(BaseCommand):
                         period = period,
                         comment = comment
                     )
-                LetterMentioning.objects.create(
-                        bib = proof,
-                        pages = proof_page if len(proof_page) else '',
-                        letter = letter
-                    )
+
+                for mentioning in row['Sigle / Kurztitel'].split(' / '):
+                    proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
+                    proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
+                    if not proof:
+                        print(f"{proof_title} not found")
+                        continue
+                    LetterMentioning.objects.create(
+                            bib = proof,
+                            pages = proof_page[0] if len(proof_page) else '',
+                            letter = letter
+                        )

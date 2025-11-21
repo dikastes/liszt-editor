@@ -40,7 +40,8 @@ class Work(WeBaseClass):
         )
 
     def __str__(self):
-        return f"{self.work_catalog_number}: {self.get_pref_title()}"
+        return self.titles.filter(status = Status.TEMPORARY).first().title
+        #return f"{self.work_catalog_number}: {self.get_pref_title()}"
 
     def to_mei(self):
         work = ET.Element('work')
