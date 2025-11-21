@@ -54,7 +54,7 @@ INSTALLED_APPS = [
     'django_htmx',
     'bib',
     'django.forms',
-    'dmrism',
+    'dmrism.apps.DmrismConfig',
     'edwoca.apps.EdwocaConfig',
     'dmad_on_django'
 ]
@@ -177,7 +177,7 @@ EDWOCA_FIXED_DATES = {
         }
     }
 
-EDITOR_MODE = 'production'
+EDITOR_MODE = 'test'
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'
