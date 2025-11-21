@@ -270,6 +270,9 @@ def manifestation_title_update(request, pk):
     }
 
     if request.method == 'POST':
+        print_form = ManifestationPrintForm(request.POST, instance=manifestation)
+        if print_form.is_valid():
+            print_form.save()
         # Handle existing title forms
         for title_obj in manifestation.titles.all():
             prefix = f'title_{title_obj.id}'
@@ -348,6 +351,8 @@ def manifestation_title_update(request, pk):
             prefix = f'corporation_dedication_{corporation_dedication.id}'
             corporation_dedication_forms.append(ManifestationCorporationDedicationForm(instance=corporation_dedication, prefix=prefix))
         context['corporation_dedication_forms'] = corporation_dedication_forms
+
+    context['print_form'] = ManifestationPrintForm(instance=manifestation)
 
     q_dedicatee = request.GET.get('dedicatee-q')
     q_place = request.GET.get('place-q')
@@ -568,12 +573,14 @@ def manifestation_remove_publisher(request, pk):
     manifestation.save()
     return redirect('edwoca:manifestation_print', pk=pk)
 
+
 def manifestation_add_stitcher(request, pk, stitcher_id):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     stitcher = get_object_or_404(Corporation, pk=stitcher_id)
     manifestation.stitcher = stitcher
     manifestation.save()
     return redirect('edwoca:manifestation_print', pk=pk)
+
 
 def manifestation_remove_stitcher(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
@@ -651,7 +658,7 @@ class ManifestationCommentUpdateView(SimpleFormView):
 
 
 def manifestation_print_update(request, pk):
-    manifestation = get_object_or_404(DmrismManifestation, pk=pk)
+    manifestation = get_object_or_404(EdwocaManifestation, pk=pk)
     context = {
         'object': manifestation,
         'entity_type': 'manifestation'
@@ -667,16 +674,13 @@ def manifestation_print_update(request, pk):
             form = PublicationForm(request.POST, instance=publication, prefix=prefix)
             if form.is_valid():
                 form.save()
-        
-
-
         return redirect('edwoca:manifestation_print', pk=pk)
 
     publication_forms = []
     for publication in manifestation.publications.all():
         prefix = f'publication_{publication.id}'
         publication_forms.append(PublicationForm(instance=publication, prefix=prefix))
-    
+
     context['publication_forms'] = publication_forms
 
     if manifestation.stitcher:
@@ -689,12 +693,11 @@ def manifestation_print_update(request, pk):
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['stitcher_query'] = search_form.cleaned_data.get('q')
             context[f"found_stitchers"] = search_form.search().models(Corporation)
-    
+
     search_form = SearchForm(request.GET or None)
     if search_form.is_valid() and search_form.cleaned_data.get('q'):
         context['query'] = search_form.cleaned_data.get('q')
         context[f"found_publishers"] = search_form.search().models(Corporation)
-
 
     context['search_form'] = search_form
 
@@ -1217,6 +1220,7 @@ def person_dedication_add(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     ManifestationPersonDedication.objects.create(manifestation=manifestation)
     return redirect('edwoca:manifestation_title', pk=pk)
+
 
 def corporation_dedication_add(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)

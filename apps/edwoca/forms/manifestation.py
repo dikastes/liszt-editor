@@ -489,6 +489,10 @@ class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
         return wrap
 
 
-class ManifestationTitleHandwritingForm(HandwritingForm):
-    class Meta(HandwritingForm.Meta):
-        model = ManifestationTitleHandwriting
+class ManifestationPrintForm(ModelForm):
+    class Meta:
+        model = Manifestation
+        fields = ['print_type']
+        widgets = {
+            'print_type': Select(attrs={'class': 'select select-bordered w-full'}),
+        }
