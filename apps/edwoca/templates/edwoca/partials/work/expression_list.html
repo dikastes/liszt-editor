@@ -1,0 +1,73 @@
+{% load static %}
+
+<div class="bg-white border border-base-300 p-5 rounded-box">
+    <div class="prose max-w-none">
+        <h2> Expressionen </h2>
+
+        {# Message-Handler bleibt unverändert, nur Errors werden angezeigt #}
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            {% if 'error' in message.tags %}
+            <div class="alert alert-error shadow-lg text-sm p-3 rounded-lg flex items-center mb-2" role="alert">
+                <span class="font-bold mr-2">Fehler:</span>
+                <p>{{ message }}</p>
+            </div>
+            {% endif %}
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {# Verwende eine unnummerierte Liste mit angepasstem Stil #}
+        <ul class="list-none p-0 space-y-2">
+            {% for expression in object.expressions.all %}
+
+            <li
+                class="flex items-center justify-between p-2 border-b border-base-200 hover:bg-base-100 last:border-b-0">
+
+                {# Container für die Up/Down-Buttons #}
+                <div class="flex flex-0 gap-1 mr-4">
+                    {% url 'edwoca:expression_swap_order' pk=expression.id direction='up' as swap_up_url %}
+                    <form hx-post="{{ swap_up_url }}" hx-target="#expression-list-container" hx-swap="innerHTML"
+                        class="flex-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-xs btn-ghost text-gray-500 hover:text-primary-focus p-1"
+                            title="Nach oben verschieben">
+                            ↑ Auf
+                        </button>
+                    </form>
+
+                    {% url 'edwoca:expression_swap_order' pk=expression.id direction='down' as swap_down_url %}
+                    <form hx-post="{{ swap_down_url }}" hx-target="#expression-list-container" hx-swap="innerHTML"
+                        class="flex-0">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-xs btn-ghost text-gray-500 hover:text-primary-focus p-1"
+                            title="Nach unten verschieben">
+                            ↓ Ab
+                        </button>
+                    </form>
+                </div>
+
+                {# Link zur Expression - nimmt den verfügbaren Platz ein #}
+                <a href="{% url 'edwoca:expression_relations' expression.id %}"
+                    class="flex-1 font-semibold text-lg hover:text-primary transition duration-150">
+                    {{ expression }}
+                </a>
+
+                {# Löschen-Button - am rechten Rand #}
+                <a href="{% url 'edwoca:expression_delete' expression.id %}" class="flex-0 btn btn-error btn-sm ml-4">
+                    löschen
+                </a>
+            </li>
+            {% empty %}
+            <li class="p-2 text-center text-gray-500">
+                <em> keine Expressionen angelegt </em>
+                <span class="badge badge-primary ml-2">!</span>
+            </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'edwoca:expression_create' object.id %}" class="btn btn-primary mt-4"> neue Expression anlegen
+        </a>
+    </div>
+</div>

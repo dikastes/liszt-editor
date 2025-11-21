@@ -1,0 +1,57 @@
+== 1D ==
+GND Error in 1001258422, GSA 60/I 4
+Could not find a GND Entity for ID "1031524932"
+- Verlag falsch
+
+GND Error in GSA 60/G 1
+Could not find a GND Entity for ID "3"
+- Ort nicht in GND
+
+GND Error in 1001258940, GSA 60/I 43
+Could not find a GND Entity for ID "3"
+- Ort nicht in GND
+
+GND Error in 1001259163, GSA 60/I 54
+Could not find a GND Entity for ID "3"
+- Ort nicht in GND
+
+GND Error in Fond 2/121
+Could not find GND-ID in "http://d-nb.info/gnd/"
+- hier ist ein Zeilenumbruch im Ortsfeld
+
+GND Error in GSA 60/U 52
+Could not find a GND Entity for ID "3"
+- Ort nicht in GND
+
+GND Error in ML31 .R67a no. 16
+Could not find a GND Entity for ID "330252534"
+- Verlag falsch
+
+GND Error in ML96 .L58 1852
+Could not find a GND Entity for ID "330273590"
+- Verlag falsch
+
+GND Error in , ML96 .L58
+Could not find a GND Entity for ID "1090897855"
+- Verlag falsch
+
+GND Error in , ML31 .R67a no. 1
+Could not find a GND Entity for ID "1031524851"
+- Verlag falsch
+
+GND Error in , GSA 60/H 5
+Could not find GND-ID in "http://d-nb.info/gnd/keine GND [Strandort, westlich von Pisa]"
+- Ort nicht in GND
+
+== 2 ==
+GND Error in , GSA 60/G 4
+Could not find a GND Entity for ID "330244418"
+- Verlag falsch 25x
+
+GND Error in , GSA 60/W 7
+Could not find a GND Entity for ID "330265350"
+- Verlag falsch 3x
+
+GND Error in , GSA 60/B 5a
+Could not find a GND Entity for ID "330272160"
+- Verlag falsch 3x

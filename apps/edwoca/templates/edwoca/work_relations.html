@@ -1,134 +1,115 @@
 {% extends 'edwoca/base.html' %}
 
-
-
 {% block content %}
 
 <div class="bg-white border border-base-300 p-5 mb-10">
-	<div class="prose">
-		<h2> Bezugswerke </h2>
+    <div class="prose">
+        <h2> Bezugswerke </h2>
 
-		<h3> verknüpfte Werke </h3>
-		<ul>
-		{% for work_relation in object.source_work_of.all %}
-			<li>
-				<div class="flex">
-					<a href="{% url 'edwoca:work_relations' work_relation.target_work.id %}" class="flex-1">
-						{{ work_relation.target_work }} ({{ work_relation.label }})
-					</a>
-					<form method="post" action="{% url 'edwoca:related_work_remove' work_relation.id %}" class="flex-0">
-						{% csrf_token %}
-						<input type="submit" class="btn btn-small" value="entfernen">
-					</form>
-				</div>
-			</li>
-		{% empty %}
-			<li> <em> keine Werke verknüpft </em> </li>
-		{% endfor %}
-		</ul>
+        <h3> verknüpfte Werke </h3>
+        <ul>
+        {% for work_relation in object.source_work_of.all %}
+            <li>
+                <div class="flex">
+                    <a href="{% url 'edwoca:work_relations' work_relation.target_work.id %}" class="flex-1">
+                        {{ work_relation.target_work }} ({{ work_relation.label }})
+                    </a>
+                    <form method="post" action="{% url 'edwoca:related_work_remove' work_relation.id %}" class="flex-0">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-small" value="entfernen">
+                    </form>
+                </div>
+            </li>
+        {% empty %}
+            <li> <em> keine Werke verknüpft </em> </li>
+        {% endfor %}
+        </ul>
 
-		<h3> eingehende Verknüpfungen </h3>
-		<ul>
-		{% for work_relation in object.target_work_of.all %}
-			<li>
-				<a href="{% url 'edwoca:work_relations' work_relation.source_work.id %}" class="flex-1">
-					{{ work_relation.source_work }} ({{ work_relation.label }})
-				</a>
-			</li>
-		{% empty %}
-			<li> <em> keine eingehenden Verknüpfungen </em> </li>
-		{% endfor %}
-		</ul>
+        <h3> eingehende Verknüpfungen </h3>
+        <ul>
+        {% for work_relation in object.target_work_of.all %}
+            <li>
+                <a href="{% url 'edwoca:work_relations' work_relation.source_work.id %}" class="flex-1">
+                    {{ work_relation.source_work }} ({{ work_relation.label }})
+                </a>
+            </li>
+        {% empty %}
+            <li> <em> keine eingehenden Verknüpfungen </em> </li>
+        {% endfor %}
+        </ul>
 
-		<h3> neues Werk verknüpfen </h3>
+        <h3> neues Werk verknüpfen </h3>
 
-		{% if show_search_form == True %}
+        {% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:work_relations' object.id %}" method="get">
-			{{ searchform.q }}
-			<input type="hidden" name="target_model" value="work" />
-			<input type="submit" id="submit-form" class="btn" />
-		</form>
-		
-		<ul>
-		{% if query %}
-			{% for found_work in found_works %}
-				<li>
-					<a href="{% url 'edwoca:related_work_add' object.id found_work.object.id %}">
-						{{ found_work.object }}
-					</a>
-				</li>
-			{% empty %}
-				<li> <em> keine Suchergebnisse </em> </li>
-			{% endfor %}
-		{% else %}
-			<li> <em> bitte Suchbegriff eingeben </em> </li>
-		{% endif %}
-		</ul>
+        <form action="{% url 'edwoca:work_relations' object.id %}" method="get">
+            {{ searchform.q }}
+            <input type="hidden" name="target_model" value="work" />
+            <input type="submit" id="submit-form" class="btn" />
+        </form>
+        
+        <ul>
+        {% if query %}
+            {% for found_work in found_works %}
+                <li>
+                    <a href="{% url 'edwoca:related_work_add' object.id found_work.object.id %}">
+                        {{ found_work.object }}
+                    </a>
+                </li>
+            {% empty %}
+                <li> <em> keine Suchergebnisse </em> </li>
+            {% endfor %}
+        {% else %}
+            <li> <em> bitte Suchbegriff eingeben </em> </li>
+        {% endif %}
+        </ul>
 
-		{% else %}
+        {% else %}
 
-		<form method="post">
-			{% csrf_token %}
-			{{ object }} mit {{ target_work }} verknüpfen als:
-			{{ form }}
-			<input type="submit" id="submit-form" class="btn" />
-		</form>
+        <form method="post">
+            {% csrf_token %}
+            {{ object }} mit {{ target_work }} verknüpfen als:
+            {{ form }}
+            <input type="submit" id="submit-form" class="btn" />
+        </form>
 
-		{% endif %}
+        {% endif %}
 
-		{% comment %}
-		<a href="{% url 'edwoca:work_create' %}" class="btn btn-primary"> neues Werk anlegen </a>
-		{% endcomment %}
-	</div>
+        {% comment %}
+        <a href="{% url 'edwoca:work_create' %}" class="btn btn-primary"> neues Werk anlegen </a>
+        {% endcomment %}
+    </div>
 </div>
 
-<div class="bg-white border border-base-300 p-5">
-	<div class="prose">
-		<h2> Expressionen </h2>
-
-		<ul>
-		{% for expression in object.expressions.all %}
-			<li>
-				<a href="{% url 'edwoca:expression_relations' expression.id %}">
-					{{ expression }}
-				</a>
-				<a href="{% url 'edwoca:expression_delete' expression.id %}" class="flex-0 btn">
-					löschen
-				</a>
-			</li>
-		{% empty %}
-			<li> <em> keine Expressionen angelegt </em> <span class="badge badge-primary">!</span> </li>
-		{% endfor %}
-		</ul>
-
-		<a href="{% url 'edwoca:expression_create' object.id %}" class="btn btn-primary"> neue Expression anlegen </a>
-	</div>
+{# HIER WIRD DER EXPRESSIONEN-BLOCK DURCH DEN HTMX-CONTAINER ERSETZT #}
+<div id="expression-list-container">
+    {% include 'edwoca/partials/work/expression_list.html' %}
 </div>
+
 
 <div class="bg-white border border-base-300 p-5 mb-10">
-	<div class="prose">
-		<h2> Bearbeitungsschichten </h2>
-		<em> Bearbeitungsschichten, die auf diese Manifestation verweisen, erscheinen hier </em>
-		<ul>
-		{% for modification in object.relating_modifications.all %}
-			<li>
-				{% if modification.item.manifestation.is_singleton %}
-					<a href="{% url 'edwoca:manifestation_manuscript' modification.item.manifestation.id %}" class="flex-1">
-						{{ modification.item.manifestation }} &ndash; {{ modification }}
-					</a>
-				{% else %}
-					<a href="{% url 'edwoca:item_manuscript' modification.item.id %}" class="flex-1">
-						{{ modification.item }} &ndash; {{ modification }}
-					</a>
-				{% endif %}
-			</li>
-		{% empty %}
-			<li> <em> keine eingehenden Verknüpfungen </em> </li>
-		{% endfor %}
-		</ul>
+    <div class="prose">
+        <h2> Bearbeitungsschichten </h2>
+        <em> Bearbeitungsschichten, die auf diese Manifestation verweisen, erscheinen hier </em>
+        <ul>
+        {% for modification in object.relating_modifications.all %}
+            <li>
+                {% if modification.item.manifestation.is_singleton %}
+                    <a href="{% url 'edwoca:manifestation_manuscript' modification.item.manifestation.id %}" class="flex-1">
+                        {{ modification.item.manifestation }} &ndash; {{ modification }}
+                    </a>
+                {% else %}
+                    <a href="{% url 'edwoca:item_manuscript' modification.item.id %}" class="flex-1">
+                        {{ modification.item }} &ndash; {{ modification }}
+                    </a>
+                {% endif %}
+            </li>
+        {% empty %}
+            <li> <em> keine eingehenden Verknüpfungen </em> </li>
+        {% endfor %}
+        </ul>
 
-	</div>
+    </div>
 </div>
 
 {% endblock %}

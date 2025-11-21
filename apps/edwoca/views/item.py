@@ -6,11 +6,19 @@ from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.decorators.http import require_POST
 from ..models import Item as EdwocaItem, ItemModification, ModificationHandwriting, Work, Expression, Manifestation
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, ItemDigitalCopy, ItemPersonDedication, ItemCorporationDedication, ItemHandwriting
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Person, Corporation, Place
 from bib.models import ZotItem
+from liszt_util.tools import swap_order
+from django.contrib import messages
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+
+
+
 
 
 def item_set_template(request, pk):
@@ -65,8 +73,23 @@ def item_update(request, pk):
     }
     return render(request, 'edwoca/item_update.html', context)
 
+@require_POST
+def item_swap_view(request, pk, direction):
 
+    item = get_object_or_404(EdwocaItem, pk=pk)
+    success = swap_order(item, direction)
+    if not success:
+        messages.error(request, "Element steht am Anfang oder Ende der Liste")
+        
+    manifestation = item.manifestation
 
+    context = {'object': manifestation}
+    
+    return render(
+        request,
+        'edwoca/partials/manifestation/item_list.html',
+        context
+    )
 """
 class ItemCreateView(EntityMixin, CreateView):
     model = EdwocaItem
