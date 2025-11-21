@@ -33,7 +33,7 @@ def get_model_link(model):
         f'class=link link-primary>'
         f'{model}</a>'
     )
-
+    )
 def swap_order(obj, group_field_name, direction):
     
     ModelClass = obj.__class__
@@ -86,4 +86,4 @@ def swap_order(obj, group_field_name, direction):
         ModelClass.objects.filter(pk=obj.pk).update(order_index=neighbour_index)
         
     return True
-    )
+    

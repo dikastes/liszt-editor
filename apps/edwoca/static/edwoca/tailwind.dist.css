@@ -1476,18 +1476,6 @@ html {
     }
   }
 
-  .btn-outline.btn-error:hover {
-    --tw-text-opacity: 1;
-    color: var(--fallback-erc,oklch(var(--erc)/var(--tw-text-opacity)));
-  }
-
-  @supports (color: color-mix(in oklab, black, black)) {
-    .btn-outline.btn-error:hover {
-      background-color: color-mix(in oklab, var(--fallback-er,oklch(var(--er)/1)) 90%, black);
-      border-color: color-mix(in oklab, var(--fallback-er,oklch(var(--er)/1)) 90%, black);
-    }
-  }
-
   .btn-disabled:hover,
     .btn[disabled]:hover,
     .btn:disabled:hover {
@@ -1970,10 +1958,6 @@ html {
     --btn-color: var(--fallback-s);
   }
 
-  .btn-error {
-    --btn-color: var(--fallback-er);
-  }
-
   .prose :where(code):not(:where([class~="not-prose"] *, pre *)) {
     background-color: var(--fallback-b3,oklch(var(--b3)/1));
   }
@@ -1988,11 +1972,6 @@ html {
   .btn-outline.btn-secondary.btn-active {
     background-color: color-mix(in oklab, var(--fallback-s,oklch(var(--s)/1)) 90%, black);
     border-color: color-mix(in oklab, var(--fallback-s,oklch(var(--s)/1)) 90%, black);
-  }
-
-  .btn-outline.btn-error.btn-active {
-    background-color: color-mix(in oklab, var(--fallback-er,oklch(var(--er)/1)) 90%, black);
-    border-color: color-mix(in oklab, var(--fallback-er,oklch(var(--er)/1)) 90%, black);
   }
 }
 
@@ -2016,22 +1995,12 @@ html {
   .btn-secondary {
     --btn-color: var(--s);
   }
-
-  .btn-error {
-    --btn-color: var(--er);
-  }
 }
 
 .btn-secondary {
   --tw-text-opacity: 1;
   color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
   outline-color: var(--fallback-s,oklch(var(--s)/1));
-}
-
-.btn-error {
-  --tw-text-opacity: 1;
-  color: var(--fallback-erc,oklch(var(--erc)/var(--tw-text-opacity)));
-  outline-color: var(--fallback-er,oklch(var(--er)/1));
 }
 
 .btn.glass {
@@ -2064,16 +2033,6 @@ html {
 .btn-outline.btn-secondary.btn-active {
   --tw-text-opacity: 1;
   color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
-}
-
-.btn-outline.btn-error {
-  --tw-text-opacity: 1;
-  color: var(--fallback-er,oklch(var(--er)/var(--tw-text-opacity)));
-}
-
-.btn-outline.btn-error.btn-active {
-  --tw-text-opacity: 1;
-  color: var(--fallback-erc,oklch(var(--erc)/var(--tw-text-opacity)));
 }
 
 .btn.btn-disabled,
@@ -2799,14 +2758,6 @@ details.collapse summary::-webkit-details-marker {
   border-bottom-color: var(--fallback-bc,oklch(var(--bc)/0.2));
 }
 
-.badge-sm {
-  height: 1rem;
-  font-size: 0.75rem;
-  line-height: 1rem;
-  padding-left: 0.438rem;
-  padding-right: 0.438rem;
-}
-
 .btm-nav-xs > *:where(.active) {
   border-top-width: 1px;
 }
@@ -2913,23 +2864,6 @@ details.collapse summary::-webkit-details-marker {
   margin-top: 0px;
 }
 
-.menu-lg :where(li:not(.menu-title) > *:not(ul, details, .menu-title)), .menu-lg :where(li:not(.menu-title) > details > summary:not(.menu-title)) {
-  border-radius: var(--rounded-btn, 0.5rem);
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-  font-size: 1.125rem;
-  line-height: 1.75rem;
-}
-
-.menu-lg .menu-title {
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
-
 .modal-top :where(.modal-box) {
   width: 100%;
   max-width: none;
@@ -2977,6 +2911,10 @@ details.collapse summary::-webkit-details-marker {
   visibility: collapse;
 }
 
+.static {
+  position: static;
+}
+
 .z-\[1\] {
   z-index: 1;
 }
@@ -3002,8 +2940,8 @@ details.collapse summary::-webkit-details-marker {
   margin-bottom: 1.25rem;
 }
 
-.ml-2 {
-  margin-left: 0.5rem;
+.ml-4 {
+  margin-left: 1rem;
 }
 
 .ml-5 {
@@ -3052,6 +2990,10 @@ details.collapse summary::-webkit-details-marker {
 
 .h-24 {
   height: 6rem;
+}
+
+.h-32 {
+  height: 8rem;
 }
 
 .h-full {
@@ -3116,6 +3058,10 @@ details.collapse summary::-webkit-details-marker {
 
 .items-center {
   align-items: center;
+}
+
+.justify-end {
+  justify-content: flex-end;
 }
 
 .gap-10 {
@@ -3207,10 +3153,6 @@ details.collapse summary::-webkit-details-marker {
 
 .font-bold {
   font-weight: 700;
-}
-
-.font-semibold {
-  font-weight: 600;
 }
 
 .shadow {
