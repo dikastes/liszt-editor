@@ -33,4 +33,11 @@
 			<input type="submit" class="btn">
 		</form>
 	{% endif %}
+
+	{% if list_entity_type == 'letter' %}
+		<form action="{% url 'edwoca:letter_search' %}" method="get" class="m-0">
+			{{ form.q }}
+			<input type="submit" class="btn">
+		</form>
+	{% endif %}
 </div>
