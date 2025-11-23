@@ -1,12 +1,13 @@
 from .base import *
 from django.db import models
+from django.db.models import Max
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status
+from liszt_util.models import Sortable
 from dmrism.models import BaseContributor, BaseBib, RelatedEntity, BasePersonDedication, BaseCorporationDedication
 
-
-class Expression(WeBaseClass):
+class Expression(Sortable,WeBaseClass):
     work_catalog_number = models.CharField(
             max_length=20,
             unique=True,
@@ -44,12 +45,30 @@ class Expression(WeBaseClass):
             related_name = 'expressions'
         )
 
+    _group_field_name = 'work'
+
     def __str__(self):
         #return ' | '.join(str(index_number) for index_number in self.index_numbers.all()) or 'ohne WV-Nr.'
         if temp_titles := self.titles.filter(status = Status.TEMPORARY):
             return temp_titles.first().title
         return '<ohne Titel>'
 
+    def save(self, *args, **kwargs):
+
+        if self.pk is None:
+            max_index = (
+                Expression.objects
+                .filter(work=self.work)
+                .aggregate(Max('order_index'))['order_index__max']
+            )
+
+            if max_index is not None:
+                self.order_index = max_index+1
+        super().save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['work', 'order_index']
+        unique_together = ('work', 'order_index')
 
 class ExpressionTitle(WemiTitle):
     expression = models.ForeignKey(

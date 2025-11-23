@@ -1,0 +1,82 @@
+GND Error in 1001258422, GSA 60/I 4
+Could not find a GND Entity for ID "1031524932"
+
+GND Error in GSA 60/G 1
+Could not find a GND Entity for ID "3"
+
+GND Error in 1001258940, GSA 60/I 43
+Could not find a GND Entity for ID "3"
+
+GND Error in 1001259163, GSA 60/I 54
+Could not find a GND Entity for ID "3"
+
+GND Error in Fond 2/121
+Could not find GND-ID in "http://d-nb.info/gnd/"
+
+GND Error in GSA 60/U 52
+Could not find a GND Entity for ID "3"
+
+GND Error in ML31 .R67a no. 16
+Could not find a GND Entity for ID "330252534"
+
+GND Error in ML96 .L58 1852
+Could not find a GND Entity for ID "330273590"
+
+GND Error in , ML96 .L58
+Could not find a GND Entity for ID "1090897855"
+
+GND Error in , ML31 .R67a no. 1
+Could not find a GND Entity for ID "1031524851"
+
+GND Error in , GSA 60/H 5
+Could not find GND-ID in "http://d-nb.info/gnd/keine GND [Strandort, westlich von Pisa]"
+
+GSA 60/H 5
+1001300492
+GSA 60/I 28
+
+Mus.Hs.41402
+
+Mus.Hs.42071
+
+Mus.Hs.41722
+
+Mus.Hs.43304
+1001317039
+GSA 60/B 35
+
+GSA 60/B 34
+
+GSA 60/B 34
+
+GSA 60/B 34
+
+GSA 60/B 34
+
+GSA 60/B 34
+
+GSA 60/B 34
+
+GSA 60/B 34
+
+GSA 60/B 34
+
+GSA 60/B 31
+
+GSA 60/B 30
+
+GSA 60/B 23
+
+GSA 60/B 17a
+
+NAF 25177
+
+NAF 25177
+
+NAF 25177
+
+Fonts Dupuis DUPUIS | ms. 1 | 001
+
+MAM 973
+
+Inv. Nr. 4497a
