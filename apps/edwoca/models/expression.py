@@ -48,7 +48,10 @@ class Expression(Sortable,WeBaseClass):
     _group_field_name = 'work'
 
     def __str__(self):
-        return ' | '.join(str(index_number) for index_number in self.index_numbers.all()) or 'ohne WV-Nr.'
+        #return ' | '.join(str(index_number) for index_number in self.index_numbers.all()) or 'ohne WV-Nr.'
+        if temp_titles := self.titles.filter(status = Status.TEMPORARY):
+            return temp_titles.first().title
+        return '<ohne Titel>'
 
     def save(self, *args, **kwargs):
 
@@ -76,6 +79,18 @@ class ExpressionTitle(WemiTitle):
 
 
 class RelatedExpression(RelatedEntity):
+    class Label(models.TextChoices):
+        IS_COMPONENT_OF = 'CP', _('is componnt of'),
+        IS_PART_OF = 'PA', _('is part of'),
+        IS_DERIVATIVE_OF = 'DE', _('is derivative of')
+        IS_INCORPORATED_IN = 'IN', _('is incorporated in')
+        HAS_ALTERNATIVE = 'AL', _('has alternative')
+
+    label = models.CharField(
+            max_length = 2,
+            choices = Label,
+            default = Label.IS_PART_OF
+            )
     source_expression = models.ForeignKey(
             'Expression',
             on_delete=models.CASCADE,

@@ -40,7 +40,10 @@ class Work(WeBaseClass):
         )
 
     def __str__(self):
-        return f"{self.work_catalog_number}: {self.get_pref_title()}"
+        if self.titles.filter(status = Status.TEMPORARY).first():
+            return self.titles.filter(status = Status.TEMPORARY).first().title
+        return "< ohne Titel >"
+        #return f"{self.work_catalog_number}: {self.get_pref_title()}"
 
     def to_mei(self):
         work = ET.Element('work')
@@ -87,6 +90,14 @@ class WorkBib(BaseBib):
 
 
 class RelatedWork(RelatedEntity):
+    class Label(models.TextChoices):
+        IS_PART_OF = 'PA', _('is part of'),
+        IS_DERIVATIVE_OF = 'DE', _('is derivative of')
+        IS_SUCCESSOR_OF = 'SU', _('is successor of')
+        IS_INSPIRED_BY = 'IN', _('is inspired by')
+        USES_EXPRESSION_OF = 'EX', _('uses expression of')
+        ACCOMPANIES_OR_COMPLEMENTS = 'AC', _('accompanies or complements')
+
     source_work = models.ForeignKey(
             'Work',
             on_delete=models.CASCADE,
@@ -97,6 +108,11 @@ class RelatedWork(RelatedEntity):
             on_delete=models.CASCADE,
             related_name="target_work_of"
         )
+    label = models.CharField(
+            max_length = 2,
+            choices = Label,
+            default = Label.IS_PART_OF
+            )
 
 
 class WorkTitle(WemiTitle):

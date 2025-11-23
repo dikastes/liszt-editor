@@ -22,3 +22,5 @@ echo importing letters
 python manage.py import_letters_from_csv "${CSV_PATH_PREFIX}liszt_letter.csv"
 echo importing works and expressions
 python manage.py import_works_from_csv "${CSV_PATH_PREFIX}liszt_work.csv"
+echo rebuilding index
+python manage.py rebuild_index --noinput

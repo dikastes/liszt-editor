@@ -614,93 +614,93 @@ def composite_manuscript_update(request, pk):
     return render(request, 'edwoca/manifestation_manuscript.html', context)
 
 
-def person_provenance_add_owner(request, pk, pps_id, person_id):
-    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
-    person = get_object_or_404(Person, pk=person_id)
-    pps.owner = person
-    pps.save()
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def person_provenance_add_owner(request, pk, pps_id, person_id):
+    #pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    #person = get_object_or_404(Person, pk=person_id)
+    #pps.owner = person
+    #pps.save()
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
 
-def person_provenance_add_bib(request, pk, pps_id, bib_id):
-    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
-    bib = get_object_or_404(ZotItem, pk=bib_id)
-    pps.bib = bib
-    pps.save()
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def person_provenance_add_bib(request, pk, pps_id, bib_id):
+    #pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    #bib = get_object_or_404(ZotItem, pk=bib_id)
+    #pps.bib = bib
+    #pps.save()
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def corporation_provenance_add_owner(request, pk, cps_id, corporation_id):
-    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-    corporation = get_object_or_404(Corporation, pk=corporation_id)
-    cps.owner = corporation
-    cps.save()
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def corporation_provenance_add_owner(request, pk, cps_id, corporation_id):
+    #cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    #corporation = get_object_or_404(Corporation, pk=corporation_id)
+    #cps.owner = corporation
+    #cps.save()
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def corporation_provenance_add_bib(request, pk, cps_id, bib_id):
-    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-    bib = get_object_or_404(ZotItem, pk=bib_id)
-    cps.bib = bib
-    cps.save()
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def corporation_provenance_add_bib(request, pk, cps_id, bib_id):
+    #cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    #bib = get_object_or_404(ZotItem, pk=bib_id)
+    #cps.bib = bib
+    #cps.save()
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def person_provenance_remove_owner(request, pk, pps_id):
-    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
-    pps.owner = None
-    pps.save()
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def person_provenance_remove_owner(request, pk, pps_id):
+    #pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    #pps.owner = None
+    #pps.save()
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def person_provenance_remove_bib(request, pk, pps_id):
-    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
-    pps.bib = None
-    pps.save()
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def person_provenance_remove_bib(request, pk, pps_id):
+    #pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    #pps.bib = None
+    #pps.save()
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def person_provenance_add_letter(request, pk, pps_id, letter_pk):
-    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
-    letter = get_object_or_404(Letter, pk=letter_pk)
-    letter.person_provenance.add(pps)
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def person_provenance_add_letter(request, pk, pps_id, letter_pk):
+    #pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    #letter = get_object_or_404(Letter, pk=letter_pk)
+    #letter.person_provenance.add(pps)
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def person_provenance_remove_letter(request, pk, pps_id, letter_pk):
-    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
-    letter = get_object_or_404(Letter, pk=letter_pk)
-    letter.person_provenance.remove(pps)
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def person_provenance_remove_letter(request, pk, pps_id, letter_pk):
+    #pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    #letter = get_object_or_404(Letter, pk=letter_pk)
+    #letter.person_provenance.remove(pps)
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def corporation_provenance_remove_owner(request, pk, cps_id):
-    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-    cps.owner = None
-    cps.save()
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def corporation_provenance_remove_owner(request, pk, cps_id):
+    #cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    #cps.owner = None
+    #cps.save()
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def corporation_provenance_remove_bib(request, pk, cps_id):
-    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-    cps.bib = None
-    cps.save()
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def corporation_provenance_remove_bib(request, pk, cps_id):
+    #cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    #cps.bib = None
+    #cps.save()
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def corporation_provenance_add_letter(request, pk, cps_id, letter_pk):
-    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-    letter = get_object_or_404(Letter, pk=letter_pk)
-    letter.corporation_provenance.add(cps)
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def corporation_provenance_add_letter(request, pk, cps_id, letter_pk):
+    #cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    #letter = get_object_or_404(Letter, pk=letter_pk)
+    #letter.corporation_provenance.add(cps)
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
-def corporation_provenance_remove_letter(request, pk, cps_id, letter_pk):
-    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-    letter = get_object_or_404(Letter, pk=letter_pk)
-    letter.corporation_provenance.remove(cps)
-    return redirect('edwoca:composite_provenance', pk=pk)
+#def corporation_provenance_remove_letter(request, pk, cps_id, letter_pk):
+    #cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    #letter = get_object_or_404(Letter, pk=letter_pk)
+    #letter.corporation_provenance.remove(cps)
+    #return redirect('edwoca:composite_provenance', pk=pk)
 
 
 def composite_digital_copy(request, pk):
@@ -744,16 +744,16 @@ class CompositeDigitalCopyDeleteView(DeleteView):
         return reverse('edwoca:composite_digital_copy',kwargs={'pk': composite.id})
 
 
-def person_dedication_add(request, pk):
-    composite = get_object_or_404(Composite, pk=pk)
-    CompositePersonDedication.objects.create(composite=composite)
-    return redirect('edwoca:composite_title', pk=pk)
+#def person_dedication_add(request, pk):
+    #composite = get_object_or_404(Composite, pk=pk)
+    #CompositePersonDedication.objects.create(composite=composite)
+    #return redirect('edwoca:composite_title', pk=pk)
 
 
-def corporation_dedication_add(request, pk):
-    composite = get_object_or_404(Composite, pk=pk)
-    CompositeCorporationDedication.objects.create(composite=composite)
-    return redirect('edwoca:composite_title', pk=pk)
+#def corporation_dedication_add(request, pk):
+    #composite = get_object_or_404(Composite, pk=pk)
+    #CompositeCorporationDedication.objects.create(composite=composite)
+    #return redirect('edwoca:composite_title', pk=pk)
 
 
 def composite_title_update(request, pk):

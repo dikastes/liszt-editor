@@ -7,6 +7,7 @@
 	{% if object.is_singleton %}
 		<h2> Manuskript </h2>
 		
+		{% comment %}
 		<!-- {{ object }} ist ein <em>Manuskript</em>. -->
 		<a class="btn btn-primary" href="{% url 'edwoca:manifestation_unset_singleton' object.id %}">
 			Druck
@@ -20,6 +21,7 @@
 				verschollen
 			</a>
 		{% endif %}
+		{% endcomment %}
 
 		<form method="post">
 			{% csrf_token %}
@@ -47,6 +49,7 @@
 	{% else %}
 		<h2> Druck </h2>
 		
+		{% comment %}
 		<!-- {{ object }} ist ein <em>Druck</em>. -->
 		{% if object.items.count > 1 %}
 			<p>
@@ -66,6 +69,7 @@
 				</a>
 			{% endif %}
 		{% endif %}
+		{% endcomment %}
 
 		<form method="post">
 			{% csrf_token %}

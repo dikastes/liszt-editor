@@ -53,8 +53,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             publisher_addition = self.publications.first().plate_number
 
         if self.publications.first() and self.publications.first().publisher:
-            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()}"
-        return f"<< Verlag >> {publisher_addition}, {self.get_temp_title()}"
+            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()} ({self.source_type})"
+        return f"<< Verlag >> {publisher_addition}, {self.get_temp_title()} ({self.source_type})"
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
@@ -143,6 +143,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         COMMENT_QUESTION_KEY = 'Kommentar intern / Fragen (interne Kommunikation)'
         FURTHER_INFORMATION_KEY = 'Weiterführende Informationen (Ausgaben, Permalinks etc.) (intern)'
 
+        single_item = Item.objects.create(manifestation = self)
+
         self.manifestation_form = manifestation_form
         self.function = function
 
@@ -161,6 +163,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             taken_information += [ 'Inhalt: ' + content ]
 
         self.taken_information = '\n'.join(taken_information)
+        single_item.taken_information = self.taken_information
 
         fixed_persons = settings.EDWOCA_FIXED_PERSONS
 
@@ -213,7 +216,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 status = BaseSignature.Status.CURRENT,
                 signature = raw_data[Manifestation.CURRENT_SIGNATURE_KEY]
             )
-        single_item = Item.objects.create(manifestation = self)
         single_item.signatures.add(signature)
 
         if raw_data[FORMER_SIGNATURE_KEY]:
@@ -249,6 +251,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             self.is_singleton = False
             single_item.is_template = True
 
+        single_item.extent = raw_data[EXTENT_KEY]
+        single_item.measure = raw_data[MEASURE_KEY]
         single_item.private_provenance_comment = '\n'.join(provenance_comment)
         single_item.save()
 
@@ -565,9 +569,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         self.private_title_comment = '\n'.join(private_title_comments)
 
-        self.extent = raw_data[EXTENT_KEY]
-        self.measure = raw_data[MEASURE_KEY]
-
         if PHYSICAL_FEATURES_KEY in raw_data and (phys_features := raw_data[PHYSICAL_FEATURES_KEY]):
             self.private_manuscript_comment = f'Beschreiung physischer Merkmale: {phys_features}'
 
@@ -597,8 +598,18 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     class Meta:
         proxy = True
 
+    @property
+    def manifestation(self):
+        return Manifestation.objects.get(pk = self.manifestation_id)
+
     def get_manifestation_url(self):
         return reverse(f'edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
+
+    def __str__(self):
+        manifestation = self.manifestation
+        if (title := manifestation.titles.filter(status = Status.TEMPORARY).first()):
+            return super().__str__() + title.title
+        return super().__str__()
 
 
 class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):
@@ -783,6 +794,10 @@ class Letter(models.Model):
             null = True,
             blank = True
         )
+    work = models.ManyToManyField(
+            'Work',
+            related_name = 'letters'
+        )
     manifestation = models.ManyToManyField(
             'Manifestation',
             related_name = 'letters'
@@ -802,23 +817,23 @@ class Letter(models.Model):
     def __str__(self):
         if self.sender_person:
             if self.sender_corporation:
-                sender = str(self.sender_person) + ' u. a.'
+                sender = self.sender_person.get_default_name() + ' u. a.'
             else:
-                sender = str(self.sender_person)
+                sender = self.sender_person.get_default_name()
         else:
             if self.sender_corporation:
-                sender = str(self.sender_corporation)
+                sender = self.sender_corporation.get_default_name()
             else:
                 sender = 'unbekannt'
 
         if self.receiver_person:
             if self.receiver_corporation:
-                receiver = str(self.receiver_person) + ' u. a.'
+                receiver = self.receiver_person.get_default_name() + ' u. a.'
             else:
-                receiver = str(self.receiver_person)
+                receiver = self.receiver_person.get_default_name()
         else:
             if self.receiver_corporation:
-                receiver = str(self.receiver_corporation)
+                receiver = self.receiver_corporation.get_default_name()
             else:
                 receiver = 'unbekannt'
 
@@ -841,11 +856,6 @@ class LetterMentioning(models.Model):
         )
 
 class ItemModification(models.Model):
-    class ModificationType(models.TextChoices):
-        ARRANGEMENT = 'AR', _('Arrangement')
-        TRANSCRIPTION = 'TR', _('Transcription')
-        REVISION = 'RV', _('Revision')
-
     item = models.ForeignKey(
             'dmrism.Item',
             related_name = 'modifications',
@@ -872,12 +882,6 @@ class ItemModification(models.Model):
     note = models.TextField(
             null = True,
             blank = True
-        )
-    modification_type = models.CharField(
-            max_length = 2,
-            choices = ModificationType,
-            default = None,
-            null = True
         )
 
     def __str__(self):

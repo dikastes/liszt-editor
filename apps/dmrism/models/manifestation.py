@@ -217,6 +217,10 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
+    print_extent = models.TextField(
+            blank = True,
+            null = True
+        )
     private_head_comment = models.TextField(
             blank = True,
             null = True

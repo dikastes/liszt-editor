@@ -351,9 +351,10 @@ class ManifestationCreateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.publisher_instance = kwargs.pop('publisher', None)
         super().__init__(*args, **kwargs)
-        if self.publisher_instance:
-            self.initial['publisher'] = self.publisher_instance
-            self.fields['publisher'].queryset = Corporation.objects.filter(pk=self.publisher_instance.pk)
+        if 'initial' in kwargs and 'publisher' in kwargs['initial'] and \
+            (publisher_instance := kwargs['initial']['publisher']):
+            self.initial['publisher'] = publisher_instance
+            self.fields['publisher'].queryset = Corporation.objects.filter(pk=publisher_instance.pk)
             self.fields['publisher'].widget.attrs['disabled'] = True
 
     def clean(self):
@@ -487,6 +488,15 @@ class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
         
         wrap.add(raw(field.as_widget(attrs={"class" : cls})))
         return wrap
+
+
+class ManifestationPrintForm(ModelForm):
+    class Meta:
+        model = Manifestation
+        fields = ['print_type']
+        widgets = {
+            'print_type': Select(attrs={'class': 'select select-bordered w-full'}),
+        }
 
 
 class ManifestationTitleHandwritingForm(HandwritingForm):

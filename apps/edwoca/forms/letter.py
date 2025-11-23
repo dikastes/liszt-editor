@@ -1,6 +1,6 @@
 from .base import *
 from django import forms
-from ..models import Letter
+from ..models import Letter, LetterMentioning
 from django.conf import settings
 from django.forms import DateTimeField, SelectDateWidget, CharField, TextInput, ModelForm, Textarea
 from dmad_on_django.models import Period
@@ -102,3 +102,11 @@ class LetterForm(ModelForm, SimpleFormMixin):
         form.add(comment_container)
 
         return mark_safe(str(form))
+
+class LetterMentioningForm(ModelForm):
+    class Meta:
+        model = LetterMentioning
+        fields = ['pages']
+        widgets = {
+            'pages': TextInput(attrs={'class': 'input input-bordered'})
+        }

@@ -30,13 +30,16 @@ class Command(BaseCommand):
                         existing_index_number = IndexNumber.objects.filter(number = index_number).first()
                         if existing_index_number:
                             work = existing_index_number.expression.work
+                            work_title = work.titles.filter(status = Status.TEMPORARY).first()
+                            work_title.title += ' | ' + row['Werktitel (MGG)']
+                            work_title.save()
                         else:
                             work = Work.objects.create()
-                        WorkTitle.objects.create(
-                                title = row['Werktitel (MGG)'],
-                                work = work,
-                                status = Status.TEMPORARY
-                            )
+                            WorkTitle.objects.create(
+                                    title = row['Werktitel (MGG)'],
+                                    work = work,
+                                    status = Status.TEMPORARY
+                                )
 
                         expression = Expression.objects.create(work = work)
                         IndexNumber.objects.create(

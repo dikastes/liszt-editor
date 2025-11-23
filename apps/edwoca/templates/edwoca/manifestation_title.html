@@ -388,6 +388,11 @@
 {% if object.is_singleton %}
     <div class="bg-white border border-base-300 p-5 mt-5">
         <h2 class="card-title mt-0 flex-1"> Angaben zum dazugehörigen Druck </h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ print_form.as_p }}
+            <input type="submit" value="Druckart speichern" class="hidden" id="submit-form">
+        </form>
 
         <form method="post">
             {% csrf_token %}

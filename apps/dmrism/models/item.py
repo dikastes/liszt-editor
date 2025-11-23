@@ -44,6 +44,10 @@ class Item(Sortable, WemiBaseClass):
             blank = True,
             null = True
         )
+    taken_information = models.TextField(
+            blank = True,
+            null = True
+        )
 
     _group_field_name = 'manifestation'
 

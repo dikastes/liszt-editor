@@ -19,6 +19,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         with open(options['file_name'][0]) as file:
+            roman_literals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI']
             reader = list(DictReader(file))
             total = len(reader)
             for i, row in enumerate(reader):
@@ -53,13 +54,30 @@ class Command(BaseCommand):
                 if not_after:
                     parsed_not_after = datetime.datetime.strptime(not_after, '%d.%m.%Y')
                 inferred = False if 'Vorlage' in row['Datierung Checkbox'] else True
-                comment = '\n'.join([row['Kommentar (intern)'], row['Bemerkungen']])
 
-                proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
-                proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
-                if not proof:
-                    print(f"{proof_title} not found")
-                    continue
+                work_comments = []
+                for number in roman_literals:
+                    if row[f'Werkerwähnung ({number})']:
+                        work_comments += [' // '.join([
+                                string for
+                                string in [
+                                    row[f'Werkerwähnung ({number})'],
+                                    'Entstehung' if row[f'Entstehung ({number})'] else None,
+                                    'Quellentransfer' if row[f'Quellentransfer ({number})'] else None,
+                                    'Aufführungen' if row[f'Aufführungen ({number})'] else None,
+                                    f'Seite {row[f"Seite ({number})"]}',
+                                    row[f'WVZ (Raabe) ({number})'],
+                                    row[f'Werktitel ({number})'],
+                                    row[f'Kommentar (intern) ({number})'],
+                                    row[f'Erwähnung auf Werk- oder Quellenebene ({number})'],
+                                ]
+                                if string
+                            ])]
+                comment = '\n'.join([
+                        row['Kommentar (intern)'],
+                        row['Bemerkungen'],
+                        *work_comments
+                        ])
 
                 period = Period.objects.create(
                         not_before = parsed_not_before,
@@ -76,8 +94,16 @@ class Command(BaseCommand):
                         period = period,
                         comment = comment
                     )
-                LetterMentioning.objects.create(
-                        bib = proof,
-                        pages = proof_page if len(proof_page) else '',
-                        letter = letter
-                    )
+
+                for mentioning in row['Sigle / Kurztitel'].split(' / '):
+                    proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
+                    proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
+                    if not proof:
+                        print(f"{proof_title} not found")
+                        continue
+                    LetterMentioning.objects.create(
+                            bib = proof,
+                            pages = proof_page[0] if len(proof_page) else '',
+                            letter = letter
+                        )
+

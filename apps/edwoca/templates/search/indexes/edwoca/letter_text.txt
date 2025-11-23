@@ -1,1 +1,1 @@
-{{ object }}
+{{ object }} {{ object.period.not_before.year }} {{ object.period.not_after.year }}
