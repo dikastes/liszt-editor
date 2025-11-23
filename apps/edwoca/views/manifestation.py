@@ -108,13 +108,20 @@ def manifestation_create(request, publisher_pk=None):
             # handle error, maybe redirect to search page
             return redirect('edwoca:manifestation_create')
 
-        form = ManifestationCreateForm(request.POST, publisher=publisher)
+        data = request.POST.copy()
+        data['publisher'] = publisher
+        form = ManifestationCreateForm(data)
         if form.is_valid():
             manifestation = EdwocaManifestation.objects.create()
-            manifestation.publisher = form.cleaned_data.get('publisher')
-            manifestation.plate_number = form.cleaned_data.get('plate_number')
+            #manifestation.publisher = form.cleaned_data.get('publisher')
+            #manifestation.plate_number = form.cleaned_data.get('plate_number')
             manifestation.source_type = form.cleaned_data.get('source_type')
             manifestation.save()
+            Publication.objects.create(
+                    publisher = form.cleaned_data.get('publisher'),
+                    plate_number = form.cleaned_data.get('plate_number'),
+                    manifestation = manifestation
+                )
 
             if form.cleaned_data.get('temporary_title'):
                 ManifestationTitle.objects.create(
@@ -930,17 +937,17 @@ def manifestation_manuscript_update(request, pk):
 
     if search_form.is_valid() and search_form.cleaned_data.get('q'):
         context['query'] = search_form.cleaned_data.get('q')
-        context[f"found_persons"] = search_form.search().models(Person)
+        context[f"manifestation_found_persons"] = search_form.search().models(Person)
 
     if request.GET.get('handwriting_id'):
         context['handwriting_id'] = int(request.GET.get('handwriting_id'))
 
-    if request.GET.get('add_handwriting_for_modification'):
+    if request.GET.get('modification_id'):
         context['add_handwriting_for_modification'] = True
         context['modification_id'] = int(request.GET.get('modification_id'))
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['query'] = search_form.cleaned_data.get('q')
-            context[f"found_persons"] = search_form.search().models(Person)
+            context[f"modification_found_persons"] = search_form.search().models(Person)
 
     if request.GET.get('modification_handwriting_id'):
         context['modification_handwriting_id'] = int(request.GET.get('modification_handwriting_id'))

@@ -4,3 +4,4 @@
 {{ item.current_signature.signature }}
 {% endif %}
 {% endfor %}
+{{ object.private_head_comment }}

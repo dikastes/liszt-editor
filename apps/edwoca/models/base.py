@@ -53,8 +53,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             publisher_addition = self.publications.first().plate_number
 
         if self.publications.first() and self.publications.first().publisher:
-            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()}"
-        return f"<< Verlag >> {publisher_addition}, {self.get_temp_title()}"
+            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()} ({self.source_type})"
+        return f"<< Verlag >> {publisher_addition}, {self.get_temp_title()} ({self.source_type})"
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
@@ -598,8 +598,18 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     class Meta:
         proxy = True
 
+    @property
+    def manifestation(self):
+        return Manifestation.objects.get(pk = self.manifestation_id)
+
     def get_manifestation_url(self):
         return reverse(f'edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
+
+    def __str__(self):
+        manifestation = self.manifestation
+        if (title := manifestation.titles.filter(status = Status.TEMPORARY).first()):
+            return super().__str__() + title.title
+        return super().__str__()
 
 
 class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):

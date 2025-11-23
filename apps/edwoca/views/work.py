@@ -416,7 +416,7 @@ def work_dedication_remove_place(request, pk, dedication_id):
 def work_letter_add(request, pk, letter_pk):
     work = get_object_or_404(Work, pk=pk)
     letter = get_object_or_404(Letter, pk=letter_pk)
-    work.letters.add(letter)
+    letter.work.add(work)
     return redirect('edwoca:work_bibliography', pk=pk)
 
 def work_letter_remove(request, pk, letter_pk):

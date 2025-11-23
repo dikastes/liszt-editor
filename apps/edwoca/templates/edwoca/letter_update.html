@@ -240,7 +240,7 @@
                     <div class="flex-1 m-0">
                         {{ form.pages }}
                     </div>
-                    <a href="{% url 'edwoca:letter_remove_edition' object.id form.instance.bib.id %}" class="btn flex-0"> Entfernen </a>
+                    <a href="{% url 'edwoca:letter_remove_edition' object.id form.instance.bib.zot_key %}" class="btn flex-0"> Entfernen </a>
                 </div>
             {% endfor %}
             <input type="submit" value="Seitenzahlen speichern" class="btn btn-primary mt-3">
