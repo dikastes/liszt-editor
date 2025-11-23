@@ -784,6 +784,10 @@ class Letter(models.Model):
             null = True,
             blank = True
         )
+    work = models.ManyToManyField(
+            'Work',
+            related_name = 'letters'
+        )
     manifestation = models.ManyToManyField(
             'Manifestation',
             related_name = 'letters'
