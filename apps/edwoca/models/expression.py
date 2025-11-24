@@ -12,10 +12,15 @@ class Expression(Sortable,WeBaseClass):
             max_length=20,
             unique=True,
             null=True,
-            blank=True
+            blank=True,
+            verbose_name=_('work catalog number')
         )
-    incipit_music = models.TextField()
-    incipit_text = models.TextField()
+    incipit_music = models.TextField(
+        verbose_name=_('incipit music')
+    )
+    incipit_text = models.TextField(
+        verbose_name=_('incipit text')
+    )
     period = models.OneToOneField(
             'dmad.Period',
             on_delete=models.SET_NULL,
@@ -23,8 +28,12 @@ class Expression(Sortable,WeBaseClass):
             blank = True,
             related_name = 'expression'
         )
-    period_comment = models.TextField()
-    history = models.TextField()
+    period_comment = models.TextField(
+        verbose_name=_('period comment')
+    )
+    history = models.TextField(
+        verbose_name=_('history')
+    )
     contributors = models.ManyToManyField(
             'dmad.Person',
             through = 'ExpressionContributor'
@@ -89,7 +98,8 @@ class RelatedExpression(RelatedEntity):
     label = models.CharField(
             max_length = 2,
             choices = Label,
-            default = Label.IS_PART_OF
+            default = Label.IS_PART_OF,
+            verbose_name = _('label')
             )
     source_expression = models.ForeignKey(
             'Expression',
@@ -129,11 +139,13 @@ class Metronom(models.Model):
     reference_value = models.CharField(
             max_length=4,
             choices=Value,
-            default=Value.QUARTER
+            default=Value.QUARTER,
+            verbose_name=_('reference value')
         )
     bpm = models.IntegerField(
             null = True,
-            blank = True
+            blank = True,
+            verbose_name=_('bpm')
         )
 
 
@@ -149,19 +161,22 @@ class Movement(models.Model):
             max_length=100,
             unique=True,
             null=True,
-            blank=True
+            blank=True,
+            verbose_name=_('title')
         )
     tempo = models.CharField(
             max_length=10,
             unique=True,
             null=True,
-            blank=True
+            blank=True,
+            verbose_name=_('tempo')
         )
     meter = models.CharField(
             max_length=10,
             unique=True,
             null=True,
-            blank=True
+            blank=True,
+            verbose_name=_('meter')
         )
 
 
@@ -183,12 +198,14 @@ class IndexNumber(models.Model):
     index = models.CharField(
             max_length=10,
             choices=Indexes,
-            default=Indexes.LQWV
+            default=Indexes.LQWV,
+            verbose_name=_('index')
         )
     number = models.CharField(
             max_length=10,
             null=True,
-            blank=True
+            blank=True,
+            verbose_name=_('number')
         )
 
     def __str__(self):
@@ -226,17 +243,20 @@ class Key(models.Model):
     note = models.CharField(
             max_length=1,
             choices=Note,
-            default=Note.C
+            default=Note.C,
+            verbose_name=_('note')
         )
     accidental = models.CharField(
             max_length=2,
             choices=Acc,
-            default=Acc.NULL
+            default=Acc.NULL,
+            verbose_name=_('accidental')
         )
     mode = models.CharField(
             max_length=2,
             choices=Mode,
-            default=Mode.MAJOR
+            default=Mode.MAJOR,
+            verbose_name=_('mode')
         )
 
 
