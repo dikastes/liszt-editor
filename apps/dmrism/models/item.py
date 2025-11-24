@@ -12,41 +12,49 @@ class Item(Sortable, WemiBaseClass):
     rism_id = models.CharField(
             max_length=20,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('RISM id')
         )
     manifestation = models.ForeignKey(
             'Manifestation',
             on_delete = models.CASCADE,
-            related_name = 'items'
+            related_name = 'items',
         )
     private_dedication_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private dedication comment')
         )
     private_provenance_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private provenance comment')
         )
     public_provenance_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('public provenance comment')
         )
     is_template = models.BooleanField(default=False)
     extent = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('extent')
         )
     measure = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('measure')
         )
     private_manuscript_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private manuscript comment')
         )
     taken_information = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('taken information')
         )
 
     _group_field_name = 'manifestation'
@@ -116,13 +124,15 @@ class Library(models.Model):
             unique=True,
             max_length=100,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('name')
         )
     siglum = models.CharField(
             unique=True,
             max_length=20,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('siglum')
         )
 
     def get_absolute_url(self):
@@ -149,12 +159,14 @@ class BaseSignature(models.Model):
     signature = models.CharField(
             max_length=20,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('signature')
         )
     status = models.CharField(
             max_length=1,
             choices=Status,
-            default=Status.CURRENT
+            default=Status.CURRENT,
+            verbose_name = _('status')
         )
 
     def __str__(self):
@@ -288,13 +300,14 @@ class BaseDigitalCopy(models.Model):
                 return BaseDigitalCopy.LinkType.DIGITIZED
             return None
 
-    url = models.URLField()
+    url = models.URLField(verbose_name = _('URL'))
     link_type = models.TextField(
             max_length = 20,
             null = True,
             blank = True,
             choices=LinkType,
-            default=LinkType.DIGITIZED
+            default=LinkType.DIGITIZED,
+            verbose_name = _('link type')
         )
 
 

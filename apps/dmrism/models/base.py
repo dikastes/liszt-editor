@@ -9,11 +9,13 @@ class WemiBaseClass(models.Model):
         abstract = True
 
     public_comment = models.TextField(
-            null = True
+            null = True,
+            verbose_name = _('public comment')
         )
 
     private_comment = models.TextField(
-            null = True
+            null = True,
+            verbose_name = _('private comment')
         )
 
     def get_absolute_url(self):
@@ -37,7 +39,12 @@ class BaseContributor(models.Model):
         on_delete=models.CASCADE,
         related_name='%(class)s_set' # Added dynamic related_name
     )
-    role = models.CharField(max_length=10, choices=Role, default=Role.COMPOSER)
+    role = models.CharField(
+            max_length=10,
+            choices=Role,
+            default=Role.COMPOSER,
+            verbose_name = _('role')
+        )
 
     def to_mei(self):
         contributor = ET.Element('persName')
@@ -74,9 +81,15 @@ class RelatedEntity(models.Model):
 
     comment = models.TextField(
             null=True,
-            blank=True
+            blank=True,
+            verbose_name = _('comment')
         )
-    label = models.CharField(max_length=2,choices=Label,default=Label.PARENT)
+    label = models.CharField(
+            max_length=2,
+            choices=Label,
+            default=Label.PARENT,
+            verbose_name = _('label')
+        )
 
     def is_upperclass(self):
         return self.label in {
@@ -145,9 +158,13 @@ class BaseHandwriting(models.Model):
     medium = models.CharField(
             max_length = 100,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('medium')
         )
-    dubious_writer = models.BooleanField(default = False)
+    dubious_writer = models.BooleanField(
+            default = False,
+            verbose_name = _('dubious writer')
+        )
 
     def str_with_link(self):
         try:
