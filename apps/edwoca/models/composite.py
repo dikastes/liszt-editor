@@ -67,7 +67,8 @@ class Composite(models.Model):
         )
     private_head_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private head comment')
         )
     private_relations_comment = models.TextField(
             blank = True,

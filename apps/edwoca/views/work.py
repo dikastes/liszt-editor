@@ -68,10 +68,12 @@ class WorkTitleUpdateView(EntityMixin, TitleUpdateView):
         self.object = self.get_object()
         formset = self.get_form_class()(request.POST, request.FILES, instance=self.object)
         identification_form = WorkIdentificationForm(request.POST, instance=self.object)
+        head_comment_form = WorkHeadCommentForm(request.POST, instance=self.object)
 
-        if formset.is_valid() and identification_form.is_valid():
+        if formset.is_valid() and identification_form.is_valid() and head_comment_form.is_valid():
             formset.save()
             identification_form.save()
+            head_comment_form.save()
 
             # Handle existing PersonDedication forms
             for person_dedication in self.object.workpersondedication_set.all():
@@ -89,12 +91,14 @@ class WorkTitleUpdateView(EntityMixin, TitleUpdateView):
 
             return self.form_valid(formset)
         else:
-            return self.form_invalid(formset, identification_form=identification_form)
+            return self.form_invalid(formset, identification_form=identification_form, head_comment_form=head_comment_form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if 'identification_form' not in kwargs:
             context['identification_form'] = WorkIdentificationForm(instance=self.object)
+        if 'head_comment_form' not in kwargs:
+            context['head_comment_form'] = WorkHeadCommentForm(instance=self.object)
 
         # Initialize forms for existing PersonDedication
         person_dedication_forms = []
@@ -254,6 +258,13 @@ class WorkBibliographyUpdateView(EntityMixin, UpdateView):
 class WorkCommentUpdateView(SimpleFormView):
     model = Work
     property = 'comment'
+
+
+class WorkHeadCommentUpdateView(SimpleFormView):
+    model = Work
+    property = 'private_head_comment'
+
+
 
 
 class WorkBibAddView(FormView):

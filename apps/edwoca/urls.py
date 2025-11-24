@@ -66,6 +66,7 @@ urlpatterns = [
         path('works/<int:pk>/letteradd/<int:letter_pk>', views.work_letter_add, name = 'work_letter_add'),
         path('works/<int:pk>/letterremove/<int:letter_pk>', views.work_letter_remove, name = 'work_letter_remove'),
         path('works/<int:pk>/comment', views.WorkCommentUpdateView.as_view(), name = 'work_comment'),
+        path('works/<int:pk>/head_comment', views.WorkHeadCommentUpdateView.as_view(), name = 'work_head_comment'),
         path('works/<int:pk>/delete', views.WorkDeleteView.as_view(), name = 'work_delete'),
         path('expressions', views.ExpressionListView.as_view(), name = 'expression_list'),
         path('expressions/search', views.ExpressionSearchView.as_view(), name = 'expression_search'),

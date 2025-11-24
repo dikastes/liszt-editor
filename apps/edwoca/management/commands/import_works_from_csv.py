@@ -28,13 +28,23 @@ class Command(BaseCommand):
 
                     if index_number != '-':
                         existing_index_number = IndexNumber.objects.filter(number = index_number).first()
+                        private_head_comment = ' | '.join([
+                            f"Besetzung: {row['Besetzung']}",
+                            f"Raabe: {row['Raabe']}",
+                            f"Searle: {row['Searle']}",
+                            f"Eckhardt-Müller: {row['Eckhardt-Müller']}"
+                        ])
                         if existing_index_number:
                             work = existing_index_number.expression.work
                             work_title = work.titles.filter(status = Status.TEMPORARY).first()
                             work_title.title += ' | ' + row['Werktitel (MGG)']
                             work_title.save()
+                            work.private_head_comment += ' | ' + private_head_comment
+                            work.save()
                         else:
-                            work = Work.objects.create()
+                            work = Work.objects.create(
+                                private_head_comment = private_head_comment
+                            )
                             WorkTitle.objects.create(
                                     title = row['Werktitel (MGG)'],
                                     work = work,
@@ -65,7 +75,15 @@ class Command(BaseCommand):
                                 status = Status.TEMPORARY
                             )
                     else:
-                        work = Work.objects.create()
+                        private_head_comment = ' | '.join([
+                            f"Besetzung: {row['Besetzung']}",
+                            f"Raabe: {row['Raabe']}",
+                            f"Searle: {row['Searle']}",
+                            f"Eckhardt-Müller: {row['Eckhardt-Müller']}"
+                        ])
+                        work = Work.objects.create(
+                            private_head_comment = private_head_comment
+                        )
                         WorkTitle.objects.create(
                                 title = row['Werktitel (MGG)'],
                                 work = work,
