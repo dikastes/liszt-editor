@@ -1,6 +1,7 @@
 from .base import *
 from django.db import models
 from dmrism.models import BaseBib
+from django.utils.translation import gettext_lazy as _
 
 
 class CompositeManifestationRelation(models.Model):
