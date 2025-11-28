@@ -154,7 +154,8 @@ class BaseSignature(models.Model):
             'dmrism.Library',
             on_delete = models.SET_NULL,
             related_name = '%(class)s',
-            null = True
+            null = True,
+            blank = True
         )
     signature = models.CharField(
             max_length=20,
@@ -292,6 +293,7 @@ class BaseDigitalCopy(models.Model):
     class LinkType(models.TextChoices):
         DIGITIZED = 'Dig', _('Digitized')
         IIIF_MANIFEST = 'IIIF', _('IIIF Manifest')
+        PRIVATE = 'Prv', _('Private')
 
         def parse(string):
             if 'iiif' in string:
