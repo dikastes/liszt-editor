@@ -1,111 +1,139 @@
 {% extends 'edwoca/base.html' %}
 
+{% load i18n %}
+
 {% block content %}
 
 {% include 'edwoca/partials/manifestation/preview-divs/bib_prolog.html' %}
 
 <div class="bg-white border border-base-300 p-5">
-	<div class="prose">
-		<h2> Literatur </h2>
+        <h2>
+            {% translate 'bibliography' %}
+        </h2>
 
-		<ul>
-		{% for bib in object.bib_set.all %}
-			<li>
-				<div class="flex">
-					{{ bib.bib }}
-					<form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_bib_remove' bib.id %}" class="flex-0">
-						{% csrf_token %}
-						<input type="submit" class="btn btn-small" value="entfernen">
-					</form>
-				</div>
-			</li>
-		{% empty %}
-			<li> <em> keine bibliografischen Einträge verknüpft </em> </li>
-		{% endfor %}
-		</ul>
+        <ul>
+            {% for bib in object.bib_set.all %}
+                <li>
+                    <div class="flex">
+                        {{ bib.bib }}
+                        <form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_bib_remove' bib.id %}" class="flex-0">
+                            {% csrf_token %}
+                            <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
+                        </form>
+                    </div>
+                </li>
+            {% empty %}
+                <li>
+                    <em>
+                        {% translate 'no bibliographic datasets have been linked' %}
+                    </em>
 
-		<h3> neuen Titel verknüpfen </h3>
+                </li>
+            {% endfor %}
+        </ul>
 
-		{% if show_zotitem_search_form == True %}
+        <h3>
+            {% translate 'link new bibliographic dataset' %}
+        </h3>
 
-		<form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
-			<label class="input input-bordered flex items-center gap-2 flex-1">
-				Literatur
-				{{ zotitem_searchform.q }}
-			</label>
-			<input type="hidden" name="target_model" value="{{ entity_type}}" />
-			<input type="submit" id="submit-form" class="btn" value="Suchen"/>
-		</form>
-		
-		<ul>
-		{% if zotitem_query %}
-			{% for found_bib in found_bibs %}
-				<li>
-					<form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_bib_add' object.id found_bib.object.pk %}">
-						{% csrf_token %}
-						<input type="submit" value="{{ found_bib.object }}" class="cursor-pointer">
-					</form>
-				</li>
-			{% empty %}
-				<li> <em> keine Suchergebnisse </em> </li>
-			{% endfor %}
-		{% else %}
-			<li> <em> bitte Suchbegriff eingeben </em> </li>
-		{% endif %}
-		</ul>
+        {% if show_zotitem_search_form == True %}
 
-		{% endif %}
+        <form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
+            <label class="input input-bordered flex items-center gap-2 flex-1">
+                {{ zotitem_searchform.q }}
+            </label>
+            <input type="hidden" name="target_model" value="{{ entity_type}}" />
+            <input type="submit" id="submit-form" class="btn" value="{% translate 'search' %}"/>
+        </form>
 
-		<h2> Briefe </h2>
+        <ul>
+            {% if zotitem_query %}
+                {% for found_bib in found_bibs %}
+                    <li>
+                        <form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_bib_add' object.id found_bib.object.pk %}">
+                            {% csrf_token %}
+                            <input type="submit" value="{{ found_bib.object }}" class="cursor-pointer">
+                        </form>
+                    </li>
+                {% empty %}
+                    <li>
+                        <em>
+                            {% translate 'no search results' %}
+                        </em>
+                    </li>
+                {% endfor %}
+            {% else %}
+                {% comment %}
+                    <li> <em> bitte Suchbegriff eingeben </em> </li>
+                {% endcomment %}
+            {% endif %}
+        </ul>
 
-		<ul>
-		{% for letter in object.letters.all %}
-			<li>
-				<div class="flex">
-					{{ letter }}
-					<form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_letter_remove' object.id letter.id %}" class="flex-0">
-						{% csrf_token %}
-						<input type="submit" class="btn btn-small" value="entfernen">
-					</form>
-				</div>
-			</li>
-		{% empty %}
-			<li> <em> keine Briefe verknüpft </em> </li>
-		{% endfor %}
-		</ul>
+        {% endif %}
 
-		<h3> neuen Brief verknüpfen </h3>
+        <h2>
+            {% translate 'letters' %}
+        </h2>
 
-		{% if show_letter_search_form == True %}
+        <ul>
+            {% for letter in object.letters.all %}
+                <li>
+                    <div class="flex">
+                        {{ letter }}
+                        <form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_letter_remove' object.id letter.id %}" class="flex-0">
+                            {% csrf_token %}
+                            <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
+                        </form>
+                    </div>
+                </li>
+            {% empty %}
+                <li> 
+                    <em>
+                        {% translate 'no letters have been linked' %}
+                    </em>
+                </li>
+            {% endfor %}
+        </ul>
 
-		<form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
-			<label class="input input-bordered flex items-center gap-2 flex-1">
-				Brief
-				{{ letter_searchform.q }}
-			</label>
-			<input type="hidden" name="target_model" value="{{ entity_type}}" />
-			<input type="submit" id="submit-form" class="btn" value="Suchen"/>
-		</form>
-		
-		<ul>
-		{% if letter_query %}
-			{% for found_letter in found_letters %}
-				<li>
-					<form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_letter_add' object.id found_letter.object.pk %}">
-						{% csrf_token %}
-						<input type="submit" value="{{ found_letter.object }}" class="cursor-pointer">
-					</form>
-				</li>
-			{% empty %}
-				<li> <em> keine Suchergebnisse </em> </li>
-			{% endfor %}
-		{% else %}
-			<li> <em> bitte Suchbegriff eingeben </em> </li>
-		{% endif %}
-		</ul>
+        <h3>
+            {% translate 'link new letter' %}
+        </h3>
 
-		{% endif %}
-	</div>
+        {% if show_letter_search_form == True %}
+
+        <form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
+            <label class="input input-bordered flex items-center gap-2 flex-1">
+                {% translate 'letter' %}
+                {{ letter_searchform.q }}
+            </label>
+            <input type="hidden" name="target_model" value="{{ entity_type }}" />
+            <input type="submit" id="submit-form" class="btn" value="{% translate 'search' %}"/>
+        </form>
+
+        <ul>
+            {% if letter_query %}
+                {% for found_letter in found_letters %}
+                    <li>
+                        <form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_letter_add' object.id found_letter.object.pk %}">
+                            {% csrf_token %}
+                            <input type="submit" value="{{ found_letter.object }}" class="cursor-pointer">
+                        </form>
+                    </li>
+                {% empty %}
+                    <li>
+                        <em>
+                            {% translate 'no search results' %}
+                        </em>
+                    </li>
+                {% endfor %}
+            {% else %}
+                {% comment %}
+                    <li> <em> bitte Suchbegriff eingeben </em> </li>
+                {% endcomment %}
+            {% endif %}
+        </ul>
+
+        {% endif %}
 
 </div>
 
