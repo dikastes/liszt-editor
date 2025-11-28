@@ -73,8 +73,8 @@
 
 <div class="bg-white border border-base-300 p-5 mb-10">
     <div class="prose">
-        <h2> Expressions </h2>
-        <h3> verknüpfte Expressions </h3>
+        <h2> Fassungen </h2>
+        <h3> verknüpfte Fassungen </h3>
         <ul>
         {% for expression in object.expressions.all %}
             <li>
@@ -88,7 +88,7 @@
                 </div>
             </li>
         {% empty %}
-            <li> <em> keine Expressions verknüpft </em> </span> </li>
+            <li> <em> keine Fassungen verknüpft </em> </span> </li>
         {% endfor %}
         </ul>
 
@@ -224,7 +224,7 @@
 
 <div class="bg-white border border-base-300 p-5 mt-5">
     <div class="prose">
-        <h2> Privater Kommentar zu Bezügen </h2>
+        <h2> interner Kommentar (Bezüge) </h2>
         <form method="post">
             {% csrf_token %}
             {{ relations_comment_form.as_daisy }}

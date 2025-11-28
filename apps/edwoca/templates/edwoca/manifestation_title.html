@@ -236,7 +236,7 @@
                 </form>
 
                 <div class="mt-5">
-                    <h4 class="text-lg font-bold mb-5">Handschriften zum Titel</h4>
+                    <h4 class="text-lg font-bold mb-5">Schreiber/Hände</h4>
                     {% for handwriting_form in title_form.handwriting_forms %}
                         <div class="flex gap-5 items-center mb-5 rounded-lg">
                             <form method="post" class="flex-1 flex gap-5 m-0">
@@ -307,7 +307,7 @@
 {% include 'edwoca/partials/manifestation/preview-divs/title_prolog.html' %}
 
 <div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0 flex-1"> Titel </h2>
+    <h2 class="card-title mt-0 flex-1"> Titelansetzung </h2>
 
     <div class="mt-5">
     {% for title in object.titles.all %}

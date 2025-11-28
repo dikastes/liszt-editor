@@ -154,7 +154,7 @@ html,
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: BeausiteClassicWeb, ui-sans-serif, system-ui;
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -626,13 +626,11 @@ html {
 
 :root {
   --p: 65.7784% 0.231016 34.431105;
-  --b2: 91.985% 0.003216 219.532142;
-  --b3: 85.0614% 0.002974 219.532142;
   --in: 72.06% 0.191 231.6;
   --su: 64.8% 0.150 160;
   --wa: 84.71% 0.199 83.87;
   --er: 71.76% 0.221 22.18;
-  --bc: 19.7817% 0.000692 219.532142;
+  --bc: 19.5467% 0.000498 165.076152;
   --sc: 19.5467% 0.000498 165.076152;
   --nc: 90.347% 0.00518 233.805816;
   --inc: 0% 0 0;
@@ -653,7 +651,9 @@ html {
   --a: 65.7784% 0.231016 34.431105;
   --ac: 100% 0 0;
   --n: 51.7351% 0.025899 233.805816;
-  --b1: 98.9086% 0.003458 219.532142;
+  --b1: 97.7333% 0.002491 165.076152;
+  --b2: 98.9086% 0.003458 219.532142;
+  --b3: 83.2891% 0.007194 124.468857;
 }
 
 .container {
@@ -1733,19 +1733,6 @@ html {
   padding-right: 0.25rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-}
-
-.hero {
-  display: grid;
-  width: 100%;
-  place-items: center;
-  background-size: cover;
-  background-position: center;
-}
-
-.hero > * {
-  grid-column-start: 1;
-  grid-row-start: 1;
 }
 
 .input {
@@ -3784,6 +3771,11 @@ details.collapse summary::-webkit-details-marker {
   margin: 0px;
 }
 
+.mx-10 {
+  margin-left: 2.5rem;
+  margin-right: 2.5rem;
+}
+
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -3841,10 +3833,6 @@ details.collapse summary::-webkit-details-marker {
 
 .mt-0 {
   margin-top: 0px;
-}
-
-.mt-10 {
-  margin-top: 2.5rem;
 }
 
 .mt-2 {
@@ -3909,6 +3897,10 @@ details.collapse summary::-webkit-details-marker {
 
 .h-screen {
   height: 100vh;
+}
+
+.min-h-16 {
+  min-height: 4rem;
 }
 
 .min-h-inherit {
@@ -4007,12 +3999,20 @@ details.collapse summary::-webkit-details-marker {
   flex-direction: column;
 }
 
+.content-center {
+  align-content: center;
+}
+
 .items-end {
   align-items: flex-end;
 }
 
 .items-center {
   align-items: center;
+}
+
+.items-stretch {
+  align-items: stretch;
 }
 
 .justify-end {
@@ -4099,6 +4099,10 @@ details.collapse summary::-webkit-details-marker {
   border-right-width: 0px;
 }
 
+.border-none {
+  border-style: none;
+}
+
 .border-base-200 {
   --tw-border-opacity: 1;
   border-color: var(--fallback-b2,oklch(var(--b2)/var(--tw-border-opacity, 1)));
@@ -4107,6 +4111,11 @@ details.collapse summary::-webkit-details-marker {
 .border-base-300 {
   --tw-border-opacity: 1;
   border-color: var(--fallback-b3,oklch(var(--b3)/var(--tw-border-opacity, 1)));
+}
+
+.bg-base-100 {
+  --tw-bg-opacity: 1;
+  background-color: var(--fallback-b1,oklch(var(--b1)/var(--tw-bg-opacity, 1)));
 }
 
 .bg-base-200 {
@@ -4144,13 +4153,27 @@ details.collapse summary::-webkit-details-marker {
   padding: 1.25rem;
 }
 
+.px-10 {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+}
+
 .px-5 {
   padding-left: 1.25rem;
   padding-right: 1.25rem;
 }
 
+.py-5 {
+  padding-top: 1.25rem;
+  padding-bottom: 1.25rem;
+}
+
 .text-center {
   text-align: center;
+}
+
+.font-sans {
+  font-family: BeausiteClassicWeb, ui-sans-serif, system-ui;
 }
 
 .text-2xl {
@@ -4247,6 +4270,55 @@ details.collapse summary::-webkit-details-marker {
 @tailwind typography;
 
 @tailwind layout;
+
+@font-face {
+  font-family: 'BeausiteClassicWeb';
+
+  src: url('fonts/BeausiteClassicWeb-Clear-BJz0vUPX.woff');
+
+  font-weight: 300;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'BeausiteClassicWeb';
+
+  src: url('fonts/BeausiteClassicWeb-Regular-Dywx2iCt.woff');
+
+  font-weight: 400;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'BeausiteClassicWeb';
+
+  src: url('fonts/BeausiteClassicWeb-Semibold-Chyi-LBS.woff');
+
+  font-weight: 600;
+
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'MakeWayWeb';
+
+  src: url('fonts/MakeWayWeb-Regular-BfRbPMXa.woff');
+
+  font-weight: 400;
+
+  font-style: normal;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: MakeWayWeb, ui-sans-serif, system-ui;
+}
+
+h2 {
+  --tw-text-opacity: 1;
+  color: var(--fallback-p,oklch(var(--p)/var(--tw-text-opacity, 1)));
+}
 
 .hidden {
   display: none;

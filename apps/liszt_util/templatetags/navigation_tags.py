@@ -40,9 +40,9 @@ def render_main_navbar_link(context):
         app_key_to_use = 'edwoca' # Standard-Fallback-App
 
     app_info = settings.GLOBAL_NAVIGATION.get(app_key_to_use, {})
-    
+
     # Hole Label und href, mit Fallbacks, falls nicht explizit in den Settings definiert.
     label = app_info.get('label', app_key_to_use) # Fallback auf app_key, falls Label fehlt
     href = app_info.get('href', '#') # Fallback auf '#', falls href fehlt oder None ist
 
-    return mark_safe(f'<a class="btn btn-ghost text-xl rounded-none min-h-inherit" href="{href}">{label}</a>')
+    return mark_safe(f'<a class="content-center text-2xl min-h-inherit" href="{href}">{label}</a>')

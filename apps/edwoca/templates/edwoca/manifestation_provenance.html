@@ -98,7 +98,7 @@
                 {% else %}
                     <form method="get" class="flex-1 flex gap-5 mt-5">
                         <label class="input input-bordered flex items-center gap-2 flex-1">
-                            Owner-Suche
+                            Vorbesitzer-Suche
                             {{ owner_search_form.q }}
                         </label>
                         <input type="submit" class="btn" value="Suchen"/>
@@ -140,7 +140,7 @@
             <div class="modal-box w-11/12 max-w-5xl">
                 <h3 class="text-lg font-bold">Körperschafts-Provenienz bearbeiten</h3>
 
-                <h3 class="text-lg font-bold">Verknüpfte Literatur</h3>
+                <h3 class="text-lg font-bold">Provenienzbeleg (Literatur)</h3>
                 {% if cps_form.instance.bib %}
                     <ul>
                         <li>
@@ -197,7 +197,7 @@
 			<li> <em> keine Briefe verknüpft </em> </li>
 		{% endfor %}
 		</ul>
-                <h3 class="text-lg font-bold mt-5">Verknüpfte Briefe</h3>
+                <h3 class="text-lg font-bold mt-5">Provenienzbeleg (Briefe)</h3>
                 <ul>
                 {% for letter in cps_form.instance.letters.all %}
                     <li>
@@ -290,7 +290,7 @@
 {% include 'edwoca/partials/manifestation/preview-divs/provenance_prolog.html' %}
 
 <div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0 flex-1"> Provenienz (Personen) </h2>
+    <h2 class="card-title mt-0 flex-1"> Vorbesitzende Personen </h2>
 
     <div class="mt-5">
     {% for pps in item.person_provenance_stations.all %}
@@ -305,15 +305,15 @@
             </form>
         </div>
     {% empty %}
-        <p> keine Personen-Provenienz-Einträge </p>
+        <p> keine Einträge </p>
     {% endfor %}
     </div>
     <div class="flex items-center">
         <div class="flex-1"></div>
-        <a href="{% url 'edwoca:person_provenance_add' item.id %}" class="btn flex-0"> Personen-Provenienz hinzufügen </a>
+        <a href="{% url 'edwoca:person_provenance_add' item.id %}" class="btn flex-0"> Provenienz hinzufügen </a>
     </div>
 
-    <h2 class="card-title mt-5 flex-1"> Provenienz (Körperschaften) </h2>
+    <h2 class="card-title mt-5 flex-1"> Vorbesitzende Körperschaften</h2>
 
     <div class="mt-5">
     {% for cps in item.corporation_provenance_stations.all %}
@@ -328,12 +328,12 @@
             </form>
         </div>
     {% empty %}
-        <p> keine Körperschafts-Provenienz-Einträge </p>
+        <p> keine Einträge </p>
     {% endfor %}
     </div>
     <div class="flex items-center">
         <div class="flex-1"></div>
-        <a href="{% url 'edwoca:corporation_provenance_add' item.id %}" class="btn flex-0"> Körperschafts-Provenienz hinzufügen </a>
+        <a href="{% url 'edwoca:corporation_provenance_add' item.id %}" class="btn flex-0"> Provenienz hinzufügen </a>
     </div>
 
 </div>

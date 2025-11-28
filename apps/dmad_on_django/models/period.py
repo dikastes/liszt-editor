@@ -1,4 +1,5 @@
 from calendar import monthrange
+from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.conf import settings
 import re
@@ -9,15 +10,18 @@ from datetime import date, datetime
 class Period(models.Model):
     not_before = models.DateField(
             null=True,
-            blank=True
+            blank=True,
+            verbose_name = _("not before")
         )
     not_after = models.DateField(
             null=True,
-            blank=True
+            blank=True,
+            verbose_name = _("not after")
         )
     display = models.TextField(
             null=True,
-            blank=True
+            blank=True,
+            verbose_name = _("standardized date")
         )
 
     def render_detailed(self):

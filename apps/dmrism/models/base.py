@@ -200,7 +200,8 @@ class BaseDedication(models.Model):
         )
     diplomatic_dedication = models.TextField(
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('dedication text')
         )
 
 

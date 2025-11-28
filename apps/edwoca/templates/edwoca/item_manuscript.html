@@ -68,7 +68,7 @@
                     </form>
 
                     <div class="mt-5">
-                        <h4 class="text-md font-bold mb-5">Handschriften der Modifikation</h4>
+                        <h4 class="text-md font-bold mb-5">Schreiber/Hände</h4>
                             {% for form in modification.handwriting_forms %}
                                 <div class="flex gap-5 items-center mb-5 rounded-lg">
                                     <form method="post" class="flex-1 flex gap-5 m-0">
@@ -120,7 +120,7 @@
 
                         <form method="post">
                             {% csrf_token %}
-                            <button type="submit" name="add_modification_handwriting" value="{{ modification.form.instance.id }}" class="btn btn-secondary mt-3">Handschrift hinzufügen</button>
+                            <button type="submit" name="add_modification_handwriting" value="{{ modification.form.instance.id }}" class="btn btn-secondary mt-3">Schreiber/Hände hinzufügen</button>
                         </form>
                     </div>
 

@@ -1,11 +1,13 @@
+<div class="content-center text-primary min-h-inherit p-5 rounded-none border-none text-2xl font-bold h-full">
 {% if entity_type == 'expression' %}
-    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">E-{{ object.id }}</div>
+    E-{{ object.id }}
 {% elif entity_type == 'work' %}
-    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">W-{{ object.id }}</div>
+    W-{{ object.id }}
 {% elif entity_type == 'manifestation' and object.is_singleton %}
-    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">M/I-{{ object.id }}</div>
+    M/I-{{ object.id }}
 {% elif entity_type == 'manifestation' and not object.is_singleton %}
-    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">M-{{ object.id }}</div>
+    M-{{ object.id }}
 {% elif entity_type == 'item' %}
-    <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">I-{{ object.id }}</div>
+    I-{{ object.id }}
 {% endif %}
+</div>

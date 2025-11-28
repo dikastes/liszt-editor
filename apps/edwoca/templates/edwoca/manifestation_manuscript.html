@@ -17,7 +17,7 @@
         </form>
 
         <div class="mt-5">
-            <h3 class="text-lg font-bold mb-5">Handschriften</h3>
+            <h3 class="text-lg font-bold mb-5">Schreiber/Hände</h3>
             {% for form in handwriting_forms %}
                 <div class="flex gap-5 items-center mb-5 rounded-lg">
                     <form method="post" class="flex-1 flex gap-5 m-0">
@@ -68,7 +68,7 @@
             {% endfor %}
             <form method="post">
                 {% csrf_token %}
-                <input type="submit" name="add_handwriting" value="Handschrift hinzufügen" class="btn btn-secondary mt-3">
+                <input type="submit" name="add_handwriting" value="Schreiber hinzufügen" class="btn btn-secondary mt-3">
             </form>
         </div>
     </div>
@@ -143,7 +143,7 @@
                                             Schreiber
                                             <input type="text" class="grow" disabled value="{{ form.instance.writer }}" />
                                         </label>
-                                        <a class="btn" href="{% url 'edwoca:modification_remove_handwriting_writer' form.instance.id %}">Entfernen</a>
+                                        <a class="btn" href="{% url 'edwoca:modification_remove_handwriting_writer' form.instance.id %}">löschen</a>
                                     </div>
                                 {% else %}
                                     <div class="mt-2">

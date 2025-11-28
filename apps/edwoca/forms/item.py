@@ -16,7 +16,7 @@ class ItemForm(ModelForm):
         fields = ['rism_id']
         widgets = {
                 'rism_id': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': 'grow'
                     })
             }
 
@@ -24,7 +24,7 @@ class ItemForm(ModelForm):
         form = div(cls='mb-10')
 
         rism_id_field = self['rism_id']
-        rism_id_field_label = label(rism_id_field.label, cls='input input-bordered flex flex-1 items-center gap-2')
+        rism_id_field_label = label(rism_id_field.label, cls='input input-bordered flex flex-1 items-center gap-2 my-5')
         rism_id_field_label.add(raw(str(rism_id_field)))
 
         form.add(rism_id_field_label)

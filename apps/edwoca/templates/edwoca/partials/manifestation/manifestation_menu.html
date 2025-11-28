@@ -1,4 +1,4 @@
-<div class="flex flex-col h-full">
+<div class="flex flex-col h-full overflow-auto">
 	<ul class="menu p-0 flex-1">
 		<li>
 		    <a
@@ -85,6 +85,7 @@
 		    </a>
 		</li>
 	</ul>
+	<div class="flex-0 min-h-16"></div>
 	<ul class="menu p-0 flex-0">
 		<li>
 		    <a href="{% url 'edwoca:manifestation_delete' object.id %}"

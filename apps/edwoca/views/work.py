@@ -1,6 +1,6 @@
 from .base import *
 from ..models.work import *
-from ..forms.work import WorkForm, WorkTitleForm, WorkTitleFormSet, WorkCreateForm, WorkIdentificationForm, RelatedWorkForm, WorkContributorForm, WorkBibForm
+from ..forms.work import WorkForm, WorkTitleForm, WorkTitleFormSet, WorkCreateForm, WorkIdentificationForm, RelatedWorkForm, WorkContributorForm, WorkBibForm, WorkHeadCommentForm
 from ..forms.dedication import WorkPersonDedicationForm, WorkCorporationDedicationForm
 from dmad_on_django.models import Work as DmadWork, Person, Place, Corporation, SubjectTerm, Status
 from edwoca.forms import EdwocaSearchForm

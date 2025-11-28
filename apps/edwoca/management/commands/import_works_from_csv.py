@@ -26,13 +26,13 @@ class Command(BaseCommand):
                     print(f'{str(i+1)} von {total}')
                     print(f'Raabe {row["Raabe"]}')
 
+                    raabe = f'R {row["Raabe"]}' if row['Raabe'] else None
+                    muller = f'R {row["Eckhardt-Müller"]}' if row['Eckhardt-Müller'] else None
+                    searle = f'R {row["Searle"]}' if row['Searle'] else None
                     if index_number != '-':
                         existing_index_number = IndexNumber.objects.filter(number = index_number).first()
                         private_head_comment = ' | '.join([
-                            f"Besetzung: {row['Besetzung']}",
-                            f"Raabe: {row['Raabe']}",
-                            f"Searle: {row['Searle']}",
-                            f"Eckhardt-Müller: {row['Eckhardt-Müller']}"
+                            number for number in [ raabe, muller, searle ] if number
                         ])
                         if existing_index_number:
                             work = existing_index_number.expression.work
@@ -108,3 +108,4 @@ class Command(BaseCommand):
                                 expression = expression,
                                 status = Status.TEMPORARY
                             )
+        Expression.objects().delete()
