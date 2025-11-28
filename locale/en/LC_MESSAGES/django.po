@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: apps/edwoca/models/expression.py:219
+#: apps/edwoca/models/expression.py:230
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-24 23:22+0000\n"
+"POT-Creation-Date: 2025-11-25 09:59+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -76,7 +76,7 @@ msgid "comment"
 msgstr ""
 
 #: apps/dmrism/models/base.py:91 apps/dmrism/models/manifestation.py:613
-#: apps/edwoca/models/expression.py:94 apps/edwoca/models/work.py:123
+#: apps/edwoca/models/expression.py:102
 msgid "label"
 msgstr ""
 
@@ -89,7 +89,6 @@ msgid "dubious writer"
 msgstr ""
 
 #: apps/dmrism/models/item.py:16 apps/dmrism/models/manifestation.py:218
-#: apps/edwoca/models/composite.py:93
 msgid "RISM id"
 msgstr ""
 
@@ -101,19 +100,19 @@ msgstr ""
 msgid "private provenance comment"
 msgstr ""
 
-#: apps/dmrism/models/item.py:36 apps/edwoca/models/composite.py:98
+#: apps/dmrism/models/item.py:36
 msgid "public provenance comment"
 msgstr ""
 
-#: apps/dmrism/models/item.py:42 apps/edwoca/models/composite.py:103
+#: apps/dmrism/models/item.py:42
 msgid "extent"
 msgstr ""
 
-#: apps/dmrism/models/item.py:47 apps/edwoca/models/composite.py:108
+#: apps/dmrism/models/item.py:47
 msgid "measure"
 msgstr ""
 
-#: apps/dmrism/models/item.py:52 apps/edwoca/models/composite.py:113
+#: apps/dmrism/models/item.py:52
 msgid "private manuscript comment"
 msgstr ""
 
@@ -303,8 +302,7 @@ msgstr ""
 msgid "state"
 msgstr ""
 
-#: apps/dmrism/models/manifestation.py:178 apps/edwoca/models/composite.py:62
-#: apps/edwoca/models/expression.py:28 apps/edwoca/models/work.py:34
+#: apps/dmrism/models/manifestation.py:178 apps/edwoca/models/expression.py:35
 msgid "history"
 msgstr ""
 
@@ -333,19 +331,19 @@ msgid "print extent"
 msgstr ""
 
 #: apps/dmrism/models/manifestation.py:241 apps/edwoca/models/composite.py:72
-#: apps/edwoca/models/work.py:47
+#: apps/edwoca/models/work.py:44
 msgid "private head comment"
 msgstr ""
 
-#: apps/dmrism/models/manifestation.py:246 apps/edwoca/models/composite.py:77
+#: apps/dmrism/models/manifestation.py:246
 msgid "private relations comment"
 msgstr ""
 
-#: apps/dmrism/models/manifestation.py:251 apps/edwoca/models/composite.py:82
+#: apps/dmrism/models/manifestation.py:251
 msgid "private title comment"
 msgstr ""
 
-#: apps/dmrism/models/manifestation.py:256 apps/edwoca/models/composite.py:87
+#: apps/dmrism/models/manifestation.py:256
 msgid "private history comment"
 msgstr ""
 
@@ -358,6 +356,7 @@ msgid "plate number"
 msgstr ""
 
 #: apps/dmrism/models/manifestation.py:547 apps/edwoca/models/base.py:671
+#: apps/edwoca/models/expression.py:165
 msgid "title"
 msgstr ""
 
@@ -389,179 +388,183 @@ msgstr ""
 msgid "pages"
 msgstr ""
 
-#: apps/edwoca/models/base.py:905 apps/edwoca/models/expression.py:236
+#: apps/edwoca/models/base.py:905 apps/edwoca/models/expression.py:247
 msgid "note"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:16 apps/edwoca/models/work.py:25
+#: apps/edwoca/models/expression.py:16
 msgid "work catalog number"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:18
-msgid "musical incipit"
-msgstr ""
-
 #: apps/edwoca/models/expression.py:19
-msgid "textual incipit"
+msgid "incipit music"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:27
+#: apps/edwoca/models/expression.py:22
+msgid "incipit text"
+msgstr ""
+
+#: apps/edwoca/models/expression.py:32
 msgid "period comment"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:84
+#: apps/edwoca/models/expression.py:92
 msgid "is componnt of"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:85 apps/edwoca/models/work.py:102
+#: apps/edwoca/models/expression.py:93 apps/edwoca/models/work.py:99
 msgid "is part of"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:86 apps/edwoca/models/work.py:103
+#: apps/edwoca/models/expression.py:94 apps/edwoca/models/work.py:100
 msgid "is derivative of"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:87
+#: apps/edwoca/models/expression.py:95
 msgid "is incorporated in"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:88
+#: apps/edwoca/models/expression.py:96
 msgid "has alternative"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:118
+#: apps/edwoca/models/expression.py:126
 msgid "1/8"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:119
+#: apps/edwoca/models/expression.py:127
 msgid "1/4"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:120
+#: apps/edwoca/models/expression.py:128
 msgid "1/4."
 msgstr ""
 
-#: apps/edwoca/models/expression.py:121
+#: apps/edwoca/models/expression.py:129
 msgid "1/2"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:122
+#: apps/edwoca/models/expression.py:130
 msgid "1/2."
 msgstr ""
 
-#: apps/edwoca/models/expression.py:135
+#: apps/edwoca/models/expression.py:143
 msgid "reference value"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:140
+#: apps/edwoca/models/expression.py:148
 msgid "bpm"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:174
+#: apps/edwoca/models/expression.py:172
+msgid "tempo"
+msgstr ""
+
+#: apps/edwoca/models/expression.py:179
+msgid "meter"
+msgstr ""
+
+#: apps/edwoca/models/expression.py:185
 msgid "Raabe"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:175
+#: apps/edwoca/models/expression.py:186
 msgid "Müller/Eckhardt"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:176
+#: apps/edwoca/models/expression.py:187
 msgid "Searle"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:177
+#: apps/edwoca/models/expression.py:188
 msgid "Chiappari"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:178
+#: apps/edwoca/models/expression.py:189
 msgid "LQWV"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:191
+#: apps/edwoca/models/expression.py:202
 msgid "index"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:197
+#: apps/edwoca/models/expression.py:208
 msgid "number"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:206
+#: apps/edwoca/models/expression.py:217
 msgid "Major"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:207
+#: apps/edwoca/models/expression.py:218
 msgid "Minor"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:210
+#: apps/edwoca/models/expression.py:221
 msgid "A"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:211
+#: apps/edwoca/models/expression.py:222
 msgid "B"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:212
+#: apps/edwoca/models/expression.py:223
 msgid "C"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:213
+#: apps/edwoca/models/expression.py:224
 msgid "D"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:214
+#: apps/edwoca/models/expression.py:225
 msgid "e"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:215
+#: apps/edwoca/models/expression.py:226
 msgid "F"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:216
+#: apps/edwoca/models/expression.py:227
 msgid "G"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:220
+#: apps/edwoca/models/expression.py:231
 msgid "#"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:221
+#: apps/edwoca/models/expression.py:232
 msgid "##"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:222
+#: apps/edwoca/models/expression.py:233
 msgid "b"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:223
+#: apps/edwoca/models/expression.py:234
 msgid "bb"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:242
+#: apps/edwoca/models/expression.py:253
 msgid "accidental"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:248
+#: apps/edwoca/models/expression.py:259
 msgid "mode"
 msgstr ""
 
-#: apps/edwoca/models/work.py:18
-msgid "GND id"
-msgstr ""
-
-#: apps/edwoca/models/work.py:104
+#: apps/edwoca/models/work.py:101
 msgid "is successor of"
 msgstr ""
 
-#: apps/edwoca/models/work.py:105
+#: apps/edwoca/models/work.py:102
 msgid "is inspired by"
 msgstr ""
 
-#: apps/edwoca/models/work.py:106
+#: apps/edwoca/models/work.py:103
 msgid "uses expression of"
 msgstr ""
 
-#: apps/edwoca/models/work.py:107
+#: apps/edwoca/models/work.py:104
 msgid "accompanies or complements"
 msgstr ""
 

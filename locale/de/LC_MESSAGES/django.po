@@ -3,12 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: apps/edwoca/models/expression.py:219
+#: apps/edwoca/models/expression.py:230
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-24 23:22+0000\n"
+"POT-Creation-Date: 2025-11-28 09:33+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: German\n"
@@ -24,11 +24,23 @@ msgstr "Bevorzugter Titel"
 
 #: apps/dmad_on_django/models/base.py:23
 msgid "Alternative"
-msgstr "Alternativtitel"
+msgstr "Titelvariante"
 
 #: apps/dmad_on_django/models/base.py:24
 msgid "Temporary"
 msgstr "Arbeitstitel"
+
+#: apps/dmad_on_django/models/period.py:14
+msgid "not before"
+msgstr "nicht vor"
+
+#: apps/dmad_on_django/models/period.py:19
+msgid "not after"
+msgstr "nicht nach"
+
+#: apps/dmad_on_django/models/period.py:24
+msgid "standardized date"
+msgstr "Datierung (standardisiert)"
 
 #: apps/dmrism/models/base.py:13
 msgid "public comment"
@@ -75,20 +87,23 @@ msgid "comment"
 msgstr "Kommentar"
 
 #: apps/dmrism/models/base.py:91 apps/dmrism/models/manifestation.py:613
-#: apps/edwoca/models/expression.py:94 apps/edwoca/models/work.py:123
+#: apps/edwoca/models/expression.py:102
 msgid "label"
-msgstr "Label"
+msgstr "Relation"
 
 #: apps/dmrism/models/base.py:162
 msgid "medium"
-msgstr "Schreibmittel"
+msgstr "Schreibstoff"
 
 #: apps/dmrism/models/base.py:166
 msgid "dubious writer"
 msgstr "Schreiber unsicher"
 
+#: apps/dmrism/models/base.py:204
+msgid "dedication text"
+msgstr "Widmungstext (diplomatisch)"
+
 #: apps/dmrism/models/item.py:16 apps/dmrism/models/manifestation.py:218
-#: apps/edwoca/models/composite.py:93
 msgid "RISM id"
 msgstr "RISM ID Nr."
 
@@ -100,21 +115,21 @@ msgstr "interner Kommentar zur Widmung"
 msgid "private provenance comment"
 msgstr "interner Kommentar zur Provenienz"
 
-#: apps/dmrism/models/item.py:36 apps/edwoca/models/composite.py:98
+#: apps/dmrism/models/item.py:36
 msgid "public provenance comment"
 msgstr "öffentlicher Kommentar zur Provenienz"
 
-#: apps/dmrism/models/item.py:42 apps/edwoca/models/composite.py:103
+#: apps/dmrism/models/item.py:42
 msgid "extent"
 msgstr "Umfang"
 
-#: apps/dmrism/models/item.py:47 apps/edwoca/models/composite.py:108
+#: apps/dmrism/models/item.py:47
 msgid "measure"
-msgstr "Maß"
+msgstr "Format"
 
-#: apps/dmrism/models/item.py:52 apps/edwoca/models/composite.py:113
+#: apps/dmrism/models/item.py:52
 msgid "private manuscript comment"
-msgstr "interner Kommentar zu den Manuskriptspezifika"
+msgstr "interner Kommentar (Manuskript)"
 
 #: apps/dmrism/models/item.py:57 apps/dmrism/models/manifestation.py:266
 msgid "taken information"
@@ -136,29 +151,33 @@ msgstr "aktuell"
 msgid "Former"
 msgstr "vormalig"
 
-#: apps/dmrism/models/item.py:163
+#: apps/dmrism/models/item.py:164
 msgid "signature"
-msgstr "Signatur"
+msgstr "Standort"
 
-#: apps/dmrism/models/item.py:169 apps/dmrism/models/manifestation.py:560
+#: apps/dmrism/models/item.py:170 apps/dmrism/models/manifestation.py:560
 #: apps/edwoca/models/base.py:677
 msgid "status"
 msgstr "Status"
 
-#: apps/dmrism/models/item.py:293
+#: apps/dmrism/models/item.py:294
 msgid "Digitized"
 msgstr "Digitalisat"
 
-#: apps/dmrism/models/item.py:294
+#: apps/dmrism/models/item.py:295
 msgid "IIIF Manifest"
 msgstr "IIIF-Manifest"
 
-#: apps/dmrism/models/item.py:303
+#: apps/dmrism/models/item.py:296
+msgid "Private"
+msgstr ""
+
+#: apps/dmrism/models/item.py:305
 #: venv/lib/python3.10/site-packages/django/db/models/fields/__init__.py:2642
 msgid "URL"
 msgstr "URL"
 
-#: apps/dmrism/models/item.py:310
+#: apps/dmrism/models/item.py:312
 msgid "link type"
 msgstr "Linktyp"
 
@@ -188,7 +207,7 @@ msgstr "Fragment"
 
 #: apps/dmrism/models/manifestation.py:26
 msgid "Excerpts"
-msgstr "Auszug"
+msgstr "Ausschnitt"
 
 #: apps/dmrism/models/manifestation.py:35
 msgid "Score"
@@ -220,7 +239,7 @@ msgstr "Abschrift"
 
 #: apps/dmrism/models/manifestation.py:44
 msgid "Album Page"
-msgstr "Albumseite"
+msgstr "Albumblatt"
 
 #: apps/dmrism/models/manifestation.py:45
 msgid "Part Excerpt"
@@ -302,8 +321,7 @@ msgstr "Drucktyp"
 msgid "state"
 msgstr "Status"
 
-#: apps/dmrism/models/manifestation.py:178 apps/edwoca/models/composite.py:62
-#: apps/edwoca/models/expression.py:28 apps/edwoca/models/work.py:34
+#: apps/dmrism/models/manifestation.py:178 apps/edwoca/models/expression.py:35
 msgid "history"
 msgstr "Geschichte"
 
@@ -325,28 +343,28 @@ msgstr "Wasserzeichen URL"
 
 #: apps/dmrism/models/manifestation.py:231
 msgid "diplomatic date"
-msgstr "Datum diplomatisch"
+msgstr "Datierug (diplomatisch)"
 
 #: apps/dmrism/models/manifestation.py:236
 msgid "print extent"
 msgstr "Druckumfang"
 
 #: apps/dmrism/models/manifestation.py:241 apps/edwoca/models/composite.py:72
-#: apps/edwoca/models/work.py:47
+#: apps/edwoca/models/work.py:44
 msgid "private head comment"
 msgstr "interner Kommentar zum Kopfbereich"
 
-#: apps/dmrism/models/manifestation.py:246 apps/edwoca/models/composite.py:77
+#: apps/dmrism/models/manifestation.py:246
 msgid "private relations comment"
 msgstr "interner Kommentar zu den Bezügen"
 
-#: apps/dmrism/models/manifestation.py:251 apps/edwoca/models/composite.py:82
+#: apps/dmrism/models/manifestation.py:251
 msgid "private title comment"
 msgstr "interner Kommentar zur Titelei"
 
-#: apps/dmrism/models/manifestation.py:256 apps/edwoca/models/composite.py:87
+#: apps/dmrism/models/manifestation.py:256
 msgid "private history comment"
-msgstr "interner Kommentar zur Geschichte"
+msgstr "interner Kommentar (Datierung/Ort)"
 
 #: apps/dmrism/models/manifestation.py:261
 msgid "private print comment"
@@ -357,12 +375,13 @@ msgid "plate number"
 msgstr "Plattennummer"
 
 #: apps/dmrism/models/manifestation.py:547 apps/edwoca/models/base.py:671
+#: apps/edwoca/models/expression.py:165
 msgid "title"
 msgstr "Titel"
 
 #: apps/dmrism/models/manifestation.py:554
 msgid "title type"
-msgstr "Seitentitel"
+msgstr "Titelart"
 
 #: apps/edwoca/models/base.py:700
 msgid "Published"
@@ -388,181 +407,232 @@ msgstr "Kategorie"
 msgid "pages"
 msgstr "Seiten"
 
-#: apps/edwoca/models/base.py:905 apps/edwoca/models/expression.py:236
+#: apps/edwoca/models/base.py:905 apps/edwoca/models/expression.py:247
 msgid "note"
-msgstr "Notiz"
+msgstr "Note"
 
-#: apps/edwoca/models/expression.py:16 apps/edwoca/models/work.py:25
+#: apps/edwoca/models/expression.py:16
 msgid "work catalog number"
 msgstr "Werkverzeichnisnummer"
 
-#: apps/edwoca/models/expression.py:18
-msgid "musical incipit"
+#: apps/edwoca/models/expression.py:19
+msgid "incipit music"
 msgstr "musikalisches Incipit"
 
-#: apps/edwoca/models/expression.py:19
-msgid "textual incipit"
+#: apps/edwoca/models/expression.py:22
+msgid "incipit text"
 msgstr "Textincipit"
 
-#: apps/edwoca/models/expression.py:27
+#: apps/edwoca/models/expression.py:32
 msgid "period comment"
 msgstr "Kommentar zur Datierung"
 
-#: apps/edwoca/models/expression.py:84
+#: apps/edwoca/models/expression.py:92
 msgid "is componnt of"
 msgstr "ist Komponente von"
 
-#: apps/edwoca/models/expression.py:85 apps/edwoca/models/work.py:102
+#: apps/edwoca/models/expression.py:93 apps/edwoca/models/work.py:99
 msgid "is part of"
 msgstr "ist Teil von"
 
-#: apps/edwoca/models/expression.py:86 apps/edwoca/models/work.py:103
+#: apps/edwoca/models/expression.py:94 apps/edwoca/models/work.py:100
 msgid "is derivative of"
 msgstr "ist abgeleitet von"
 
-#: apps/edwoca/models/expression.py:87
+#: apps/edwoca/models/expression.py:95
 msgid "is incorporated in"
 msgstr "ist inkorporiert in"
 
-#: apps/edwoca/models/expression.py:88
+#: apps/edwoca/models/expression.py:96
 msgid "has alternative"
 msgstr "hat Alternative"
 
-#: apps/edwoca/models/expression.py:118
+#: apps/edwoca/models/expression.py:126
 msgid "1/8"
 msgstr "1/8"
 
-#: apps/edwoca/models/expression.py:119
+#: apps/edwoca/models/expression.py:127
 msgid "1/4"
 msgstr "1/4"
 
-#: apps/edwoca/models/expression.py:120
+#: apps/edwoca/models/expression.py:128
 msgid "1/4."
 msgstr "1/4."
 
-#: apps/edwoca/models/expression.py:121
+#: apps/edwoca/models/expression.py:129
 msgid "1/2"
 msgstr "1/2"
 
-#: apps/edwoca/models/expression.py:122
+#: apps/edwoca/models/expression.py:130
 msgid "1/2."
 msgstr "1/2."
 
-#: apps/edwoca/models/expression.py:135
+#: apps/edwoca/models/expression.py:143
 msgid "reference value"
 msgstr "Referenzwert"
 
-#: apps/edwoca/models/expression.py:140
+#: apps/edwoca/models/expression.py:148
 msgid "bpm"
 msgstr "bpm"
 
-#: apps/edwoca/models/expression.py:174
+#: apps/edwoca/models/expression.py:172
+msgid "tempo"
+msgstr "Tempo"
+
+#: apps/edwoca/models/expression.py:179
+msgid "meter"
+msgstr "Metrum"
+
+#: apps/edwoca/models/expression.py:185
 msgid "Raabe"
 msgstr "Raabe"
 
-#: apps/edwoca/models/expression.py:175
+#: apps/edwoca/models/expression.py:186
 msgid "Müller/Eckhardt"
 msgstr "Müller/Eckhardt"
 
-#: apps/edwoca/models/expression.py:176
+#: apps/edwoca/models/expression.py:187
 msgid "Searle"
 msgstr "Searle"
 
-#: apps/edwoca/models/expression.py:177
+#: apps/edwoca/models/expression.py:188
 msgid "Chiappari"
 msgstr "Chiappari"
 
-#: apps/edwoca/models/expression.py:178
+#: apps/edwoca/models/expression.py:189
 msgid "LQWV"
 msgstr "LQWV"
 
-#: apps/edwoca/models/expression.py:191
+#: apps/edwoca/models/expression.py:202
 msgid "index"
 msgstr "Verzeichnis"
 
-#: apps/edwoca/models/expression.py:197
+#: apps/edwoca/models/expression.py:208
 msgid "number"
 msgstr "Nummer"
 
-#: apps/edwoca/models/expression.py:206
+#: apps/edwoca/models/expression.py:217
 msgid "Major"
 msgstr "Dur"
 
-#: apps/edwoca/models/expression.py:207
+#: apps/edwoca/models/expression.py:218
 msgid "Minor"
 msgstr "Moll"
 
-#: apps/edwoca/models/expression.py:210
+#: apps/edwoca/models/expression.py:221
 msgid "A"
 msgstr "A"
 
-#: apps/edwoca/models/expression.py:211
+#: apps/edwoca/models/expression.py:222
 msgid "B"
 msgstr "H"
 
-#: apps/edwoca/models/expression.py:212
+#: apps/edwoca/models/expression.py:223
 msgid "C"
 msgstr "C"
 
-#: apps/edwoca/models/expression.py:213
+#: apps/edwoca/models/expression.py:224
 msgid "D"
 msgstr "D"
 
-#: apps/edwoca/models/expression.py:214
+#: apps/edwoca/models/expression.py:225
 msgid "e"
 msgstr "E"
 
-#: apps/edwoca/models/expression.py:215
+#: apps/edwoca/models/expression.py:226
 msgid "F"
 msgstr "F"
 
-#: apps/edwoca/models/expression.py:216
+#: apps/edwoca/models/expression.py:227
 msgid "G"
 msgstr "G"
 
-#: apps/edwoca/models/expression.py:220
+#: apps/edwoca/models/expression.py:231
 msgid "#"
 msgstr "#"
 
-#: apps/edwoca/models/expression.py:221
+#: apps/edwoca/models/expression.py:232
 msgid "##"
 msgstr "##"
 
-#: apps/edwoca/models/expression.py:222
+#: apps/edwoca/models/expression.py:233
 msgid "b"
 msgstr "b"
 
-#: apps/edwoca/models/expression.py:223
+#: apps/edwoca/models/expression.py:234
 msgid "bb"
 msgstr "bb"
 
-#: apps/edwoca/models/expression.py:242
+#: apps/edwoca/models/expression.py:253
 msgid "accidental"
 msgstr "Vorzeichen"
 
-#: apps/edwoca/models/expression.py:248
+#: apps/edwoca/models/expression.py:259
 msgid "mode"
 msgstr "Modus"
 
-#: apps/edwoca/models/work.py:18
-msgid "GND id"
-msgstr "GND-ID"
-
-#: apps/edwoca/models/work.py:104
+#: apps/edwoca/models/work.py:101
 msgid "is successor of"
 msgstr "ist Nachfolger von"
 
-#: apps/edwoca/models/work.py:105
+#: apps/edwoca/models/work.py:102
 msgid "is inspired by"
 msgstr "ist inspiriert durch"
 
-#: apps/edwoca/models/work.py:106
+#: apps/edwoca/models/work.py:103
 msgid "uses expression of"
 msgstr "nutzt Expression von"
 
-#: apps/edwoca/models/work.py:107
+#: apps/edwoca/models/work.py:104
 msgid "accompanies or complements"
 msgstr "begleitet oder ergänzt"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:12
+msgid "bibliography"
+msgstr "Literatur"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:22
+#: apps/edwoca/templates/edwoca/bib_update.html:87
+msgid "remove"
+msgstr "entfernen"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:29
+msgid "no bibliographic datasets have been linked"
+msgstr "keine verknüpften Literatureinträge"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:37
+msgid "link new bibliographic dataset"
+msgstr "Literatureintrag verknüpfen"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:47
+#: apps/edwoca/templates/edwoca/bib_update.html:112
+#, fuzzy
+#| msgid "Search"
+msgid "search"
+msgstr "Suche"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:62
+#: apps/edwoca/templates/edwoca/bib_update.html:127
+msgid "no search results"
+msgstr "keine Suchergebnisse"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:77
+msgid "letters"
+msgstr "Briefe"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:94
+msgid "no letters have been linked"
+msgstr "keine verknüpften Briefe"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:101
+msgid "link new letter"
+msgstr "Brief verknüpfen"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:108
+#, fuzzy
+#| msgid "Letter"
+msgid "letter"
+msgstr "Brief"
 
 #: venv/lib/python3.10/site-packages/dal/views.py:205
 msgid "Error"
@@ -588,7 +658,7 @@ msgstr "Syndication"
 #. range generated by paginators, e.g. [1, 2, '…', 5, 6, 7, '…', 9, 10].
 #: venv/lib/python3.10/site-packages/django/core/paginator.py:30
 msgid "…"
-msgstr "..."
+msgstr "…"
 
 #: venv/lib/python3.10/site-packages/django/core/paginator.py:32
 msgid "That page number is not an integer"
@@ -1834,6 +1904,15 @@ msgstr ""
 #: venv/lib/python3.10/site-packages/haystack/templates/panels/haystack.html:9
 msgid "Kwargs"
 msgstr ""
+
+#~ msgid "musical incipit"
+#~ msgstr "musikalisches Incipit"
+
+#~ msgid "textual incipit"
+#~ msgstr "Textincipit"
+
+#~ msgid "GND id"
+#~ msgstr "GND-ID"
 
 #~ msgid "English"
 #~ msgstr "Englisch"
