@@ -8,6 +8,8 @@ from django import forms
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, SelectDateWidget, CharField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
+from liszt_util.forms.forms import GenericAsDaisyMixin
+from liszt_util.forms.layouts import Layouts
 
 
 class ItemForm(ModelForm):
@@ -236,8 +238,8 @@ class PersonProvenanceStationForm(ModelForm):
         period_palette.add(not_before_container)
         period_palette.add(not_after_container)
 
-        form.add(period_palette)
         form.add(display_container)
+        form.add(period_palette)
 
         return mark_safe(str(form))
 
@@ -315,8 +317,8 @@ class CorporationProvenanceStationForm(ModelForm):
         period_palette.add(not_before_container)
         period_palette.add(not_after_container)
 
-        form.add(period_palette)
         form.add(display_container)
+        form.add(period_palette)
 
         return mark_safe(str(form))
 
@@ -344,7 +346,8 @@ class LibraryForm(ModelForm):
         return mark_safe(str(form))
 
 
-class ItemDigitizedCopyForm(ModelForm, SimpleFormMixin):
+class ItemDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
+    layout = Layouts.LABEL_OUTSIDE
     class Meta:
         model = ItemDigitalCopy
         fields = ['url', 'link_type', 'item']
@@ -354,6 +357,7 @@ class ItemDigitizedCopyForm(ModelForm, SimpleFormMixin):
             'item': HiddenInput(),
         }
 
+"""
     def as_daisy(self):
         form = div()
         for field_name in self.Meta.fields:
@@ -369,6 +373,7 @@ class ItemDigitizedCopyForm(ModelForm, SimpleFormMixin):
                 wrap.add(raw(str(field)))
                 form.add(wrap)
         return mark_safe(str(form))
+"""
 
 
 class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):

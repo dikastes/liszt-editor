@@ -23,7 +23,10 @@ class GenericAsDaisyMixin():
     
     def _inside_layout(self):
         
-        root = div(cls="flex flex-col gap-5")
+        root = div(cls="flex flex-col")
+
+        for field in self.hidden_fields():
+            root.add(raw(str(field)))
 
         for field in self.visible_fields():
             if isinstance(field.field.widget, HiddenInput):
@@ -58,7 +61,10 @@ class GenericAsDaisyMixin():
         return root.render()
     
     def _outside_layout(self):
-        root = div(cls="flex flex-col gap-5")
+        root = div(cls="flex flex-col")
+
+        for field in self.hidden_fields():
+            root.add(raw(str(field)))
 
         for field in self.visible_fields():
             if isinstance(field.field.widget, HiddenInput):
@@ -85,6 +91,11 @@ class GenericAsDaisyMixin():
                 cls = "input input-bordered w-full"
                
             wrap.add(raw(field.as_widget(attrs={"class" : cls})))
+
+            if field.errors:
+                bottom = div(cls="label")
+                bottom.add(span(field.errors[0], cls="label-text-alt text-primary"))
+                wrap.add(bottom)
 
             root.add(wrap)
 

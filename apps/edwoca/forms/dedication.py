@@ -15,9 +15,9 @@ class WorkPersonDedicationForm(forms.ModelForm):
                 'class': 'select select-bordered'
             }
         }
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
         model = WorkPersonDedication
@@ -62,9 +62,9 @@ class WorkCorporationDedicationForm(forms.ModelForm):
                 'class': 'select select-bordered'
             }
         }
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
         model = WorkCorporationDedication
@@ -109,9 +109,9 @@ class ManifestationPersonDedicationForm(forms.ModelForm):
                 'class': 'select select-bordered'
             }
         }
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
         model = ManifestationPersonDedication
@@ -155,9 +155,9 @@ class ManifestationCorporationDedicationForm(forms.ModelForm):
                 'class': 'select select-bordered'
             }
         }
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
         model = ManifestationCorporationDedication
@@ -202,9 +202,9 @@ class ItemPersonDedicationForm(forms.ModelForm):
                 'class': 'select select-bordered'
             }
         }
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
         model = ItemPersonDedication
@@ -249,9 +249,9 @@ class ItemCorporationDedicationForm(forms.ModelForm):
                 'class': 'select select-bordered'
             }
         }
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
 
     class Meta:
         model = ItemCorporationDedication

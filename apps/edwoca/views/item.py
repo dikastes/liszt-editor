@@ -18,9 +18,6 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 
 
-
-
-
 def item_set_template(request, pk):
     item = get_object_or_404(Item, pk=pk)
     manifestation = item.manifestation
@@ -72,6 +69,7 @@ def item_update(request, pk):
         'item_form': item_form
     }
     return render(request, 'edwoca/item_update.html', context)
+
 
 @require_POST
 def item_swap_view(request, pk, direction):

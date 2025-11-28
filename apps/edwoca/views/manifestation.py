@@ -290,7 +290,10 @@ def manifestation_title_update(request, pk):
             # Handle existing ManifestationTitleHandwriting forms for this title
             for handwriting_obj in title_obj.handwritings.all():
                 handwriting_prefix = f'title_handwriting_{handwriting_obj.id}'
-                handwriting_form = ManifestationTitleHandwritingForm(request.POST, instance=handwriting_obj, prefix=handwriting_prefix)
+                data = request.POST.copy()
+                if f'{handwriting_prefix}-medium' not in data:
+                    data[f'{handwriting_prefix}-medium'] = handwriting_obj.medium
+                handwriting_form = ManifestationTitleHandwritingForm(data, instance=handwriting_obj, prefix=handwriting_prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
 
@@ -1175,12 +1178,6 @@ def corporation_provenance_remove_letter(request, pk, cps_id, letter_pk):
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-
-
-
-
-
-
 def manifestation_digital_copy(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     item = manifestation.items.first()
@@ -1191,12 +1188,15 @@ def manifestation_digital_copy(request, pk):
     }
 
     if request.method == 'POST':
+        forms = []
         for digital_copy in item.digital_copies.all():
             prefix = f'digital_copy_{digital_copy.id}'
             form = ItemDigitizedCopyForm(request.POST, instance=digital_copy, prefix=prefix)
             if form.is_valid():
                 form.save()
-        return redirect('edwoca:manifestation_digital_copy', pk=pk)
+            forms.append(form)
+        context['forms'] = forms
+        #return redirect('edwoca:manifestation_digital_copy', pk=pk)
     else:
         forms = []
         for digital_copy in item.digital_copies.all():

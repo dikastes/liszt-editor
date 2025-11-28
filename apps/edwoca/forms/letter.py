@@ -97,8 +97,8 @@ class LetterForm(ModelForm, SimpleFormMixin):
         period_palette.add(not_before_container)
         period_palette.add(not_after_container)
 
-        form.add(period_palette)
         form.add(display_container)
+        form.add(period_palette)
         form.add(comment_container)
 
         return mark_safe(str(form))
