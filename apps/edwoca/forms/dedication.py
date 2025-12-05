@@ -1,7 +1,8 @@
 from .base import SimpleFormMixin
 from django import forms
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField
+from liszt_util.forms import SelectDateWidget
 from dmrism.models.manifestation import ManifestationPersonDedication, ManifestationCorporationDedication
 from dmrism.models.item import ItemPersonDedication, ItemCorporationDedication
 from edwoca.models.work import WorkPersonDedication, WorkCorporationDedication
@@ -12,6 +13,7 @@ class WorkPersonDedicationForm(forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
+                'form': 'form',
                 'class': 'select select-bordered'
             }
         }
@@ -106,10 +108,11 @@ class ManifestationPersonDedicationForm(forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
+                'form': 'form',
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': 'grow input input-bordered border-black bg-white w-full'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
 
@@ -118,6 +121,7 @@ class ManifestationPersonDedicationForm(forms.ModelForm):
         fields = ['diplomatic_dedication']
         widgets = {
             'diplomatic_dedication': Textarea(attrs={
+                'form': 'form',
                 'class': SimpleFormMixin.text_area_classes
             }),
         }
@@ -152,10 +156,11 @@ class ManifestationCorporationDedicationForm(forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
+                'form': 'form',
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': 'grow input input-bordered border-black bg-white w-full'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
 
@@ -164,6 +169,7 @@ class ManifestationCorporationDedicationForm(forms.ModelForm):
         fields = ['diplomatic_dedication']
         widgets = {
             'diplomatic_dedication': Textarea(attrs={
+                'form': 'form',
                 'class': SimpleFormMixin.text_area_classes
             }),
         }

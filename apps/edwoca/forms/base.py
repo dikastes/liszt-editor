@@ -7,7 +7,7 @@ from dmad_on_django.forms import SearchForm
 
 
 class SimpleFormMixin:
-    text_area_classes = 'textarea textarea-bordered w-full'
+    text_area_classes = 'textarea textarea-bordered w-full bg-white border-black'
     text_input_classes = 'input input-bordered w-full'
 
     def as_daisy(self):
@@ -170,10 +170,12 @@ class HandwritingForm(ModelForm):
         fields = ['medium', 'dubious_writer']
         widgets = {
                 'medium': TextInput( attrs = {
-                        'class': 'grow'
+                        'class': 'grow',
+                        'form': 'form'
                     }),
                 'dubious_writer': CheckboxInput( attrs = {
-                        'class': 'toggle'
+                        'class': 'toggle',
+                        'form': 'form'
                     })
             }
 
@@ -182,7 +184,7 @@ class HandwritingForm(ModelForm):
         medium_field = self['medium']
         dubious_writer_field = self['dubious_writer']
 
-        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered flex items-center gap-2 flex-1') # Add flex-1 to medium label
+        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 flex-1') # Add flex-1 to medium label
         medium_label.add(raw(str(medium_field)))
 
         dubious_writer_label = label(_for=dubious_writer_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')

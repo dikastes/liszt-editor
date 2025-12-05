@@ -43,7 +43,7 @@ class Command(BaseCommand):
                 if (receiver_corporation_id := row["GND Adressat Körperschaft"]):
                     receiver_corporation = Corporation.fetch_or_get(receiver_corporation_id)
                 receiver_place = None
-                if (receiver_place_id := row["Absendeort_GND"]):
+                if (receiver_place_id := row["Empfangsort_GND"]):
                     receiver_place = Place.fetch_or_get(receiver_place_id)
 
                 display = row['Datierung (standardisiert)']

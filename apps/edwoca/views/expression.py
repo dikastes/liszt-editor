@@ -7,10 +7,15 @@ from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.detail import DetailView
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 
 from liszt_util.tools import swap_order
+
+
+class ExpressionDetailView(EntityMixin, DetailView):
+    model = Expression
 
 
 class ExpressionListView(EdwocaListView):
@@ -206,7 +211,7 @@ class ExpressionCommentUpdateView(EntityMixin, UpdateView):
 
 class ExpressionDeleteView(EntityMixin, DeleteView):
     model = Expression
-    template_name = 'edwoca/simple_form.html'
+    template_name = 'edwoca/delete.html'
 
     def get_success_url(self):
         if self.object.work:

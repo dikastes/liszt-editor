@@ -1,43 +1,13 @@
-<div class="form-control">
-	{% if list_entity_type == 'work' %}
-		<form action="{% url 'edwoca:work_search' %}" method="get" class="m-0">
-			{{ form.q }}
-			<input type="submit" class="btn">
-		</form>
-	{% endif %}
+{% load i18n %}
+{% load entity_labels %}
 
-	{% if list_entity_type == 'expression' %}
-		<form action="{% url 'edwoca:expression_search' %}" method="get" class="m-0">
-			{{ form.q }}
-			<input type="submit" class="btn">
-		</form>
-	{% endif %}
-
-	{% if list_entity_type == 'manifestation' %}
-		<form action="{% url 'edwoca:manifestation_search' %}" method="get" class="m-0">
-			{{ form.q }}
-			<input type="submit" class="btn">
-		</form>
-	{% endif %}
-
-	{% if list_entity_type == 'singleton' %}
-		<form action="{% url 'edwoca:singleton_search' %}" method="get" class="m-0">
-			{{ form.q }}
-			<input type="submit" class="btn">
-		</form>
-	{% endif %}
-
-	{% if list_entity_type == 'item' %}
-		<form action="{% url 'edwoca:item_search' %}" method="get" class="m-0">
-			{{ form.q }}
-			<input type="submit" class="btn">
-		</form>
-	{% endif %}
-
-	{% if list_entity_type == 'letter' %}
-		<form action="{% url 'edwoca:letter_search' %}" method="get" class="m-0">
-			{{ form.q }}
-			<input type="submit" class="btn">
-		</form>
-	{% endif %}
-</div>
+<form action="{% url 'edwoca:'|add:list_entity_type|add:'_search' %}" method="get" class="flex m-0">
+    <input
+        name="q"
+        type="text"
+        placeholder="{% blocktrans with type=list_entity_type|entity_label %}search {{ type }}{% endblocktrans %}"
+        value="{{ request.GET.q }}"
+        class="input input-bordered bg-white border-black border-r-0 flex-1"
+        />
+    <input value="{% translate 'search' %}" type="submit" class="btn-outline flex-0 bg-white btn">
+</form>

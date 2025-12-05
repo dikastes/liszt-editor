@@ -63,10 +63,10 @@ class ManifestationTitleForm(ModelForm):
         model = ManifestationTitle
         fields = ['title', 'title_type', 'status', 'manifestation']
         widgets = {
-            'title': Textarea(attrs={'class': 'textarea textarea-bordered h-64'}),
-            'title_type': Select(attrs={'class': 'select select-bordered w-full'}),
-            'status': Select(attrs={'class': 'select select-bordered w-full'}),
-            'manifestation': HiddenInput(),
+            'title': Textarea(attrs={'form': 'form', 'class': 'textarea border-black bg-white textarea-bordered h-64'}),
+            'title_type': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
+            'status': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
+            'manifestation': HiddenInput(attrs={'form': 'form'}),
         }
 
     def as_daisy(self):
@@ -447,9 +447,6 @@ class ManifestationCreateForm(forms.Form):
         return mark_safe(str(form))
 
 
-
-
-
 class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
     layout = Layouts.LABEL_OUTSIDE
     temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False)
@@ -459,19 +456,19 @@ class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
 
     def as_daisy(self):
         root = div(cls="flex flex-col gap-5")
-        
+
         palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
         palette1.add(self._render_field('temporary_title'))
         palette1.add(self._render_field('source_type'))
         root.add(palette1)
-        
+
         palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
         palette2.add(self._render_field('library'))
         palette2.add(self._render_field('signature'))
         root.add(palette2)
-        
+
         return mark_safe(root.render())
-    
+
     def _render_field(self, field_name):
         field = self[field_name]
         widget = field.field.widget
@@ -481,11 +478,11 @@ class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
         if field.help_text:
             top.add(span(field.help_text, cls="label-text-alt"))
         wrap.add(top)
-        
+
         cls = "input input-bordered w-full"
         if isinstance(widget, forms.Select):
             cls = "select select-bordered w-full"
-        
+
         wrap.add(raw(field.as_widget(attrs={"class" : cls})))
         return wrap
 

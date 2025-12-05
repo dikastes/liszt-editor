@@ -35,14 +35,14 @@ class GenericAsDaisyMixin():
 
             widget = field.field.widget
 
-            wrapper = label(cls="input input-bordered flex items-center gap-2")
+            wrapper = label(cls="input input-bordered border-black bg-white flex items-center gap-2")
 
             if field.label:
                 wrapper.add(field.label)
                 
             cls = "grow"
             if isinstance(widget, Textarea):
-                cls = f'textarea textarea-bordered'
+                cls = f'textarea textarea-bordered border-black bg-white'
                 root.add(raw(field.as_widget(attrs={"class": cls, "placeholder" : field.label})))
                 continue
             
@@ -85,10 +85,10 @@ class GenericAsDaisyMixin():
                 continue
 
             if isinstance(widget, Textarea):
-                cls = "textarea textarea-bordered w-full"
+                cls = "textarea textarea-bordered border-black bg-white w-full"
     
             else:
-                cls = "input input-bordered w-full"
+                cls = "input input-bordered border-black bg-white w-full"
                
             wrap.add(raw(field.as_widget(attrs={"class" : cls})))
 

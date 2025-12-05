@@ -2,7 +2,9 @@ from .base import *
 from django import forms
 from ..models import Letter, LetterMentioning
 from django.conf import settings
-from django.forms import DateTimeField, SelectDateWidget, CharField, TextInput, ModelForm, Textarea
+from django.forms import DateTimeField, CharField, TextInput, ModelForm, Textarea
+from liszt_util.forms import SelectDateWidget
+from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period
 from .base import SimpleFormMixin
 from django.utils.safestring import mark_safe
@@ -13,9 +15,9 @@ from dominate.util import raw
 class LetterForm(ModelForm, SimpleFormMixin):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
-            'attrs': {
-                'class': 'select select-bordered'
-            }
+            #'attrs': {
+                #'class': 'select select-bordered bg-white border-black'
+            #}
         }
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
@@ -26,7 +28,7 @@ class LetterForm(ModelForm, SimpleFormMixin):
         fields = ['comment']
         widgets = {
             'comment': Textarea(attrs={
-                'class': SimpleFormMixin.text_area_classes
+                'class': SimpleFormMixin.text_area_classes + ' bg-white border-black'
             }),
         }
 
@@ -64,7 +66,7 @@ class LetterForm(ModelForm, SimpleFormMixin):
         comment_field = self['comment']
 
         not_before_container = label(cls='form-control')
-        not_before_label = div(not_before_field.label, cls='label-text')
+        not_before_label = div(_('not before'), cls='label-text')
         not_before_selects = div(cls='flex')
         not_before_selects.add(raw(str(not_before_field)))
         not_before_container.add(not_before_label)
@@ -73,7 +75,7 @@ class LetterForm(ModelForm, SimpleFormMixin):
             not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
 
         not_after_container = label(cls='form-control')
-        not_after_label = div(not_after_field.label, cls='label-text')
+        not_after_label = div(_('not after'), cls='label-text')
         not_after_selects = div(cls='flex')
         not_after_selects.add(raw(str(not_after_field)))
         not_after_container.add(not_after_label)
@@ -81,7 +83,7 @@ class LetterForm(ModelForm, SimpleFormMixin):
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container = label(_('standardized date'), _for = display_field.id_for_label, cls='input input-bordered bg-white border-black flex items-center gap-2 my-5')
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
@@ -108,5 +110,5 @@ class LetterMentioningForm(ModelForm):
         model = LetterMentioning
         fields = ['pages']
         widgets = {
-            'pages': TextInput(attrs={'class': 'input input-bordered'})
+                'pages': TextInput(attrs={'form': 'form', 'class': 'flex-1 min-w-0'})
         }

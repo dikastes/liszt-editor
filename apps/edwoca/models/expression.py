@@ -227,7 +227,7 @@ class Key(models.Model):
         G = 'G', _('G')
 
     class Acc(models.TextChoices):
-        NULL = '', _('')
+        NULL = '', ''
         SHARP = '#', _('#')
         DOUBLE_SHARP = '##', _('##')
         FLAT = 'b', _('b')

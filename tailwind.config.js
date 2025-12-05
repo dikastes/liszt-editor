@@ -61,7 +61,7 @@ module.exports = {
           "neutral": "#5a6b75",
           // header background
           "base-100": "#f6f8f7",
-          // header background
+          // graphics background
           "base-200": "#f9fcfd",
           // lines
           "base-300": "#c7c9c4"

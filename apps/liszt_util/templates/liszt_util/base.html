@@ -28,29 +28,21 @@
         {% render_editor_mode_warning %}
         {% block navbar_title %}
         {% endblock %}
-        {% comment %}
-        <div class="container w-full max-w-7xl mx-auto flex flex-col min-h-screen h-screen">
-            <div class="container mx-auto max-w-7xl mb-10 border border-base-300">
+        <div class="flex gap-10 flex-1 my-5 overflow-hidden">
+            <div class="flex-0 px-10">
+                {% block menu %}
+                {% endblock %}
             </div>
-        {% endcomment %}
-            <div class="flex gap-10 flex-1 my-10 overflow-hidden">
-                <div class="flex-0 px-10">
-                    {% block menu %}
-                    {% endblock %}
-                </div>
-                <div class="flex-1 min-w-0 overflow-auto max-w-5xl mx-auto">
-                    {% block content %}
-                    {% endblock %}
-                </div>
-                <div class="flex-0 px-10">
-                    {% block nav %}
-                    {% endblock %}
-                </div>
+            <div class="flex-1 min-w-0 overflow-auto max-w-5xl mx-auto px-20">
+                {% block content %}
+                {% endblock %}
             </div>
-            {% render_main_menu %}
-        {% comment %}
+            <div class="flex-0 px-10">
+                {% block nav %}
+                {% endblock %}
+            </div>
         </div>
-        {% endcomment %}
+        {% render_main_menu %}
 
         <!-- jquery.js -->
         <script src="/static/django_htmx/htmx.min.js"></script>

@@ -1,0 +1,15 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+<div class="prose">
+    {% include 'edwoca/partials/item/preview-paragraphs/head.html' %}
+    {% include 'edwoca/partials/item/preview-paragraphs/manuscript.html' %}
+    {% include 'edwoca/partials/item/preview-paragraphs/relations.html' %}
+    {% include 'edwoca/partials/item/preview-paragraphs/dedication.html' %}
+    {% include 'edwoca/partials/item/preview-paragraphs/provenance.html' %}
+    {% include 'edwoca/partials/item/preview-paragraphs/digital_copy.html' %}
+    {% include 'edwoca/partials/item/preview-paragraphs/comment.html' %}
+</div>
+
+{% endblock %}

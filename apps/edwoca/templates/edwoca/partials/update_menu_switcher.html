@@ -6,4 +6,8 @@
     {% include 'edwoca/partials/manifestation/manifestation_menu.html' %}
 {% elif entity_type == 'item' %}
     {% include 'edwoca/partials/item/item_menu.html' %}
+{% elif entity_type == 'library' %}
+    {% include 'edwoca/partials/library/library_menu.html' %}
+{% elif entity_type == 'letter' %}
+    {% include 'edwoca/partials/letter/letter_menu.html' %}
 {% endif %}

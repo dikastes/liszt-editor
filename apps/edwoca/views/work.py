@@ -11,6 +11,11 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, ModelFormMixin
+from django.views.generic.detail import DetailView
+
+
+class WorkDetailView(EntityMixin, DetailView):
+    model = Work
 
 
 class WorkListView(EdwocaListView):
@@ -47,7 +52,7 @@ class WorkUpdateView(EntityMixin, UpdateView):
 class WorkDeleteView(EntityMixin, DeleteView):
     model = Work
     success_url = reverse_lazy('edwoca:index')
-    template_name = 'edwoca/simple_form.html'
+    template_name = 'edwoca/delete.html'
     context_object_name = 'work'
 
     def get_context_data(self, **kwargs):

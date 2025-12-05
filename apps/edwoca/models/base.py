@@ -15,8 +15,8 @@ class EdwocaUpdateUrlMixin:
     def get_absolute_url(self):
         model = self.__class__.__name__.lower()
         if model == 'item' and self.manifestation.is_singleton:
-            return reverse('edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
-        return reverse(f'edwoca:{model}_update', kwargs={'pk': self.id})
+            return reverse('edwoca:manifestation_detail', kwargs={'pk': self.manifestation.id})
+        return reverse(f'edwoca:{model}_detail', kwargs={'pk': self.id})
 
 
 class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
@@ -753,6 +753,9 @@ class Letter(models.Model):
         LETTER = 'L', _('Letter')
         POSTCARD = 'P', _('Postcard')
         COPY = 'C', _('Copy')
+
+    class Meta:
+        ordering = ['period__not_before']
 
     receiver_person = models.ForeignKey(
             'dmad.Person',
