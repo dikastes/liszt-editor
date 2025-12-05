@@ -171,7 +171,10 @@ class BaseSignature(models.Model):
         )
 
     def __str__(self):
-        return f"{self.library.siglum} {self.signature}"
+        if self.library:
+            return f"{self.library.siglum} {self.signature}"
+        else:
+            return f"<<Institution>> {self.signature}"
 
 
 class ItemSignature(BaseSignature):
