@@ -4,10 +4,10 @@
 
 CSV_PATH_PREFIX=${1:-../liszt_csv/}
 
-echo importing 1b fragments
-python manage.py import_manifestations_from_csv "${CSV_PATH_PREFIX}liszt_1b_long.csv" -st autograph -mf fragment
-echo importing 1c correction sheets
-python manage.py import_manifestations_from_csv "${CSV_PATH_PREFIX}liszt_1c_long.csv" -st autograph -f correctionsheet
+#echo importing 1b fragments
+#python manage.py import_manifestations_from_csv "${CSV_PATH_PREFIX}liszt_1b_long.csv" -st autograph -mf fragment
+#echo importing 1c correction sheets
+#python manage.py import_manifestations_from_csv "${CSV_PATH_PREFIX}liszt_1c_long.csv" -st autograph -f correctionsheet
 echo importing 1d autographs
 python manage.py import_manifestations_from_csv "${CSV_PATH_PREFIX}liszt_1d_long.csv" -st autograph
 echo importing 2 copies
