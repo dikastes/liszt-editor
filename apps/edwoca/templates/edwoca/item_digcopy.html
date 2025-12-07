@@ -7,7 +7,6 @@
                 <h3 class="text-lg font-bold">Digitale Kopie bearbeiten</h3>
                 <form method="post" class="mt-5">
                     {% csrf_token %}
-                    {{ form.management_form }}
 
                     {{ form.as_daisy }}
 
@@ -28,7 +27,7 @@
 {% include 'edwoca/partials/item/preview-divs/digcopy_prolog.html' %}
 
 <div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0 flex-1"> Digitale Kopien für {{ object }} </h2>
+    <h2 class="card-title mt-0 flex-1"> Digitalisate von {{ object }} </h2>
 
     <div class="mt-5">
     {% for digital_copy in object.digital_copies.all %}
@@ -49,7 +48,7 @@
     </div>
     <div class="flex items-center">
         <div class="flex-1"></div>
-        <a href="{% url 'edwoca:item_digital_copy_add' object.id %}" class="btn flex-0"> Digitale Kopie hinzufügen </a>
+        <a href="{% url 'edwoca:item_digital_copy_add' object.id %}" class="btn flex-0"> Digitalisat hinzufügen </a>
     </div>
 
 </div>

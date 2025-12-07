@@ -1,0 +1,27 @@
+{% extends 'edwoca/base.html' %}
+
+{% load i18n %}
+
+{% block content %}
+
+<p>
+	{% blocktrans %}Please confirm you want to delete {{ object }}.{% endblocktrans %}
+</p>
+
+<form method="post">
+	{% csrf_token %}
+	<input type="submit" id="submit-form" class="hidden">
+</form>
+
+{% endblock %}
+
+{% block nav %}
+	<div class="flex flex-col h-full">
+		<div class="flex-1"></div>
+		<div class="flex-0">
+			<label for="submit-form" class="btn text-primary btn-outline">
+				{% translate 'confirm' %}
+			</label>
+		</div>
+	</div>
+{% endblock %}

@@ -128,7 +128,16 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'de'
+
+LANGUAGES = [
+    ('de', 'German'),
+    ('en', 'English'),
+]
+
+LOCALE_PATHS = [
+    os.path.join(BASE_DIR, 'locale'),
+]
 
 TIME_ZONE = 'UTC'
 
@@ -177,7 +186,7 @@ EDWOCA_FIXED_DATES = {
         }
     }
 
-EDITOR_MODE = 'test'
+EDITOR_MODE = 'dev'
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'

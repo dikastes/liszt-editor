@@ -1,78 +1,87 @@
+{% load i18n %}
+
 <div class="flex flex-col h-full">
 	<ul class="menu p-0 flex-1">
 		<li>
+		    <a href="{% url 'edwoca:expression_detail' object.id %}"
+				{% if 'detail' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'detail' %}
+		    </a>
+		</li>
+		<li>
 		    <a href="{% url 'edwoca:expression_title' object.id %}"
-			{% if 'title' in request.path %}class="active"{% endif %}
-			>
-			Titelei und Widmung
+				{% if 'title' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'title and dedication' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:expression_update' object.id %}"
-			{% if 'update' in request.path %}class="active"{% endif %}
-			>
-			Identifikation
+				{% if 'update' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'identification' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:expression_relations' object.id %}"
-			{% if 'relations' in request.path %}class="active"{% endif %}
-			>
-			Bezüge
+				{% if 'relations' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'relations' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:expression_categorisation' object.id %}"
-			{% if 'categorisation' in request.path %}class="active"{% endif %}
-			>
-			Kategorisierung
+				{% if 'categorisation' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'categorisation' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:expression_mediumofperformance' object.id %}"
-			{% if 'mediumofperformance' in request.path %}class="active"{% endif %}
-			>
-			Besetzung
+				{% if 'mediumofperformance' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'medium of performance' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:expression_movements' object.id %}"
-			{% if 'movements' in request.path %}class="active"{% endif %}
-			>
-			Sätze
+				{% if 'movements' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'movements' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:expression_history' object.id %}"
-			{% if 'history' in request.path %}class="active"{% endif %}
-			>
-			Entstehung
+				{% if 'history' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'history' %}
 		    </a>
 		</li>
 		<li class="disabled">
 		    <a href="#">
-			Aufführung
+				{% translate 'performance' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:expression_comment' object.id %}"
-			{% if 'comment' in request.path %}class="active"{% endif %}
-			>
-			Kommentar
+				{% if 'comment' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'comment' %}
 		    </a>
 		</li>
 	</ul>
 	<ul class="menu p-0 flex-0">
 		<li>
 		    <a href="{% url 'edwoca:expression_delete' object.id %}"
-			{% if 'delete' in request.path %}class="active"{% endif %}
-			>
-			löschen
+				{% if 'delete' in request.path %}class="active"{% endif %}
+				>
+				{% translate 'delete' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:work_list' %}">
-			zurück
+				{% translate 'back' %}
 		    </a>
 		</li>
 	</ul>

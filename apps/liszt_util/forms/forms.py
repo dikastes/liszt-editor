@@ -23,7 +23,10 @@ class GenericAsDaisyMixin():
     
     def _inside_layout(self):
         
-        root = div(cls="flex flex-col gap-5")
+        root = div(cls="flex flex-col")
+
+        for field in self.hidden_fields():
+            root.add(raw(str(field)))
 
         for field in self.visible_fields():
             if isinstance(field.field.widget, HiddenInput):
@@ -32,14 +35,14 @@ class GenericAsDaisyMixin():
 
             widget = field.field.widget
 
-            wrapper = label(cls="input input-bordered flex items-center gap-2")
+            wrapper = label(cls="input input-bordered border-black bg-white flex items-center gap-2")
 
             if field.label:
                 wrapper.add(field.label)
                 
             cls = "grow"
             if isinstance(widget, Textarea):
-                cls = f'textarea textarea-bordered'
+                cls = f'textarea textarea-bordered border-black bg-white'
                 root.add(raw(field.as_widget(attrs={"class": cls, "placeholder" : field.label})))
                 continue
             
@@ -58,7 +61,10 @@ class GenericAsDaisyMixin():
         return root.render()
     
     def _outside_layout(self):
-        root = div(cls="flex flex-col gap-5")
+        root = div(cls="flex flex-col")
+
+        for field in self.hidden_fields():
+            root.add(raw(str(field)))
 
         for field in self.visible_fields():
             if isinstance(field.field.widget, HiddenInput):
@@ -79,12 +85,17 @@ class GenericAsDaisyMixin():
                 continue
 
             if isinstance(widget, Textarea):
-                cls = "textarea textarea-bordered w-full"
+                cls = "textarea textarea-bordered border-black bg-white w-full"
     
             else:
-                cls = "input input-bordered w-full"
+                cls = "input input-bordered border-black bg-white w-full"
                
             wrap.add(raw(field.as_widget(attrs={"class" : cls})))
+
+            if field.errors:
+                bottom = div(cls="label")
+                bottom.add(span(field.errors[0], cls="label-text-alt text-primary"))
+                wrap.add(bottom)
 
             root.add(wrap)
 

@@ -227,6 +227,17 @@
 {% block content %}
 
 <div class="bg-white border border-base-300 p-5">
+	<h2 class="card-title mt-0"> Kopfkommentar </h2>
+
+	        <form method="post">
+	            {% csrf_token %}
+	            {{ head_comment_form.as_daisy }}
+	    
+	            <input id="submit-form" type="submit" value="{{ button_label }}" class="btn">
+	        </form>
+</div>
+
+<div class="bg-white border border-base-300 p-5 mt-5">
 	<h2 class="card-title mt-0"> Titel bearbeiten </h2>
 
 	<form method="post">

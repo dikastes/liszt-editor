@@ -1,6 +1,7 @@
 from .base import *
 from django.db import models
 from dmrism.models import BaseBib
+from django.utils.translation import gettext_lazy as _
 
 
 class CompositeManifestationRelation(models.Model):
@@ -67,7 +68,8 @@ class Composite(models.Model):
         )
     private_head_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private head comment')
         )
     private_relations_comment = models.TextField(
             blank = True,

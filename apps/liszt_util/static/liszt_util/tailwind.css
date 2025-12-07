@@ -4,6 +4,63 @@
 @tailwind typography;
 @tailwind layout;
 
+@font-face {
+    font-family: 'BeausiteClassicWeb';
+    src: url('fonts/BeausiteClassicWeb-Clear-BJz0vUPX.woff');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BeausiteClassicWeb';
+    src: url('fonts/BeausiteClassicWeb-Regular-Dywx2iCt.woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'BeausiteClassicWeb';
+    src: url('fonts/BeausiteClassicWeb-Semibold-Chyi-LBS.woff');
+    font-weight: 600;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'MakeWayWeb';
+    src: url('fonts/MakeWayWeb-Regular-BfRbPMXa.woff');
+    font-weight: 400;
+    font-style: normal;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    @apply font-heading;
+}
+
+h2 {
+    @apply text-primary;
+    @apply text-2xl;
+}
+
+h3 {
+    @apply text-xl;
+}
+
+.textarea:focus-within, .select:focus-within, .input:focus-within {
+    border-color: black;
+    outline-style: solid;
+    outline-width: 2px;
+    outline-offset: 2px;
+    outline-color: black;
+}
+
+@layer utilities {
+    .pseudo-input {
+        padding-left: 1rem;
+        padding-right: 1rem;
+        height: 3rem;
+    }
+}
+
 .hidden {
     display: none;
 }
@@ -20,4 +77,11 @@ p.CaptionCont label i {
 
 div.modal-box {
     max-width: 64rem;
+}
+
+:root {
+    --rounded-box: 0;
+    --rounded-field: 0;
+    --rounded-selector: 0;
+    --rounded-btn: 0;
 }

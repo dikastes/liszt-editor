@@ -5,3 +5,8 @@
 {% endif %}
 {% endfor %}
 {{ object.private_head_comment }}
+{% if object.is_singleton %}
+M/I-{{ object.id }}
+{% else %}
+M-{{ object.id }}
+{% endif %}

@@ -38,6 +38,10 @@ module.exports = {
     extend: {
       minHeight: {
         'inherit': 'inherit',
+      },
+      fontFamily: {
+        sans: ['BeausiteClassicWeb', 'ui-sans-serif', 'system-ui'],
+        heading: ['MakeWayWeb', 'ui-sans-serif', 'system-ui'],
       }
     },
   },
@@ -55,7 +59,12 @@ module.exports = {
           "accent": "#ff4208",
           "accent-content": "#fff",
           "neutral": "#5a6b75",
-          "base-100": "#f9fcfd",
+          // header background
+          "base-100": "#f6f8f7",
+          // graphics background
+          "base-200": "#f9fcfd",
+          // lines
+          "base-300": "#c7c9c4"
         },
       },
     ],

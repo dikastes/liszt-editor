@@ -1,0 +1,34 @@
+{% extends 'edwoca/base.html' %}
+
+{% block content %}
+
+<div class="prose">
+    {% include 'edwoca/partials/manifestation/preview-paragraphs/title.html' %}
+</div>
+<div class="prose">
+    {% include 'edwoca/partials/manifestation/preview-paragraphs/history.html' %}
+</div>
+{% if object.is_singleton %}
+    <div class="prose">
+        {% include 'edwoca/partials/item/preview-paragraphs/provenance.html' %}
+    </div>
+{% endif %}
+<div class="prose">
+    {% include 'edwoca/partials/manifestation/preview-paragraphs/print.html' %}
+</div>
+<div class="prose">
+    {% include 'edwoca/partials/manifestation/preview-paragraphs/manuscript.html' %}
+</div>
+<div class="prose">
+    {% include 'edwoca/partials/manifestation/preview-paragraphs/bib.html' %}
+</div>
+{% if object.is_singleton %}
+    <div class="prose">
+        {% include 'edwoca/partials/item/preview-paragraphs/digital_copy.html' %}
+    </div>
+{% endif %}
+<div class="prose">
+    {% include 'edwoca/partials/manifestation/preview-paragraphs/comment.html' %}
+</div>
+
+{% endblock %}

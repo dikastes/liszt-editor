@@ -15,8 +15,8 @@ class EdwocaUpdateUrlMixin:
     def get_absolute_url(self):
         model = self.__class__.__name__.lower()
         if model == 'item' and self.manifestation.is_singleton:
-            return reverse('edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
-        return reverse(f'edwoca:{model}_update', kwargs={'pk': self.id})
+            return reverse('edwoca:manifestation_detail', kwargs={'pk': self.manifestation.id})
+        return reverse(f'edwoca:{model}_detail', kwargs={'pk': self.id})
 
 
 class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
@@ -602,6 +602,10 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     def manifestation(self):
         return Manifestation.objects.get(pk = self.manifestation_id)
 
+    @manifestation.setter
+    def manifestation(self, value):
+        self.manifestation_id = value.pk
+
     def get_manifestation_url(self):
         return reverse(f'edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
 
@@ -662,9 +666,22 @@ class WemiTitle(models.Model):
         ordering = ['title']
         abstract = True
 
-    title = models.CharField(max_length=100)
-    status = models.CharField(max_length=1,choices=Status,default=Status.PRIMARY)
-    language = models.CharField(max_length=15, choices=Language, default=Language['DE'])
+    title = models.CharField(
+        max_length=100,
+        verbose_name=_('title')
+    )
+    status = models.CharField(
+        max_length=1,
+        choices=Status,
+        default=Status.PRIMARY,
+        verbose_name=_('status')
+    )
+    language = models.CharField(
+        max_length=15,
+        choices=Language,
+        default=Language['DE'],
+        verbose_name=_('language')
+    )
 
     def __str__(self):
         return self.title
@@ -737,6 +754,9 @@ class Letter(models.Model):
         POSTCARD = 'P', _('Postcard')
         COPY = 'C', _('Copy')
 
+    class Meta:
+        ordering = ['period__not_before']
+
     receiver_person = models.ForeignKey(
             'dmad.Person',
             null = True,
@@ -788,11 +808,13 @@ class Letter(models.Model):
     category = models.CharField(
             max_length = 1,
             choices = Category,
-            default = Category.LETTER
+            default = Category.LETTER,
+            verbose_name = _('category')
         )
     comment = models.TextField(
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('comment')
         )
     work = models.ManyToManyField(
             'Work',
@@ -852,7 +874,8 @@ class LetterMentioning(models.Model):
     pages = models.CharField(
             max_length = 20,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('pages')
         )
 
 class ItemModification(models.Model):
@@ -881,7 +904,8 @@ class ItemModification(models.Model):
         )
     note = models.TextField(
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('note')
         )
 
     def __str__(self):

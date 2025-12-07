@@ -38,6 +38,11 @@ class Work(WeBaseClass):
             'bib.ZotItem',
             through = 'WorkBib'
         )
+    private_head_comment = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('private head comment')
+        )
 
     def __str__(self):
         if self.titles.filter(status = Status.TEMPORARY).first():

@@ -5,7 +5,10 @@
 {% include 'edwoca/partials/manifestation/preview-divs/history_prolog.html' %}
 
 <div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+
+	<div class="prose">
+		<h2> Datierung </h2>
+	</div>
 
 	<form method="post">
 		{% csrf_token %}
@@ -15,7 +18,7 @@
 	</form>
 
 	<div class="prose">
-		<h2> Orte </h2>
+		<h2> Orte (standardisiert) </h2>
 
 		<ul>
 		{% for place in object.places.all %}
@@ -35,7 +38,7 @@
 		{% endfor %}
 		</ul>
 
-		<h3> neuen Ort verknüpfen </h3>
+		<h3> weiteren Ort hinzufügen </h3>
 	</div>
 
 		{% if show_search_form == True %}

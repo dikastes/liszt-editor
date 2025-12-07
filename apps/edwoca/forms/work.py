@@ -62,6 +62,19 @@ class WorkCommentForm(CommentForm):
         widgets = CommentForm.Meta.widgets
 
 
+class WorkHeadCommentForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Work
+        fields = ['private_head_comment']
+        widgets = {
+                'private_head_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            }
+
+
+
+
 class WorkContributorForm(ContributorForm):
     class Meta(ContributorForm.Meta):
         model = WorkContributor

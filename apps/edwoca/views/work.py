@@ -1,6 +1,6 @@
 from .base import *
 from ..models.work import *
-from ..forms.work import WorkForm, WorkTitleForm, WorkTitleFormSet, WorkCreateForm, WorkIdentificationForm, RelatedWorkForm, WorkContributorForm, WorkBibForm
+from ..forms.work import WorkForm, WorkTitleForm, WorkTitleFormSet, WorkCreateForm, WorkIdentificationForm, RelatedWorkForm, WorkContributorForm, WorkBibForm, WorkHeadCommentForm
 from ..forms.dedication import WorkPersonDedicationForm, WorkCorporationDedicationForm
 from dmad_on_django.models import Work as DmadWork, Person, Place, Corporation, SubjectTerm, Status
 from edwoca.forms import EdwocaSearchForm
@@ -11,6 +11,11 @@ from django.shortcuts import redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, ModelFormMixin
+from django.views.generic.detail import DetailView
+
+
+class WorkDetailView(EntityMixin, DetailView):
+    model = Work
 
 
 class WorkListView(EdwocaListView):
@@ -47,7 +52,7 @@ class WorkUpdateView(EntityMixin, UpdateView):
 class WorkDeleteView(EntityMixin, DeleteView):
     model = Work
     success_url = reverse_lazy('edwoca:index')
-    template_name = 'edwoca/simple_form.html'
+    template_name = 'edwoca/delete.html'
     context_object_name = 'work'
 
     def get_context_data(self, **kwargs):
@@ -68,10 +73,12 @@ class WorkTitleUpdateView(EntityMixin, TitleUpdateView):
         self.object = self.get_object()
         formset = self.get_form_class()(request.POST, request.FILES, instance=self.object)
         identification_form = WorkIdentificationForm(request.POST, instance=self.object)
+        head_comment_form = WorkHeadCommentForm(request.POST, instance=self.object)
 
-        if formset.is_valid() and identification_form.is_valid():
+        if formset.is_valid() and identification_form.is_valid() and head_comment_form.is_valid():
             formset.save()
             identification_form.save()
+            head_comment_form.save()
 
             # Handle existing PersonDedication forms
             for person_dedication in self.object.workpersondedication_set.all():
@@ -89,12 +96,14 @@ class WorkTitleUpdateView(EntityMixin, TitleUpdateView):
 
             return self.form_valid(formset)
         else:
-            return self.form_invalid(formset, identification_form=identification_form)
+            return self.form_invalid(formset, identification_form=identification_form, head_comment_form=head_comment_form)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         if 'identification_form' not in kwargs:
             context['identification_form'] = WorkIdentificationForm(instance=self.object)
+        if 'head_comment_form' not in kwargs:
+            context['head_comment_form'] = WorkHeadCommentForm(instance=self.object)
 
         # Initialize forms for existing PersonDedication
         person_dedication_forms = []
@@ -254,6 +263,13 @@ class WorkBibliographyUpdateView(EntityMixin, UpdateView):
 class WorkCommentUpdateView(SimpleFormView):
     model = Work
     property = 'comment'
+
+
+class WorkHeadCommentUpdateView(SimpleFormView):
+    model = Work
+    property = 'private_head_comment'
+
+
 
 
 class WorkBibAddView(FormView):

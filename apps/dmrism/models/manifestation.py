@@ -131,44 +131,51 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             choices = ManifestationForm.choices,
             default = None,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('manifestation form')
         )
     edition_type = models.CharField(
             max_length = 10,
             choices = EditionType.choices,
             default = None,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('edition type')
         )
     source_type = models.CharField(
             max_length = 5,
             choices = SourceType.choices,
             default = None,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('source type')
         )
     function = models.CharField(
             max_length = 5,
             choices = Function.choices,
             default = None,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('function')
         )
     print_type = models.CharField(
             max_length = 10,
             choices = PrintType,
             default = None,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('print type')
         )
     state = models.CharField(
             max_length=10,
             choices=State,
-            default=State.COMPLETE
+            default=State.COMPLETE,
+            verbose_name = _('state')
         )
     history = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('history')
         )
     bib = models.ManyToManyField(
             'bib.ZotItem',
@@ -178,20 +185,24 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length=15,
             choices=Language,
             default=None,
-            null=True
+            null=True,
+            verbose_name = _('language')
         )
     dedication = models.TextField(
             blank=True,
-            null=True
+            null=True,
+            verbose_name = _('dedication')
         )
     watermark = models.TextField(
             max_length=100,
             blank=True,
-            null=True
+            null=True,
+            verbose_name = _('watermark')
         )
     watermark_url = models.URLField(
             blank=True,
-            null=True
+            null=True,
+            verbose_name = _('watermark url')
         )
     is_singleton = models.BooleanField(default=False)
     missing_item = models.BooleanField(default=False)
@@ -203,7 +214,8 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     rism_id = models.CharField(
             max_length=20,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('RISM id')
         )
     raw_data = models.TextField(
             blank = True,
@@ -215,35 +227,43 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         #)
     date_diplomatic = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('diplomatic date')
         )
     print_extent = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('print extent')
         )
     private_head_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private head comment')
         )
     private_relations_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private relations comment')
         )
     private_title_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private title comment')
         )
     private_history_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private history comment')
         )
     private_print_comment = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('private print comment')
         )
     taken_information = models.TextField(
             blank = True,
-            null = True
+            null = True,
+            verbose_name = _('taken information')
         )
     stitcher = models.ForeignKey(
             'dmad.Corporation',
@@ -252,7 +272,8 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             on_delete = models.SET_NULL
         )
     specific_figure = models.BooleanField(
-            default = False
+            default = False,
+            verbose_name = 'specific figure'
         )
 
     def get_absolute_url(self):
@@ -513,7 +534,8 @@ class Publication(models.Model):
     plate_number = models.CharField(
             max_length = 50,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('plate number')
         )
 
 
@@ -521,18 +543,21 @@ class ManifestationTitle(models.Model):
 
     title = models.TextField(
             null=True,
-            blank=True
+            blank=True,
+            verbose_name = _('title')
         )
     title_type = models.CharField(
             max_length = 2,
             choices = TitleTypes,
             default = None,
-            null = True
+            null = True,
+            verbose_name = _('title type')
         )
     status = models.CharField(
             max_length=10,
             choices=Status,
-            default=Status.PRIMARY
+            default=Status.PRIMARY,
+            verbose_name = _('status')
         )
     manifestation = models.ForeignKey(
             'Manifestation',
@@ -584,7 +609,8 @@ class RelatedManifestation(RelatedEntity):
     label = models.CharField(
             max_length=10,
             choices=Label,
-            default=Label.PARENT
+            default=Label.PARENT,
+            verbose_name = _('label')
         )
     order = models.IntegerField(
             default = 0

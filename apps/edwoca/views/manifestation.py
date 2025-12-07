@@ -13,11 +13,16 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
-from dmad_on_django.forms import SearchForm
+from django.views.generic.detail import DetailView
+from liszt_util.forms import SearchForm
 from dmad_on_django.models import Place, Corporation, Status, Person
 from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting
 from dmrism.models.manifestation import Manifestation as DmrismManifestation, Publication, ManifestationPersonDedication, ManifestationCorporationDedication
-from dmrism.models.manifestation import ManifestationBib
+from dmrism.models.manifestation import ManifestationBib, Publication
+
+
+class ManifestationDetailView(EntityMixin, DetailView):
+    model = EdwocaManifestation
 
 
 class ManifestationListView(EdwocaListView):
@@ -290,7 +295,10 @@ def manifestation_title_update(request, pk):
             # Handle existing ManifestationTitleHandwriting forms for this title
             for handwriting_obj in title_obj.handwritings.all():
                 handwriting_prefix = f'title_handwriting_{handwriting_obj.id}'
-                handwriting_form = ManifestationTitleHandwritingForm(request.POST, instance=handwriting_obj, prefix=handwriting_prefix)
+                data = request.POST.copy()
+                if f'{handwriting_prefix}-medium' not in data:
+                    data[f'{handwriting_prefix}-medium'] = handwriting_obj.medium
+                handwriting_form = ManifestationTitleHandwritingForm(data, instance=handwriting_obj, prefix=handwriting_prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
 
@@ -419,14 +427,14 @@ def manifestation_title_add_handwriting_writer(request, pk, title_handwriting_pk
     person = get_object_or_404(Person, pk=person_pk)
     title_handwriting.writer = person
     title_handwriting.save()
-    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_handwriting.manifestation_title.id}')
+    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}))
 
 
 def manifestation_title_remove_handwriting_writer(request, pk, title_handwriting_pk):
     title_handwriting = get_object_or_404(ManifestationTitleHandwriting, pk=title_handwriting_pk)
     title_handwriting.writer = None
     title_handwriting.save()
-    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_handwriting.manifestation_title.id}')
+    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}))
 
 
 def manifestation_add_dedicatee(request, pk, person_id):
@@ -446,7 +454,7 @@ def manifestation_remove_dedicatee(request, pk, dedicatee_id):
 class ManifestationDeleteView(EntityMixin, DeleteView):
     model = EdwocaManifestation
     success_url = reverse_lazy('edwoca:manifestation_list')
-    template_name = 'edwoca/simple_form.html'
+    template_name = 'edwoca/delete.html'
 
 
 class ManifestationTitleDeleteView(DeleteView):
@@ -1175,12 +1183,6 @@ def corporation_provenance_remove_letter(request, pk, cps_id, letter_pk):
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-
-
-
-
-
-
 def manifestation_digital_copy(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     item = manifestation.items.first()
@@ -1191,12 +1193,15 @@ def manifestation_digital_copy(request, pk):
     }
 
     if request.method == 'POST':
+        forms = []
         for digital_copy in item.digital_copies.all():
             prefix = f'digital_copy_{digital_copy.id}'
             form = ItemDigitizedCopyForm(request.POST, instance=digital_copy, prefix=prefix)
             if form.is_valid():
                 form.save()
-        return redirect('edwoca:manifestation_digital_copy', pk=pk)
+            forms.append(form)
+        context['forms'] = forms
+        #return redirect('edwoca:manifestation_digital_copy', pk=pk)
     else:
         forms = []
         for digital_copy in item.digital_copies.all():
@@ -1241,11 +1246,13 @@ def manifestation_person_dedication_delete(request, pk):
     dedication.delete()
     return redirect('edwoca:manifestation_title', pk=manifestation_pk)
 
+
 def manifestation_corporation_dedication_delete(request, pk):
     dedication = get_object_or_404(ManifestationCorporationDedication, pk=pk)
     manifestation_pk = dedication.manifestation.pk
     dedication.delete()
     return redirect('edwoca:manifestation_title', pk=manifestation_pk)
+
 
 def manifestation_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
     dedication = get_object_or_404(ManifestationPersonDedication, pk=dedication_id)
@@ -1254,11 +1261,13 @@ def manifestation_person_dedication_add_dedicatee(request, pk, dedication_id, pe
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
+
 def manifestation_person_dedication_remove_dedicatee(request, pk, dedication_id):
     dedication = get_object_or_404(ManifestationPersonDedication, pk=dedication_id)
     dedication.dedicatee = None
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
+
 
 def manifestation_corporation_dedication_add_dedicatee(request, pk, dedication_id, corporation_id):
     dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
@@ -1267,11 +1276,13 @@ def manifestation_corporation_dedication_add_dedicatee(request, pk, dedication_i
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
+
 def manifestation_corporation_dedication_remove_dedicatee(request, pk, dedication_id):
     dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
     dedication.dedicatee = None
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
+
 
 def manifestation_dedication_add_place(request, pk, dedication_id, place_id):
     # This is a bit tricky, as we don't know if it's a person or corporation dedication.
@@ -1285,6 +1296,7 @@ def manifestation_dedication_add_place(request, pk, dedication_id, place_id):
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
+
 def manifestation_dedication_remove_place(request, pk, dedication_id):
     # This is a bit tricky, as we don't know if it's a person or corporation dedication.
     # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
@@ -1295,3 +1307,12 @@ def manifestation_dedication_remove_place(request, pk, dedication_id):
     dedication.place = None
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
+
+
+def manifestation_publication_remove_publisher(request, pk):
+    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
+    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
+    publication = get_object_or_404(Publication, pk=pk)
+    publication.publisher = None
+    publication.save()
+    return redirect('edwoca:manifestation_print', pk=publication.manifestation.id)

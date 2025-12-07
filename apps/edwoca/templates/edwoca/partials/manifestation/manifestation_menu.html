@@ -1,39 +1,49 @@
-<div class="flex flex-col h-full">
+{% load i18n %}
+
+<div class="flex flex-col h-full overflow-auto">
 	<ul class="menu p-0 flex-1">
+		<li>
+		    <a
+			href="{% url 'edwoca:manifestation_detail' object.id %}"
+			{% if 'detail' in request.path %}class="active"{% endif %}
+			>
+			{% translate 'detail' %}
+		    </a>
+		</li>
 		<li>
 		    <a
 			href="{% url 'edwoca:manifestation_update' object.id %}"
 			{% if 'update' in request.path %}class="active"{% endif %}
 			>
-			Kopf
+			{% translate 'head' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:manifestation_classification' object.id %}"
 			{% if 'classification' in request.path %}class="active"{% endif %}
 			>
-			Quellenart
+			{% translate 'source type' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:manifestation_relations' object.id %}"
 			{% if 'relations' in request.path %}class="active"{% endif %}
 			>
-			Bezüge
+			{% translate 'relations' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:manifestation_title' object.id %}"
 			{% if 'title' in request.path %}class="active"{% endif %}
 			>
-			Titelei und Widmung
+			{% translate 'title and dedication' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:manifestation_history' object.id %}"
 			{% if 'history' in request.path %}class="active"{% endif %}
 			>
-			Datierung und Ort
+			{% translate 'date and place' %}
 		    </a>
 		</li>
 		{% if not object.is_singleton %}
@@ -41,7 +51,7 @@
 			    <a href="{% url 'edwoca:manifestation_print' object.id %}"
 				{% if 'print' in request.path %}class="active"{% endif %}
 				>
-				Verlag und Druckspezifika
+				{% translate 'publisher and print characteristics' %}
 			    </a>
 			</li>
 		{% endif %}
@@ -50,14 +60,14 @@
 			    <a href="{% url 'edwoca:manifestation_provenance' object.id %}"
 				{% if 'provenance' in request.path %}class="active"{% endif %}
 				>
-				Provenienz
+				{% translate 'provenance' %}
 			    </a>
 			</li>
 			<li>
 			    <a href="{% url 'edwoca:manifestation_manuscript' object.id %}"
 				{% if 'manuscript' in request.path %}class="active"{% endif %}
 				>
-				Manuskriptspezifika
+				{% translate 'manuscript characteristics' %}
 			    </a>
 			</li>
 		{% endif %}
@@ -65,7 +75,7 @@
 		    <a href="{% url 'edwoca:manifestation_bibliography' object.id %}"
 			{% if 'bibliography' in request.path %}class="active"{% endif %}
 			>
-			Literatur
+			{% translate 'bibliography' %}
 		    </a>
 		</li>
 		{% if object.is_singleton %}
@@ -73,7 +83,7 @@
 			    <a href="{% url 'edwoca:manifestation_digital_copy' object.id %}"
 				{% if 'digcopy' in request.path %}class="active"{% endif %}
 				>
-				Digitalisate
+				{% translate 'digital copies' %}
 			    </a>
 			</li>
 		{% endif %}
@@ -81,21 +91,22 @@
 		    <a href="{% url 'edwoca:manifestation_comment' object.id %}"
 			{% if 'comment' in request.path %}class="active"{% endif %}
 			>
-			Kommentar
+			{% translate 'comment' %}
 		    </a>
 		</li>
 	</ul>
+	<div class="flex-0 min-h-16"></div>
 	<ul class="menu p-0 flex-0">
 		<li>
 		    <a href="{% url 'edwoca:manifestation_delete' object.id %}"
 			{% if 'delete' in request.path %}class="active"{% endif %}
 			>
-			löschen
+				{% translate 'delete' %}
 		    </a>
 		</li>
 		<li>
 		    <a href="{% url 'edwoca:manifestation_list' %}">
-			zurück
+				{% translate 'back' %}
 		    </a>
 		</li>
 	</ul>

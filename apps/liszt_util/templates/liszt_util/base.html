@@ -3,57 +3,53 @@
 {% load navigation_tags %}
 {% load editor_mode %}
 
-<html data-theme="liszt">
+<html data-theme="liszt" class="font-sans">
     <head>
-	<link rel="stylesheet" href="https://cdn.rawgit.com/ichord/At.js/master/dist/css/jquery.atwho.css" />
-	<link rel="stylesheet" href="{% static 'liszt_util/tailwind.dist.css' %}" crossorigin="anonymous" />
-	<link rel="stylesheet" href="{% static 'liszt_util/sumoselect.css' %}" crossorigin="anonymous" />
+        <link rel="stylesheet" href="https://cdn.rawgit.com/ichord/At.js/master/dist/css/jquery.atwho.css" />
+        <link rel="stylesheet" href="{% static 'liszt_util/tailwind.dist.css' %}" crossorigin="anonymous" />
+        <link rel="stylesheet" href="{% static 'liszt_util/sumoselect.css' %}" crossorigin="anonymous" />
     </head>
 
     {% block modals %}
     {% endblock %}
 
-    <body>
-	<div class="container w-full max-w-7xl mx-auto flex flex-col min-h-screen h-screen">
-	    <div class="mb-10 border border-base-300">
-		<div class="navbar bg-white flex flex-0 p-0">
-		    <div class="flex-none min-h-inherit">
-			{% render_main_navbar_link %}
-		    </div>
-		    <div class="flex-1 text-lg text-gray-600">
-			{% block navbar_title %}
-			{% endblock %}
-		    </div>
-		    <div class="flex-none gap-2 min-h-inherit border-r-0">
-			{% block navbar_extras %}
-			{% endblock %}
-		    </div>
-		</div>
-		{% render_editor_mode_warning %}
-	    </div>
-	    <div class="flex gap-10 flex-1 overflow-hidden">
-		<div class="flex-0">
-		    {% block menu %}
-		    {% endblock %}
-		</div>
-		<div class="flex-1 min-w-0 overflow-auto">
-		    {% block content %}
-		    {% endblock %}
-		</div>
-		<div class="flex-0">
-		    {% block nav %}
-		    {% endblock %}
-		</div>
-	    </div>
-	    {% render_main_menu %}
-	</div>
+    <body class="bg-white min-h-screen h-screen flex flex-col">
+        <div class="navbar bg-base-100 flex flex-0 p-0 items-stretch px-10 gap-10 ">
+            <div class="flex-none min-h-inherit">
+                {% render_main_navbar_link %}
+            </div>
+            <div class="flex-1 text-lg py-5">
+            </div>
+            <div class="flex-none gap-2 min-h-inherit">
+                {% block navbar_extras %}
+                {% endblock %}
+            </div>
+        </div>
+        {% render_editor_mode_warning %}
+        {% block navbar_title %}
+        {% endblock %}
+        <div class="flex gap-10 flex-1 my-5 overflow-hidden">
+            <div class="flex-0 px-10">
+                {% block menu %}
+                {% endblock %}
+            </div>
+            <div class="flex-1 min-w-0 overflow-auto max-w-5xl mx-auto px-20">
+                {% block content %}
+                {% endblock %}
+            </div>
+            <div class="flex-0 px-10">
+                {% block nav %}
+                {% endblock %}
+            </div>
+        </div>
+        {% render_main_menu %}
 
-	<!-- jquery.js -->
-	<script src="/static/django_htmx/htmx.min.js"></script>
-	<script src="{% static 'liszt_util/htmx-preload.js' %}"></script>
-	<script src="{% static 'liszt_util/jquery-3.7.1.min.js' %}"></script>
-	<script src="https://cdn.rawgit.com/ichord/Caret.js/master/dist/jquery.caret.min.js"></script>
-	<script src="https://cdn.rawgit.com/ichord/At.js/master/dist/js/jquery.atwho.min.js"></script>
-	<script src="{% static 'liszt_util/sumoselect.js' %}"></script>
+        <!-- jquery.js -->
+        <script src="/static/django_htmx/htmx.min.js"></script>
+        <script src="{% static 'liszt_util/htmx-preload.js' %}"></script>
+        <script src="{% static 'liszt_util/jquery-3.7.1.min.js' %}"></script>
+        <script src="https://cdn.rawgit.com/ichord/Caret.js/master/dist/jquery.caret.min.js"></script>
+        <script src="https://cdn.rawgit.com/ichord/At.js/master/dist/js/jquery.atwho.min.js"></script>
+        <script src="{% static 'liszt_util/sumoselect.js' %}"></script>
     </body>
 </html>

@@ -6,6 +6,7 @@ from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
+from django.views.generic.detail import DetailView
 from django.views.decorators.http import require_POST
 from ..models import Item as EdwocaItem, ItemModification, ModificationHandwriting, Work, Expression, Manifestation
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, ItemDigitalCopy, ItemPersonDedication, ItemCorporationDedication, ItemHandwriting
@@ -18,9 +19,6 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 
 
-
-
-
 def item_set_template(request, pk):
     item = get_object_or_404(Item, pk=pk)
     manifestation = item.manifestation
@@ -28,6 +26,10 @@ def item_set_template(request, pk):
     item.is_template = True
     item.save()
     return redirect('edwoca:manifestation_relations', pk=manifestation.pk)
+
+
+class ItemDetailView(EntityMixin, DetailView):
+    model = EdwocaItem
 
 
 class ItemListView(EdwocaListView):
@@ -72,6 +74,7 @@ def item_update(request, pk):
         'item_form': item_form
     }
     return render(request, 'edwoca/item_update.html', context)
+
 
 @require_POST
 def item_swap_view(request, pk, direction):
@@ -411,6 +414,7 @@ def item_dedication_remove_place(request, pk, dedication_id):
 
 class ItemDeleteView(EntityMixin, DeleteView):
     model = EdwocaItem
+    template_name = 'edwoca/delete.html'
 
     def get_success_url(self):
         return self.object.get_manifestation_url()
@@ -430,7 +434,7 @@ class LibraryCreateView(CreateView):
     form_class = LibraryForm
 
 
-class LibraryUpdateView(UpdateView):
+class LibraryUpdateView(EntityMixin, UpdateView):
     model = Library
     template_name = 'edwoca/simple_form.html'
     form_class = LibraryForm
@@ -438,7 +442,8 @@ class LibraryUpdateView(UpdateView):
 
 class LibraryDeleteView(DeleteView):
     model = Library
-    template_name = 'edwoca/simple_form.html'
+    template_name = 'edwoca/delete.html'
+    success_url = reverse_lazy('edwoca:library_list')
 
 
 def item_manuscript_update(request, pk):

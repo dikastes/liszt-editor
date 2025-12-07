@@ -1,53 +1,58 @@
 {% extends 'edwoca/base.html' %}
 
 {% block modals %}
-    {% for form in forms %}
-        <div class="modal" role="dialog" id="digital-copy-modal-{{ form.instance.id }}">
-            <div class="modal-box w-11/12 max-w-5xl">
-                <h3 class="text-lg font-bold">Digitale Kopie bearbeiten</h3>
-                <form method="post" class="mt-5">
-                    {% csrf_token %}
-                    {{ form.management_form }}
-
-                    {{ form.as_daisy }}
-
-                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-{{ form.instance.id }}">
-                </form>
-
-                <div class="modal-action flex-0 m-0">
-                    <label for="save-button-{{ form.instance.id }}" class="btn btn-primary">Speichern</label>
-                    <a href="#" class="btn">Schließen</a>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
 {% endblock %}
 
 {% block content %}
 <div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0 flex-1"> Digitale Kopien für {{ object }} </h2>
+    <div class="prose">
+        <h2 class="card-title mt-0 flex-1"> Digitalisate von {{ object }} </h2>
 
-    <div class="mt-5">
-    {% for digital_copy in item.digital_copies.all %}
-        <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
-            <div class="flex-1 m-0">
-                <p class="font-bold">{{ digital_copy.url }}</p>
-                <p>{{ digital_copy.get_link_type_display }}</p>
+        {% comment %}
+        <div class="mt-5">
+        {% for digital_copy in item.digital_copies.all %}
+            <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
+                <div class="flex-1 m-0">
+                    <p class="font-bold">{{ digital_copy.url }}</p>
+                    <p>{{ digital_copy.get_link_type_display }}</p>
+                </div>
+                <a href="#digital-copy-modal-{{ digital_copy.id }}" class="btn flex-0"> bearbeiten </a>
             </div>
-            <a href="#digital-copy-modal-{{ digital_copy.id }}" class="btn flex-0"> bearbeiten </a>
-            <form action="{% url 'edwoca:manifestation_digital_copy_delete' digital_copy.id %}" method="post" class="flex-0 m-0">
+        {% empty %}
+            <p> keine digitalen Kopien vorhanden </p>
+        {% endfor %}
+        {% endcomment %}
+        {% for form in forms %}
+            <form action="{% url 'edwoca:manifestation_digital_copy_delete' form.instance.id %}" method="post" class="flex-0 m-0">
                 {% csrf_token %}
-                <input type="submit" class="btn btn-primary" value="löschen"/>
+                <input type="submit" class="hidden" id="delete-{{ form.instance.id }}" value="löschen"/>
             </form>
-        </div>
-    {% empty %}
-        <p> keine digitalen Kopien vorhanden </p>
-    {% endfor %}
-    </div>
-    <div class="flex items-center">
-        <div class="flex-1"></div>
-        <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn flex-0"> Digitale Kopie hinzufügen </a>
-    </div>
+        {% endfor %}
+        <form method="post" class="mt-5 flex flex-col gap-5 mb-10">
+            {% for form in forms %}
+                <div class="flex gap-5">
+                    <div class="flex-1">
+                        {% csrf_token %}
+                        {{ form.as_daisy }}
+                    </div>
+                    <div class="flex-0 flex flex-col">
+                        <div class="flex-1"></div>
+                        <div class="flex-0">
+                            <label for="delete-{{ form.instance.id }}" class="btn btn-primary">löschen</label>
+                            <input type="submit" name="save_changes" value="Speichern" class="hidden" id="submit-form">
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <p> keine Digitalisate vorhanden </p>
+            {% endfor %}
+        </form>
 
+        <div class="flex items-center">
+            <div class="flex-1"></div>
+            <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn flex-0"> Digitalisat hinzufügen </a>
+        </div>
+
+    </div>
 </div>
 {% endblock %}
