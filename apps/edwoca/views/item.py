@@ -17,6 +17,8 @@ from liszt_util.tools import swap_order
 from django.contrib import messages
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.db import transaction
+from haystack.query import SearchQuerySet
 
 
 def item_set_template(request, pk):
@@ -93,6 +95,55 @@ def item_swap_view(request, pk, direction):
         'edwoca/partials/manifestation/item_list.html',
         context
     )
+@require_POST
+@transaction.atomic
+def item_move_view(request, item_pk):
+    item = get_object_or_404(Item, pk=item_pk)
+
+    target_manifestation_pk = request.POST.get('target_manifestation_pk')
+
+    if not target_manifestation_pk:
+        return HttpResponse("Keine Ziel Manifestation ausgewählt", status=400)
+
+    target_manifestation = get_object_or_404(Manifestation, pk=target_manifestation_pk)
+
+    old_manifestation = item.move_to_manifestation(target_manifestation)
+
+    if not old_manifestation.items.exists():
+        msg = f'Manifestation "{old_manifestation}" ist leer' \
+              f'<a href="{reverse("manifestation:delete_empty", args=[old_manifestation.pk])}">Löschen?</a>'
+
+        messages.warning(request, msg, extra_tags='safe')
+
+    return render(
+        request, 'edwoca/partials/manifestation/item_list.html',
+        {'object':old_manifestation}
+    )
+
+def item_move_modal(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    return render (
+        request,
+        'edwoca/partials/manifestation/item_move_modal.html',
+        {'item': item}
+    )
+
+def manifestation_autocomplete(request):
+    q = request.GET.get('q','')
+    results = (
+        SearchQuerySet().models(Manifestation)
+        .autocomplete(text=q)[:10]
+        if len(q) >= 3 else []
+    )
+
+    return render (
+        request,
+        'edwoca/partials/manifestation/item_move_search_results.html',
+        {'results':results}
+    )
+
+
+
 """
 class ItemCreateView(EntityMixin, CreateView):
     model = EdwocaItem

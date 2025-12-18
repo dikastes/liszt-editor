@@ -5,12 +5,10 @@
         {% for message in messages %}
             {% if 'error' in message.tags %}
                 
-                {# Hier beginnt der Code für die Anzeige NUR von Fehlern #}
                 <div class="alert alert-error shadow-lg text-sm p-3 rounded-lg flex items-center mb-2" role="alert">
                     <span class="font-bold mr-2">Fehler:</span>
                     <p>{{ message }}</p>
                 </div>
-                {# Hier endet der Code für die Anzeige NUR von Fehlern #}
                 
             {% endif %}
         {% endfor %}
@@ -60,6 +58,12 @@
             {% csrf_token %}
             <input type="submit" class="btn btn-sm btn-error" value="löschen"/>
         </form>
+        <button class="btn btn-sm btn-outline ml-2"
+        hx-get="{% url 'edwoca:item_move_modal' item.id %}"
+        hx-target="#modal-container"
+        onclick="move_modal.showModal()">
+        Verschieben
+        </button>
     </div>
 {% empty %}
     <p> keine Exemplare </p>

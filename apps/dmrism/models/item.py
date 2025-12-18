@@ -1,7 +1,8 @@
 from .base import *
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q, UniqueConstraint
+from django.db import transaction
+from django.db.models import Q, UniqueConstraint, F
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -91,19 +92,49 @@ class Item(Sortable, WemiBaseClass):
     def current_signature(self):
         return self.signatures.filter(status=BaseSignature.Status.CURRENT).first()
 
+    def move_to_manifestation(self, target_manifestation):
+        
+        if self.manifestation == target_manifestation:
+            return
+        
+        with transaction.atomic():
+
+            old_manifestation = self.manifestation
+            old_order_index = self.order_index
+
+            self.order_index = -1000
+            self.manifestation = target_manifestation
+            self.save()
+
+            Item.objects.filter(
+                manifestation=old_manifestation,
+                order_index__gt=old_order_index
+            ).update(order_index=F('order_index') - 1)
+
+            self.save()
+            
+        return old_manifestation
+
     def save(self, *args, **kwargs):
         if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
             raise ValidationError("Cannot add another item to a singleton manifestation.")
-        
-        if self.pk is None:
+
+        has_moved = False
+
+        if self.pk:
+            old_instance = Item.objects.get(pk=self.pk)
+            if old_instance.manifestation_id != self.manifestation_id:
+                has_moved = True
+
+        if self.pk is None or has_moved:
             max_index = (
                 Item.objects
                 .filter(manifestation=self.manifestation)
                 .aggregate(models.Max('order_index'))['order_index__max']
             )
 
-            if max_index is not None:
-                self.order_index = max_index + 1
+            self.order_index = (max_index + 1) if max_index is not None else 0
+            
 
         super().save(*args, **kwargs)
 

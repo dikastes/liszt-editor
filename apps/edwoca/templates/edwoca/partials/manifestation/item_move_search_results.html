@@ -1,0 +1,25 @@
+{% for result in results %}
+<label class="flex items-start gap-3 p-3 hover:bg-base-100 cursor-pointer rounded-lg border-b border-base-300 last:border-0 group">
+    <input type="radio" 
+           name="target_manifestation_pk" 
+           value="{{ result.pk }}" 
+           class="radio radio-primary mt-1"
+           onclick="document.getElementById('submit-move').disabled = false;">
+    
+    <div class="text-sm">
+        <div class="font-bold text-primary group-hover:underline">
+            {{ result.object.rism_id|default:"Keine RISM-ID" }}
+        </div>
+        <div class="opacity-80 leading-tight">
+            {{ result.object.get_pref_title }}
+        </div>
+        {% if result.object.get_current_signature %}
+            <div class="text-xs opacity-50">{{ result.object.get_current_signature }}</div>
+        {% endif %}
+    </div>
+</label>
+{% empty %}
+<div class="p-4 text-center">
+    <p class="text-error font-semibold text-sm">Keine Ergebnisse gefunden.</p>
+</div>
+{% endfor %}
