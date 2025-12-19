@@ -1,5 +1,5 @@
 from .base import *
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, FieldError
 from django.db import models
 from django.db import transaction
 from django.db.models import Q, UniqueConstraint, F
@@ -95,6 +95,7 @@ class Item(Sortable, WemiBaseClass):
     def move_to_manifestation(self, target_manifestation):
         
         if self.manifestation == target_manifestation:
+            raise FieldError("Can not move item into same manifestation")
             return
         
         with transaction.atomic():
@@ -126,7 +127,7 @@ class Item(Sortable, WemiBaseClass):
             if old_instance.manifestation_id != self.manifestation_id:
                 has_moved = True
 
-        if self.pk is None or has_moved:
+        if (self.pk is None or has_moved) and self.order_index != -1000:
             max_index = (
                 Item.objects
                 .filter(manifestation=self.manifestation)

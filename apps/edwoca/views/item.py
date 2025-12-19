@@ -18,6 +18,7 @@ from django.contrib import messages
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.db import transaction
+from django.utils.html import mark_safe
 from haystack.query import SearchQuerySet
 
 
@@ -96,7 +97,6 @@ def item_swap_view(request, pk, direction):
         context
     )
 @require_POST
-@transaction.atomic
 def item_move_view(request, item_pk):
     item = get_object_or_404(Item, pk=item_pk)
 
@@ -110,15 +110,18 @@ def item_move_view(request, item_pk):
     old_manifestation = item.move_to_manifestation(target_manifestation)
 
     if not old_manifestation.items.exists():
-        msg = f'Manifestation "{old_manifestation}" ist leer' \
-              f'<a href="{reverse("manifestation:delete_empty", args=[old_manifestation.pk])}">Löschen?</a>'
+        msg = mark_safe(f'Manifestation "{old_manifestation}" ist leer' \
+              f'<a href="{reverse("edwoca:manifestation_delete", kwargs={'pk':old_manifestation.id})}">Löschen?</a>')
 
         messages.warning(request, msg, extra_tags='safe')
 
-    return render(
+    response = render(
         request, 'edwoca/partials/manifestation/item_list.html',
         {'object':old_manifestation}
     )
+    # Close the modal by sending an empty OOB swap for the modal's ID
+    response.content += b'<div id="move_modal" hx-swap-oob="true"></div>'
+    return response
 
 def item_move_modal(request, pk):
     item = get_object_or_404(Item, pk=pk)
@@ -132,6 +135,7 @@ def manifestation_autocomplete(request):
     q = request.GET.get('q','')
     results = (
         SearchQuerySet().models(Manifestation)
+        .filter(is_singleton=False)
         .autocomplete(text=q)[:10]
         if len(q) >= 3 else []
     )

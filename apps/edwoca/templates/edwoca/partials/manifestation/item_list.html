@@ -3,14 +3,12 @@
 {% if messages %}
     <div class="mb-4">
         {% for message in messages %}
-            {% if 'error' in message.tags %}
                 
                 <div class="alert alert-error shadow-lg text-sm p-3 rounded-lg flex items-center mb-2" role="alert">
                     <span class="font-bold mr-2">Fehler:</span>
                     <p>{{ message }}</p>
                 </div>
                 
-            {% endif %}
         {% endfor %}
     </div>
 {% endif %}
