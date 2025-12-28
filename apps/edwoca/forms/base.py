@@ -9,6 +9,8 @@ from dmad_on_django.forms import SearchForm
 class SimpleFormMixin:
     text_area_classes = 'textarea textarea-bordered w-full bg-white border-black'
     text_input_classes = 'input input-bordered w-full'
+    autocomplete_classes = 'autocomplete-select select select-bordered w-full border-black bg-white'
+    select_classes = 'select select-bordered w-full border-black bg-white'
 
     def as_daisy(self):
         form = tags.div()
@@ -193,10 +195,11 @@ class HandwritingForm(ModelForm):
         dubious_writer_label = tags.label(cls='label cursor-pointer flex items-center gap-2')
         dubious_writer_label.add(tags.span(dubious_writer_field.label, cls='label-text'))
 
-        dubious_toggle_input = tags.input_(type='submit', value='', name=f'toggle_dubious_writer-{self.instance.id}', cls='toggle', form='form')
-        if self.instance.dubious_writer:
-            dubious_toggle_input['checked'] = 'checked'
-        dubious_writer_label.add(dubious_toggle_input)
+        dubious_writer_field.field.widget.attrs.update({
+            'onchange': 'this.form.submit()',
+            'form': 'form'
+        })
+        dubious_writer_label.add(raw(str(dubious_writer_field)))
         
         form.add(dubious_writer_label)
 

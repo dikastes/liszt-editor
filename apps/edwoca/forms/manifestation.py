@@ -5,6 +5,7 @@ from django.conf import settings
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period, Corporation
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting
@@ -14,31 +15,22 @@ from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
 
 
-class ManifestationForm(ModelForm):
+class ManifestationForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
     class Meta:
         model = Manifestation
         fields = ['rism_id', 'private_head_comment']
         widgets = {
                 'rism_id': TextInput( attrs = {
-                        'class': 'grow h-full'
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
                     }),
                 'private_head_comment': Textarea( attrs = {
-                        'class': 'textarea textarea-bordered w-full'
-                    })
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
             }
-
-    def as_daisy(self):
-        form = div()
-        rism_id_label = label(self['rism_id'].label, _for=self['rism_id'].id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        rism_id_label.add(raw(str(self['rism_id'])))
-        form.add(rism_id_label)
-
-        private_head_comment_label = label(cls='form-control', _for=self['private_head_comment'].id_for_label)
-        private_head_comment_label.add(span(self['private_head_comment'].label, cls='label-text'))
-        private_head_comment_label.add(raw(str(self['private_head_comment'])))
-        form.add(private_head_comment_label)
-
-        return mark_safe(str(form))
 
 
 class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
@@ -302,7 +294,8 @@ class ManifestationClassificationForm(ModelForm):
 
         palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
         palette2.add(function_label)
-        palette2.add(source_type_label)
+        if self.instance.is_singleton:
+            palette2.add(source_type_label)
 
         form.add(palette1)
         form.add(palette2)
@@ -340,13 +333,13 @@ class ManifestationCreateForm(forms.Form):
             }
         }
     read_only_fields = ['publisher']
-    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
-    plate_number = forms.CharField(label='Plattennummer', max_length=50, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
-    source_type = forms.ChoiceField(label='Quellentyp', choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
+    plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
+    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
-    publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label='Verlag', empty_label="Bibliothek auswählen", widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+    publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label=_('publisher'), empty_label=_('choose publisher'), widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
 
     def __init__(self, *args, **kwargs):
         self.publisher_instance = kwargs.pop('publisher', None)
@@ -449,9 +442,9 @@ class ManifestationCreateForm(forms.Form):
 
 class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
     layout = Layouts.LABEL_OUTSIDE
-    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False)
-    source_type = forms.ChoiceField(label='Quellentyp', choices=Manifestation.SourceType.choices)
-    library = forms.ModelChoiceField(queryset=Library.objects.all(), label='Bibliothek', empty_label="Bibliothek auswählen")
+    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False)
+    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices)
+    library = forms.ModelChoiceField(queryset=Library.objects.all(), label=_('library'), empty_label=_('choose library'))
     signature = forms.CharField(label='Signatur', max_length=255)
 
     def as_daisy(self):

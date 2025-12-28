@@ -13,9 +13,10 @@ from dominate.tags import div, label, span
 from dominate.util import raw
 
 
-class ManifestationForm(ModelForm):
+"""
+class CompositeForm(ModelForm):
     class Meta:
-        model = Manifestation
+        model = Composite
         fields = ['rism_id', 'private_head_comment']
         widgets = {
                 'rism_id': TextInput( attrs = {
@@ -40,9 +41,9 @@ class ManifestationForm(ModelForm):
         return mark_safe(str(form))
 
 
-class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
+class CompositeDedicationForm(ModelForm, SimpleFormMixin):
     class Meta:
-        model = Manifestation
+        model = Composite
         fields = ['dedication', 'private_title_comment']
         widgets = {
                 'dedication': Textarea( attrs = {
@@ -56,10 +57,9 @@ class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
             'private_title_comment': 'Interner Widmungskommentar',
         }
 
-
-class ManifestationTitleForm(ModelForm):
+class CompositeTitleForm(ModelForm):
     class Meta:
-        model = ManifestationTitle
+        model = CompositeTitle
         fields = ['title', 'title_type', 'status', 'manifestation']
         widgets = {
             'title': Textarea(attrs={'class': 'textarea textarea-bordered h-64'}),
@@ -89,9 +89,9 @@ class ManifestationTitleForm(ModelForm):
         return mark_safe(str(form))
 
 
-class ManifestationCommentForm(CommentForm):
+class CompositeCommentForm(CommentForm):
     class Meta:
-        model = Manifestation
+        model = Composite
         fields = CommentForm.Meta.fields + ['taken_information']
         widgets = dict(CommentForm.Meta.widgets, **{
                 'taken_information': Textarea( attrs = {
@@ -241,9 +241,9 @@ class RelatedManifestationForm(ModelForm):
         return mark_safe(str(form))
 
 
-class ManifestationClassificationForm(ModelForm):
+class CompositeClassificationForm(ModelForm):
     class Meta:
-        model = Manifestation
+        model = Composite
         fields = [
                 'manifestation_form',
                 'edition_type',
@@ -299,10 +299,10 @@ class ManifestationClassificationForm(ModelForm):
         return mark_safe(str(form))
 
 
-ManifestationTitleFormSet = inlineformset_factory(
-        Manifestation,
-        ManifestationTitle,
-        form = ManifestationTitleForm,
+CompositeTitleFormSet = inlineformset_factory(
+        Composite,
+        CompositeTitle,
+        form = CompositeTitleForm,
         formset = SkipEmptyTitleFormSet,
         extra = 1,
         max_num = 100,
@@ -310,12 +310,9 @@ ManifestationTitleFormSet = inlineformset_factory(
     )
 
 
-
-
-
-class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
+class CompositeRelationsCommentForm(ModelForm, SimpleFormMixin):
     class Meta:
-        model = Manifestation
+        model = Composite
         fields = ['private_relations_comment']
         widgets = {
                 'private_relations_comment': Textarea( attrs = {
@@ -324,12 +321,13 @@ class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
             }
 
 
-class ManifestationCreateForm(forms.Form):
+class CompositeCreateForm(forms.Form):
     temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False)
     signature = forms.CharField(label='Signatur', max_length=255)
     library = forms.ModelChoiceField(queryset=Library.objects.all(), label='Bibliothek', empty_label="Bibliothek auswählen", widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
 
 
-class ManifestationTitleHandwritingForm(HandwritingForm):
+class CompositeTitleHandwritingForm(HandwritingForm):
     class Meta(HandwritingForm.Meta):
-        model = ManifestationTitleHandwriting
+        model = CompositeTitleHandwriting
+"""

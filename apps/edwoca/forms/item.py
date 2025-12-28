@@ -1,8 +1,11 @@
 from .base import *
+from secrets import token_urlsafe
+from django.urls import reverse_lazy, reverse
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from dmad_on_django.models import Period
 from dmrism.models.item import *
-from dominate.tags import div, label, span
+from dominate.tags import div, label, span, form, input_
 from dominate.util import raw
 from django import forms
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, SelectDateWidget, CharField
@@ -33,28 +36,30 @@ class ItemForm(ModelForm):
 
         return mark_safe(str(form))
 
-class SignatureForm(ModelForm):
+class SignatureForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
     class Meta:
         model = ItemSignature
         fields = ['library', 'signature', 'status', 'id']
         widgets = {
                 'library': Select( attrs = {
-                        'class': 'autocomplete-select select select-bordered w-full'
+                        'class': SimpleFormMixin.autocomplete_classes,
+                        'form': 'form'
                     }),
                 'signature': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': 'grow w-full',
+                        'form': 'form'
                     }),
                 'status': Select( attrs = {
-                        'class': 'select select-bordered w-full'
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
                     }),
                 'id': HiddenInput()
             }
 
     def as_daisy(self):
-        form = div(cls='mb-10')
-
-        if self.instance.pk:
-           form.add(raw(str(self['id'])))
+        form_wrapper = div(cls='mb-10')
 
         library_field = self['library']
         signature_field = self['signature']
@@ -63,7 +68,7 @@ class SignatureForm(ModelForm):
         library_container = div(cls='flex-1')
         library_container.add(raw(str(library_field)))
 
-        signature_field_label = label(signature_field.label, cls='input input-bordered flex flex-1 items-center gap-2')
+        signature_field_label = label(signature_field.label, cls='input input-bordered border-black bg-white flex flex-1 items-center gap-2')
         signature_field_label.add(raw(str(signature_field)))
 
         status_container = div(cls='flex-0')
@@ -76,16 +81,10 @@ class SignatureForm(ModelForm):
         upper_palette.add(status_container)
         lower_palette.add(signature_field_label)
 
-        form.add(upper_palette)
-        form.add(lower_palette)
+        form_wrapper.add(upper_palette)
+        form_wrapper.add(lower_palette)
 
-        if 'DELETE' in self.fields:
-            del_field = self['DELETE']
-            del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
-            del_field_label.add(raw(str(del_field)))
-            lower_palette.add(del_field_label)
-
-        return mark_safe(str(form))
+        return mark_safe(str(form_wrapper))
 
 
 SignatureFormSet = inlineformset_factory(
@@ -396,13 +395,16 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
         fields = ['extent', 'measure', 'private_manuscript_comment']
         widgets = {
                 'extent': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     }),
                 'measure': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     }),
                 'private_manuscript_comment': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     })
             }
 
