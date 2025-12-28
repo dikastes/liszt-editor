@@ -518,6 +518,11 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             manifestation.save()
         return manifestation
 
+    def get_single_item(self):
+        if self.is_singleton:
+            return self.items.first()
+        raise Exception('You want to retrieve a single item from a non singleton manifestation.')
+
 
 class Publication(models.Model):
     manifestation = models.ForeignKey(

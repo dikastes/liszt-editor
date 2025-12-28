@@ -84,6 +84,12 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
     )
     gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
 
+    def concise(self):
+        if (name := self.names.filter(status=Status.PRIMARY).first()):
+            if hasattr(name, 'name'):
+                return name.name
+            return f'{name.first_name} {name.last_name}'
+
     def get_alt_names(self):
         return self.names.filter(status=Status.ALTERNATIVE)
 
