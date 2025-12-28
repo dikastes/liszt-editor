@@ -1,0 +1,55 @@
+{% load i18n %}
+
+{% if form.instance.writer %}
+    <div class="flex items-center mt-2">
+        <label class="pseudo-input border border-black border-r-0 bg-white flex-1 flex items-center gap-2">
+            {% translate 'writer' %}
+            {% if form.instance.dubious_writer %}
+                <input type="text" class="grow arrow-disabled" disabled value="[{{ form.instance.writer }}]" />
+            {% else %}
+                <input type="text" class="grow arrow-disabled" disabled value="{{ form.instance.writer }}" />
+            {% endif %}
+        </label>
+        <a class="btn btn-outline" href="{% url 'edwoca:manifestation_remove_handwriting_writer' object.id form.instance.id %}">
+            {% translate 'remove' %}
+        </a>
+    </div>
+{% else %}
+    <form>
+        <div class="mt-2 flex items-center">
+            <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2 flex-1">
+                {% translate 'writer' %}
+                {% if handwriting_found_persons.handwriting_id == form.instance.id %}
+                    <input type="text" value="{{ query }}" name="handwriting-{{ form.instance.id }}-q" class="grow flex-1">
+                {% else %}
+                    <input type="text" name="handwriting-{{ form.instance.id }}-q" class="grow flex-1">
+                {% endif %}
+            </label>
+            <input type="submit" class="btn btn-outline" value="{% translate 'search' %}"/>
+        </div>
+    </form>
+    {% if search_form.is_valid and search_form.cleaned_data.q and handwriting_found_persons.handwriting_id == form.instance.id %}
+        <ul class="border border-black h-32 overflow-auto p-2">
+            {% for person in handwriting_found_persons.results %}
+                <li>
+                    <a href="{% url 'edwoca:manifestation_add_handwriting_writer' object.id form.instance.id person.pk %}">
+                        {{ person.object }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>
+                    {% translate 'no search results' %}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endif %}
+
+{{ form.as_daisy }}
+
+<div class="flex justify-end mt-3 mb-10">
+    <form action="{% url 'edwoca:manifestation_handwriting_delete' form.instance.id %}" method="post" class="flex-0 m-0">
+        {% csrf_token %}
+        <input type="submit" class="btn btn-outline text-primary" value="{% translate 'remove' %}"/>
+    </form>
+</div>

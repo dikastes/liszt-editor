@@ -1,36 +1,39 @@
 {% extends 'edwoca/base.html' %}
 
+{% load i18n %}
+
 {% block content %}
-<div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0">Neuen Druck anlegen</h2>
+<h2 class="card-title mt-0">Neuen Druck anlegen</h2>
 
-    {% if search_form %}
-        <form class="flex gap-5">
-            <div class="flex-1">
-                {{ search_form.as_daisy }}
-            </div>
-            <input id="submit-form" type="submit" value="Suche" class="hidden" />
-        </form>
-        {% if publisher_list %}
-        <ul>
-            {% for publisher in publisher_list %}
-                <li>
-                    <a href="{% url 'edwoca:manifestation_create' publisher.object.id %}">
-                        {{ publisher.object }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-        {% endif %}
-    {% endif %}
-
-    {% if form %}
-    <form method="post" class="mt-5">
-        {% csrf_token %}
-        {{ form.as_daisy }}
-        <input type="submit" value="Speichern" class="btn mt-5">
+{% if search_form %}
+    <form class="flex mt-5">
+        <label class="flex gap-2 input input-bordered border-r-0 border-black items-center bg-white flex-1">
+            <span class="flex-0">
+                {% translate 'publisher' %}
+            </span>
+            <input type="text" class="flex-1 grow" placeholder="{% translate 'search publisher' %}" name="q" />
+        </label>
+        <input id="submit-form" type="submit" value="{% translate 'search' %}" class="flex-0 btn btn-outline" />
     </form>
+    {% if publisher_list %}
+    <ul class="p-2 border border-black h-32 overflow-auto">
+        {% for publisher in publisher_list %}
+            <li>
+                <a href="{% url 'edwoca:manifestation_create' publisher.object.id %}">
+                    {{ publisher.object }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
     {% endif %}
+{% endif %}
 
-</div>
+{% if form %}
+<form method="post" class="mt-5">
+    {% csrf_token %}
+    {{ form.as_daisy }}
+    <input type="submit" value="Speichern" class="btn mt-5">
+</form>
+{% endif %}
+
 {% endblock %}

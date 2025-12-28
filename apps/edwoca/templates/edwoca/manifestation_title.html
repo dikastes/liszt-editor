@@ -14,8 +14,8 @@
 
 <div class="mt-5">
 {% for title_form in title_forms %}
-    <div class="collapse collapse-arrow my-5">
-        <input type="radio" name="title-accordion" {% if forloop.first %}checked{% endif %} />
+    <div class="collapse collapse-arrow bg-base-100 my-5">
+        <input type="checkbox" />
         <div class="bg-base-100 collapse-title truncate">
             {{ title_form.instance.title }}
         </div>
@@ -91,15 +91,18 @@
 </div>
 <div class="flex items-center">
     <div class="flex-1"></div>
-    <a href="{% url 'edwoca:manifestation_title_add' object.id%}" class="btn flex-0"> {% translate 'create title' %}</a>
+    <a href="{% url 'edwoca:manifestation_title_add' object.id%}" class="btn btn-outline flex-0"> {% translate 'create title' %}</a>
 </div>
 
 <h3> {% translate 'person dedications' %} </h3>
 {% for person_dedication_form in person_dedication_forms %}
-    <div class="collapse collapse-arrow my-5">
-        <input type="radio" name="person-dedication-accordion" {% if forloop.first %}checked{% endif %} />
+    <div class="collapse bg-base-100 collapse-arrow my-5">
+        <input type="checkbox" />
         <div class="bg-base-100 collapse-title truncate">
+            {{ person_dedication_form.instance.place.concise }}
+            ({{ person_dedication_form.instance.period}}):
             {{ person_dedication_form.instance.diplomatic_dedication }}
+            ({{ person_dedication_form.instance.dedicatee.concise }})
         </div>
         <div class="collapse-content mt-5">
             <label>
@@ -218,8 +221,8 @@
 
 <h3> {% translate 'corporation dedications' %} </h3>
 {% for corporation_dedication_form in corporation_dedication_forms %}
-    <div class="collapse collapse-arrow my-5">
-        <input type="radio" name="corporation-dedication-accordion" {% if forloop.first %}checked{% endif %} />
+    <div class="collapse bg-base-100 collapse-arrow my-5">
+        <input type="checkbox" />
         <div class="bg-base-100 collapse-title truncate">
             {{ corporation_dedication_form.instance.diplomatic_dedication }}
         </div>
