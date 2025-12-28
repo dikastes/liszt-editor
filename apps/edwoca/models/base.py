@@ -53,8 +53,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             publisher_addition = self.publications.first().plate_number
 
         if self.publications.first() and self.publications.first().publisher:
-            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()} ({self.source_type})"
-        return f"<< Verlag >> {publisher_addition}, {self.get_temp_title()} ({self.source_type})"
+            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()} ({self.get_source_type_display()})"
+        return f"<< Verlag >> {publisher_addition}, {self.get_temp_title()} ({self.get_source_type_display()})"
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
@@ -633,11 +633,11 @@ class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):
 
         temporary_title = next((t.title for t in titles if t.status == Status.TEMPORARY), None)
         if temporary_title:
-            return f"{temporary_title.title} (T)"
+            return f"{temporary_title} (T)"
 
         alternative_title = next((t.title for t in titles if t.status == Status.ALTERNATIVE), None)
         if alternative_title:
-            return f"{alternative_title.title} (A)"
+            return f"{alternative_title} (A)"
 
         return '<ohne Titel>'
 
