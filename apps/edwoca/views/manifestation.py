@@ -1,5 +1,5 @@
 from ..forms.manifestation import *
-from ..forms.item import SignatureFormSet, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
+from ..forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
 from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
 from ..forms.publication import PublicationForm
 from ..forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
@@ -161,70 +161,28 @@ def manifestation_update(request, pk):
     if manifestation.is_singleton:
         item = manifestation.items.first()
 
-        if 'add_signature' in request.POST:
-            data = request.POST.copy()
-            total_forms = int(data.get(f'signatures-TOTAL_FORMS', 0))
-            data[f'signatures-TOTAL_FORMS'] = str(total_forms + 1)
-            signature_formset = SignatureFormSet(data, instance=item)
-        else:
-            signature_formset = SignatureFormSet(request.POST or None, instance=item)
-
-        if request.method == 'POST' and 'save_changes' in request.POST:
-            if item and manifestation_form.is_valid():
-                manifestation_form.save()
-            if signature_formset.is_valid():
-                signature_formset.save()
-            return redirect('edwoca:manifestation_update', pk=pk)
-
-        context['signature_formset'] = signature_formset
+        if manifestation.is_singleton:
+            context['signature_forms'] = []
+            for signature in manifestation.get_single_item().signatures.all():
+                signature_form = SignatureForm(
+                        request.POST or None,
+                        instance = signature,
+                        prefix = f"signature-{signature.id}"
+                    )
+                context['signature_forms'] += [ signature_form ]
+                if request.POST and signature_form.is_valid():
+                    signature_form.save()
+            if 'add_signature' in request.POST:
+                signature = ItemSignature.objects.create(
+                        item = manifestation.get_single_item(),
+                        status = ItemSignature.Status.FORMER
+                    )
+                context['signature_forms'] += [ SignatureForm(instance = signature, prefix = f"signature-{signature.id}") ]
         context['library_search_form'] = SearchForm()
     else:
-        if request.method == 'POST' and 'save_changes' in request.POST:
+        if request.method == 'POST':
             if manifestation_form.is_valid():
                 manifestation_form.save()
-            for item in manifestation.items.all():
-                signature_formset = SignatureFormSet(request.POST, instance=item, prefix=f'signatures_{item.id}')
-                if signature_formset.is_valid():
-                    signature_formset.save()
-
-            new_signature_formset = SignatureFormSet(request.POST, prefix='new_signatures') # No instance here yet
-
-            # Check if a new item should be created based on signature formset data
-            if new_signature_formset.is_valid() and new_signature_formset.has_changed():
-                # Create new_item instance
-                if manifestation.items.count():
-                    new_item = Item.objects.create(manifestation = manifestation)
-                else:
-                    new_item = Item.objects.create(manifestation = manifestation, is_template = True)
-
-                # Associate the signature formset with the newly created item
-                new_signature_formset = SignatureFormSet(request.POST, instance=new_item, prefix='new_signatures')
-                if new_signature_formset.is_valid():
-                    new_signature_formset.save()
-
-            return redirect('edwoca:manifestation_update', pk=pk)
-
-        item_forms = []
-        for item in manifestation.items.all():
-            signature_prefix = f'signatures_{item.id}'
-
-            signature_formset_data = request.POST or None
-
-            if f'add_signature_{item.id}' in request.POST:
-                data = request.POST.copy()
-                total_forms = int(data.get(f'{signature_prefix}-TOTAL_FORMS', 0))
-                data[f'{signature_prefix}-TOTAL_FORMS'] = str(total_forms + 1)
-                signature_formset_data = data
-
-            item_forms.append({
-                'item': item,
-                'signature_formset': SignatureFormSet(signature_formset_data, instance=item, prefix=signature_prefix)
-            })
-
-        new_signature_formset = NewItemSignatureFormSet(request.POST or None, prefix='new_signatures')
-
-        context['item_forms'] = item_forms
-        context['new_signature_formset'] = new_signature_formset
     context['manifestation_form'] = manifestation_form
 
     return render(request, 'edwoca/manifestation_update.html', context)
@@ -875,30 +833,41 @@ def manifestation_manuscript_update(request, pk):
         'object': manifestation,
         'entity_type': 'manifestation'
     }
+    item_handwriting_ids = [
+            handwriting.id
+            for handwriting
+            in manifestation.get_single_item().handwritings.all()
+        ]
+    modification_handwriting_ids = [
+            handwriting.id
+            for modification
+            in manifestation.get_single_item().modifications.all()
+            for handwriting
+            in modification.handwritings.all()
+        ]
 
     if request.method == 'POST':
-        if 'save_changes' in request.POST:
-            form = ItemManuscriptForm(request.POST, instance=item)
-            if form.is_valid():
-                form.save()
+        form = ItemManuscriptForm(request.POST, instance=item)
+        if form.is_valid():
+            form.save()
 
-            for handwriting in item.handwritings.all():
-                prefix = f'handwriting_{handwriting.id}'
-                handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+        for handwriting in item.handwritings.all():
+            prefix = f'handwriting_{handwriting.id}'
+            handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+            if handwriting_form.is_valid():
+                handwriting_form.save()
+
+        for modification in item.modifications.all():
+            prefix = f'modification_{modification.id}'
+            modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
+            if modification_form.is_valid():
+                modification_form.save()
+
+            for handwriting in modification.handwritings.all():
+                prefix = f'modification_handwriting_{handwriting.id}'
+                handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
-
-            for modification in item.modifications.all():
-                prefix = f'modification_{modification.id}'
-                modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
-                if modification_form.is_valid():
-                    modification_form.save()
-
-                for handwriting in modification.handwritings.all():
-                    prefix = f'modification_handwriting_{handwriting.id}'
-                    handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
-                    if handwriting_form.is_valid():
-                        handwriting_form.save()
 
         if 'add_handwriting' in request.POST:
             ItemHandwriting.objects.create(item=item)
@@ -910,11 +879,39 @@ def manifestation_manuscript_update(request, pk):
             modification_id = request.POST.get('add_modification_handwriting')
             modification = get_object_or_404(ItemModification, pk=modification_id)
             ModificationHandwriting.objects.create(modification=modification)
-            return redirect('edwoca:manifestation_manuscript', pk=pk)
+        
+        if 'delete_modification' in request.POST:
+            modification_id = request.POST.get('delete_modification')
+            modification = get_object_or_404(ItemModification, pk=modification_id)
+            modification.delete()
+
+        open_modifications = []
+        for key in request.POST:
+            if key.startswith('collapse_modification_'):
+                mod_id = int(key.split('_')[-1])
+                open_modifications.append(mod_id)
+        request.session['open_modifications'] = open_modifications
 
         return redirect('edwoca:manifestation_manuscript', pk=pk)
 
     else:
+        open_modifications = request.session.get('open_modifications', [])
+        if 'open_modifications' in request.session:
+            del request.session['open_modifications']
+        context['open_modifications'] = open_modifications
+
+        for handwriting_id in item_handwriting_ids + modification_handwriting_ids:
+            prefix = f'handwriting-{handwriting_id}'
+            if f'{prefix}-q' in request.GET:
+                search_form = SearchForm(request.GET or None, prefix = prefix)
+                if search_form.is_valid() and search_form.cleaned_data.get('q'):
+                    context['query'] = search_form.cleaned_data.get('q')
+                    context['search_form'] = search_form
+                    context['handwriting_found_persons'] = {
+                            'handwriting_id': handwriting_id,
+                            'results': search_form.search().models(Person)
+                        }
+
         form = ItemManuscriptForm(instance=item)
         handwriting_forms = []
         for handwriting in item.handwritings.all():
@@ -926,12 +923,12 @@ def manifestation_manuscript_update(request, pk):
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
             modification_form = ItemModificationForm(instance=modification, prefix=prefix)
-            
+
             handwriting_forms = []
             for handwriting in modification.handwritings.all():
                 prefix = f'modification_handwriting_{handwriting.id}'
                 handwriting_forms.append(ModificationHandwritingForm(instance=handwriting, prefix=prefix))
-            
+
             modifications.append({
                 'form': modification_form,
                 'handwriting_forms': handwriting_forms
@@ -940,12 +937,7 @@ def manifestation_manuscript_update(request, pk):
         context['modifications'] = modifications
 
     context['form'] = form
-    search_form = SearchForm(request.GET or None)
-    context['search_form'] = search_form
-
-    if search_form.is_valid() and search_form.cleaned_data.get('q'):
-        context['query'] = search_form.cleaned_data.get('q')
-        context[f"manifestation_found_persons"] = search_form.search().models(Person)
+    #context['search_form'] = search_form
 
     if request.GET.get('handwriting_id'):
         context['handwriting_id'] = int(request.GET.get('handwriting_id'))
@@ -961,33 +953,33 @@ def manifestation_manuscript_update(request, pk):
         context['modification_handwriting_id'] = int(request.GET.get('modification_handwriting_id'))
 
     # Search forms for modifications
-    q_work = request.GET.get('work-q')
-    q_expression = request.GET.get('expression-q')
-    q_manifestation = request.GET.get('manifestation-q')
+    for key in request.GET:
+        if key.startswith('modification-') and key.endswith('-q'):
+            parts = key.split('-')
+            modification_id = int(parts[1])
+            model_name = parts[2]
+            
+            context['modification_id'] = modification_id
+            if modification_id not in open_modifications:
+                open_modifications.append(modification_id)
 
-    if q_work:
-        work_search_form = SearchForm(request.GET, prefix='work')
-        if work_search_form.is_valid():
-            context['query_work'] = work_search_form.cleaned_data.get('q')
-            context['found_works'] = work_search_form.search().models(Work)
-    else:
-        work_search_form = SearchForm(prefix='work')
+            query = request.GET.get(key)
+            
+            search_form = SearchForm({'q': query})
+            
+            if model_name == 'work':
+                context['query_work'] = query
+                context['found_works'] = search_form.search().models(Work)
+            elif model_name == 'expression':
+                context['query_expression'] = query
+                context['found_expressions'] = search_form.search().models(Expression)
+            elif model_name == 'manifestation':
+                context['query_manifestation'] = query
+                context['found_manifestations'] = search_form.search().models(Manifestation)
 
-    if q_expression:
-        expression_search_form = SearchForm(request.GET, prefix='expression')
-        if expression_search_form.is_valid():
-            context['query_expression'] = expression_search_form.cleaned_data.get('q')
-            context['found_expressions'] = expression_search_form.search().models(Expression)
-    else:
-        expression_search_form = SearchForm(prefix='expression')
-
-    if q_manifestation:
-        manifestation_search_form = SearchForm(request.GET, prefix='manifestation')
-        if manifestation_search_form.is_valid():
-            context['query_manifestation'] = manifestation_search_form.cleaned_data.get('q')
-            context['found_manifestations'] = manifestation_search_form.search().models(Manifestation)
-    else:
-        manifestation_search_form = SearchForm(prefix='manifestation')
+    work_search_form = SearchForm(prefix='work')
+    expression_search_form = SearchForm(prefix='expression')
+    manifestation_search_form = SearchForm(prefix='manifestation')
 
     context['work_search_form'] = work_search_form
     context['expression_search_form'] = expression_search_form

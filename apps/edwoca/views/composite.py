@@ -35,7 +35,6 @@ class CompositeSearchView(EdwocaSearchView):
         return super().get_queryset().filter(is_singleton = False)
 
 
-
 def composite_create(request):
     if request.method == 'POST':
         form = CompositeCreateForm(request.POST)
@@ -119,7 +118,8 @@ class CompositeManifestationRelationDeleteView(DeleteView):
 class CompositeRelationsUpdateView(EntityMixin, RelationsUpdateView):
     template_name = 'edwoca/composite_relations.html'
     model = Composite
-    form_class = RelatedManifestationForm
+    #form_class = RelatedManifestationForm
+    fields = []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -148,7 +148,8 @@ class CompositeHistoryUpdateView(SimpleFormView):
     model = Composite
     property = 'history'
     template_name = 'edwoca/composite_history.html'
-    form_class = CompositeHistoryForm
+    #form_class = CompositeHistoryForm
+    fields = []
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
