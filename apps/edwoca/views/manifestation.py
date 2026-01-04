@@ -1,4 +1,5 @@
 from ..forms.manifestation import *
+from calendar import monthrange
 from ..forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
 from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
 from ..forms.publication import PublicationForm
@@ -173,16 +174,18 @@ def manifestation_update(request, pk):
                 if request.POST and signature_form.is_valid():
                     signature_form.save()
             if 'add_signature' in request.POST:
+                item = manifestation.get_single_item()
+                status = ItemSignature.Status.CURRENT
+                if item.signatures.count():
+                    status = ItemSignature.Status.FORMER
                 signature = ItemSignature.objects.create(
-                        item = manifestation.get_single_item(),
-                        status = ItemSignature.Status.FORMER
+                        item = item,
+                        status = status
                     )
                 context['signature_forms'] += [ SignatureForm(instance = signature, prefix = f"signature-{signature.id}") ]
         context['library_search_form'] = SearchForm()
-    else:
-        if request.method == 'POST':
-            if manifestation_form.is_valid():
-                manifestation_form.save()
+    if request.POST and manifestation_form.is_valid():
+            manifestation_form.save()
     context['manifestation_form'] = manifestation_form
 
     return render(request, 'edwoca/manifestation_update.html', context)
@@ -495,6 +498,16 @@ class ManifestationHistoryUpdateView(SimpleFormView):
     property = 'history'
     template_name = 'edwoca/manifestation_history.html'
     form_class = ManifestationHistoryForm
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(self, request, *args, **kwargs)
+        if 'calculate-machine-readable-date' in request.POST:
+            period = self.object.period
+            period.parse_display()
+            period.save()
+
+        return response
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

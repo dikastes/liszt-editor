@@ -8,7 +8,8 @@ from dmad_on_django.forms import SearchForm
 
 class SimpleFormMixin:
     text_area_classes = 'textarea textarea-bordered w-full bg-white border-black'
-    text_input_classes = 'input input-bordered w-full'
+    text_input_classes = 'input input-bordered w-full border-black bg-white'
+    text_label_classes = 'input input-bordered w-full border-black bg-white flex gap-2 items-center'
     autocomplete_classes = 'autocomplete-select select select-bordered w-full border-black bg-white'
     select_classes = 'select select-bordered w-full border-black bg-white'
 

@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period, Corporation
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting
-from dominate.tags import div, label, span
+from dominate.tags import div, label, span, _input
 from dominate.util import raw
 from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
@@ -104,7 +104,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'class': 'select select-bordered'
+                'class': SimpleFormMixin.select_classes
             }
         }
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
@@ -162,8 +162,8 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         display_field = self['display']
         #history_field = self['history']
 
-        not_before_container = label(cls='form-control')
-        not_before_label = div(not_before_field.label, cls='label-text')
+        not_before_container = label(cls='form-control flex-0')
+        not_before_label = div(_('not before'), cls='label-text')
         not_before_selects = div(cls='flex')
         not_before_selects.add(raw(str(not_before_field)))
         not_before_container.add(not_before_label)
@@ -171,8 +171,8 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         if not_before_field.errors:
             not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        not_after_container = label(cls='form-control')
-        not_after_label = div(not_after_field.label, cls='label-text')
+        not_after_container = label(cls='form-control flex-0')
+        not_after_label = div(_('not after'), cls='label-text')
         not_after_selects = div(cls='flex')
         not_after_selects.add(raw(str(not_after_field)))
         not_after_container.add(not_after_label)
@@ -180,7 +180,9 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        calculate_input = _input(type='submit', cls='btn btn-outline flex-0', value=_('calculate'), name='calculate-machine-readable-date')
+
+        display_container = label(_('standardized date'), _for = display_field.id_for_label, cls=SimpleFormMixin.text_label_classes)
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
@@ -193,20 +195,14 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         date_diplomatic_wrap.add(date_diplomatic_label)
         date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
 
-        #history_wrap = label(cls='form-control')
-        #history_label = div(cls='label')
-        #history_span = span(history_field.label, cls='label-text')
-        #history_label.add(history_span)
-        #history_wrap.add(history_label)
-        #history_wrap.add(raw(str(history_field)))
-
-        period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        period_palette = div(cls='flex flex-rows w-full gap-10 my-5 items-end')
         period_palette.add(not_before_container)
         period_palette.add(not_after_container)
-        #period_palette.add(display_container)
+        period_palette.add(div(cls='flex-1'))
+        period_palette.add(calculate_input)
 
-        form.add(period_palette)
         form.add(display_container)
+        form.add(period_palette)
         form.add(date_diplomatic_wrap)
 
         private_history_comment_field = self['private_history_comment']
@@ -255,16 +251,16 @@ class ManifestationClassificationForm(ModelForm):
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
-                        'class': 'select w-full select-bordered'
+                        'class': SimpleFormMixin.select_classes,
                     }),
                 'edition_type': Select( attrs = {
-                        'class': 'select w-full select-bordered'
+                        'class': SimpleFormMixin.select_classes,
                     }),
                 'function': Select( attrs = {
-                        'class': 'select w-full select-bordered'
+                        'class': SimpleFormMixin.select_classes,
                     }),
                 'source_type': Select( attrs = {
-                        'class': 'select w-full select-bordered'
+                        'class': SimpleFormMixin.select_classes,
                     }),
             }
 
