@@ -1,5 +1,7 @@
 {% extends 'edwoca/base.html' %}
+
 {% load static %}
+{% load i18n %}
 
 {% block modals %}
     {% if not object.is_singleton %}
@@ -27,7 +29,6 @@
                             </div>
                         {% endfor %}
 
-                        
                         <div class="flex gap-5">
                             <div class="flex-1"></div>
                             <input type="submit" name="add_signature_{{ item_form.item.id }}" value="Signatur hinzufügen" class="flex-0 btn">
@@ -53,7 +54,6 @@
                         </div>
                     {% endfor %}
 
-                    
                     <div class="flex gap-5">
                         <div class="flex-1"></div>
                         <input type="submit" name="save_changes" value="Speichern" class="flex-0 btn btn-primary">
@@ -71,108 +71,100 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
 
-<div class="bg-white border border-base-300 p-5 mb-10">
-    <div class="prose">
-        <h2> Fassungen </h2>
-        <h3> verknüpfte Fassungen </h3>
-        <ul>
-        {% for expression in object.expressions.all %}
+<h2 class="mb-5"> Fassungen </h2>
+
+<h3 class="mb-5"> verknüpfte Fassungen </h3>
+
+<ul class="list-disc ml-5 mb-5">
+{% for expression in object.expressions.all %}
+    <li>
+        <div class="flex items-center">
+            <a href="{% url 'edwoca:expression_update' expression.id %}" class="flex-1">
+                {{ expression }}
+            </a>
+            <a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-sm ml-4">
+                entfernen
+            </a>
+        </div>
+    </li>
+{% empty %}
+    <li> <em> keine Fassungen verknüpft </em> </span> </li>
+{% endfor %}
+</ul>
+
+<h3 class="mb-5"> neue Expression verknüpfen </h3>
+
+<form class="flex w-full" action="{% url 'edwoca:manifestation_relations' object.id %}" method="get">
+    <input type="text" name="expression-q" class="flex-1 input input-bordered border-black bg-white border-r-0" value="{% if query_expression %}{{ query_expression }}{% endif %}">
+    <input type="submit" id="submit-form" class="btn btn-outline flex-0" value="{% translate 'search' %}" />
+</form>
+
+{% if query_expression %}
+    <ul class="border border-black p-2 h-32 overflow-auto">
+        {% for found_expression in found_expressions %}
             <li>
-                <div class="flex items-center">
-                    <a href="{% url 'edwoca:expression_update' expression.id %}" class="flex-1">
-                        {{ expression }}
-                    </a>
-                    <a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-sm ml-4">
-                        entfernen
-                    </a>
-                </div>
-            </li>
-        {% empty %}
-            <li> <em> keine Fassungen verknüpft </em> </span> </li>
-        {% endfor %}
-        </ul>
-
-        <h3> neue Expression verknüpfen </h3>
-
-        <form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get">
-            {{ expression_search_form.q.label_tag }}
-            <input type="text" name="expression-q" class="input input-bordered" value="{% if query_expression %}{{ query_expression }}{% endif %}">
-            <input type="submit" id="submit-form" class="btn" />
-        </form>
-        
-        <ul>
-        {% if query_expression %}
-            {% for found_expression in found_expressions %}
-                <li>
-                    <div class="flex items-center">
-                        <div class="flex-1">
-                            {{ found_expression.object }}
-                        </div>
-                        <a href="{% url 'edwoca:manifestation_expression_add' object.id found_expression.object.id %}" class="btn btn-sm ml-4">
-                            hinzufügen
-                        </a>
-                    </div>
-                </li>
-            {% empty %}
-                <li> <em> keine Suchergebnisse </em> </li>
-            {% endfor %}
-        {% else %}
-            <li> <em> bitte Suchbegriff eingeben </em> </li>
-        {% endif %}
-        </ul>
-    </div>
-</div>
-
-<div class="bg-white border border-base-300 p-5 mb-10">
-    <div class="prose">
-        <h2> Manifestationen </h2>
-
-        <h3> ausgehende Verknüpfungen </h3>
-        <em> Verknüpfungen, die mit Hilfe des Suchformulars unten angelegt werden, erscheinen hier </em>
-        <ul>
-        {% for manifestation_relation in object.source_manifestation_of.all %}
-            <li>
-                <div class="flex items-center">
-                    <a href="{% url 'edwoca:manifestation_relations' manifestation_relation.target_manifestation.id %}" class="flex-1">
-                        {{ manifestation_relation.target_manifestation }} ({{ manifestation_relation.label }})
-                    </a>
-                    <form method="post" action="{% url 'edwoca:related_manifestation_remove' manifestation_relation.id %}" class="flex-0 ml-4">
-                        {% csrf_token %}
-                        <input type="submit" class="btn btn-sm" value="entfernen">
-                    </form>
-                </div>
-            </li>
-        {% empty %}
-            <li> <em> keine Manifestationen verknüpft </em> </span> </li>
-        {% endfor %}
-        </ul>
-
-        <h3> eingehende Verknüpfungen </h3>
-        <em> Manifestationen, die mit dieser Manifestation verknüpft wurden, erscheinen hier </em>
-        <ul>
-        {% for manifestation_relation in object.target_manifestation_of.all %}
-            <li>
-                <a href="{% url 'edwoca:manifestation_relations' manifestation_relation.source_manifestation.id %}" class="flex-1">
-                    {{ manifestation_relation.source_manifestation }} ({{ manifestation_relation.label }})
+                <a href="{% url 'edwoca:manifestation_expression_add' object.id found_expression.object.id %}">
+                    {{ found_expression.object }}
                 </a>
             </li>
         {% empty %}
-            <li> <em> keine eingehenden Verknüpfungen </em> </li>
+            <li>
+                <em>
+                    {% translate 'no search results' %}
+                </em>
+            </li>
         {% endfor %}
-        </ul>
+    </ul>
+{% endif %}
 
-        <h3> neue Manifestation verknüpfen </h3>
+<h2 class="mb-5"> Manifestationen </h2>
 
-        {% if show_search_form == True %}
+<h3> ausgehende Verknüpfungen </h3>
+<em> Verknüpfungen, die mit Hilfe des Suchformulars unten angelegt werden, erscheinen hier </em>
+<ul class="list-disc ml-5 my-5">
+    {% for manifestation_relation in object.source_manifestation_of.all %}
+        <li>
+            <div class="flex items-center">
+                <a href="{% url 'edwoca:manifestation_relations' manifestation_relation.target_manifestation.id %}" class="flex-1">
+                    {{ manifestation_relation.target_manifestation }} ({{ manifestation_relation.label }})
+                </a>
+                <form method="post" action="{% url 'edwoca:related_manifestation_remove' manifestation_relation.id %}" class="flex-0 ml-4">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-sm" value="entfernen">
+                </form>
+            </div>
+        </li>
+    {% empty %}
+        <li> <em> keine Manifestationen verknüpft </em> </span> </li>
+    {% endfor %}
+</ul>
 
-        <form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get">
-            {{ searchform.q }}
-            <input type="hidden" name="target_model" value="manifestation">
-            <input type="submit" id="submit-form" class="btn" />
-        </form>
-        
-        <ul>
-        {% if query %}
+<h3> eingehende Verknüpfungen </h3>
+<em> Manifestationen, die mit dieser Manifestation verknüpft wurden, erscheinen hier </em>
+<ul class="list-disc ml-5 my-5">
+    {% for manifestation_relation in object.target_manifestation_of.all %}
+        <li>
+            <a href="{% url 'edwoca:manifestation_relations' manifestation_relation.source_manifestation.id %}" class="flex-1">
+                {{ manifestation_relation.source_manifestation }} ({{ manifestation_relation.label }})
+            </a>
+        </li>
+    {% empty %}
+        <li> <em> keine eingehenden Verknüpfungen </em> </li>
+    {% endfor %}
+</ul>
+
+<h3 class="my-5"> neue Manifestation verknüpfen </h3>
+
+{% if show_search_form == True %}
+
+    <form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get" class="w-full flex">
+        {{ searchform.q }}
+        <input type="hidden" name="target_model" value="manifestation">
+        <input type="submit" value="{% translate 'search' %}" id="submit-form" class="btn btn-outline border-l-0" />
+    </form>
+
+    {% if query %}
+        <ul class="border border-black p-2 h-32 overflow-auto">
             {% for found_manifestation in found_manifestations %}
                 <li>
                     <a href="{% url 'edwoca:related_manifestation_add' object.id found_manifestation.object.id %}" class="flex-1">
@@ -182,56 +174,41 @@
             {% empty %}
                 <li> <em> keine Suchergebnisse </em> </li>
             {% endfor %}
-        {% else %}
-            <li> <em> bitte Suchbegriff eingeben </em> </li>
-        {% endif %}
         </ul>
+    {% endif %}
 
-        {% else %}
+{% else %}
 
-        <form method="post">
-            {% csrf_token %}
-            {{ object }} mit {{ object }} verknüpfen als:
-            {{ form }}
-            <input type="submit" id="submit-form" class="btn" />
-        </form>
+    <form method="post">
+        {% csrf_token %}
+        {{ object }} mit {{ object }} verknüpfen als:
+        {{ form }}
+        <input type="submit" id="submit-form" class="btn" />
+    </form>
 
-        {% endif %}
-    </div>
-</div>
-
-{% if not object.is_singleton %}
-    <div class="bg-white border border-base-300 p-5 mb-10">
-        <div class="prose">
-            <h2> Exemplare </h2>
-            {% if object.missing_item %}
-                <p> Alle Exemplare dieses Drucks sind verschollen </p>
-            {% else %}
-                
-                <div id="item-list-container">
-                    {% include 'edwoca/partials/manifestation/item_list.html' %}
-                </div>
-                
-                <div class="flex mt-4">
-                    <div class="flex-1"></div>
-                    <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn flex-0"> neues Exemplar </a>
-                </div>
-            {% endif %}
-        </div>
-    </div>
 {% endif %}
 
+{% if not object.is_singleton %}
+    <h2 class="my-5"> Exemplare </h2>
+    {% if object.missing_item %}
+        <p> Alle Exemplare dieses Drucks sind verschollen </p>
+    {% else %}
+        <div id="item-list-container">
+            {% include 'edwoca/partials/manifestation/item_list.html' %}
+        </div>
+        <div class="flex mt-4">
+            <div class="flex-1"></div>
+            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn flex-0"> neues Exemplar </a>
+        </div>
+    {% endif %}
+{% endif %}
 
-<div class="bg-white border border-base-300 p-5 mt-5">
-    <div class="prose">
-        <h2> interner Kommentar (Bezüge) </h2>
-        <form method="post">
-            {% csrf_token %}
-            {{ relations_comment_form.as_daisy }}
-            <input id="submit-form" type="submit" value="Speichern" class="hidden">
-        </form>
-    </div>
-</div>
+<h2 class="my-5"> interner Kommentar (Bezüge) </h2>
+<form method="post">
+    {% csrf_token %}
+    {{ relations_comment_form.as_daisy }}
+    <input id="submit-form" type="submit" value="Speichern" class="hidden">
+</form>
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_epilog.html' %}
 

@@ -9,6 +9,7 @@ module.exports = {
   safelist: [
     'text-primary-content',
     'items-center',
+    'items-end',
     'form-control',
     'label',
     'label-text',

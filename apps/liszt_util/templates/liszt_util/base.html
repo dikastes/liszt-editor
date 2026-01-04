@@ -15,6 +15,8 @@
     {% endblock %}
 
     <body class="bg-white min-h-screen h-screen flex flex-col">
+        {% block form %}
+        {% endblock %}
         <div class="navbar bg-base-100 flex flex-0 p-0 items-stretch px-10 gap-10 ">
             <div class="flex-none min-h-inherit">
                 {% render_main_navbar_link %}
