@@ -54,16 +54,13 @@
                     {% endif %}
                 {% endif %}
 
-                <form method="post" class="mt-5">
-                    {% csrf_token %}
-                    {{ pps_form.management_form }}
+                <h3>
+                    {% translate 'date provenance' %}
+                </h3>
 
-                    {{ pps_form.as_daisy }}
+                {{ pps_form.as_daisy }}
 
-                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-person-{{ pps_form.instance.id }}">
-                </form>
-
-                <h3 class="text-lg font-bold">
+                <h3>
                     {% translate 'bibliography' %}
                 </h3>
                 <ul>
@@ -79,12 +76,6 @@
                                 <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
                             </form>
                         </div>
-                    </li>
-                {% empty %}
-                    <li>
-                        <em>
-                            {% translate 'no bibliography' %}
-                        </em>
                     </li>
                 {% endfor %}
                 </ul>
@@ -110,7 +101,7 @@
                     </ul>
                 {% endif %}
 
-                <h3 class="text-lg font-bold mt-5">
+                <h3>
                     {% translate 'letters' %}
                 </h3>
                 <ul>
@@ -126,12 +117,6 @@
                                 <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
                             </form>
                         </div>
-                    </li>
-                {% empty %}
-                    <li>
-                        <em>
-                            {% translate 'no letters' %}
-                        </em>
                     </li>
                 {% endfor %}
                 </ul>
@@ -217,16 +202,13 @@
                     {% endif %}
                 {% endif %}
 
-                <form method="post" class="mt-5">
-                    {% csrf_token %}
-                    {{ cps_form.management_form }}
+                <h3>
+                    {% translate 'date provenance' %}
+                </h3>
 
-                    {{ cps_form.as_daisy }}
+                {{ cps_form.as_daisy }}
 
-                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-corporation-{{ cps_form.instance.id }}">
-                </form>
-
-                <h3 class="text-lg font-bold">
+                <h3>
                     {% translate 'bibliography' %}
                 </h3>
                 <ul>
@@ -242,12 +224,6 @@
                                 <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
                             </form>
                         </div>
-                    </li>
-                {% empty %}
-                    <li>
-                        <em>
-                            {% translate 'no bibliography' %}
-                        </em>
                     </li>
                 {% endfor %}
                 </ul>
@@ -273,7 +249,7 @@
                     </ul>
                 {% endif %}
 
-                <h3 class="text-lg font-bold mt-5">
+                <h3>
                     {% translate 'letters' %}
                 </h3>
                 <ul>
@@ -289,12 +265,6 @@
                                 <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
                             </form>
                         </div>
-                    </li>
-                {% empty %}
-                    <li>
-                        <em>
-                            {% translate 'no letters' %}
-                        </em>
                     </li>
                 {% endfor %}
                 </ul>
