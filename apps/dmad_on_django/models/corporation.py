@@ -50,10 +50,10 @@ class Corporation(DisplayableModel):
 
     # broaderTermInstantial -> bisher nur für Verlage überprüft
     category = models.ManyToManyField(SubjectTerm)
-    
+
     # placeOfBusiness
     place = models.ManyToManyField(Place)
-    
+
     # period not before: dateOfEstablishment,
     # period not after: dateOfTermination,
     # period display: something like 1880-1882
@@ -70,16 +70,16 @@ class Corporation(DisplayableModel):
 
 
     def update_from_raw(self):
-        
+
         pl_org = PyLobidOrg()
         pl_org.process_data(data=loads(self.raw_data))
 
         GNDSubjectCategory.create_or_link(self)
         self.geographic_area_codes.all().delete()
         CorporationGeographicAreaCode.create_geographic_area_codes(self)
-        
+
         self.names.all().delete()
-        
+
         pref_name = CorporationName.create_from_string(pl_org.pref_name, Status.PRIMARY, self)
         pref_name.save()
 
@@ -140,10 +140,10 @@ class Corporation(DisplayableModel):
 
     def get_table(self):
         table = CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
-        
+
         for pl in self.place.all():
             table.append(("Wirkungsort", get_model_link(pl)))
-        
+
         table += GNDSubjectCategory.get_subject_category_table(self)
 
         table.append(("Zeitraum", self.period))
@@ -152,7 +152,7 @@ class Corporation(DisplayableModel):
             table.append(("Kategorie", get_model_link(c)))
 
         return table
-    
+
     @staticmethod
     def search(search_string):
         lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:Company OR type:CorporateBody)&size=5&format=json:suggest"
@@ -160,7 +160,9 @@ class Corporation(DisplayableModel):
         return lobid_response.json()
 
     def __str__(self):
-        return f'{self.gnd_id}: {self.get_default_name()}'
+        if self.gnd_id:
+            return f'{self.get_default_name()} ({self.gnd_id})'
+        return self.interim_designator
 
     def get_model(self):
         return self

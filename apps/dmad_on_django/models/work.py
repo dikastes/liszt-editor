@@ -34,9 +34,11 @@ class WorkName(models.Model):
         workname.status = status
         workname.work = work
         return workname
-    
+
     def __str__(self):
-        return self.name
+        if self.gnd_id:
+            return f'{self.name} ({self.gnd_id})'
+        return self.interim_designator
 
 
 class Work(DisplayableModel):

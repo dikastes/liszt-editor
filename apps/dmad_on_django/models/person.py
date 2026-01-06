@@ -62,7 +62,7 @@ class Person(DisplayableModel):
         MALE = 'm', 'male'
         FEMALE = 'f', 'female'
         NULL = '', 'null'
-        
+
     gender = models.CharField(
         max_length=1,
         choices=Gender,
@@ -237,7 +237,7 @@ class Person(DisplayableModel):
 
     def __str__(self):
         if self.gnd_id:
-            return f'{self.gnd_id}: {self.get_default_name()}'
+            return f'{self.get_default_name()} ({self.gnd_id})'
         return self.interim_designator
 
     @staticmethod
