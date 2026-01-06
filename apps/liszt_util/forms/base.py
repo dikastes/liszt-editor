@@ -8,6 +8,15 @@ class SearchForm(GenericAsDaisyMixin, SearchForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields['q'].widget.attrs.update({
+                'class': 'grow',
+            })
+
+
+class FramedSearchForm(SearchForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         if 'entity_type' in kwargs:
             placeholder = _(kwargs['entity_type'])
         else:

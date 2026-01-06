@@ -6,7 +6,7 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/bib_prolog.html' %}
 
-    <h2>
+    <h2 class="my-5">
         {% translate 'bibliography' %}
     </h2>
 
@@ -31,25 +31,23 @@
         {% endfor %}
     </ul>
 
-    <h3>
+    <h3 class="my-5">
         {% translate 'link new bibliographic dataset' %}
     </h3>
 
     {% if show_zotitem_search_form == True %}
 
-    <form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
-        <label class="input input-bordered flex items-center gap-2 flex-1">
-            {{ zotitem_searchform.q }}
-        </label>
+    <form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex">
+        <input type="text" class="input input-bordered border-black bg-white flex-1 border-r-0" name="zotitem-q" placeholder="{% translate 'search bibliography' %}" value="{{ zotitem_query }}" />
         <input type="hidden" name="target_model" value="{{ entity_type}}" />
-        <input type="submit" id="submit-form" class="btn" value="{% translate 'search' %}"/>
+        <input type="submit" id="submit-form" class="btn btn-outline" value="{% translate 'search' %}"/>
     </form>
 
-    <ul>
-        {% if zotitem_query %}
+    {% if zotitem_query %}
+        <ul class="border border-black p-2 h-32 overflow-auto">
             {% for found_bib in found_bibs %}
                 <li>
-                    <form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_bib_add' object.id found_bib.object.pk %}">
+                    <form method="POST" class="m-0" action="{% url 'edwoca:'|add:entity_type|add:'_bib_add' object.id found_bib.object.pk %}">
                         {% csrf_token %}
                         <input type="submit" value="{{ found_bib.object }}" class="cursor-pointer">
                     </form>
@@ -61,16 +59,12 @@
                     </em>
                 </li>
             {% endfor %}
-        {% else %}
-            {% comment %}
-                <li> <em> bitte Suchbegriff eingeben </em> </li>
-            {% endcomment %}
-        {% endif %}
-    </ul>
+        </ul>
+    {% endif %}
 
     {% endif %}
 
-    <h2>
+    <h2 class="my-5">
         {% translate 'letters' %}
     </h2>
 
@@ -94,26 +88,23 @@
         {% endfor %}
     </ul>
 
-    <h3>
+    <h3 class="my-5">
         {% translate 'link new letter' %}
     </h3>
 
     {% if show_letter_search_form == True %}
 
-    <form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex gap-5">
-        <label class="input input-bordered flex items-center gap-2 flex-1">
-            {% translate 'letter' %}
-            {{ letter_searchform.q }}
-        </label>
+    <form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex">
+        <input type="text" class="input input-bordered border-black bg-white flex-1 border-r-0" name="letter-q" placeholder="{% translate 'search bibliography' %}" value="{{ letter_query }}" />
         <input type="hidden" name="target_model" value="{{ entity_type }}" />
-        <input type="submit" id="submit-form" class="btn" value="{% translate 'search' %}"/>
+        <input type="submit" id="submit-form" class="btn btn-outline" value="{% translate 'search' %}"/>
     </form>
 
-    <ul>
-        {% if letter_query %}
+    {% if letter_query %}
+        <ul class="border border-black p-2 h-32 overflow-auto">
             {% for found_letter in found_letters %}
                 <li>
-                    <form method="POST" action="{% url 'edwoca:'|add:entity_type|add:'_letter_add' object.id found_letter.object.pk %}">
+                    <form method="POST" class="m-0" action="{% url 'edwoca:'|add:entity_type|add:'_letter_add' object.id found_letter.object.pk %}">
                         {% csrf_token %}
                         <input type="submit" value="{{ found_letter.object }}" class="cursor-pointer">
                     </form>
@@ -125,12 +116,8 @@
                     </em>
                 </li>
             {% endfor %}
-        {% else %}
-            {% comment %}
-                <li> <em> bitte Suchbegriff eingeben </em> </li>
-            {% endcomment %}
-        {% endif %}
-    </ul>
+        </ul>
+    {% endif %}
 
 {% endif %}
 

@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, FormView, CreateView, DeleteView
 from django.db.models import Case, When
-from liszt_util.forms import SearchForm
+from liszt_util.forms import FramedSearchForm, SearchForm
 from dmad_on_django.models import Person, Status, Corporation, Place
 from bib.models import ZotItem
 from ..forms import LetterForm, LetterMentioningForm
@@ -26,7 +26,7 @@ class EdwocaListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = SearchForm()
+        context['form'] = FramedSearchForm()
         context['work_count'] = Work.objects.count()
         context['expression_count'] = Expression.objects.count()
         context['manifestation_count'] = Manifestation.objects.filter(is_singleton = False).count()
@@ -52,7 +52,7 @@ class EntityMixin:
 
 class EdwocaSearchView(SearchView):
     template_name = 'edwoca/list.html'
-    form_class = SearchForm
+    form_class = FramedSearchForm
     paginate_by = 10
 
     def get_model_name(self):

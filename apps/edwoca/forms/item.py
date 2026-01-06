@@ -168,12 +168,13 @@ class PersonProvenanceStationForm(ModelForm):
     kwargs = {
         'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
         'attrs': {
-            'class': 'select select-bordered'
+            'class': 'select select-bordered border-black bg-white',
+            'form': 'form'
         }
     }
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow'}))
+    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow', 'form': 'form'}))
 
     class Meta:
         model = PersonProvenanceStation
@@ -228,7 +229,7 @@ class PersonProvenanceStationForm(ModelForm):
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        display_container = label(display_field.label, _for=display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container = label(display_field.label, _for=display_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 my-5')
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
@@ -247,12 +248,13 @@ class CorporationProvenanceStationForm(ModelForm):
     kwargs = {
         'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
         'attrs': {
-            'class': 'select select-bordered'
+            'class': 'select select-bordered border-black bg-white',
+            'form': 'form'
         }
     }
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow'}))
+    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow', 'form': 'form'}))
 
     class Meta:
         model = CorporationProvenanceStation
@@ -307,7 +309,7 @@ class CorporationProvenanceStationForm(ModelForm):
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        display_container = label(display_field.label, _for=display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container = label(display_field.label, _for=display_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 my-5')
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
@@ -381,10 +383,12 @@ class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):
         fields = ['public_provenance_comment', 'private_provenance_comment']
         widgets = {
             'public_provenance_comment': Textarea(attrs={
-                'class': SimpleFormMixin.text_area_classes
+                'class': SimpleFormMixin.text_area_classes,
+                'form': 'form'
             }),
             'private_provenance_comment': Textarea(attrs={
-                'class': SimpleFormMixin.text_area_classes
+                'class': SimpleFormMixin.text_area_classes,
+                'form': 'form'
             })
         }
 
