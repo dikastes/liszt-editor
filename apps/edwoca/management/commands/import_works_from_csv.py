@@ -108,4 +108,4 @@ class Command(BaseCommand):
                                 expression = expression,
                                 status = Status.TEMPORARY
                             )
-        Expression.objects().delete()
+        Expression.objects.delete()
