@@ -833,6 +833,11 @@ class Letter(models.Model):
             related_name = 'letters'
         )
 
+    def get_first_mentioning(self):
+        if self.lettermentioning_set.all():
+            return str(self.lettermentioning_set.first())
+        return f'<{_("no proof")}>'
+
     def get_absolute_url(self):
         return reverse('edwoca:letter_update', kwargs={'pk': self.id})
 
@@ -859,7 +864,7 @@ class Letter(models.Model):
             else:
                 receiver = 'unbekannt'
 
-        return f'{sender} an {receiver}, {self.period}'
+        return f'{sender} an {receiver}, {self.period} ({self.get_first_mentioning()})'
 
 
 class LetterMentioning(models.Model):
@@ -877,6 +882,9 @@ class LetterMentioning(models.Model):
             blank = True,
             verbose_name = _('pages')
         )
+
+    def __str__(self):
+        return f'{self.bib.zot_short_title}, {self.pages}'
 
 class ItemModification(models.Model):
     item = models.ForeignKey(
