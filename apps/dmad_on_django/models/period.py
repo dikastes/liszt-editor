@@ -8,6 +8,11 @@ from datetime import date, datetime
 
 
 class Period(models.Model):
+    class Status(models.TextChoices):
+        DOCUMENTED = 'D', _('documented')
+        INFERRED = 'I', _('inferred')
+        ASSUMED = 'A', _('assumed')
+
     not_before = models.DateField(
             null=True,
             blank=True,
@@ -23,6 +28,13 @@ class Period(models.Model):
             blank=True,
             verbose_name = _("standardized date")
         )
+    status = models.TextField(
+            choices = Status,
+            max_length = 1,
+            null = True,
+            blank = True,
+            verbose_name = _("status")
+        )
 
     def render_detailed(self):
         if self.not_before == self.not_after:
@@ -33,16 +45,17 @@ class Period(models.Model):
         return self.display
 
     def parse_display(self):
-        INSECURE_TOKEN = '[?]'
+        ASSUMED_TOKEN = '[?]'
         display_value = self.display
 
-        if INSECURE_TOKEN in display_value:
-            period.insecure = True
-            display_value = display_value.replace(INSECURE_TOKEN, '').strip()
+        self.status = self.Status.DOCUMENTED
+        if ASSUMED_TOKEN in display_value:
+            self.status = self.Status.ASSUMED
+            display_value = display_value.replace(ASSUMED_TOKEN, '').strip()
 
         if '[' in display_value:
             if ']' in display_value:
-                period.inferred = True
+                self.status = self.Status.INFERRED
                 display_value = display_value.replace('[', '').replace(']', '').strip()
             else:
                 raise Exception('Invalid display date. A [ was provided but no ].')
