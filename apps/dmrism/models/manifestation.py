@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
+from dmad_on_django.models.base import DocumentationStatus
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
@@ -275,6 +276,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = 'specific figure'
         )
+    plate_number = models.CharField(
+            max_length = 50,
+            null = True,
+            blank = True,
+            verbose_name = _('plate number')
+        )
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -462,7 +469,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             RelatedManifestation.objects.create(
                     source_manifestation = self,
                     target_manifestation = target_manifestation,
-                    label = RelatedManifestation.Label.PARENT
+                    label = RelatedManifestation.Label.IS_PART_OF
                 )
 
         for electronic_location in data.get_fields('856'):
@@ -536,11 +543,18 @@ class Publication(models.Model):
             null = True,
             on_delete = models.SET_NULL
         )
-    plate_number = models.CharField(
-            max_length = 50,
+    place = models.ForeignKey(
+            'dmad.Place',
+            related_name = 'published_manifestations',
             null = True,
-            blank = True,
-            verbose_name = _('plate number')
+            on_delete = models.SET_NULL
+        )
+    place_status = models.CharField(
+            max_length = 1,
+            choices = DocumentationStatus,
+            default = None,
+            null = True,
+            verbose_name = _('title type')
         )
 
 
@@ -598,8 +612,9 @@ class ManifestationBib(BaseBib):
 
 class RelatedManifestation(RelatedEntity):
     class Label(models.TextChoices):
-        PARENT = 'PA', _('Parent'),
-        RELATED = 'RE', _('Related')
+        IS_PART_OF = 'P', _('is part of')
+        IS_COMPONENT_OF = 'C', _('is component of')
+        HAS_ALTERNATIVE = 'A', _('has alternative')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',
@@ -614,8 +629,8 @@ class RelatedManifestation(RelatedEntity):
     label = models.CharField(
             max_length=10,
             choices=Label,
-            default=Label.PARENT,
-            verbose_name = _('label')
+            verbose_name = _('label'),
+            null = True
         )
     order = models.IntegerField(
             default = 0

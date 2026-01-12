@@ -173,14 +173,23 @@ class RelationsUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        search_form = SearchForm(self.request.GET or None)
+        search_form = FramedSearchForm(self.request.GET or None)
         context['searchform'] = search_form
         context['show_search_form'] = True
 
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['query'] = search_form.cleaned_data.get('q')
             target_model = getattr(edwoca_models, snake_to_camel_case(self.request.GET['target_model']))
-            context[f"found_{camel_to_snake_case(target_model.__name__)}s"] = search_form.search().models(target_model)
+            filter = self.request.GET['filter-field'] or None
+            filter_value = self.request.GET['filter-value'] or None
+            if filter:
+                context[f"found_{camel_to_snake_case(target_model.__name__)}s"] = search_form.search().models(target_model).filter(**{filter: filter_value})
+            else:
+                context[f"found_{camel_to_snake_case(target_model.__name__)}s"] = search_form.search().models(target_model)
+
+            context['target_model'] = target_model
+            context['filter_field'] = filter
+            context['filter_value'] = filter_value
 
         return context
 

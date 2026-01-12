@@ -451,19 +451,52 @@ class RelatedManifestationRemoveView(DeleteView):
         return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_manifestation.id})
 
 
-class ManifestationRelationsUpdateView(EntityMixin, RelationsUpdateView):
+class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
     template_name = 'edwoca/manifestation_relations.html'
     model = Manifestation
     form_class = RelatedManifestationForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        expression_search_form = FramedSearchForm(self.request.GET or None, prefix='expression')
+        manuscript_search_form = FramedSearchForm(self.request.GET or None, prefix='manuscript')
+        print_search_form = FramedSearchForm(self.request.GET or None, prefix='print')
         context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
-        expression_search_form = SearchForm(self.request.GET or None, prefix='expression')
         context['expression_search_form'] = expression_search_form
+        context['manuscript_search_form'] = manuscript_search_form
+        context['print_search_form'] = print_search_form
+
+        if 'expression_link' in self.request.GET:
+            expression_link = get_object_or_404(Expression, pk = self.request.GET['expression_link'])
+            context['expression_link'] = expression_link
+        if 'manuscript_link' in self.request.GET:
+            manuscript_link = get_object_or_404(Manifestation, pk = self.request.GET['manuscript_link'])
+            context['manuscript_link'] = expression_link
+        if 'print_link' in self.request.GET:
+            print_link = get_object_or_404(Manifestation, pk = self.request.GET['print_link'])
+            context['print_link'] = expression_link
+
+
         if expression_search_form.is_valid() and expression_search_form.cleaned_data.get('q'):
-            context['query_expression'] = expression_search_form.cleaned_data.get('q')
+            context['expression_query'] = expression_search_form.cleaned_data.get('q')
             context['found_expressions'] = expression_search_form.search().models(Expression)
+
+        if manuscript_search_form.is_valid() and manuscript_search_form.cleaned_data.get('q'):
+            context['manuscript_query'] = manuscript_search_form.cleaned_data.get('q')
+            context['found_manuscripts'] = manuscript_search_form.search().models(Manifestation).filter(is_singleton = True)
+
+        if print_search_form.is_valid() and print_search_form.cleaned_data.get('q'):
+            context['print_query'] = print_search_form.cleaned_data.get('q')
+            context['found_prints'] = print_search_form.search().models(Manifestation).filter(is_singleton = False)
+
+        if 'manifestation-link-type' in self.request.GET:
+            manifestation_link = get_object_or_404(Manifestation, pk = self.request.GET['manifestation-link'])
+            link_type = getattr(RelatedManifestation.Label, self.request.GET['manifestation-link-type'].upper())
+            RelatedManifestation.objects.create(
+                    source_manifestation = self.object,
+                    target_manifestation = manifestation_link,
+                    label = link_type
+                )
 
         return context
 

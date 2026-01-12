@@ -39,13 +39,15 @@
             {% translate 'title and dedication' %}
             </a>
         </li>
-        <li>
-            <a href="{% url 'edwoca:manifestation_history' object.id %}"
-            {% if 'history' in request.path %}class="active"{% endif %}
-            >
-            {% translate 'date and place' %}
-            </a>
-        </li>
+        {% if object.is_singleton %}
+            <li>
+                <a href="{% url 'edwoca:manifestation_history' object.id %}"
+                {% if 'history' in request.path %}class="active"{% endif %}
+                >
+                {% translate 'date and place' %}
+                </a>
+            </li>
+        {% endif %}
         {% if not object.is_singleton %}
             <li>
                 <a href="{% url 'edwoca:manifestation_print' object.id %}"
