@@ -627,7 +627,7 @@ class RelatedManifestation(RelatedEntity):
             related_name="target_manifestation_of"
         )
     label = models.CharField(
-            max_length=10,
+            max_length=1,
             choices=Label,
             verbose_name = _('label'),
             null = True

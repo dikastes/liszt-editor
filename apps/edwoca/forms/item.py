@@ -48,7 +48,7 @@ class SignatureForm(GenericAsDaisyMixin, ModelForm):
                         'form': 'form'
                     }),
                 'signature': TextInput( attrs = {
-                        'class': 'grow w-full',
+                        'class': SimpleFormMixin.text_input_classes,
                         'form': 'form'
                     }),
                 'status': Select( attrs = {
@@ -65,13 +65,25 @@ class SignatureForm(GenericAsDaisyMixin, ModelForm):
         signature_field = self['signature']
         status_field = self['status']
 
-        library_container = div(cls='flex-1')
+        library_container = label(cls='form-control w-full flex-1')
+        library_span = span(library_field.label, cls='label-text')
+        library_div = div(cls='label')
+        library_div.add(library_span)
+        library_container.add(library_div)
         library_container.add(raw(str(library_field)))
 
-        signature_field_label = label(signature_field.label, cls='input input-bordered border-black bg-white flex flex-1 items-center gap-2')
-        signature_field_label.add(raw(str(signature_field)))
+        signature_container = label(cls='form-control w-full flex-1')
+        signature_span = span(signature_field.label, cls='label-text')
+        signature_div = div(cls='label')
+        signature_div.add(signature_span)
+        signature_container.add(signature_div)
+        signature_container.add(raw(str(signature_field)))
 
-        status_container = div(cls='flex-0')
+        status_container = label(cls='form-control w-full max-w-xs flex-0')
+        status_span = span(status_field.label, cls='label-text')
+        status_div = div(cls='label')
+        status_div.add(status_span)
+        status_container.add(status_div)
         status_container.add(raw(str(status_field)))
 
         upper_palette = div(cls='flex flex-rows w-full gap-10 my-5')
@@ -79,7 +91,7 @@ class SignatureForm(GenericAsDaisyMixin, ModelForm):
 
         upper_palette.add(library_container)
         upper_palette.add(status_container)
-        lower_palette.add(signature_field_label)
+        lower_palette.add(signature_container)
 
         form_wrapper.add(upper_palette)
         form_wrapper.add(lower_palette)

@@ -94,6 +94,8 @@
     <a href="{% url 'edwoca:manifestation_title_add' object.id%}" class="btn btn-outline flex-0"> {% translate 'create title' %}</a>
 </div>
 
+<h2 class="mb-5"> {% translate 'dedications' %} </h2>
+
 <h3> {% translate 'person dedications' %} </h3>
 {% for person_dedication_form in person_dedication_forms %}
     <div class="collapse bg-base-100 collapse-arrow my-5">
@@ -105,6 +107,7 @@
             ({{ person_dedication_form.instance.dedicatee.concise }})
         </div>
         <div class="collapse-content mt-5">
+            <h3> {% translate 'date' %} </h3>
             <label>
                 <div class="label">
                     <span class="label-text">
@@ -131,7 +134,7 @@
             <label>
                 <div class="label">
                     <span class="label-text">
-                        {% translate 'dedication' %}
+                        {% translate 'dedication text' %}
                     </span>
                 </div>
                 {{ person_dedication_form.diplomatic_dedication }}
@@ -227,6 +230,7 @@
             {{ corporation_dedication_form.instance.diplomatic_dedication }}
         </div>
         <div class="collapse-content mt-5">
+            <h3> {% translate 'date' %} </h3>
             <label>
                 <div class="label">
                     <span class="label-text">
@@ -253,7 +257,7 @@
             <label>
                 <div class="label">
                     <span class="label-text">
-                        {% translate 'dedication' %}
+                        {% translate 'dedication text' %}
                     </span>
                 </div>
                 {{ corporation_dedication_form.diplomatic_dedication }}
