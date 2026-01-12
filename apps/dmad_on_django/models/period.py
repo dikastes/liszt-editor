@@ -5,14 +5,10 @@ from django.conf import settings
 import re
 from re import split
 from datetime import date, datetime
+from .base import DocumentationStatus
 
 
 class Period(models.Model):
-    class Status(models.TextChoices):
-        DOCUMENTED = 'D', _('documented')
-        INFERRED = 'I', _('inferred')
-        ASSUMED = 'A', _('assumed')
-
     not_before = models.DateField(
             null=True,
             blank=True,
@@ -29,7 +25,7 @@ class Period(models.Model):
             verbose_name = _("standardized date")
         )
     status = models.TextField(
-            choices = Status,
+            choices = DocumentationStatus,
             max_length = 1,
             null = True,
             blank = True,

@@ -24,6 +24,12 @@ class Status(models.TextChoices):
     TEMPORARY = 'T', _('Temporary')
 
 
+class DocumentationStatus(models.TextChoices):
+    DOCUMENTED = 'D', _('documented')
+    INFERRED = 'I', _('inferred')
+    ASSUMED = 'A', _('assumed')
+
+
 class GNDSubjectCategory(models.Model):
     link = models.CharField(max_length=200,unique=True)
     label = models.CharField(max_length=50)

@@ -2,11 +2,12 @@ from .base import *
 from bib.models import ZotItem
 from django import forms
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField, ChoiceField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period, Corporation
+from dmad_on_django.models.base import DocumentationStatus
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting
 from dominate.tags import div, label, span, _input
@@ -110,6 +111,11 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    status = ChoiceField(
+            choices = DocumentationStatus.choices,
+            required = False,
+            widget = Select( attrs = { 'class': 'select w-full select-bordered border-black bg-white' })
+        )
 
     class Meta:
         model = Manifestation
@@ -132,6 +138,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
             self.fields['not_before'].initial = self.instance.period.not_before
             self.fields['not_after'].initial = self.instance.period.not_after
             self.fields['display'].initial = self.instance.period.display
+            self.fields['status'].initial = self.instance.period.status
 
     def save(self, commit=True):
         manifestation_instance = super().save(commit=False)
@@ -144,6 +151,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         period_instance.not_before = self.cleaned_data['not_before']
         period_instance.not_after = self.cleaned_data['not_after']
         period_instance.display = self.cleaned_data['display']
+        period_instance.status = self.cleaned_data['status']
 
         if commit:
             period_instance.save()
@@ -180,9 +188,13 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        calculate_input = _input(type='submit', cls='btn btn-outline flex-0', value=_('calculate'), name='calculate-machine-readable-date')
+        status_container = div(cls='flex-0')
+        status_container.add(raw(str(self['status'])))
 
-        display_container = label(_('standardized date'), _for = display_field.id_for_label, cls=SimpleFormMixin.text_label_classes)
+        calculate_input = _input(type='submit', cls='btn btn-outline flex-0', value=_('calculate'), name='calculate-machine-readable-date')
+        clear_input = _input(type='submit', cls='btn btn-outline flex-0', value=_('clear'), name='clear-machine-readable-date')
+
+        display_container = label(_('standardized date'), _for = display_field.id_for_label, cls=SimpleFormMixin.text_label_classes + ' flex-1')
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
@@ -195,13 +207,18 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         date_diplomatic_wrap.add(date_diplomatic_label)
         date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
 
+        display_palette = div(cls='flex flex-rows w-full gap-10 my-5 items-end')
+        display_palette.add(display_container)
+        display_palette.add(status_container)
+        display_palette.add(calculate_input)
+
         period_palette = div(cls='flex flex-rows w-full gap-10 my-5 items-end')
         period_palette.add(not_before_container)
         period_palette.add(not_after_container)
         period_palette.add(div(cls='flex-1'))
-        period_palette.add(calculate_input)
+        period_palette.add(clear_input)
 
-        form.add(display_container)
+        form.add(display_palette)
         form.add(period_palette)
         form.add(date_diplomatic_wrap)
 

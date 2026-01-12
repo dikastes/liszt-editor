@@ -32,15 +32,15 @@ msgstr "Arbeitstitel"
 
 #: apps/dmad_on_django/models/period.py:12
 msgid "documented"
-msgstr ""
+msgstr "nach Vorlage"
 
 #: apps/dmad_on_django/models/period.py:13
 msgid "inferred"
-msgstr ""
+msgstr "erschlossen"
 
 #: apps/dmad_on_django/models/period.py:14
 msgid "assumed"
-msgstr ""
+msgstr "angenommen"
 
 #: apps/dmad_on_django/models/period.py:19 apps/edwoca/forms/letter.py:69
 #: apps/edwoca/forms/manifestation.py:173
@@ -971,10 +971,8 @@ msgid "provenance comment"
 msgstr "Kommentar zur Provenienz"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:12
-#, fuzzy
-#| msgid "edition type"
 msgid "edit item"
-msgstr "Ausgabeform"
+msgstr "Exemplar bearbeiten"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:17
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:57
@@ -983,74 +981,60 @@ msgid "locations"
 msgstr "Standorte"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:52
-#, fuzzy
-#| msgid "create title"
 msgid "create item"
-msgstr "Titel anlegen"
+msgstr "Exemplar anlegen"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:84
-#, fuzzy
-#| msgid "expression"
 msgid "expressions"
-msgstr "Fassung"
+msgstr "Fassungen"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:126
-#, fuzzy
-#| msgid "manuscript"
 msgid "manuscripts"
-msgstr "Handschrift"
+msgstr "Handschriften"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:130
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:216
 msgid "outbound"
-msgstr ""
+msgstr "ausgehend"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:133
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:219
 msgid "links created by the search form will be displayed here"
-msgstr ""
+msgstr "Verknüpfungen, die mit dem Suchformular angelegt werden, werden hier angezeigt."
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:151
-#, fuzzy
-#| msgid "no linked place"
 msgid "no linked manuscripts"
-msgstr "kein Ort verknüpft"
+msgstr "keine Handschriften verknüpft"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:158
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:244
 msgid "inbound"
-msgstr ""
+msgstr "eingehend"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:161
 msgid "manuscripts linked to this object will be displayed here."
-msgstr ""
+msgstr "Handschriften, die mit diesem Objekt verknüpft wurden, werden hier angezeigt."
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:173
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:259
 msgid "no inbound links"
-msgstr ""
+msgstr "keine eingehenden Verknüpfungen"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:212
-#, fuzzy
-#| msgid "print"
 msgid "prints"
-msgstr "Druck"
+msgstr "Drucke"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:237
-#, fuzzy
-#| msgid "no linked place"
 msgid "no linked prints"
-msgstr "kein Ort verknüpft"
+msgstr "keine Drucke verknüpft"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:247
 msgid "prints linked to this object will be displayed here."
-msgstr ""
+msgstr "Drucke, die mit diesem Objekt verknüpft wurden, werden hier angezeigt."
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:266
-#, fuzzy
-#| msgid "manuscript"
 msgid "link new manuscript"
-msgstr "Handschrift"
+msgstr "Handschrift verknüpfen"
 
 #: apps/edwoca/templates/edwoca/manifestation_title.html:9
 #: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:16
