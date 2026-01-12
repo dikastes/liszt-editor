@@ -49,8 +49,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             return f"{catalog_number} unbekannt {numerus_currens}"
 
         publisher_addition = self.period
-        if self.publications.first() and self.publications.first().plate_number:
-            publisher_addition = self.publications.first().plate_number
+        if self.plate_number:
+            publisher_addition = self.plate_number
 
         if self.publications.first() and self.publications.first().publisher:
             return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()} ({self.get_source_type_display()})"
@@ -302,14 +302,15 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY]),
                         plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
                     )
+                self.plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
 
         if PUBLISHER_KEY in raw_data:
             if raw_data[PUBLISHER_KEY]:
                 Publication.objects.create(
                         manifestation = self,
                         publisher = Corporation.fetch_or_get(raw_data[PUBLISHER_KEY]),
-                        plate_number = raw_data[PLATE_NUMBER_KEY]
                     )
+                self.plate_number = raw_data[PLATE_NUMBER_KEY]
         if STITCHER_KEY in raw_data and (stitcher := raw_data[STITCHER_KEY]):
             self.stitcher = Corporation.fetch_or_get(stitcher)
 
