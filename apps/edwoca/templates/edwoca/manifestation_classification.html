@@ -2,34 +2,34 @@
 
 {% block content %}
 <div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
-	{% include 'edwoca/partials/manifestation/preview-divs/source_type_prolog.html' %}
+    {% include 'edwoca/partials/manifestation/preview-divs/source_type_prolog.html' %}
 </div>
 
 <div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+    <h2> hallo</h2>
 
-	<form method="post">
-	    {% csrf_token %}
-	    {{ form.as_daisy }}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_daisy }}
 
-	    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
-	</form>
+        <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+    </form>
 </div>
 
 <div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
-	<p class="prose">
-		{% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
-	</p>
-	<p class="prose">
-		{% include 'edwoca/partials/contributors_preview.html' %}
-	</p>
-	<p class="prose">
-		{% include 'edwoca/partials/bib_preview.html' %}
-	</p>
+    <p class="prose">
+        {% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
+    </p>
+    <p class="prose">
+        {% include 'edwoca/partials/contributors_preview.html' %}
+    </p>
+    <p class="prose">
+        {% include 'edwoca/partials/bib_preview.html' %}
+    </p>
 </div>
 
 <div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
-	{% include 'edwoca/partials/manifestation/preview-divs/source_type_epilog.html' %}
+    {% include 'edwoca/partials/manifestation/preview-divs/source_type_epilog.html' %}
 </div>
 
 {% endblock %}
