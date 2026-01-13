@@ -12,6 +12,15 @@
 
 <h3> {% translate 'title setting' %} </h3>
 
+<label>
+    <div class="label">
+        <span class="label-text">
+            {% translate source_title_form.source_title.label %}
+        </span>
+    </div>
+    {{ source_title_form.source_title }}
+</label>
+
 <div class="mt-5">
 {% for title_form in title_forms %}
     <div class="collapse collapse-arrow bg-base-100 my-5">
@@ -344,6 +353,17 @@
     <div class="flex-1"></div>
     <a href="{% url 'edwoca:corporation_dedication_add' object.id %}" class="btn-outline btn flex-0"> {% translate 'create corporation dedication' %} </a>
 </div>
+
+<h2 class="my-5"> {% translate 'comment' %} </h2>
+
+<label>
+    <div class="label">
+        <span class="label-text">
+            {% translate source_title_form.private_dedication_comment.label %}
+        </span>
+    </div>
+    {{ source_title_form.private_dedication_comment }}
+</label>
 
 {% include 'edwoca/partials/manifestation/preview-divs/title_epilog.html' %}
 

@@ -80,48 +80,6 @@
 {% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
 
 <h2 class="mb-5"> 
-    {% translate 'expressions' %}
-</h2>
-
-<ul class="list-disc ml-5 mb-5">
-{% for expression in object.expressions.all %}
-    <li>
-        <div class="flex items-center">
-            <a href="{% url 'edwoca:expression_update' expression.id %}" class="flex-1">
-                {{ expression }}
-            </a>
-            <a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-sm btn-outline text-primary ml-4">
-                entfernen
-            </a>
-        </div>
-    </li>
-{% endfor %}
-</ul>
-
-<form class="flex w-full" action="{% url 'edwoca:manifestation_relations' object.id %}" method="get">
-    {{ expression_search_form.q }}
-    <input type="submit" id="submit-form" class="btn btn-outline flex-0 border-l-0" value="{% translate 'search' %}" />
-</form>
-
-{% if expression_query %}
-    <ul class="border border-black p-2 h-32 overflow-auto">
-        {% for found_expression in found_expressions %}
-            <li>
-                <a href="{% url 'edwoca:manifestation_expression_add' object.id found_expression.object.id %}">
-                    {{ found_expression.object }}
-                </a>
-            </li>
-        {% empty %}
-            <li>
-                <em>
-                    {% translate 'no search results' %}
-                </em>
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-<h2 class="mb-5"> 
     {% translate 'manuscripts' %}
 </h2>
 
@@ -317,7 +275,10 @@
     {% endif %}
 {% endif %}
 
-<h2 class="my-5"> interner Kommentar (Bezüge) </h2>
+<h2 class="my-5"> 
+    {% translate 'relations comment' %}
+</h2>
+
 <form method="post">
     {% csrf_token %}
     {{ relations_comment_form.as_daisy }}

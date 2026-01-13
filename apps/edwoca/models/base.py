@@ -30,9 +30,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         match csv_representation:
             case 'Partitur':
                 return Manifestation.EditionType.SCORE
-            case 'Stimme':
-                return Manifestation.EditionType.PART
-            case 'Stimmen':
+            case 'Stimmen' | 'Stimme':
                 return Manifestation.EditionType.PARTS
             case 'Particell':
                 return Manifestation.EditionType.PARTICELL
@@ -53,8 +51,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             publisher_addition = self.plate_number
 
         if self.publications.first() and self.publications.first().publisher:
-            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.get_temp_title()} ({self.get_source_type_display()})"
-        return f"<< Verlag >> {publisher_addition}, {self.get_temp_title()} ({self.get_source_type_display()})"
+            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.working_title} ({self.get_source_type_display()})"
+        return f"<< Verlag >> {publisher_addition}, {self.working_title} ({self.get_source_type_display()})"
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
@@ -264,7 +262,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if raw_data[TITLE_KEY]:
             ManifestationTitle.objects.create(
                     title = raw_data[TITLE_KEY],
-                    status = Status.TEMPORARY,
                     manifestation = self
                 )
 
@@ -300,7 +297,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 Publication.objects.create(
                         manifestation = self,
                         publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY]),
-                        plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
                     )
                 self.plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
 
@@ -612,8 +608,8 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
 
     def __str__(self):
         manifestation = self.manifestation
-        if (title := manifestation.titles.filter(status = Status.TEMPORARY).first()):
-            return super().__str__() + title.title
+        if (title := self.manifestation.working_title):
+            return super().__str__() + title
         return super().__str__()
 
 

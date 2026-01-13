@@ -158,6 +158,15 @@ def manifestation_update(request, pk):
         'entity_type': 'manifestation'
     }
 
+    expression_search_form = FramedSearchForm(request.GET or None, prefix='expression')
+    context['expression_search_form'] = expression_search_form
+    if 'expression_link' in request.GET:
+        expression_link = get_object_or_404(Expression, pk = request.GET['expression_link'])
+        context['expression_link'] = expression_link
+    if expression_search_form.is_valid() and expression_search_form.cleaned_data.get('q'):
+        context['expression_query'] = expression_search_form.cleaned_data.get('q')
+        context['found_expressions'] = expression_search_form.search().models(Expression)
+
     manifestation_form = ManifestationForm(request.POST or None, instance=manifestation)
     if manifestation.is_singleton:
         item = manifestation.items.first()
@@ -243,6 +252,11 @@ def manifestation_title_update(request, pk):
     }
 
     if request.method == 'POST':
+        source_title_form = ManifestationSourceTitleForm(request.POST, instance=manifestation)
+        if source_title_form.is_valid():
+            source_title_form.save()
+        context['source_title_form'] = source_title_form
+
         print_form = ManifestationPrintForm(request.POST, instance=manifestation)
         if print_form.is_valid():
             print_form.save()
@@ -294,6 +308,9 @@ def manifestation_title_update(request, pk):
         return redirect('edwoca:manifestation_title', pk=pk)
     else:
         # Initialize forms for existing titles
+        source_title_form = ManifestationSourceTitleForm(instance=manifestation)
+        context['source_title_form'] = source_title_form
+
         title_forms = []
         for title_obj in manifestation.titles.all():
             prefix = f'title_{title_obj.id}'
@@ -458,28 +475,18 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        expression_search_form = FramedSearchForm(self.request.GET or None, prefix='expression')
         manuscript_search_form = FramedSearchForm(self.request.GET or None, prefix='manuscript')
         print_search_form = FramedSearchForm(self.request.GET or None, prefix='print')
         context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
-        context['expression_search_form'] = expression_search_form
         context['manuscript_search_form'] = manuscript_search_form
         context['print_search_form'] = print_search_form
 
-        if 'expression_link' in self.request.GET:
-            expression_link = get_object_or_404(Expression, pk = self.request.GET['expression_link'])
-            context['expression_link'] = expression_link
         if 'manuscript_link' in self.request.GET:
             manuscript_link = get_object_or_404(Manifestation, pk = self.request.GET['manuscript_link'])
-            context['manuscript_link'] = expression_link
+            context['manuscript_link'] = manuscript_link
         if 'print_link' in self.request.GET:
             print_link = get_object_or_404(Manifestation, pk = self.request.GET['print_link'])
-            context['print_link'] = expression_link
-
-
-        if expression_search_form.is_valid() and expression_search_form.cleaned_data.get('q'):
-            context['expression_query'] = expression_search_form.cleaned_data.get('q')
-            context['found_expressions'] = expression_search_form.search().models(Expression)
+            context['print_link'] = print_link
 
         if manuscript_search_form.is_valid() and manuscript_search_form.cleaned_data.get('q'):
             context['manuscript_query'] = manuscript_search_form.cleaned_data.get('q')
@@ -516,14 +523,14 @@ def manifestation_expression_add(request, pk, expression_pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     expression = get_object_or_404(Expression, pk=expression_pk)
     manifestation.expressions.add(expression)
-    return redirect('edwoca:manifestation_relations', pk=pk)
+    return redirect('edwoca:manifestation_update', pk=pk)
 
 
 def manifestation_expression_remove(request, pk, expression_pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     expression = get_object_or_404(Expression, pk=expression_pk)
     manifestation.expressions.remove(expression)
-    return redirect('edwoca:manifestation_relations', pk=pk)
+    return redirect('edwoca:manifestation_update', pk=pk)
 
 
 class ManifestationHistoryUpdateView(SimpleFormView):

@@ -21,13 +21,49 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
 
     class Meta:
         model = Manifestation
-        fields = ['rism_id', 'private_head_comment']
+        fields = ['rism_id', 'private_head_comment', 'working_title']
         widgets = {
                 'rism_id': TextInput( attrs = {
                         'class': SimpleFormMixin.text_input_classes,
                         'form': 'form'
                     }),
+                'working_title': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
+                    }),
                 'private_head_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+            }
+
+
+class ManifestationSourceTitleForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
+    class Meta:
+        model = Manifestation
+        fields = ['source_title', 'private_dedication_comment']
+        widgets = {
+                'source_title': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
+                    }),
+                'private_dedication_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    })
+            }
+
+
+class ManifestationDedicationCommentForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
+    class Meta:
+        model = Manifestation
+        fields = ['private_dedication_comment']
+        widgets = {
+                'private_dedication_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
@@ -54,11 +90,10 @@ class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
 class ManifestationTitleForm(ModelForm):
     class Meta:
         model = ManifestationTitle
-        fields = ['title', 'title_type', 'status', 'manifestation']
+        fields = ['title', 'title_type', 'manifestation']
         widgets = {
             'title': Textarea(attrs={'form': 'form', 'class': 'textarea border-black bg-white textarea-bordered h-64'}),
             'title_type': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
-            'status': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
             'manifestation': HiddenInput(attrs={'form': 'form'}),
         }
 
@@ -72,7 +107,7 @@ class ManifestationTitleForm(ModelForm):
 
         # Remaining properties on a palette with flex-1
         palette = div(cls='flex flex-wrap gap-5')
-        for field_name in ['title_type', 'status']:
+        for field_name in ['title_type']:
             field = self[field_name]
             field_label = label(field.label, _for=field.id_for_label, cls='form-control flex-1 min-w-[200px]')
             field_label.add(raw(str(field)))
@@ -281,6 +316,21 @@ class ManifestationClassificationForm(ModelForm):
                     }),
             }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.is_singleton:
+            self.fields['source_type'].choices = [
+                    (Manifestation.SourceType.TRANSCRIPT.value, Manifestation.SourceType.TRANSCRIPT.label),
+                    (Manifestation.SourceType.CORRECTED_TRANSCRIPT.value, Manifestation.SourceType.CORRECTED_TRANSCRIPT.label),
+                    (Manifestation.SourceType.AUTOGRAPH.value, Manifestation.SourceType.AUTOGRAPH.label),
+                    (Manifestation.SourceType.QUESTIONABLE_AUTOGRAPH.value, Manifestation.SourceType.QUESTIONABLE_AUTOGRAPH.label)
+                ]
+        else:
+            self.fields['source_type'].choices = [
+                    (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
+                ]
+
     def as_daisy(self):
         form = div(cls='mb-10')
 
@@ -302,13 +352,12 @@ class ManifestationClassificationForm(ModelForm):
         source_type_label.add(raw(str(source_type_field)))
 
         palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette1.add(manifestation_form_label)
+        palette1.add(source_type_label)
         palette1.add(edition_type_label)
 
         palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette2.add(manifestation_form_label)
         palette2.add(function_label)
-        if self.instance.is_singleton:
-            palette2.add(source_type_label)
 
         form.add(palette1)
         form.add(palette2)
@@ -325,6 +374,17 @@ ManifestationTitleFormSet = inlineformset_factory(
         max_num = 100,
         can_delete = True
     )
+
+
+class ManifestationDedicationCommentForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['private_dedication_comment']
+        widgets = {
+                'private_dedication_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            }
 
 
 class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
