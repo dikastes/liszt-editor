@@ -43,7 +43,7 @@ class ManifestationSourceTitleForm(GenericAsDaisyMixin, ModelForm):
 
     class Meta:
         model = Manifestation
-        fields = ['source_title', 'private_dedication_comment']
+        fields = ['source_title', 'plate_number', 'private_dedication_comment']
         widgets = {
                 'source_title': TextInput( attrs = {
                         'class': SimpleFormMixin.text_input_classes,
@@ -52,19 +52,9 @@ class ManifestationSourceTitleForm(GenericAsDaisyMixin, ModelForm):
                 'private_dedication_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
-                    })
-            }
-
-
-class ManifestationDedicationCommentForm(GenericAsDaisyMixin, ModelForm):
-    layout = Layouts.LABEL_OUTSIDE
-
-    class Meta:
-        model = Manifestation
-        fields = ['private_dedication_comment']
-        widgets = {
-                'private_dedication_comment': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes,
+                    }),
+                'plate_number': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes,
                         'form': 'form'
                     }),
             }
@@ -376,13 +366,18 @@ ManifestationTitleFormSet = inlineformset_factory(
     )
 
 
-class ManifestationDedicationCommentForm(ModelForm, SimpleFormMixin):
+class ManifestationTitleDedicationForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Manifestation
-        fields = ['private_dedication_comment']
+        fields = ['private_dedication_comment', 'plate_number']
         widgets = {
                 'private_dedication_comment': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+                'plate_number': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
                     })
             }
 
@@ -453,7 +448,7 @@ class ManifestationCreateForm(forms.Form):
         if publisher_field.errors:
             publisher_container.add(div(span(publisher_field.errors, cls='text-primary text-sm'), cls='label'))
         form.add(publisher_container)
-        
+       
         # Plate Number
         plate_number_field = self['plate_number']
         plate_number_container = label(cls='form-control w-full')

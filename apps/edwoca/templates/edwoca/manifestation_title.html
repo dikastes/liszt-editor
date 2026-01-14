@@ -375,6 +375,19 @@
     <a href="{% url 'edwoca:corporation_dedication_add' object.id %}" class="btn-outline btn flex-0"> {% translate 'create corporation dedication' %} </a>
 </div>
 
+<h2 class="my-5">
+    {% translate 'reference to print' %}
+</h2>
+
+<label>
+    <div class="label">
+        <span class="label-text">
+            {% translate source_title_form.plate_number.label %}
+        </span>
+    </div>
+    {{ source_title_form.plate_number }}
+</label>
+
 <h2 class="my-5"> {% translate 'comment' %} </h2>
 
 <label>

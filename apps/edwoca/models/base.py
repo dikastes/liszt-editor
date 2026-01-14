@@ -285,7 +285,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 self.dedicatees.add(dedicatee)
                                 break
 
-        self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY].replace(' | ', '\n')
+        self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY]#.replace(' | ', '\n')
         if raw_data[MACHINE_READABLE_DATE_KEY]:
             self.period = Period.parse(raw_data[MACHINE_READABLE_DATE_KEY])
 
@@ -584,7 +584,7 @@ class ManifestationTitle(DmRismManifestationTitle):
                 writer = writer,
                 medium = medium
             )
-        manifestation_title.title = title.replace('|', '\n')
+        manifestation_title.title = title#.replace('|', '\n')
 
         return manifestation_title
 
