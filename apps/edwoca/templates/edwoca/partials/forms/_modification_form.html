@@ -120,9 +120,10 @@
                 {% endif %}
             </div>
             <div class="flex justify-end gap-3 mt-3">
-                <button type="submit" name="delete_modification" value="{{ modification.form.instance.id }}" class="btn btn-outline text-primary">
-                    {% translate 'remove modification' %}
-                </button>
+                <form method="post" action="{% url 'edwoca:modification_delete' modification.form.instance.id %}" >
+                    {% csrf_token %}
+                    <input type="submit" name="delete_modification" value="{% translate 'remove modification' %}" class="btn btn-outline text-primary" />
+                </form>
             </div>
         </div>
     </div>

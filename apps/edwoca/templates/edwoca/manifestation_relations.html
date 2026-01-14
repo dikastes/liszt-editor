@@ -97,7 +97,7 @@
             <li>
                 <div class="flex items-center">
                     <a href="{% url 'edwoca:manifestation_relations' manifestation_relation.target_manifestation.id %}" class="flex-1">
-                        {{ manifestation_relation.target_manifestation }} ({{ manifestation_relation.label }})
+                        {{ manifestation_relation.target_manifestation }} ({{ manifestation_relation.get_label_display }})
                     </a>
                     <form method="post" action="{% url 'edwoca:related_manifestation_remove' manifestation_relation.id %}" class="flex-0 ml-4">
                         {% csrf_token %}
@@ -120,7 +120,7 @@
         {% if manifestation_relation.source_manifestation.is_singleton %}
             <li>
                 <a href="{% url 'edwoca:manifestation_relations' manifestation_relation.source_manifestation.id %}" class="flex-1">
-                    {{ manifestation_relation.source_manifestation }} ({{ manifestation_relation.label }})
+                    {{ manifestation_relation.source_manifestation }} ({{ manifestation_relation.get_label_display }})
                 </a>
             </li>
         {% endif %}
@@ -192,7 +192,7 @@
             <li>
                 <div class="flex items-center">
                     <a href="{% url 'edwoca:manifestation_relations' manifestation_relation.target_manifestation.id %}" class="flex-1">
-                        {{ manifestation_relation.target_manifestation }} ({{ manifestation_relation.label }})
+                        {{ manifestation_relation.target_manifestation }} ({{ manifestation_relation.get_label_display }})
                     </a>
                     <form method="post" action="{% url 'edwoca:related_manifestation_remove' manifestation_relation.id %}" class="flex-0 ml-4">
                         {% csrf_token %}
@@ -215,7 +215,7 @@
         {% if not manifestation_relation.source_manifestation.is_singleton %}
             <li>
                 <a href="{% url 'edwoca:manifestation_relations' manifestation_relation.source_manifestation.id %}" class="flex-1">
-                    {{ manifestation_relation.source_manifestation }} ({{ manifestation_relation.label }})
+                    {{ manifestation_relation.source_manifestation }} ({{ manifestation_relation.get_label_display }})
                 </a>
             </li>
         {% endif %}

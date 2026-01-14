@@ -6,11 +6,11 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/title_prolog.html' %}
 
-<h2> {% translate 'title and dedication' %} </h2>
+<h2 class="my-5"> {% translate 'title and dedication' %} </h2>
 
 <form id="form" class="hidden" method="post"> {% csrf_token %} <input id="submit-form" type="submit" /> </form>
 
-<h3> {% translate 'title setting' %} </h3>
+<h3 class="my-5"> {% translate 'title setting' %} </h3>
 
 <label>
     <div class="label">
@@ -91,6 +91,13 @@
                         <input type="submit" name="add_title_handwriting" value="{% translate 'create handwriting' %}" class="btn btn-outline mt-3">
                     </form>
                 </div>
+            </div>
+            <div class="flex">
+                <div class="flex-1"></div>
+                <form action="{% url 'edwoca:manifestation_title_delete' title_form.instance.id %}" method="post" class="flex-0">
+                    {% csrf_token %}
+                    <input class="btn btn-primary btn-outline" type="submit" value="{% translate 'remove title' %}" />
+                </form>
             </div>
         </div>
     </div>
@@ -220,6 +227,13 @@
                     {% endif %}
                 </div>
             {% endif %}
+            <div class="flex">
+                <div class="flex-1"></div>
+                <form action="{% url 'edwoca:manifestation_person_dedication_delete' person_dedication_form.instance.id %}" method="post" class="flex-0">
+                    {% csrf_token %}
+                    <input class="btn btn-primary btn-outline" type="submit" value="{% translate 'remove dedication' %}" />
+                </form>
+            </div>
         </div>
     </div>
 {% empty %}
@@ -343,6 +357,13 @@
                     {% endif %}
                 </div>
             {% endif %}
+            <div class="flex">
+                <div class="flex-1"></div>
+                <form action="{% url 'edwoca:manifestation_corporation_dedication_delete' corporation_dedication_form.instance.id %}" method="post" class="flex-0">
+                    {% csrf_token %}
+                    <input class="btn btn-primary btn-outline" type="submit" value="{% translate 'remove dedication' %}" />
+                </form>
+            </div>
         </div>
     </div>
 {% empty %}

@@ -260,10 +260,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 self.places.add(place)
 
         if raw_data[TITLE_KEY]:
-            ManifestationTitle.objects.create(
-                    title = raw_data[TITLE_KEY],
-                    manifestation = self
-                )
+            self.working_title = raw_data[TITLE_KEY]
 
         if EDITION_TYPE_KEY in raw_data:
             self.edition_type = Manifestation.parse_edition_type(raw_data[EDITION_TYPE_KEY])
