@@ -1,18 +1,15 @@
-{% load static %}
-
-{% if messages %}
-    <div class="mb-4">
-        {% for message in messages %}
-                
-                <div class="alert alert-error shadow-lg text-sm p-3 rounded-lg flex items-center mb-2" role="alert">
-                    <span class="font-bold mr-2">Fehler:</span>
-                    <p>{{ message }}</p>
-                </div>
-                
-        {% endfor %}
-    </div>
-{% endif %}
-
+{% load static message_utils %}
+<div id="messages-container">
+    {% for message in messages %}
+        {% get_message_colors message.tags as colors %}
+        <div style="padding: 0.75rem; margin-bottom: 1rem; border-radius: 0.4rem; border: 1px solid {{ colors.br }}; background-color: {{ colors.bg }}; color: {{ colors.cl }}; display: flex; justify-content: space-between; align-items: center; font-family: sans-serif;">
+            <div>
+                {% if 'safe' in message.tags %}{{ message|safe }}{% else %}{{ message }}{% endif %}
+            </div>
+            <button type="button" onclick="this.parentElement.remove()" style="background: transparent; border: none; font-size: 1.25rem; cursor: pointer; color: inherit; font-weight: bold;">&times;</button>
+        </div>
+    {% endfor %}
+</div>
 {% for item in object.items.all %}
     <div class="flex gap-3 items-center mb-2">
         
@@ -58,8 +55,7 @@
         </form>
         <button class="btn btn-sm btn-outline ml-2"
         hx-get="{% url 'edwoca:item_move_modal' item.id %}"
-        hx-target="#modal-container"
-        onclick="move_modal_{{ item.id }}.showModal()">
+        hx-target="#modal-container">
         Verschieben
         </button>
     </div>

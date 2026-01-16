@@ -93,50 +93,63 @@ class Item(Sortable, WemiBaseClass):
         return self.signatures.filter(status=BaseSignature.Status.CURRENT).first()
 
     def move_to_manifestation(self, target_manifestation):
-        
         if self.manifestation == target_manifestation:
-            raise FieldError("Can not move item into same manifestation")
-            return
+            return self.manifestation
         
-        with transaction.atomic():
+        if target_manifestation.is_singleton and target_manifestation.items.exists():
+            raise ValidationError("Ziel-Manifestation ist ein Singleton und hat bereits ein Item.")
 
+        with transaction.atomic():
             old_manifestation = self.manifestation
             old_order_index = self.order_index
 
-            self.order_index = -1000
-            self.manifestation = target_manifestation
-            self.save()
+            # Neuen order index berechnen
+            max_idx = Item.objects.filter(manifestation=target_manifestation).aggregate(
+                models.Max('order_index'))['order_index__max']
+            new_index = (max_idx + 1) if max_idx is not None else 0
 
+            # Item verschieben und unique constraints umgehen
+            Item.objects.filter(pk=self.pk).update(
+                manifestation=target_manifestation,
+                order_index=new_index,
+                is_template=False  
+            )
+
+            # Lücke in der alten Manifestation schließen
             Item.objects.filter(
                 manifestation=old_manifestation,
                 order_index__gt=old_order_index
             ).update(order_index=F('order_index') - 1)
 
-            self.save()
+            # Sicherheitshalber das item nochmal aus der DB laden
+            self.refresh_from_db()
             
         return old_manifestation
 
     def save(self, *args, **kwargs):
-        if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
-            raise ValidationError("Cannot add another item to a singleton manifestation.")
+    # 1. Singleton-Schutz
+        if self.manifestation.is_singleton:
+            other_items_exists = Item.objects.filter(
+                manifestation=self.manifestation
+            ).exclude(pk=self.pk).exists()
+            if other_items_exists:
+                raise ValidationError("Cannot add another item to a singleton manifestation.")
 
-        has_moved = False
-
-        if self.pk:
-            old_instance = Item.objects.get(pk=self.pk)
-            if old_instance.manifestation_id != self.manifestation_id:
-                has_moved = True
-
-        if (self.pk is None or has_moved) and self.order_index != -1000:
-            max_index = (
-                Item.objects
-                .filter(manifestation=self.manifestation)
-                .aggregate(models.Max('order_index'))['order_index__max']
-            )
-
-            self.order_index = (max_index + 1) if max_index is not None else 0
+        # 2. Index-Zuweisung für neue Items
+        # Wir prüfen auf pk is None (neues Objekt) 
+        # UND (Index ist None ODER Index ist der Default 0)
+        if self.pk is None and (self.order_index is None or self.order_index == 0):
+            max_index = Item.objects.filter(
+                manifestation=self.manifestation
+            ).aggregate(models.Max('order_index'))['order_index__max']
             
+            # Wenn bereits Items existieren, nimm max + 1, sonst bleib bei 0
+            if max_index is not None:
+                self.order_index = max_index + 1
+            else:
+                self.order_index = 0
 
+        # 3. Vererbungskette aufrufen (Sortable -> Models -> DB)
         super().save(*args, **kwargs)
 
     class Meta:

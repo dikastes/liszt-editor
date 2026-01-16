@@ -15,6 +15,7 @@ from dmad_on_django.models import Person, Corporation, Place
 from bib.models import ZotItem
 from liszt_util.tools import swap_order
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.db import transaction
@@ -109,7 +110,6 @@ def item_swap_view(request, pk, direction):
 @require_POST
 def item_move_view(request, item_pk):
     item = get_object_or_404(Item, pk=item_pk)
-
     target_manifestation_pk = request.POST.get('target_manifestation_pk')
 
     if not target_manifestation_pk:
@@ -117,20 +117,29 @@ def item_move_view(request, item_pk):
 
     target_manifestation = get_object_or_404(Manifestation, pk=target_manifestation_pk)
 
+    # Verschieben ausführen
     old_manifestation = item.move_to_manifestation(target_manifestation)
+    
+    # Erfolgsmeldung für den Verschiebevorgang
+    messages.success(request, f'Exemplar wurde erfolgreich nach "{target_manifestation}" verschoben.')
 
+    # Sonderfall: Alte Manifestation ist jetzt leer
     if not old_manifestation.items.exists():
-        msg = mark_safe(f'Manifestation "{old_manifestation}" ist leer' \
-              f'<a href="{reverse("edwoca:manifestation_delete", kwargs={'pk':old_manifestation.id})}">Löschen?</a>')
-
+        msg = mark_safe(
+            f'Manifestation hat keine Exemplare mehr. '
+            f'<a href="{reverse("edwoca:manifestation_delete", kwargs={"pk":old_manifestation.id})}" '
+            f'style="text-decoration: underline; font-weight: bold; color: inherit;">Löschen?</a>'
+        )
         messages.warning(request, msg, extra_tags='safe')
 
+    
     response = render(
         request, 'edwoca/partials/manifestation/item_list.html',
-        {'object':old_manifestation}
+        {'object': old_manifestation}
     )
-    # Close the modal by sending an empty OOB swap for the modal's ID
-    response.content += b'<div id="move_modal" hx-swap-oob="true"></div>'
+
+    response.content += b'<div id="modal-container" hx-swap-oob="true"></div>'
+    
     return response
 
 def item_move_modal(request, pk):
