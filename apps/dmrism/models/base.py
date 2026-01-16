@@ -10,11 +10,13 @@ class WemiBaseClass(models.Model):
 
     public_comment = models.TextField(
             null = True,
+            blank = True,
             verbose_name = _('public comment')
         )
 
     private_comment = models.TextField(
             null = True,
+            blank = True,
             verbose_name = _('private comment')
         )
 

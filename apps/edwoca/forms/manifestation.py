@@ -2,43 +2,72 @@ from .base import *
 from bib.models import ZotItem
 from django import forms
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField, ChoiceField
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period, Corporation
+from dmad_on_django.models.base import DocumentationStatus
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting
-from dominate.tags import div, label, span
+from dominate.tags import div, label, span, _input
 from dominate.util import raw
 from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
 
 
-class ManifestationForm(ModelForm):
+class ManifestationForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
     class Meta:
         model = Manifestation
-        fields = ['rism_id', 'private_head_comment']
+        fields = ['rism_id', 'private_head_comment', 'working_title']
         widgets = {
                 'rism_id': TextInput( attrs = {
-                        'class': 'grow h-full'
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
+                    }),
+                'working_title': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
                     }),
                 'private_head_comment': Textarea( attrs = {
-                        'class': 'textarea textarea-bordered w-full'
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+            }
+
+
+class ManifestationSourceTitleForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
+    class Meta:
+        model = Manifestation
+        fields = ['source_title', 'private_dedication_comment']
+        widgets = {
+                'source_title': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
+                    }),
+                'private_dedication_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     })
             }
 
-    def as_daisy(self):
-        form = div()
-        rism_id_label = label(self['rism_id'].label, _for=self['rism_id'].id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-        rism_id_label.add(raw(str(self['rism_id'])))
-        form.add(rism_id_label)
 
-        private_head_comment_label = label(cls='form-control', _for=self['private_head_comment'].id_for_label)
-        private_head_comment_label.add(span(self['private_head_comment'].label, cls='label-text'))
-        private_head_comment_label.add(raw(str(self['private_head_comment'])))
-        form.add(private_head_comment_label)
+class ManifestationDedicationCommentForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
 
-        return mark_safe(str(form))
+    class Meta:
+        model = Manifestation
+        fields = ['private_dedication_comment']
+        widgets = {
+                'private_dedication_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+            }
 
 
 class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
@@ -61,11 +90,10 @@ class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
 class ManifestationTitleForm(ModelForm):
     class Meta:
         model = ManifestationTitle
-        fields = ['title', 'title_type', 'status', 'manifestation']
+        fields = ['title', 'title_type', 'manifestation']
         widgets = {
             'title': Textarea(attrs={'form': 'form', 'class': 'textarea border-black bg-white textarea-bordered h-64'}),
             'title_type': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
-            'status': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
             'manifestation': HiddenInput(attrs={'form': 'form'}),
         }
 
@@ -79,7 +107,7 @@ class ManifestationTitleForm(ModelForm):
 
         # Remaining properties on a palette with flex-1
         palette = div(cls='flex flex-wrap gap-5')
-        for field_name in ['title_type', 'status']:
+        for field_name in ['title_type']:
             field = self[field_name]
             field_label = label(field.label, _for=field.id_for_label, cls='form-control flex-1 min-w-[200px]')
             field_label.add(raw(str(field)))
@@ -112,12 +140,17 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'class': 'select select-bordered'
+                'class': SimpleFormMixin.select_classes
             }
         }
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    status = ChoiceField(
+            choices = DocumentationStatus.choices,
+            required = False,
+            widget = Select( attrs = { 'class': 'select w-full select-bordered border-black bg-white' })
+        )
 
     class Meta:
         model = Manifestation
@@ -140,6 +173,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
             self.fields['not_before'].initial = self.instance.period.not_before
             self.fields['not_after'].initial = self.instance.period.not_after
             self.fields['display'].initial = self.instance.period.display
+            self.fields['status'].initial = self.instance.period.status
 
     def save(self, commit=True):
         manifestation_instance = super().save(commit=False)
@@ -152,6 +186,7 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         period_instance.not_before = self.cleaned_data['not_before']
         period_instance.not_after = self.cleaned_data['not_after']
         period_instance.display = self.cleaned_data['display']
+        period_instance.status = self.cleaned_data['status']
 
         if commit:
             period_instance.save()
@@ -170,8 +205,8 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         display_field = self['display']
         #history_field = self['history']
 
-        not_before_container = label(cls='form-control')
-        not_before_label = div(not_before_field.label, cls='label-text')
+        not_before_container = label(cls='form-control flex-0')
+        not_before_label = div(_('not before'), cls='label-text')
         not_before_selects = div(cls='flex')
         not_before_selects.add(raw(str(not_before_field)))
         not_before_container.add(not_before_label)
@@ -179,8 +214,8 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         if not_before_field.errors:
             not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        not_after_container = label(cls='form-control')
-        not_after_label = div(not_after_field.label, cls='label-text')
+        not_after_container = label(cls='form-control flex-0')
+        not_after_label = div(_('not after'), cls='label-text')
         not_after_selects = div(cls='flex')
         not_after_selects.add(raw(str(not_after_field)))
         not_after_container.add(not_after_label)
@@ -188,7 +223,13 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        status_container = div(cls='flex-0')
+        status_container.add(raw(str(self['status'])))
+
+        calculate_input = _input(type='submit', cls='btn btn-outline flex-0', value=_('calculate'), name='calculate-machine-readable-date')
+        clear_input = _input(type='submit', cls='btn btn-outline flex-0', value=_('clear'), name='clear-machine-readable-date')
+
+        display_container = label(_('standardized date'), _for = display_field.id_for_label, cls=SimpleFormMixin.text_label_classes + ' flex-1')
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
@@ -201,20 +242,19 @@ class ManifestationHistoryForm(ModelForm, SimpleFormMixin):
         date_diplomatic_wrap.add(date_diplomatic_label)
         date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
 
-        #history_wrap = label(cls='form-control')
-        #history_label = div(cls='label')
-        #history_span = span(history_field.label, cls='label-text')
-        #history_label.add(history_span)
-        #history_wrap.add(history_label)
-        #history_wrap.add(raw(str(history_field)))
+        display_palette = div(cls='flex flex-rows w-full gap-10 my-5 items-end')
+        display_palette.add(display_container)
+        display_palette.add(status_container)
+        display_palette.add(calculate_input)
 
-        period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        period_palette = div(cls='flex flex-rows w-full gap-10 my-5 items-end')
         period_palette.add(not_before_container)
         period_palette.add(not_after_container)
-        #period_palette.add(display_container)
+        period_palette.add(div(cls='flex-1'))
+        period_palette.add(clear_input)
 
+        form.add(display_palette)
         form.add(period_palette)
-        form.add(display_container)
         form.add(date_diplomatic_wrap)
 
         private_history_comment_field = self['private_history_comment']
@@ -263,18 +303,33 @@ class ManifestationClassificationForm(ModelForm):
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
-                        'class': 'select w-full select-bordered'
+                        'class': SimpleFormMixin.select_classes,
                     }),
                 'edition_type': Select( attrs = {
-                        'class': 'select w-full select-bordered'
+                        'class': SimpleFormMixin.select_classes,
                     }),
                 'function': Select( attrs = {
-                        'class': 'select w-full select-bordered'
+                        'class': SimpleFormMixin.select_classes,
                     }),
                 'source_type': Select( attrs = {
-                        'class': 'select w-full select-bordered'
+                        'class': SimpleFormMixin.select_classes,
                     }),
             }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.instance.is_singleton:
+            self.fields['source_type'].choices = [
+                    (Manifestation.SourceType.TRANSCRIPT.value, Manifestation.SourceType.TRANSCRIPT.label),
+                    (Manifestation.SourceType.CORRECTED_TRANSCRIPT.value, Manifestation.SourceType.CORRECTED_TRANSCRIPT.label),
+                    (Manifestation.SourceType.AUTOGRAPH.value, Manifestation.SourceType.AUTOGRAPH.label),
+                    (Manifestation.SourceType.QUESTIONABLE_AUTOGRAPH.value, Manifestation.SourceType.QUESTIONABLE_AUTOGRAPH.label)
+                ]
+        else:
+            self.fields['source_type'].choices = [
+                    (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
+                ]
 
     def as_daisy(self):
         form = div(cls='mb-10')
@@ -297,12 +352,12 @@ class ManifestationClassificationForm(ModelForm):
         source_type_label.add(raw(str(source_type_field)))
 
         palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette1.add(manifestation_form_label)
+        palette1.add(source_type_label)
         palette1.add(edition_type_label)
 
         palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
+        palette2.add(manifestation_form_label)
         palette2.add(function_label)
-        palette2.add(source_type_label)
 
         form.add(palette1)
         form.add(palette2)
@@ -319,6 +374,17 @@ ManifestationTitleFormSet = inlineformset_factory(
         max_num = 100,
         can_delete = True
     )
+
+
+class ManifestationDedicationCommentForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['private_dedication_comment']
+        widgets = {
+                'private_dedication_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    })
+            }
 
 
 class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
@@ -340,13 +406,13 @@ class ManifestationCreateForm(forms.Form):
             }
         }
     read_only_fields = ['publisher']
-    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
-    plate_number = forms.CharField(label='Plattennummer', max_length=50, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
-    source_type = forms.ChoiceField(label='Quellentyp', choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
+    plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
+    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
-    publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label='Verlag', empty_label="Bibliothek auswählen", widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+    publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label=_('publisher'), empty_label=_('choose publisher'), widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
 
     def __init__(self, *args, **kwargs):
         self.publisher_instance = kwargs.pop('publisher', None)
@@ -449,9 +515,9 @@ class ManifestationCreateForm(forms.Form):
 
 class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
     layout = Layouts.LABEL_OUTSIDE
-    temporary_title = forms.CharField(label='Temporärer Titel', max_length=255, required=False)
-    source_type = forms.ChoiceField(label='Quellentyp', choices=Manifestation.SourceType.choices)
-    library = forms.ModelChoiceField(queryset=Library.objects.all(), label='Bibliothek', empty_label="Bibliothek auswählen")
+    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False)
+    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices)
+    library = forms.ModelChoiceField(queryset=Library.objects.all(), label=_('library'), empty_label=_('choose library'))
     signature = forms.CharField(label='Signatur', max_length=255)
 
     def as_daisy(self):

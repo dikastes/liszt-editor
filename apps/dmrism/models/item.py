@@ -187,7 +187,8 @@ class BaseSignature(models.Model):
             on_delete = models.SET_NULL,
             related_name = '%(class)s',
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('holding institution')
         )
     signature = models.CharField(
             max_length=20,

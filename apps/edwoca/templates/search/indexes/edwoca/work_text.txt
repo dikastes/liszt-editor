@@ -1,3 +1,5 @@
-{{ object.get_pref_title }}
+{{ object }}
+{{ object.work_catalog_number }}
+{{ object.gnd_id }}
 {{ object.private_head_comment }}
 W-{{ object.id }}

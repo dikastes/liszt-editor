@@ -1,84 +1,75 @@
 {% extends 'edwoca/base.html' %}
 
+{% load i18n %}
+
 {% block content %}
 
 {% include 'edwoca/partials/manifestation/preview-divs/history_prolog.html' %}
 
-<div class="bg-white border border-base-300 p-5">
+<h2>
+    {% translate 'date' %}
+</h2>
 
-	<div class="prose">
-		<h2> Datierung </h2>
-	</div>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_daisy }}
+    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+</form>
 
-	<form method="post">
-		{% csrf_token %}
-		{{ form.as_daisy }}
+<h2>
+    {% translate 'places (standardized)' %}
+</h2>
 
-		<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
-	</form>
+<ul class="m-5 list-disc">
+{% for place in object.places.all %}
+    <li>
+        <div class="flex">
+            <a href="{% url 'dmad_on_django:place_update' place.id %}" class="flex-1">
+                {{ place }}
+            </a>
+            <form method="post" action="{% url 'edwoca:manifestation_remove_place' object.id place.id %}" class="flex-0">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
+            </form>
+        </div>
+    </li>
+{% empty %}
+    <li>
+        <em>
+            {% translate 'no linked place' %}
+        </em>
+    </li>
+{% endfor %}
+</ul>
 
-	<div class="prose">
-		<h2> Orte (standardisiert) </h2>
+<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get" class="flex">
+    <label class="input input-bordered flex items-center gap-2 flex-1 border-black bg-white">
+        <span class="flex-0">
+            {% translate 'place' %}
+        </span>
+        <input type="text" name="q" value="{{ query }}" class="flex-1" />
+    </label>
+    <input type="hidden" name="target_model" value="manifestation" />
+    <input type="submit" id="submit-form" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
+</form>
 
-		<ul>
-		{% for place in object.places.all %}
-			<li>
-				<div class="flex">
-					<a href="{% url 'dmad_on_django:place_update' place.id %}" class="flex-1">
-						{{ place }}
-					</a>
-					<form method="post" action="{% url 'edwoca:manifestation_remove_place' object.id place.id %}" class="flex-0">
-						{% csrf_token %}
-						<input type="submit" class="btn btn-small" value="entfernen">
-					</form>
-				</div>
-			</li>
-		{% empty %}
-			<li> <em> keine Orte verknüpft </em> </li>
-		{% endfor %}
-		</ul>
-
-		<h3> weiteren Ort hinzufügen </h3>
-	</div>
-
-		{% if show_search_form == True %}
-
-		<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get" class="flex gap-5">
-            <label class="input input-bordered flex items-center gap-2 flex-1">
-                Ort
-                {{ searchform.q }}
-            </label>
-			<input type="hidden" name="target_model" value="manifestation" />
-			<input type="submit" id="submit-form" class="btn" value="Suchen"/>
-		</form>
-		
-		<ul>
-		{% if query %}
-			{% for found_place in found_places %}
-				<li>
-					<a href="{% url 'edwoca:manifestation_place_add' object.id found_place.object.id %}">
-						{{ found_place.object }}
-					</a>
-				</li>
-			{% empty %}
-				<li> <em> keine Suchergebnisse </em> </li>
-			{% endfor %}
-		{% else %}
-			<li> <em> bitte Suchbegriff eingeben </em> </li>
-		{% endif %}
-		</ul>
-
-		{% else %}
-
-		<form method="post">
-			{% csrf_token %}
-			{{ person }} mit {{ object }} verknüpfen als:
-			{{ form }}
-			<input type="submit" id="submit-form" class="btn" />
-		</form>
-
-		{% endif %}
-</div>
+{% if query %}
+    <ul class="border border-black p-2 h-32 overflow-auto">
+        {% for found_place in found_places %}
+            <li>
+                <a href="{% url 'edwoca:manifestation_place_add' object.id found_place.object.id %}">
+                    {{ found_place.object }}
+                </a>
+            </li>
+        {% empty %}
+            <li>
+                <em>
+                    {% translate 'no search results' %}
+                </em>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
 
 {% include 'edwoca/partials/manifestation/preview-divs/history_epilog.html' %}
 

@@ -1,8 +1,11 @@
 from .base import *
+from secrets import token_urlsafe
+from django.urls import reverse_lazy, reverse
+from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from dmad_on_django.models import Period
 from dmrism.models.item import *
-from dominate.tags import div, label, span
+from dominate.tags import div, label, span, form, input_
 from dominate.util import raw
 from django import forms
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, SelectDateWidget, CharField
@@ -33,40 +36,54 @@ class ItemForm(ModelForm):
 
         return mark_safe(str(form))
 
-class SignatureForm(ModelForm):
+class SignatureForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
     class Meta:
         model = ItemSignature
         fields = ['library', 'signature', 'status', 'id']
         widgets = {
                 'library': Select( attrs = {
-                        'class': 'autocomplete-select select select-bordered w-full'
+                        'class': SimpleFormMixin.autocomplete_classes,
+                        'form': 'form'
                     }),
                 'signature': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
                     }),
                 'status': Select( attrs = {
-                        'class': 'select select-bordered w-full'
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
                     }),
                 'id': HiddenInput()
             }
 
     def as_daisy(self):
-        form = div(cls='mb-10')
-
-        if self.instance.pk:
-           form.add(raw(str(self['id'])))
+        form_wrapper = div(cls='mb-10')
 
         library_field = self['library']
         signature_field = self['signature']
         status_field = self['status']
 
-        library_container = div(cls='flex-1')
+        library_container = label(cls='form-control w-full flex-1')
+        library_span = span(library_field.label, cls='label-text')
+        library_div = div(cls='label')
+        library_div.add(library_span)
+        library_container.add(library_div)
         library_container.add(raw(str(library_field)))
 
-        signature_field_label = label(signature_field.label, cls='input input-bordered flex flex-1 items-center gap-2')
-        signature_field_label.add(raw(str(signature_field)))
+        signature_container = label(cls='form-control w-full flex-1')
+        signature_span = span(signature_field.label, cls='label-text')
+        signature_div = div(cls='label')
+        signature_div.add(signature_span)
+        signature_container.add(signature_div)
+        signature_container.add(raw(str(signature_field)))
 
-        status_container = div(cls='flex-0')
+        status_container = label(cls='form-control w-full max-w-xs flex-0')
+        status_span = span(status_field.label, cls='label-text')
+        status_div = div(cls='label')
+        status_div.add(status_span)
+        status_container.add(status_div)
         status_container.add(raw(str(status_field)))
 
         upper_palette = div(cls='flex flex-rows w-full gap-10 my-5')
@@ -74,18 +91,12 @@ class SignatureForm(ModelForm):
 
         upper_palette.add(library_container)
         upper_palette.add(status_container)
-        lower_palette.add(signature_field_label)
+        lower_palette.add(signature_container)
 
-        form.add(upper_palette)
-        form.add(lower_palette)
+        form_wrapper.add(upper_palette)
+        form_wrapper.add(lower_palette)
 
-        if 'DELETE' in self.fields:
-            del_field = self['DELETE']
-            del_field_label = label(del_field.label, cls='input input-bordered flex-0 flex items-center gap-2')
-            del_field_label.add(raw(str(del_field)))
-            lower_palette.add(del_field_label)
-
-        return mark_safe(str(form))
+        return mark_safe(str(form_wrapper))
 
 
 SignatureFormSet = inlineformset_factory(
@@ -169,12 +180,13 @@ class PersonProvenanceStationForm(ModelForm):
     kwargs = {
         'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
         'attrs': {
-            'class': 'select select-bordered'
+            'class': 'select select-bordered border-black bg-white',
+            'form': 'form'
         }
     }
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow'}))
+    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow', 'form': 'form'}))
 
     class Meta:
         model = PersonProvenanceStation
@@ -229,7 +241,7 @@ class PersonProvenanceStationForm(ModelForm):
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        display_container = label(display_field.label, _for=display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container = label(display_field.label, _for=display_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 my-5')
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
@@ -248,12 +260,13 @@ class CorporationProvenanceStationForm(ModelForm):
     kwargs = {
         'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
         'attrs': {
-            'class': 'select select-bordered'
+            'class': 'select select-bordered border-black bg-white',
+            'form': 'form'
         }
     }
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow'}))
+    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow', 'form': 'form'}))
 
     class Meta:
         model = CorporationProvenanceStation
@@ -308,7 +321,7 @@ class CorporationProvenanceStationForm(ModelForm):
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        display_container = label(display_field.label, _for=display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container = label(display_field.label, _for=display_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 my-5')
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
@@ -382,10 +395,12 @@ class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):
         fields = ['public_provenance_comment', 'private_provenance_comment']
         widgets = {
             'public_provenance_comment': Textarea(attrs={
-                'class': SimpleFormMixin.text_area_classes
+                'class': SimpleFormMixin.text_area_classes,
+                'form': 'form'
             }),
             'private_provenance_comment': Textarea(attrs={
-                'class': SimpleFormMixin.text_area_classes
+                'class': SimpleFormMixin.text_area_classes,
+                'form': 'form'
             })
         }
 
@@ -396,13 +411,16 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
         fields = ['extent', 'measure', 'private_manuscript_comment']
         widgets = {
                 'extent': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     }),
                 'measure': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     }),
                 'private_manuscript_comment': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     })
             }
 

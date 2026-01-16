@@ -20,9 +20,9 @@ class GenericAsDaisyMixin():
                 return mark_safe(self._inside_layout())
             case Layouts.LABEL_OUTSIDE:
                 return mark_safe(self._outside_layout())
-    
+
     def _inside_layout(self):
-        
+
         root = div(cls="flex flex-col")
 
         for field in self.hidden_fields():
@@ -35,17 +35,17 @@ class GenericAsDaisyMixin():
 
             widget = field.field.widget
 
-            wrapper = label(cls="input input-bordered border-black bg-white flex items-center gap-2")
+            wrapper = label(cls="my-5 input input-bordered border-black bg-white flex items-center gap-2")
 
             if field.label:
                 wrapper.add(field.label)
-                
+
             cls = "grow"
             if isinstance(widget, Textarea):
                 cls = f'textarea textarea-bordered border-black bg-white'
                 root.add(raw(field.as_widget(attrs={"class": cls, "placeholder" : field.label})))
                 continue
-            
+
             if isinstance(widget, CheckboxInput):
                 root.add(self._render_checkbox(field))
                 continue
@@ -57,9 +57,9 @@ class GenericAsDaisyMixin():
                 wrapper.add(span(field.help_text, cls="badge badge-info"))
 
             root.add(wrapper)
-                
+
         return root.render()
-    
+
     def _outside_layout(self):
         root = div(cls="flex flex-col")
 
@@ -86,10 +86,10 @@ class GenericAsDaisyMixin():
 
             if isinstance(widget, Textarea):
                 cls = "textarea textarea-bordered border-black bg-white w-full"
-    
+
             else:
                 cls = "input input-bordered border-black bg-white w-full"
-               
+
             wrap.add(raw(field.as_widget(attrs={"class" : cls})))
 
             if field.errors:
@@ -100,11 +100,10 @@ class GenericAsDaisyMixin():
             root.add(wrap)
 
         return root.render()
-    
+
     def _render_checkbox(self, field):
         wrap = label(cls="label cursor-pointer justify-start gap-3")
         wrap.add(span(field.label or field.name, cls="label-text flex-1"))
         wrap.add(raw(field.as_widget(attrs={"class":"toggle toggle-primary flex-0"})))
-            
+
         return wrap
-        

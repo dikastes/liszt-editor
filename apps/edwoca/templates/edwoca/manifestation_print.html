@@ -29,8 +29,8 @@
                 <form method="get" class="flex-1 flex">
                     <div class="flex-1 min-w-0">
                         <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2">
-                            Verlag
-                            <input type="text" name="q" class="grow" />
+                            {% translate 'publisher' %}
+                            <input type="text" name="q" class="grow" placeholder="{% translate 'search publisher' %}" />
                         </label>
                         {% if request.GET.q %}
                             <ul class="border border-black p-2 h-32 overflow-auto">
@@ -71,7 +71,7 @@
     {% if object.stitcher %}
         <div class="flex">
             <label class="flex-1 pseudo-input border border-black bg-white flex items-center gap-2 border-r-0">
-                Stecher
+                {% translate 'stitcher' %}
                 <input type="text" class="grow" disabled value="{{ object.stitcher.get_designator }}" />
             </label>
             <a class="flex-0 btn btn-outline" href="{% url 'edwoca:manifestation_remove_stitcher' object.id %}"> {% translate 'remove' %} </a>
@@ -80,7 +80,8 @@
         <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1 flex">
             <label class="input input-bordered border-black border-r-0 bg-white flex items-center gap-2 flex-1">
                 {% translate 'stitcher' %}
-                {{ stitcher_searchform.q }}
+                {%comment%}{{ stitcher_searchform.q }}{%endcomment%}
+                <input type="text" name="stitcher-q" class="grow" placeholder="{% translate 'search stitcher' %}"/>
             </label>
             <input type="submit" id="submit-form-stitcher" class="btn btn-outline" value="{% translate 'search' %}"/>
         </form>

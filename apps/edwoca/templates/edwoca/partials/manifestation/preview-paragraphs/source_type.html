@@ -1,27 +1,27 @@
 <p>
-	<span class="mr-5">
-		<em> Quellenart: </em>
-	</span>
-	{% if object.edition_type %}
-		<span class="mr-5">
-			{{ object.edition_type }}
-		</span>
-	{% else %}
-		<span class="badge badge-primary">!</span> keine Ausgabeform
-	{% endif %}
-	{% if object.source_type %}
-	<span class="mr-5">
-		{{ object.source_type }}
-	</span>
-	{% endif %}
-	{% if object.manifestation_form %}
-	<span class="mr-5">
-		{{ object.manifestation_form }}
-	</span>
-	{% endif %}
-	{% if object.function %}
-	<span class="mr-5">
-		{{ object.function }}
-	</span>
-	{% endif %}
+    <span class="mr-5">
+        <em> Quellenart: </em>
+    </span>
+    {% if object.edition_type %}
+        <span class="mr-5">
+            {{ object.get_edition_type_display }}
+        </span>
+    {% else %}
+        <span class="badge badge-primary">!</span> keine Ausgabeform
+    {% endif %}
+    {% if object.source_type %}
+    <span class="mr-5">
+        {{ object.get_source_type_display }}
+    </span>
+    {% endif %}
+    {% if object.manifestation_form %}
+    <span class="mr-5">
+        {{ object.get_manifestation_form_display }}
+    </span>
+    {% endif %}
+    {% if object.function %}
+    <span class="mr-5">
+        {{ object.get_function_display }}
+    </span>
+    {% endif %}
 </p>

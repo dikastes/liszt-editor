@@ -3914,6 +3914,10 @@ details.collapse summary::-webkit-details-marker {
   margin: 0px;
 }
 
+.m-5 {
+  margin: 1.25rem;
+}
+
 .mx-10 {
   margin-left: 2.5rem;
   margin-right: 2.5rem;
@@ -4144,6 +4148,10 @@ details.collapse summary::-webkit-details-marker {
 
 .content-center {
   align-content: center;
+}
+
+.items-end {
+  align-items: flex-end;
 }
 
 .items-center {

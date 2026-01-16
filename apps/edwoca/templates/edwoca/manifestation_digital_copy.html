@@ -4,9 +4,10 @@
 {% endblock %}
 
 {% block content %}
-<div class="bg-white border border-base-300 p-5">
-    <div class="prose">
-        <h2 class="card-title mt-0 flex-1"> Digitalisate von {{ object }} </h2>
+
+{% include 'edwoca/partials/manifestation/preview-divs/digitized_copy_prolog.html' %}
+
+<h2> Digitalisate </h2>
 
         {% comment %}
         <div class="mt-5">
@@ -22,37 +23,35 @@
             <p> keine digitalen Kopien vorhanden </p>
         {% endfor %}
         {% endcomment %}
-        {% for form in forms %}
-            <form action="{% url 'edwoca:manifestation_digital_copy_delete' form.instance.id %}" method="post" class="flex-0 m-0">
+{% for form in forms %}
+    <form action="{% url 'edwoca:manifestation_digital_copy_delete' form.instance.id %}" method="post" class="flex-0 m-0">
+        {% csrf_token %}
+        <input type="submit" class="hidden" id="delete-{{ form.instance.id }}" value="löschen"/>
+    </form>
+{% endfor %}
+<form method="post" class="mt-5 flex flex-col gap-5 mb-10">
+    {% for form in forms %}
+        <div class="flex gap-5">
+            <div class="flex-1">
                 {% csrf_token %}
-                <input type="submit" class="hidden" id="delete-{{ form.instance.id }}" value="löschen"/>
-            </form>
-        {% endfor %}
-        <form method="post" class="mt-5 flex flex-col gap-5 mb-10">
-            {% for form in forms %}
-                <div class="flex gap-5">
-                    <div class="flex-1">
-                        {% csrf_token %}
-                        {{ form.as_daisy }}
-                    </div>
-                    <div class="flex-0 flex flex-col">
-                        <div class="flex-1"></div>
-                        <div class="flex-0">
-                            <label for="delete-{{ form.instance.id }}" class="btn btn-primary">löschen</label>
-                            <input type="submit" name="save_changes" value="Speichern" class="hidden" id="submit-form">
-                        </div>
-                    </div>
+                {{ form.as_daisy }}
+            </div>
+            <div class="flex-0 flex flex-col">
+                <div class="flex-1"></div>
+                <div class="flex-0">
+                    <label for="delete-{{ form.instance.id }}" class="btn btn-primary">löschen</label>
+                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="submit-form">
                 </div>
-            {% empty %}
-                <p> keine Digitalisate vorhanden </p>
-            {% endfor %}
-        </form>
-
-        <div class="flex items-center">
-            <div class="flex-1"></div>
-            <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn flex-0"> Digitalisat hinzufügen </a>
+            </div>
         </div>
+    {% empty %}
+        <p> keine Digitalisate vorhanden </p>
+    {% endfor %}
+</form>
 
-    </div>
+<div class="flex items-center">
+    <div class="flex-1"></div>
+    <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn flex-0"> Digitalisat hinzufügen </a>
 </div>
+
 {% endblock %}

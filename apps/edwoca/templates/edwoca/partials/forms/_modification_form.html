@@ -1,0 +1,130 @@
+{% load i18n %}
+{% load edwoca_extras %}
+
+<div class="collapse bg-base-100 collapse-arrow my-5">
+    <input
+        type="checkbox"
+        name="collapse_modification_{{ modification.form.instance.id }}"
+        form="form"
+        {% if modification.form.instance.id in open_modifications or modification_id == modification.form.instance.id %}
+            checked
+        {% endif %}
+    />
+    <div class="collapse-title truncate">
+        {{ modification_id }}
+        {{ modification.form.instance }}
+    </div>
+    <div class="collapse-content mt-5">
+        {{ modification.form.as_daisy }}
+        <div class="mt-5">
+            <h4>
+                {% translate 'modification writers / hands' %}
+            </h4>
+            {% for form in modification.handwriting_forms %}
+                {% include 'edwoca/partials/forms/handwriting_form.html' %}
+            {% endfor %}
+
+            <div class="flex">
+                <div class="flex-1"></div>
+                <div class="flex-0">
+                    <button form="form" type="submit" name="add_modification_handwriting" value="{{ modification.form.instance.id }}" class="btn btn-outline mt-3">
+                        {% translate 'create handwriting' %}
+                    </button>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <h4 class="text-md font-bold mb-5">
+                    {% translate 'relations' %}
+                </h4>
+                {% if modification.form.instance.related_work %}
+                    <div class="flex items-center mb-5">
+                        <label class="pseudo-input border input-bordered border-black bg-white border-r-0 flex items-center gap-2 flex-1">
+                            {% translate 'work' %}
+                            <input type="text" disabled name="modification-{{ modification.form.instance.id }}-work-q" class="grow truncate" value="{{ modification.form.instance.related_work }}" />
+                        </label>
+                        <a class="btn flex-0 btn-outline" href="{% url 'edwoca:modification_remove_related_work' modification.form.instance.id %}">
+                            {% translate 'remove' %}
+                        </a>
+                    </div>
+                    <div class="flex mb-10">
+                        <div class="flex-1"></div>
+                        <div class="flex-0">
+                            <a href="{% url 'edwoca:work_relations' modification.form.instance.related_work.id %}" class="text-primary">
+                                {% translate 'go to work' %}
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <form method="get" class="flex">
+                        <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2 flex-1">
+                            {% translate 'work' %}
+                            <input type="text" name="modification-{{ modification.form.instance.id }}-work-q" class="grow" value="{% if modification_id == modification.form.instance.id %}{{ query_work }}{% endif %}" />
+                        </label>
+                        <input type="submit" value="{% translate 'search' %}" class="btn btn-outline">
+                    </form>
+                    {% if query_work and modification_id == modification.form.instance.id %}
+                        <ul class="border border-black p-2 overflow-auto h-32 bg-white">
+                        {% for work in found_works %}
+                            <li><a href="{% url 'edwoca:modification_add_related_work' modification.form.instance.id work.object.id %}">{{ work.object }}</a></li>
+                        {% empty %}
+                            <li>
+                                {% translate 'no search results' %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+
+                {% if modification.form.instance.related_expression %}
+                    <div class="flex items-center mb-5">
+                        <label class="pseudo-input border input-bordered border-black bg-white border-r-0 flex items-center gap-2 flex-1">
+                            {% translate 'expression' %}
+                            <input type="text" disabled name="modification-{{ modification.form.instance.id }}-expression-q" class="grow truncate" value="{{ modification.form.instance.related_expression }}" />
+                        </label>
+                        <a class="btn flex-0 btn-outline" href="{% url 'edwoca:modification_remove_related_expression' modification.form.instance.id %}">
+                            {% translate 'remove' %}
+                        </a>
+                    </div>
+                    <div class="flex mb-10">
+                        <div class="flex-1"></div>
+                        <div class="flex-0">
+                            <a href="{% url 'edwoca:work_relations' modification.form.instance.related_work.id %}" class="text-primary">
+                                {% translate 'go to expression' %}
+                            </a>
+                        </div>
+                    </div>
+                {% else %}
+                    <form method="get" class="flex mt-2">
+                        <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2 flex-1">
+                            {% translate 'expression' %}
+                            <input type="text" name="modification-{{ modification.form.instance.id }}-expression-q" class="grow" value="{% if modification_id == modification.form.instance.id %}{{ query_expression }}{% endif %}" />
+                        </label>
+                        <input type="submit" value="{% translate 'search' %}" class="btn btn-outline">
+                    </form>
+                    {% if query_expression and modification_id == modification.form.instance.id %}
+                        <ul class="border border-black p-2 overflow-auto h-32 bg-white">
+                        {% for expression in found_expressions %}
+                            <li>
+                                <a href="{% url 'edwoca:modification_add_related_expression' modification.form.instance.id expression.object.id %}">
+                                    {{ expression.object }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>
+                                {% translate 'no search results' %}
+                            </li>
+                        {% endfor %}
+                        </ul>
+                    {% endif %}
+                {% endif %}
+            </div>
+            <div class="flex justify-end gap-3 mt-3">
+                <form method="post" action="{% url 'edwoca:modification_delete' modification.form.instance.id %}" >
+                    {% csrf_token %}
+                    <input type="submit" name="delete_modification" value="{% translate 'remove modification' %}" class="btn btn-outline text-primary" />
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

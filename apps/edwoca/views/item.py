@@ -51,8 +51,18 @@ class ItemSearchView(EdwocaSearchView):
         return super().get_queryset().filter(manifestation_is_singleton = False)
 
 
+class ItemSignatureDeleteView(DeleteView):
+    model = ItemSignature
+
+    def get_success_url(self):
+        if self.object.item.manifestation.is_singleton:
+            return reverse_lazy('edwoca:manifestation_update', kwargs={'pk': self.object.item.manifestation.id})
+        else:
+            return reverse_lazy('edwoca:item_update', kwargs={'pk': self.object.item.id})
+
+
 def item_update(request, pk):
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(EdwocaItem, pk=pk)
     item_form = ItemForm(request.POST or None, instance=item)
 
     if request.POST and 'add_signature' in request.POST:
@@ -184,7 +194,7 @@ class RelatedItemRemoveView(DeleteView):
 
 
 class ItemContributorsUpdateView(EntityMixin, ContributorsUpdateView):
-    model = Item
+    model = EdwocaItem
     form_class = ItemContributorForm
 
 
@@ -200,7 +210,7 @@ class ItemContributorRemoveView(DeleteView):
 
 
 def item_provenance(request, pk):
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(EdwocaItem, pk=pk)
     context = {
         'object': item,
         'entity_type': 'item',
@@ -277,7 +287,7 @@ def item_provenance(request, pk):
 
 
 def item_digital_copy(request, pk):
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(EdwocaItem, pk=pk)
     context = {
         'object': item,
         'entity_type': 'item',
@@ -319,14 +329,14 @@ class ItemDigitalCopyDeleteView(DeleteView):
 
 
 class ItemCommentUpdateView(SimpleFormView):
-    model = Item
+    model = EdwocaItem
     property = 'comment'
     form_class = ItemCommentForm
     template_name = 'edwoca/item_comment.html'
 
 
 def item_dedication(request, pk):
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(EdwocaItem, pk=pk)
     context = {
         'object': item,
         'entity_type': 'item',
@@ -395,12 +405,13 @@ def item_dedication(request, pk):
 
 
 def item_person_dedication_add(request, pk):
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(EdwocaItem, pk=pk)
     ItemPersonDedication.objects.create(item=item)
     return redirect('edwoca:item_dedication', pk=pk)
 
+
 def item_corporation_dedication_add(request, pk):
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(EdwocaItem, pk=pk)
     ItemCorporationDedication.objects.create(item=item)
     return redirect('edwoca:item_dedication', pk=pk)
 
@@ -411,11 +422,13 @@ def item_person_dedication_delete(request, pk):
     dedication.delete()
     return redirect('edwoca:item_dedication', pk=item_pk)
 
+
 def item_corporation_dedication_delete(request, pk):
     dedication = get_object_or_404(ItemCorporationDedication, pk=pk)
     item_pk = dedication.item.pk
     dedication.delete()
     return redirect('edwoca:item_dedication', pk=item_pk)
+
 
 def item_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
     dedication = get_object_or_404(ItemPersonDedication, pk=dedication_id)
@@ -424,11 +437,13 @@ def item_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
 
+
 def item_person_dedication_remove_dedicatee(request, pk, dedication_id):
     dedication = get_object_or_404(ItemPersonDedication, pk=dedication_id)
     dedication.dedicatee = None
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
+
 
 def item_corporation_dedication_add_dedicatee(request, pk, dedication_id, corporation_id):
     dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
@@ -437,11 +452,13 @@ def item_corporation_dedication_add_dedicatee(request, pk, dedication_id, corpor
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
 
+
 def item_corporation_dedication_remove_dedicatee(request, pk, dedication_id):
     dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
     dedication.dedicatee = None
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
+
 
 def item_dedication_add_place(request, pk, dedication_id, place_id):
     # This is a bit tricky, as we don't know if it's a person or corporation dedication.
@@ -454,6 +471,7 @@ def item_dedication_add_place(request, pk, dedication_id, place_id):
     dedication.place = place
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
+
 
 def item_dedication_remove_place(request, pk, dedication_id):
     # This is a bit tricky, as we don't know if it's a person or corporation dedication.
@@ -502,7 +520,7 @@ class LibraryDeleteView(DeleteView):
 
 
 def item_manuscript_update(request, pk):
-    item = get_object_or_404(Item, pk=pk)
+    item = get_object_or_404(EdwocaItem, pk=pk)
     context = {
         'object': item,
         'entity_type': 'item'
@@ -513,7 +531,7 @@ def item_manuscript_update(request, pk):
             form = ItemManuscriptForm(request.POST, instance=item)
             if form.is_valid():
                 form.save()
-            
+
             for modification in item.modifications.all():
                 prefix = f'modification_{modification.id}'
                 modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
@@ -636,6 +654,7 @@ class ItemHandwritingDeleteView(DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('edwoca:item_manuscript', kwargs={'pk': self.object.item.id})
+
 
 class ModificationDeleteView(DeleteView):
     model = ItemModification

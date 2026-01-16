@@ -6,16 +6,14 @@
 	{% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_prolog.html' %}
 {% endif %}
 
-<div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+<h2> {{ view_title }} </h2>
 
-	<form method="post">
-		{% csrf_token %}
-		{{ form.as_daisy }}
+<form method="post">
+	{% csrf_token %}
+	{{ form.as_daisy }}
 
-		<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
-	</form>
-</div>
+	<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+</form>
 
 {% if property %}
 	{% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_epilog.html' %}

@@ -103,14 +103,12 @@ class Place(DisplayableModel):
             place.fetch_raw()
             place.update_from_raw()
             return place
-        
+
     @staticmethod
     def search(search_string):
         lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:PlaceOrGeographicName)&size=5&format=json:suggest"
         lobid_response = requests.get(lobid_url)
         return lobid_response.json()
-        
-
 
     def get_default_name(self):
         if self.names.count() > 0:
@@ -121,13 +119,15 @@ class Place(DisplayableModel):
         if self.gnd_id:
             return self.get_default_name()
         return getattr(self, 'interim_designator', '') or ''
-    
+
     def get_absolute_url(self):
         return reverse('dmad_on_django:place_update', kwargs={'pk': self.pk})
 
     def __str__(self):
-        return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
-    
+        if self.gnd_id:
+            return f'{self.names.get(status=Status.PRIMARY).name} ({self.gnd_id})'
+        return self.interim_designator
+
     def get_table(self):
 
         return [("Long", self.long),

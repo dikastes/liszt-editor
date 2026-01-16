@@ -1,21 +1,24 @@
+import dominate.tags as tags
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe
-from dominate.tags import div, label, span
 from dominate.util import raw
 from dmad_on_django.forms import SearchForm
 
 
 class SimpleFormMixin:
     text_area_classes = 'textarea textarea-bordered w-full bg-white border-black'
-    text_input_classes = 'input input-bordered w-full'
+    text_input_classes = 'input input-bordered w-full border-black bg-white'
+    text_label_classes = 'input input-bordered w-full border-black bg-white flex gap-2 items-center'
+    autocomplete_classes = 'autocomplete-select select select-bordered w-full border-black bg-white'
+    select_classes = 'select select-bordered w-full border-black bg-white'
 
     def as_daisy(self):
-        form = div()
+        form = tags.div()
         for field in self.Meta.fields:
-            wrap = label(cls='form-control')
-            label_div = div(cls='label')
-            field_label = span(self[field].label, cls='label-text')
+            wrap = tags.label(cls='form-control')
+            label_div = tags.div(cls='label')
+            field_label = tags.span(self[field].label, cls='label-text')
             label_div.add(field_label)
             wrap.add(label_div)
             wrap.add(raw(str(self[field])))
@@ -180,18 +183,25 @@ class HandwritingForm(ModelForm):
             }
 
     def as_daisy(self):
-        form = div(cls='flex gap-5') # Add flex and gap classes to the main form div
+        form = tags.div(cls='flex gap-5 my-5 items-center')
+
+        # Medium field
         medium_field = self['medium']
-        dubious_writer_field = self['dubious_writer']
-
-        medium_label = label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 flex-1') # Add flex-1 to medium label
+        medium_label = tags.label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 flex-1')
         medium_label.add(raw(str(medium_field)))
-
-        dubious_writer_label = label(_for=dubious_writer_field.id_for_label, cls='label cursor-pointer flex items-center gap-5')
-        dubious_writer_label.add(span(dubious_writer_field.label, cls='label-text'))
-        dubious_writer_label.add(raw(str(dubious_writer_field)))
-
         form.add(medium_label)
+
+        # Dubious writer toggle
+        dubious_writer_field = self['dubious_writer']
+        dubious_writer_label = tags.label(cls='label cursor-pointer flex items-center gap-2')
+        dubious_writer_label.add(tags.span(dubious_writer_field.label, cls='label-text'))
+
+        dubious_writer_field.field.widget.attrs.update({
+            'onchange': 'this.form.submit()',
+            'form': 'form'
+        })
+        dubious_writer_label.add(raw(str(dubious_writer_field)))
+        
         form.add(dubious_writer_label)
 
         return mark_safe(str(form))

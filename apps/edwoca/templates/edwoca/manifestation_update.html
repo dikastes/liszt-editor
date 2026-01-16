@@ -1,105 +1,159 @@
 {% extends 'edwoca/base.html' %}
 
+{% load i18n %}
+
 {% block content %}
 
-<div class="bg-white border border-base-300 p-5">
-	<div class="prose">
-	{% if object.is_singleton %}
-		<h2> Manuskript </h2>
-		
-		{% comment %}
-		<!-- {{ object }} ist ein <em>Manuskript</em>. -->
-		<a class="btn btn-primary" href="{% url 'edwoca:manifestation_unset_singleton' object.id %}">
-			Druck
-		</a>
-		{% if object.missing_item %}
-			<a class="btn btn-primary" href="{% url 'edwoca:manifestation_unset_missing' object.id %}">
-				nicht verschollen
-			</a>
-		{% else %}
-			<a class="btn btn-primary" href="{% url 'edwoca:manifestation_set_missing' object.id %}">
-				verschollen
-			</a>
-		{% endif %}
-		{% endcomment %}
+{% if object.is_singleton %}
 
-		<form method="post">
-			{% csrf_token %}
-			{{ manifestation_form.as_daisy }}
-			{% if object.missing_item %}
-				<p> Dieses Manuskript ist verschollen. </p>
-			{% else %}
-				<h3>Standorte</h3>
-				{{ signature_formset.management_form }}
-				{% for form in signature_formset %}
-					<div class="signature-form">
-						{{ form.as_daisy }}
-					</div>
-				{% endfor %}
+    <h2>
+        {% translate 'manuscript' %}
+    </h2>
 
-				
-				<div class="flex">
-					<div class="flex-1"></div>
-					<input type="submit" name="add_signature" value="Standort hinzufügen" class="flex-0 btn btn-secondary mt-2">
-				</div>
-			{% endif %}
-			<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
-		</form>
+    <form method="post" id="form">
+        {% csrf_token %}
+        <input type="submit" id="submit-form" class="hidden" />
+    </form>
 
-	{% else %}
-		<h2> Druck </h2>
-		
-		{% comment %}
-		<!-- {{ object }} ist ein <em>Druck</em>. -->
-		{% if object.items.count > 1 %}
-			<p>
-				Falls Sie diese Manifestation als <em>Manuskript</em> oder <em> verschollen </em> deklarieren möchten, löschen Sie alle Exemplare außer eines.
-			</p>
-		{% else %}
-			<a class="btn btn-primary" href="{% url 'edwoca:manifestation_set_singleton' object.id %}">
-				Manuskript
-			</a>
-			{% if object.missing_item %}
-				<a class="btn btn-primary" href="{% url 'edwoca:manifestation_unset_missing' object.id %}">
-					nicht verschollen
-				</a>
-			{% else %}
-				<a class="btn btn-primary" href="{% url 'edwoca:manifestation_set_missing' object.id %}">
-					verschollen
-				</a>
-			{% endif %}
-		{% endif %}
-		{% endcomment %}
+    <label>
+        <div class="label">
+            <span class="label-text">
+                {% translate manifestation_form.rism_id.label %}
+            </span>
+        </div>
+        {{ manifestation_form.rism_id }}
+    </label>
 
-		<form method="post">
-			{% csrf_token %}
-			{{ manifestation_form.as_daisy }}
-			<input type="submit" name="save_changes" value="Speichern" id="submit-form" class="hidden">
-		</form>
+    {% if object.missing_item %}
+        {% comment %}
+            <p> Dieses Manuskript ist verschollen. </p>
+        {% endcomment %}
+    {% else %}
+        <h2 class="my-5">
+            {% translate 'locations' %}
+        </h2>
+        {{ signature_formset.management_form }}
+        {% for form in signature_forms %}
+            <div class="my-5">
+                {{ form.as_daisy }}
+            </div>
+            <div class="flex">
+                <div class="flex-1"></div>
+                <form class="flex-0" method="post" action="{% url 'edwoca:item_signature_remove' form.instance.id %}">
+                    {% csrf_token %}
+                    <input type="submit" value="{% translate 'remove signature' %}" class="btn btn-outline text-primary" />
+                </form>
+            </div>
+        {% endfor %}
 
-		<h3>Vorlageexemplar</h3>
-		{% for signature in object.template_item.signatures.all %}
-			<div class="signature-form">
-				<div class="flex gap-10 mb-5">
-					<label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
-						Bibliothek
-						<input class="w-full grow" value="{{ signature.library }}"/>
-					</label>
-					<label class="input input-bordered flex-0 gap-5 items-center flex" disabled>
-						Status
-						<input class="w-12" value="{{ signature.status }}"/>
-					</label>
-				</div>
-				<label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
-					Signatur
-					<input class="w-full grow" value="{{ signature.signature }}"/>
-				</label>
-			</div>
-		{% endfor %}
-		
-	{% endif %}
-	</div>
-</div>
+        <div class="flex">
+            <div class="flex-1"></div>
+            <input type="submit" name="add_signature" form="form" value="{% translate 'create location' %}" class="flex-0 btn btn-outline mt-2">
+        </div>
+    {% endif %}
+
+    <h2 class="my-5">
+        {% translate 'identification' %}
+    </h2>
+    <label>
+        <div class="label">
+            <span class="label-text">
+                {% translate manifestation_form.working_title.label %}
+            </span>
+        </div>
+        {{ manifestation_form.working_title }}
+    </label>
+
+    <h2 class="my-5"> 
+        {% translate 'expressions' %}
+    </h2>
+
+    <ul class="list-disc ml-5 mb-5">
+    {% for expression in object.expressions.all %}
+        <li>
+            <div class="flex items-center">
+                <a href="{% url 'edwoca:expression_update' expression.id %}" class="flex-1">
+                    {{ expression }}
+                </a>
+                <a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-sm btn-outline text-primary ml-4">
+                    entfernen
+                </a>
+            </div>
+        </li>
+    {% endfor %}
+    </ul>
+
+    <form class="flex w-full" method="get">
+        {{ expression_search_form.q }}
+        <input type="submit" id="submit-form" class="btn btn-outline flex-0 border-l-0" value="{% translate 'search' %}" />
+    </form>
+
+    {% if expression_query %}
+        <ul class="border border-black p-2 h-32 overflow-auto">
+            {% for found_expression in found_expressions %}
+                <li>
+                    <a href="{% url 'edwoca:manifestation_expression_add' object.id found_expression.object.id %}">
+                        {{ found_expression.object }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>
+                    <em>
+                        {% translate 'no search results' %}
+                    </em>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <h2 class="my-5">
+        {% translate 'comment' %}
+    </h2>
+
+    <label>
+        <div class="label">
+            <span class="label-text">
+                {% translate manifestation_form.private_head_comment.label %}
+            </span>
+        </div>
+        {{ manifestation_form.private_head_comment }}
+    </label>
+
+{% else %}
+
+    <h2>
+        {% translate 'print' %}
+    </h2>
+
+    <form method="post">
+        {% csrf_token %}
+        {{ manifestation_form.as_daisy }}
+        <input type="submit" name="save_changes" id="submit-form" class="hidden">
+    </form>
+
+    <h3>
+        {% translate 'template copy' %}
+    </h3>
+    {% for signature in object.template_item.signatures.all %}
+        <div class="signature-form">
+            <div class="flex gap-10 mb-5">
+                <label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
+                    Bibliothek
+                    <input class="w-full grow" value="{{ signature.library }}"/>
+                </label>
+                <label class="input input-bordered flex-0 gap-5 items-center flex" disabled>
+                    Status
+                    <input class="w-12" value="{{ signature.status }}"/>
+                </label>
+            </div>
+            <label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
+                Signatur
+                <input class="w-full grow" value="{{ signature.signature }}"/>
+            </label>
+        </div>
+    {% endfor %}
+
+{% endif %}
 
 {% include 'edwoca/partials/manifestation/preview-divs/head_epilog.html' %}
 

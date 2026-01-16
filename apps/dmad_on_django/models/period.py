@@ -5,6 +5,7 @@ from django.conf import settings
 import re
 from re import split
 from datetime import date, datetime
+from .base import DocumentationStatus
 
 
 class Period(models.Model):
@@ -23,6 +24,13 @@ class Period(models.Model):
             blank=True,
             verbose_name = _("standardized date")
         )
+    status = models.TextField(
+            choices = DocumentationStatus,
+            max_length = 1,
+            null = True,
+            blank = True,
+            verbose_name = _("status")
+        )
 
     def render_detailed(self):
         if self.not_before == self.not_after:
@@ -31,6 +39,249 @@ class Period(models.Model):
 
     def __str__(self):
         return self.display
+
+    def parse_display(self):
+        ASSUMED_TOKEN = '[?]'
+        display_value = self.display
+
+        self.status = self.Status.DOCUMENTED
+        if ASSUMED_TOKEN in display_value:
+            self.status = self.Status.ASSUMED
+            display_value = display_value.replace(ASSUMED_TOKEN, '').strip()
+
+        if '[' in display_value:
+            if ']' in display_value:
+                self.status = self.Status.INFERRED
+                display_value = display_value.replace('[', '').replace(']', '').strip()
+            else:
+                raise Exception('Invalid display date. A [ was provided but no ].')
+        if not '[' in display_value and ']' in display_value:
+            raise Exception('Invalid display date. A ] was provided but no [.')
+
+        # 2 daten
+        if '/' in display_value:
+            dates = [ date.strip() for date in display_value.split('/') ]
+            if len(dates[1]) == 2:
+                dates[1] = dates[0][:2] + dates[1][2:]
+        elif '-' in display_value:
+            dates = [ date.strip() for date in display_value.split('-') ]
+        else:
+            dates = [ display_value ]
+
+        self.not_before = self._parse_date(dates[0], 'lower')
+        if len(dates) == 2:
+            self.not_after = self._parse_date(dates[1], 'upper')
+        else:
+            self.not_after = self._parse_date(dates[0], 'upper')
+
+    def _parse_date(self, date_string, bound):
+        MONTHS = {
+                'Januar': 1,
+                'Februar': 2,
+                'März': 3,
+                'April': 4,
+                'Mai': 5,
+                'Juni': 6,
+                'Juli': 7,
+                'August': 8,
+                'September': 9,
+                'Oktober': 10,
+                'November': 11,
+                'Dezember': 12
+            }
+
+        match = re.search(r"[\d?]{4}", date_string)
+        if match:
+            year = int(match.group())
+        else:
+            raise ValueError(f'No year found in {date_string}')
+
+        for month in MONTHS:
+            if month in date_string:
+                month = MONTHS[month]
+                if 'Anfang' in date_string:
+                    if bound == 'lower':
+                        day = 1
+                    else:
+                        day = 10
+                if 'Mitte' in date_string:
+                    if bound == 'lower':
+                        day = 10
+                    else:
+                        day = 20
+                if 'Ende' in date_string:
+                    if bound == 'lower':
+                        day = 20
+                    else:
+                        day = monthrange(year, month)[1]
+                if 'Erste Hälfte' in date_string:
+                    if bound == 'lower':
+                        day = 1
+                    else:
+                        day = 14
+                if 'Zweite Hälfte' in date_string:
+                    if bound == 'lower':
+                        day = 15
+                    else:
+                        day = monthrange(year, month)[1]
+                return date(year, month, day)
+
+        if 'er Jahre' in date_string:
+            if 'Anfang' in date_string:
+                if bound == 'lower':
+                    day = 1
+                    month = 1
+                else:
+                    day = 31
+                    month = 12
+                    year += 3
+            elif 'Mitte' in date_string:
+                if bound == 'lower':
+                    day = 1
+                    month = 1
+                    year += 4
+                else:
+                    day = 31
+                    month = 12
+                    year += 6
+            elif 'Ende' in date_string:
+                if bound == 'lower':
+                    day = 1
+                    month = 1
+                    year += 7
+                else:
+                    day = 31
+                    month = 12
+                    year += 9
+            elif 'Erste Hälfte' in date_string:
+                if bound == 'lower':
+                    day = 1
+                    month = 1
+                else:
+                    day = 31
+                    month = 12
+                    year += 4
+            elif 'Zweite Hälfte' in date_string:
+                if bound == 'lower':
+                    day = 1
+                    month = 1
+                    year += 5
+                else:
+                    day = 31
+                    month = 12
+                    year += 9
+            else:
+                if bound == 'lower':
+                    day = 1
+                    month = 1
+                else:
+                    day = 31
+                    month = 12
+                    year += 9
+            return date(year, month, day)
+
+        date_parts = date_string.split('.')
+        #day = self._parse_date_part(date_parts, bound, 'day')
+        if len(date_parts) == 3:
+            day = self._parse_date_part(date_parts[0], bound, 'day')
+            month = self._parse_date_part(date_parts[1], bound, 'month')
+            if month > 12:
+                month = 12
+            year = self._parse_date_part(date_parts[2], bound, 'year')
+            if day > monthrange(year, month)[1]:
+                day = monthrange(year, month)[1]
+        if len(date_parts) == 2:
+            month = self._parse_date_part(date_parts[0], bound, 'month')
+            if month > 12:
+                month = 12
+            year = self._parse_date_part(date_parts[1], bound, 'year')
+            if bound == 'lower':
+                day = 1
+            else:
+                day = monthrange(year, month)[1]
+        if len(date_parts) == 1:
+            year = self._parse_date_part(date_parts[0], bound, 'year')
+            if bound == 'lower':
+                month = 1
+                day = 1
+            else:
+                month = 12
+                day = monthrange(year, month)[1]
+
+        return date(year, month, day)
+
+    def _parse_date_part(self, date_part_string, bound, date_part):
+        date_part_chars = [ char for char in date_part_string ]
+        century = ''
+        first_char = ''
+        second_char = ''
+
+        if len(date_part_chars) == 4:
+            if '?' in date_part_string[:2]:
+                century = '18'
+            else:
+                century = date_part_string[:2]
+            first_char = date_part_chars[2]
+            second_char = date_part_chars[3]
+        elif len(date_part_chars) == 2:
+            first_char = date_part_chars[0]
+            second_char = date_part_chars[1]
+        else:
+            first_char = date_part_chars[0]
+
+        if first_char + second_char == '??' or first_char + second_char == '?':
+            if bound == 'lower':
+                return 1
+            if bound == 'upper':
+                if date_part == 'day':
+                    return 31
+                return 12
+
+        if first_char == '?':
+            if bound == 'lower':
+                if second_char and date_part != 'day':
+                    first_part = '0'
+                if second_char > '0':
+                    first_part = '0'
+                else:
+                    first_part = '1'
+            else:
+                first_part = '9'
+                if date_part == 'day':
+                    if second_char < '2':
+                        first_part = '3'
+                    else:
+                        first_part = '2'
+                if date_part == 'month':
+                    if second_char < '3':
+                        first_part = '1'
+                    else:
+                        first_part = '0'
+            if bound == 'upper':
+                if date_part == 'day':
+                    first_part = '3'
+                    if second_char > '1':
+                        first_part = '2'
+        else:
+            first_part = first_char
+
+        if second_char:
+            if second_char == '?':
+                if bound == 'lower':
+                    if date_part == 'month' and first_char == '0':
+                        return 1
+                    second_part = '0'
+                if bound == 'upper':
+                    second_part = '9'
+                    if date_part == 'month' and first_part == '1':
+                        second_part = '2'
+            else:
+                second_part = second_char
+        else:
+            second_part = first_part
+            first_part = '0'
+
+        return int(century + first_part + second_part)
 
     @staticmethod
     def parse_date_with_fallback(datestr: str, fallback_month=1, fallback_day=1):

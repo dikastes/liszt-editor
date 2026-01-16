@@ -7,22 +7,6 @@
     <form method="post" class="mt-5">
         {% csrf_token %}
         {{ form.as_daisy }}
-        {% comment %}
-        <label class="input input-bordered flex items-center gap-2">
-            {{ form.temporary_title.label }}
-            <input type="text" name="{{ form.temporary_title.name }}" id="{{ form.temporary_title.id_for_label }}" class="grow" placeholder="{{ form.temporary_title.label }}">
-        </label>
-
-        <div class="flex gap-5 mt-5">
-            <div class="form-control flex-1">
-                {{ form.library }}
-            </div>
-            <label class="input input-bordered flex items-center gap-2 flex-1">
-                {{ form.signature.label }}
-                <input type="text" name="{{ form.signature.name }}" id="{{ form.signature.id_for_label }}" class="grow" placeholder="{{ form.signature.label }}">
-            </label>
-        </div>
-        {% endcomment %}
 
         <input type="submit" id="submit-form" value="Speichern" class="hidden">
     </form>

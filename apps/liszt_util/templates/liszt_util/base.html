@@ -8,12 +8,15 @@
         <link rel="stylesheet" href="https://cdn.rawgit.com/ichord/At.js/master/dist/css/jquery.atwho.css" />
         <link rel="stylesheet" href="{% static 'liszt_util/tailwind.dist.css' %}" crossorigin="anonymous" />
         <link rel="stylesheet" href="{% static 'liszt_util/sumoselect.css' %}" crossorigin="anonymous" />
+        <link rel="icon" href="{% static 'favicon.ico' %}" />
     </head>
 
     {% block modals %}
     {% endblock %}
 
     <body class="bg-white min-h-screen h-screen flex flex-col">
+        {% block form %}
+        {% endblock %}
         <div class="navbar bg-base-100 flex flex-0 p-0 items-stretch px-10 gap-10 ">
             <div class="flex-none min-h-inherit">
                 {% render_main_navbar_link %}

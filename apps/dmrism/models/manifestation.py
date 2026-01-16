@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
+from dmad_on_django.models.base import DocumentationStatus
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
@@ -21,9 +22,9 @@ class TitleTypes(models.TextChoices):
 
 class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     class ManifestationForm(models.TextChoices):
+        EXCERPTS = 'EX', _('Excerpts')
         SKETCHES = 'SK', _('Sketches'),
         FRAGMENTS = 'FR', _('Fragments'),
-        EXCERPTS = 'EX', _('Excerpts')
 
         def parse(string):
             match string.lower():
@@ -32,40 +33,35 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 case 'excerpt' | 'excerpts': return Manifestation.ManifestationForm.EXCERPTS
 
     class EditionType(models.TextChoices):
-        SCORE = 'SCO', _('Score')
-        PART = 'PRT', _('Part')
-        PARTS = 'PTS', _('Parts')
-        PARTICELL = 'PTC', _('Particell')
-        PIANO_REDUCTION = 'PNR', _('Piano Reduction')
         CHOIR_SCORE = 'CSC', _('Choir Score')
+        PIANO_REDUCTION = 'PNR', _('Piano Reduction')
+        PARTICELL = 'PTC', _('Particell')
+        SCORE = 'SCO', _('Score')
+        PARTS = 'PTS', _('Parts')
 
     class Function(models.TextChoices):
-        COPY = 'COP', _('Copy')
         ALBUM_PAGE = 'ABP', _('Album Page')
-        PART_EXCERPT = 'PTE', _('Part Excerpt')
-        DEDICATION_ITEM = 'DDI', _('Dedication Item')
-        STITCH_TEMPLATE = 'STT', _('Stitch Template')
-        CORRECTED_STITCH_TEMPLATE = 'CST', _('Corrected Stitch Template')
+        PERFORMANCE_MATERIAL = 'PFM', _('Performance Material')
         CORRECTION_SHEET = 'CRS', _('Correction Sheet')
+        STITCH_TEMPLATE = 'STT', _('Stitch Template')
+        DEDICATION_ITEM = 'DDI', _('Dedication Item')
 
         def parse(string):
             match string.lower():
-                case 'copy': return Manifestation.Function.COPY
                 case 'album' | 'albumpage': return Manifestation.Function.ALBUM_PAGE
-                case 'excerpt' | 'partexcerpt': return Manifestation.Function.PART_EXCERPT
-                case 'dedication' | 'dedicationitem': return Manifestation.Function.DEDICATION_ITEM
-                case 'template' | 'stitchtemplate': return Manifestation.Function.STITCH_TEMPLATE
-                case 'correctedtemplate' | 'correctedstitchtemplate': return Manifestation.Function.CORRECTED_STITCH_TEMPLATE
-                case 'correction' | 'correctionsheet': return Manifestation.Function.CORRECTION_SHEET
+                case 'performance material' | 'performancematerial': return Manifestation.Function.PERFORMANCE_MATERIAL
+                case 'correction sheet' | 'correctionsheet' | 'correction': return Manifestation.Function.CORRECTION_SHEET
+                case 'stitch template' | 'stitchtemplate' | 'stitch' | 'template': return Manifestation.Function.STITCH_TEMPLATE
+                case 'dedicationitem' | 'dedication item' | 'dedication': return Manifestation.Function.DEDICATION_ITEM
 
         def parse_from_german(german_string):
             match german_string:
                 case 'Abschrift': return Manifestation.Function.COPY
                 case 'Albumblatt': return Manifestation.Function.ALBUM_PAGE
-                case 'Chorstimmenauszug': return Manifestation.Function.PART_EXCERPT
+                case 'Chorstimmenauszug': return Manifestation.Function.PERFORMANCE_MATERIAL
                 case 'Dedikationsexemplar': return Manifestation.Function.DEDICATION_ITEM
                 case 'Stichvorlage': return Manifestation.Function.STITCH_TEMPLATE
-                case 'korrigierte Stichvorlage': return Manifestation.Function.CORRECTED_STITCH_TEMPLATE
+                case 'korrigierte Stichvorlage': return Manifestation.Function.STITCH_TEMPLATE
                 case 'Korrekturblatt': return Manifestation.Function.CORRECTION_SHEET
 
     class PrintType(models.TextChoices):
@@ -78,22 +74,22 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 case 'lithographie': return Manifestation.PrintType.LITHOGRAPH
 
     class SourceType(models.TextChoices):
-        AUTOGRAPH = 'AUT', _('Autograph')
-        COPY = 'CPY', _('Abschrift')
-        CORRECTED_COPY = 'CCP', _('Korrigierte Abschrift')
-        PRINT = 'PRT', _('Print')
-        CORRECTED_PRINT = 'CPR', _('Corrected Print')
+        TRANSCRIPT = 'TSC', _('transcript')
+        CORRECTED_TRANSCRIPT = 'CTS', _('transcript with autograph entries')
+        AUTOGRAPH = 'AUT', _('autograph')
+        QUESTIONABLE_AUTOGRAPH = 'QAU', _('questionable autograph')
+        CORRECTED_PRINT = 'CPR', _('print with autograph entries')
 
         def parse_from_rism(rism_string):
             match rism_string:
                 case 'Autograph manuscript': return Manifestation.SourceType.AUTOGRAPH
-                case 'Manuscript copy': return Manifestation.SourceType.COPY
+                case 'Manuscript copy': return Manifestation.SourceType.TRANSCRIPT
 
         def parse(string):
             match string.lower():
                 case 'autograph': return Manifestation.SourceType.AUTOGRAPH
-                case 'copy': return Manifestation.SourceType.COPY
-                case 'correctedcopy': return Manifestation.SourceType.CORRECTED_COPY
+                case 'copy': return Manifestation.SourceType.TRANSCRIPT
+                case 'correctedcopy': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
                 case 'print': return Manifestation.SourceType.PRINT
                 case 'correctedprint': return Manifestation.SourceType.CORRECTED_PRINT
 
@@ -101,6 +97,18 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         COMPLETE= 'CP', _('complete')
         INCOMPLETE= 'INC', _('incomplete')
 
+    working_title = models.TextField(
+            max_length = 100,
+            blank = True,
+            null = True,
+            verbose_name = _('working title')
+        )
+    source_title = models.TextField(
+            max_length = 100,
+            blank = True,
+            null = True,
+            verbose_name = _('source title')
+        )
     rism_id_unaligned = models.BooleanField(default=False)
     temporary = models.BooleanField(default=False)
     temporary_target = models.ForeignKey(
@@ -255,6 +263,11 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null = True,
             verbose_name = _('private history comment')
         )
+    private_dedication_comment = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('private dedication comment')
+        )
     private_print_comment = models.TextField(
             blank = True,
             null = True,
@@ -275,6 +288,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = 'specific figure'
         )
+    plate_number = models.CharField(
+            max_length = 50,
+            null = True,
+            blank = True,
+            verbose_name = _('plate number')
+        )
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -283,37 +302,11 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         return self.items.get(is_template=True)
 
     def get_pref_title(self):
-        #titles = self.titles.all()
-
-        #envelope_title = next((t.title for t in titles if t.title_type == TitleTypes.ENVELOPE), None)
-        #if envelope_title:
-            #return envelope_title
-
-        #title_page_title = next((t.title for t in titles if t.title_type == TitleTypes.TITLE_PAGE), None)
-        #if title_page_title:
-            #return title_page_title
-
-        #head_title = next((t.title for t in titles if t.title_type == TitleTypes.HEAD_TITLE), None)
-        #if head_title:
-            #return head_title
-
-        #return '<ohne Titel>'
         return self.__str__()
 
-    def get_temp_title(self):
-        if self.titles.filter(status = Status.TEMPORARY).first():
-            return self.titles.filter(status = Status.TEMPORARY).first().title
-        else:
-            return ''
-
     def __str__(self):
-        if self.titles.filter(status = Status.TEMPORARY).first():
-            temporary_title = f", {self.titles.filter(status = Status.TEMPORARY).first().title}"
-        else:
-            temporary_title = ''
-
         if self.items.count():
-            return f"{self.items.all()[0].get_current_signature()},  {self.get_temp_title()}"
+            return f"{self.items.all()[0].get_current_signature()},  {self.working_title}"
 
         return '<Fehler: keine Items>'
 
@@ -462,7 +455,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             RelatedManifestation.objects.create(
                     source_manifestation = self,
                     target_manifestation = target_manifestation,
-                    label = RelatedManifestation.Label.PARENT
+                    label = RelatedManifestation.Label.IS_PART_OF
                 )
 
         for electronic_location in data.get_fields('856'):
@@ -518,6 +511,11 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             manifestation.save()
         return manifestation
 
+    def get_single_item(self):
+        if self.is_singleton:
+            return self.items.first()
+        raise Exception('You want to retrieve a single item from a non singleton manifestation.')
+
 
 class Publication(models.Model):
     manifestation = models.ForeignKey(
@@ -531,11 +529,18 @@ class Publication(models.Model):
             null = True,
             on_delete = models.SET_NULL
         )
-    plate_number = models.CharField(
-            max_length = 50,
+    place = models.ForeignKey(
+            'dmad.Place',
+            related_name = 'published_manifestations',
             null = True,
-            blank = True,
-            verbose_name = _('plate number')
+            on_delete = models.SET_NULL
+        )
+    place_status = models.CharField(
+            max_length = 1,
+            choices = DocumentationStatus,
+            default = None,
+            null = True,
+            verbose_name = _('title type')
         )
 
 
@@ -544,7 +549,7 @@ class ManifestationTitle(models.Model):
     title = models.TextField(
             null=True,
             blank=True,
-            verbose_name = _('title')
+            verbose_name = _('diplomatic title')
         )
     title_type = models.CharField(
             max_length = 2,
@@ -552,12 +557,6 @@ class ManifestationTitle(models.Model):
             default = None,
             null = True,
             verbose_name = _('title type')
-        )
-    status = models.CharField(
-            max_length=10,
-            choices=Status,
-            default=Status.PRIMARY,
-            verbose_name = _('status')
         )
     manifestation = models.ForeignKey(
             'Manifestation',
@@ -569,9 +568,6 @@ class ManifestationTitle(models.Model):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings.all())
 
     def render_summary(self):
-        if self.status == Status.TEMPORARY:
-            return 'temporär'
-
         result = ''
         if self.title_type:
             result += self.title_type
@@ -593,8 +589,9 @@ class ManifestationBib(BaseBib):
 
 class RelatedManifestation(RelatedEntity):
     class Label(models.TextChoices):
-        PARENT = 'PA', _('Parent'),
-        RELATED = 'RE', _('Related')
+        IS_PART_OF = 'P', _('is part of')
+        IS_COMPONENT_OF = 'C', _('is component of')
+        HAS_ALTERNATIVE = 'A', _('has alternative')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',
@@ -607,10 +604,10 @@ class RelatedManifestation(RelatedEntity):
             related_name="target_manifestation_of"
         )
     label = models.CharField(
-            max_length=10,
+            max_length=1,
             choices=Label,
-            default=Label.PARENT,
-            verbose_name = _('label')
+            verbose_name = _('label'),
+            null = True
         )
     order = models.IntegerField(
             default = 0

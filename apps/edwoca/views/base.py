@@ -4,7 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, FormView, CreateView, DeleteView
 from django.db.models import Case, When
-from liszt_util.forms import SearchForm
+from liszt_util.forms import FramedSearchForm, SearchForm
 from dmad_on_django.models import Person, Status, Corporation, Place
 from bib.models import ZotItem
 from ..forms import LetterForm, LetterMentioningForm
@@ -26,7 +26,7 @@ class EdwocaListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['form'] = SearchForm()
+        context['form'] = FramedSearchForm()
         context['work_count'] = Work.objects.count()
         context['expression_count'] = Expression.objects.count()
         context['manifestation_count'] = Manifestation.objects.filter(is_singleton = False).count()
@@ -52,7 +52,7 @@ class EntityMixin:
 
 class EdwocaSearchView(SearchView):
     template_name = 'edwoca/list.html'
-    form_class = SearchForm
+    form_class = FramedSearchForm
     paginate_by = 10
 
     def get_model_name(self):
@@ -173,14 +173,23 @@ class RelationsUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        search_form = SearchForm(self.request.GET or None)
+        search_form = FramedSearchForm(self.request.GET or None)
         context['searchform'] = search_form
         context['show_search_form'] = True
 
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['query'] = search_form.cleaned_data.get('q')
             target_model = getattr(edwoca_models, snake_to_camel_case(self.request.GET['target_model']))
-            context[f"found_{camel_to_snake_case(target_model.__name__)}s"] = search_form.search().models(target_model)
+            filter = self.request.GET['filter-field'] or None
+            filter_value = self.request.GET['filter-value'] or None
+            if filter:
+                context[f"found_{camel_to_snake_case(target_model.__name__)}s"] = search_form.search().models(target_model).filter(**{filter: filter_value})
+            else:
+                context[f"found_{camel_to_snake_case(target_model.__name__)}s"] = search_form.search().models(target_model)
+
+            context['target_model'] = target_model
+            context['filter_field'] = filter
+            context['filter_value'] = filter_value
 
         return context
 
