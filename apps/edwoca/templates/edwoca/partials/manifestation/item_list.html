@@ -59,7 +59,7 @@
         <button class="btn btn-sm btn-outline ml-2"
         hx-get="{% url 'edwoca:item_move_modal' item.id %}"
         hx-target="#modal-container"
-        onclick="move_modal.showModal()">
+        onclick="move_modal_{{ item.id }}.showModal()">
         Verschieben
         </button>
     </div>
