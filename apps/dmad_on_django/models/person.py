@@ -1,14 +1,16 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+
 from json import dumps, loads
 import requests
 
 from liszt_util.tools import get_model_link
-
 from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
 from .place import Place
 from .geographicareacodes import PersonGeographicAreaCode
 from .subjectterm import SubjectTerm
+
 from pylobid.pylobid import PyLobidPerson, GNDAPIError
 
 
@@ -204,19 +206,19 @@ class Person(DisplayableModel):
 
     def get_table(self):
             rows = [
-            ("Geschlecht", self.gender),
-            ("Geburtsort", get_model_link(self.birth_place)),
-            ("Sterbeort", get_model_link(self.death_place)),
-            ("Geburtsdatum", self.birth_date),
-            ("Sterbedatum", self.death_date)
+            (_("gender"), self.gender),
+            (_("place of birth"), get_model_link(self.birth_place)),
+            (_("place of death"), get_model_link(self.death_place)),
+            (_("date of birth"), self.birth_date),
+            (_("date of death"), self.death_date)
             ]
 
             for profession in self.professions.all():
-                rows.append(("Beruf", get_model_link(profession)))
+                rows.append((_("profession"), get_model_link(profession)))
 
             if(len(self.activity_places.all()) > 0):
                 for place in self.activity_places.all():
-                    rows.append(("Wirkungsort", get_model_link(place)))
+                    rows.append((_("place of activity"), get_model_link(place)))
 
             rows += PersonGeographicAreaCode.get_area_code_table(self.geographic_area_codes) +\
             GNDSubjectCategory.get_subject_category_table(self)
@@ -224,7 +226,7 @@ class Person(DisplayableModel):
             return rows
 
     def get_overview_title(self):
-        return "Biografie"
+        return _("biography")
 
     @staticmethod
     def search(search_string):

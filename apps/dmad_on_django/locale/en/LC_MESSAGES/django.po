@@ -1,0 +1,176 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 15:43+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/dmad_on_django/models/base.py:22
+msgid "Primary"
+msgstr ""
+
+#: apps/dmad_on_django/models/base.py:23
+msgid "Alternative"
+msgstr ""
+
+#: apps/dmad_on_django/models/base.py:24
+msgid "Temporary"
+msgstr ""
+
+#: apps/dmad_on_django/models/base.py:28
+msgid "documented"
+msgstr ""
+
+#: apps/dmad_on_django/models/base.py:29
+msgid "inferred"
+msgstr ""
+
+#: apps/dmad_on_django/models/base.py:30
+msgid "assumed"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:15
+msgid "not before"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:20
+msgid "not after"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:25
+msgid "standardized date"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:32
+msgid "status"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:36
+msgid "Period"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:37
+msgid "Periods"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:61
+msgid "Invalid display date. A [ was provided but no ]."
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:63
+msgid "Invalid display date. A ] was provided but no [."
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:95
+#, python-format
+msgid "No year found in %(date)s"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:187
+#, python-format
+msgid "from %(date)s"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:190
+#, python-format
+msgid "until %(date)s"
+msgstr ""
+
+#: apps/dmad_on_django/models/period.py:192
+msgid "unknown period"
+msgstr ""
+
+#: apps/dmad_on_django/models/person.py:209
+msgid "gender"
+msgstr ""
+
+#: apps/dmad_on_django/models/person.py:210
+msgid "place of birth"
+msgstr ""
+
+#: apps/dmad_on_django/models/person.py:211
+#, fuzzy
+#| msgid "date of creation"
+msgid "place of death"
+msgstr "Date of creation"
+
+#: apps/dmad_on_django/models/person.py:212
+#, fuzzy
+#| msgid "date of creation"
+msgid "date of birth"
+msgstr "Date of creation"
+
+#: apps/dmad_on_django/models/person.py:213
+#, fuzzy
+#| msgid "date of creation"
+msgid "date of death"
+msgstr "Date of creation"
+
+#: apps/dmad_on_django/models/person.py:217
+msgid "profession"
+msgstr ""
+
+#: apps/dmad_on_django/models/person.py:221
+msgid "place of activity"
+msgstr ""
+
+#: apps/dmad_on_django/models/person.py:229
+msgid "biography"
+msgstr ""
+
+#: apps/dmad_on_django/models/place.py:117
+#: apps/dmad_on_django/models/subjectterm.py:118
+#: apps/dmad_on_django/models/work.py:146
+msgid "without name"
+msgstr "without name"
+
+#: apps/dmad_on_django/models/place.py:134
+msgid "Long"
+msgstr ""
+
+#: apps/dmad_on_django/models/place.py:135
+msgid "Lat"
+msgstr ""
+
+#: apps/dmad_on_django/models/place.py:140
+#: apps/dmad_on_django/models/subjectterm.py:137
+#: apps/dmad_on_django/models/work.py:198
+msgid "description"
+msgstr "Description"
+
+#: apps/dmad_on_django/models/work.py:163
+msgid "date of creation"
+msgstr "Date of creation"
+
+#: apps/dmad_on_django/models/work.py:166
+msgid "opus"
+msgstr ""
+
+#: apps/dmad_on_django/models/work.py:169
+msgid "work catalog number"
+msgstr ""
+
+#: apps/dmad_on_django/models/work.py:174
+msgid "category"
+msgstr ""
+
+#: apps/dmad_on_django/models/work.py:179
+msgid "creator"
+msgstr ""
+
+#: apps/dmad_on_django/models/work.py:186
+msgid "broader terms"
+msgstr ""

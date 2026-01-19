@@ -1,0 +1,169 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-19 15:43+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/dmad_on_django/models/base.py:22
+msgid "Primary"
+msgstr "Bevorzugter Titel"
+
+#: apps/dmad_on_django/models/base.py:23
+msgid "Alternative"
+msgstr "Titelvariante"
+
+#: apps/dmad_on_django/models/base.py:24
+msgid "Temporary"
+msgstr "Arbeitstitel"
+
+#: apps/dmad_on_django/models/base.py:28
+msgid "documented"
+msgstr "nach Vorlage"
+
+#: apps/dmad_on_django/models/base.py:29
+msgid "inferred"
+msgstr "erschlossen"
+
+#: apps/dmad_on_django/models/base.py:30
+msgid "assumed"
+msgstr "angenommen"
+
+#: apps/dmad_on_django/models/period.py:15
+msgid "not before"
+msgstr "nicht vor"
+
+#: apps/dmad_on_django/models/period.py:20
+msgid "not after"
+msgstr "nicht nach"
+
+#: apps/dmad_on_django/models/period.py:25
+msgid "standardized date"
+msgstr "Datierung (standardisiert)"
+
+#: apps/dmad_on_django/models/period.py:32
+msgid "status"
+msgstr "Status"
+
+#: apps/dmad_on_django/models/period.py:36
+msgid "Period"
+msgstr "Zeitraum"
+
+#: apps/dmad_on_django/models/period.py:37
+msgid "Periods"
+msgstr "Zeiträume"
+
+#: apps/dmad_on_django/models/period.py:61
+msgid "Invalid display date. A [ was provided but no ]."
+msgstr "ungültiges Datum"
+
+#: apps/dmad_on_django/models/period.py:63
+msgid "Invalid display date. A ] was provided but no [."
+msgstr "ungültiges Datum"
+
+#: apps/dmad_on_django/models/period.py:95
+#, python-format
+msgid "No year found in %(date)s"
+msgstr "Kein Jahr gefunden in %(date)s"
+
+#: apps/dmad_on_django/models/period.py:187
+#, python-format
+msgid "from %(date)s"
+msgstr "von %(date)s"
+
+#: apps/dmad_on_django/models/period.py:190
+#, python-format
+msgid "until %(date)s"
+msgstr "bis %(date)s"
+
+#: apps/dmad_on_django/models/period.py:192
+msgid "unknown period"
+msgstr "unbekannter Zeitraum"
+
+#: apps/dmad_on_django/models/person.py:209
+msgid "gender"
+msgstr "Geschlecht"
+
+#: apps/dmad_on_django/models/person.py:210
+msgid "place of birth"
+msgstr "Geburtsort"
+
+#: apps/dmad_on_django/models/person.py:211
+msgid "place of death"
+msgstr "Sterbeort"
+
+#: apps/dmad_on_django/models/person.py:212
+msgid "date of birth"
+msgstr "Geburtsdatum"
+
+#: apps/dmad_on_django/models/person.py:213
+msgid "date of death"
+msgstr "Sterbedatum"
+
+#: apps/dmad_on_django/models/person.py:217
+msgid "profession"
+msgstr "Beruf"
+
+#: apps/dmad_on_django/models/person.py:221
+msgid "place of activity"
+msgstr "Wirkungsort"
+
+#: apps/dmad_on_django/models/person.py:229
+msgid "biography"
+msgstr "Biografie"
+
+#: apps/dmad_on_django/models/place.py:117
+#: apps/dmad_on_django/models/subjectterm.py:118
+#: apps/dmad_on_django/models/work.py:146
+msgid "without name"
+msgstr "ohne Name"
+
+#: apps/dmad_on_django/models/place.py:134
+msgid "Long"
+msgstr "Längengrad"
+
+#: apps/dmad_on_django/models/place.py:135
+msgid "Lat"
+msgstr "Breitengrad"
+
+#: apps/dmad_on_django/models/place.py:140
+#: apps/dmad_on_django/models/subjectterm.py:137
+#: apps/dmad_on_django/models/work.py:198
+msgid "description"
+msgstr "Angaben"
+
+#: apps/dmad_on_django/models/work.py:163
+msgid "date of creation"
+msgstr "Entstehungszeit"
+
+#: apps/dmad_on_django/models/work.py:166
+msgid "opus"
+msgstr "Opus"
+
+#: apps/dmad_on_django/models/work.py:169
+msgid "work catalog number"
+msgstr "Werkverzeichnisnummer"
+
+#: apps/dmad_on_django/models/work.py:174
+msgid "category"
+msgstr "Gattung"
+
+#: apps/dmad_on_django/models/work.py:179
+msgid "creator"
+msgstr "Schöpfer:in"
+
+#: apps/dmad_on_django/models/work.py:186
+msgid "broader terms"
+msgstr "Oberbegriffe"

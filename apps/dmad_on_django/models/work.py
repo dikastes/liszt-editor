@@ -1,6 +1,8 @@
 from django.db import models
 from django.urls import reverse
 
+from django.utils.translation import gettext_lazy as _
+
 from .base import DisplayableModel, Status, max_trials, GNDSubjectCategory
 from dmad_on_django.models import Person
 from .subjectterm import SubjectTerm
@@ -141,7 +143,7 @@ class Work(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _("without name")
 
     def get_designator(self):
         if self.gnd_id:
@@ -158,30 +160,30 @@ class Work(DisplayableModel):
         table = []
 
         if self.date_of_creation:
-            table.append(("Entstehungszeit", self.date_of_creation))
+            table.append((_("date of creation"), self.date_of_creation))
 
         if self.opus:
-            table.append(("Opus", self.opus))
+            table.append((_("opus"), self.opus))
 
         if self.work_catalouge_number:
-            table.append(("Werkverzeichnisnummer", self.work_catalouge_number))
+            table.append((_("work catalog number"), self.work_catalouge_number))
 
         
         match self.form_of_work:
             case work_form if work_form: 
-                table.append(("Gattung", get_model_link(work_form)))
+                table.append((_("category"), get_model_link(work_form)))
 
         match self.creators:
             case creators if creators.exists():
                 for creator in creators.all():
-                    table.append(("Schöpfer:in", get_model_link(creator)))
+                    table.append((_("creator"), get_model_link(creator)))
             case _:
                 pass
 
         match self.broader_terms:
             case terms if terms.exists():
                 for term in terms.all():
-                    table.append(("Oberbegriffe", get_model_link(term)))
+                    table.append((_("broader terms"), get_model_link(term)))
             case _:
                 pass
 
@@ -193,7 +195,7 @@ class Work(DisplayableModel):
     
     def get_overview_title(self):
         
-        return "Angaben" 
+        return _("description")
     
 
 
