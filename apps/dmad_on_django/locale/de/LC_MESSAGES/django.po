@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 15:43+0000\n"
+"POT-Creation-Date: 2026-01-19 17:08+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -41,56 +41,61 @@ msgstr "erschlossen"
 msgid "assumed"
 msgstr "angenommen"
 
-#: apps/dmad_on_django/models/period.py:15
-msgid "not before"
-msgstr "nicht vor"
+#: apps/dmad_on_django/models/base.py:69
+msgid "gnd subject category"
+msgstr "GND Sachgruppe"
 
-#: apps/dmad_on_django/models/period.py:20
-msgid "not after"
-msgstr "nicht nach"
+#: apps/dmad_on_django/models/corporation.py:140
+#: apps/dmad_on_django/models/place.py:117
+#: apps/dmad_on_django/models/subjectterm.py:118
+#: apps/dmad_on_django/models/work.py:146
+msgid "without name"
+msgstr "ohne Name"
 
-#: apps/dmad_on_django/models/period.py:25
-msgid "standardized date"
-msgstr "Datierung (standardisiert)"
+#: apps/dmad_on_django/models/corporation.py:146
+#: apps/dmad_on_django/models/person.py:221
+msgid "place of activity"
+msgstr "Wirkungsort"
 
-#: apps/dmad_on_django/models/period.py:32
-msgid "status"
-msgstr "Status"
-
-#: apps/dmad_on_django/models/period.py:36
+#: apps/dmad_on_django/models/corporation.py:150
 msgid "Period"
 msgstr "Zeitraum"
 
-#: apps/dmad_on_django/models/period.py:37
-msgid "Periods"
-msgstr "Zeiträume"
+#: apps/dmad_on_django/models/corporation.py:153
+msgid "category corporation"
+msgstr "Kategorie"
 
-#: apps/dmad_on_django/models/period.py:61
-msgid "Invalid display date. A [ was provided but no ]."
-msgstr "ungültiges Datum"
+#: apps/dmad_on_django/models/geographicareacodes.py:18
+msgid "geographic area code"
+msgstr "Geografischer Gebietscode"
 
-#: apps/dmad_on_django/models/period.py:63
-msgid "Invalid display date. A ] was provided but no [."
-msgstr "ungültiges Datum"
+#: apps/dmad_on_django/models/period.py:16
+msgid "not before"
+msgstr "nicht vor"
 
-#: apps/dmad_on_django/models/period.py:95
-#, python-format
-msgid "No year found in %(date)s"
-msgstr "Kein Jahr gefunden in %(date)s"
+#: apps/dmad_on_django/models/period.py:21
+msgid "not after"
+msgstr "nicht nach"
 
-#: apps/dmad_on_django/models/period.py:187
-#, python-format
-msgid "from %(date)s"
-msgstr "von %(date)s"
+#: apps/dmad_on_django/models/period.py:26
+msgid "standardized date"
+msgstr "Datierung (standardisiert)"
 
-#: apps/dmad_on_django/models/period.py:190
-#, python-format
-msgid "until %(date)s"
-msgstr "bis %(date)s"
+#: apps/dmad_on_django/models/period.py:33
+msgid "status"
+msgstr "Status"
 
-#: apps/dmad_on_django/models/period.py:192
+#: apps/dmad_on_django/models/period.py:324
+msgid "startdate"
+msgstr "von"
+
+#: apps/dmad_on_django/models/period.py:327
+msgid "enddate"
+msgstr "bis"
+
+#: apps/dmad_on_django/models/period.py:330
 msgid "unknown period"
-msgstr "unbekannter Zeitraum"
+msgstr "unbekannter Zeitraumm"
 
 #: apps/dmad_on_django/models/person.py:209
 msgid "gender"
@@ -116,19 +121,9 @@ msgstr "Sterbedatum"
 msgid "profession"
 msgstr "Beruf"
 
-#: apps/dmad_on_django/models/person.py:221
-msgid "place of activity"
-msgstr "Wirkungsort"
-
 #: apps/dmad_on_django/models/person.py:229
 msgid "biography"
 msgstr "Biografie"
-
-#: apps/dmad_on_django/models/place.py:117
-#: apps/dmad_on_django/models/subjectterm.py:118
-#: apps/dmad_on_django/models/work.py:146
-msgid "without name"
-msgstr "ohne Name"
 
 #: apps/dmad_on_django/models/place.py:134
 msgid "Long"
@@ -167,3 +162,72 @@ msgstr "Schöpfer:in"
 #: apps/dmad_on_django/models/work.py:186
 msgid "broader terms"
 msgstr "Oberbegriffe"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:10
+msgid "edit"
+msgstr "Bearbeiten"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:17
+msgid "Lobid-Info"
+msgstr "Lobid-Info"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:29
+msgid "data overview"
+msgstr "Normdatenübersicht"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:33
+msgid "identification"
+msgstr "Idendifikation"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:37
+msgid "gnd-id"
+msgstr "GND-ID"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:41
+msgid "default name"
+msgstr "bevorzugter Name"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:46
+msgid "alternate_name"
+msgstr "alternativer Name"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:59
+msgid "raw data"
+msgstr "Rohdaten"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:85
+msgid "create entry"
+msgstr "Datensatz anlegen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:91
+msgid "remove gnd"
+msgstr "GND-Verknüpfung aufheben"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:97
+msgid "connect gnd"
+msgstr "GND Datensatz verknüpfen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:102
+msgid "save"
+msgstr "Speichern"
+
+#~ msgid "Periods"
+#~ msgstr "Zeiträume"
+
+#~ msgid "Invalid display date. A [ was provided but no ]."
+#~ msgstr "ungültiges Datum"
+
+#~ msgid "Invalid display date. A ] was provided but no [."
+#~ msgstr "ungültiges Datum"
+
+#, python-format
+#~ msgid "No year found in %(date)s"
+#~ msgstr "Kein Jahr gefunden in %(date)s"
+
+#, python-format
+#~ msgid "from %(date)s"
+#~ msgstr "von %(date)s"
+
+#, python-format
+#~ msgid "until %(date)s"
+#~ msgstr "bis %(date)s"

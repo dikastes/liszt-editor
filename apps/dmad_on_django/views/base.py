@@ -7,7 +7,7 @@ import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm, Corporation
 from haystack.generic_views import SearchView
 from json import dumps
-from dmad_on_django.forms import formWidgets, DmadCreateForm, DmadUpdateForm
+from dmad_on_django.forms import formWidgets, DmadCreateForm, DmadUpdateForm, DmadLinkForm
 from liszt_util.tools import camel_to_snake_case, snake_to_camel_case
 from pylobid.pylobid import GNDNotFoundError
 
@@ -144,7 +144,7 @@ class LinkView(DmadBaseViewMixin, UpdateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
-            form=AsDaisyModelForm,
+            form=DmadLinkForm,
             fields=self.fields,
             widgets=formWidgets
         )

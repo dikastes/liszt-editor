@@ -1,6 +1,7 @@
 from django.db import models
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
 import requests
 
@@ -136,20 +137,20 @@ class Corporation(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _("without name")
 
     def get_table(self):
         table = CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
 
         for pl in self.place.all():
-            table.append(("Wirkungsort", get_model_link(pl)))
+            table.append((_("place of activity"), get_model_link(pl)))
 
         table += GNDSubjectCategory.get_subject_category_table(self)
 
-        table.append(("Zeitraum", self.period))
+        table.append((_("Period"), self.period))
 
         for c in self.category.all():
-            table.append(("Kategorie", get_model_link(c)))
+            table.append((_("category corporation"), get_model_link(c)))
 
         return table
 

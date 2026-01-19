@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from json import loads
 
 class GeographicAreaCode(models.Model):
@@ -14,7 +15,7 @@ class GeographicAreaCode(models.Model):
 
     @staticmethod
     def get_area_code_table(areacodes):
-        return [("Geographic Area Code",code.code)
+        return [(_("geographic area code"),code.code)
                  for code in areacodes.all()]
     
     @staticmethod

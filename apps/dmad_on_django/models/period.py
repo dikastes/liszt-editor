@@ -1,5 +1,6 @@
 from calendar import monthrange
 from django.utils.translation import gettext_lazy as _
+from django.utils.translation import gettext
 from django.db import models
 from django.conf import settings
 import re
@@ -319,11 +320,14 @@ class Period(models.Model):
         if not_before and not_after:
             display = f"{not_before.strftime('%d.%m.%Y')} – {not_after.strftime('%d.%m.%Y')}"
         elif not_before:
-            display = f"ab {not_before.strftime('%d.%m.%Y')}"
+            # Lösung: Übersetzung außerhalb des F-Strings aufrufen
+            prefix = gettext("startdate")
+            display = f"{prefix} {not_before.strftime('%d.%m.%Y')}"
         elif not_after:
-            display = f"bis {not_after.strftime('%d.%m.%Y')}"
+            prefix = gettext("enddate")
+            display = f"{prefix} {not_after.strftime('%d.%m.%Y')}"
         else:
-            display = "unbekannter Zeitraum"
+            display = gettext("unknown period")
 
         return Period.objects.create(
             not_before=not_before,

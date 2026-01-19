@@ -35,3 +35,6 @@ class DmadUpdateForm(GenericAsDaisyMixin, ModelForm):
 
 class DmadCreateForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
+
+class DmadLinkForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE

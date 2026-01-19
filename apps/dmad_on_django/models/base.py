@@ -66,7 +66,7 @@ class GNDSubjectCategory(models.Model):
             except AttributeError:
                 return []
 
-            table.append(("GND Sachgruppe",
+            table.append((_("gnd subject category"),
                   f'<a href="{link}"target = "_blank" class = "link link-primary">{label}</a>'))
 
         return table
