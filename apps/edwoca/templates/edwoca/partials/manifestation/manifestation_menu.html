@@ -100,8 +100,17 @@
     <div class="flex-0 min-h-16"></div>
     <ul class="menu p-0 flex-0">
         <li>
+            <a href="{% url 'edwoca:manifestation_copy' object.id %}">
+                {% translate 'copy' %}
+            </a>
+        </li>
+        <li>
             <a href="{% url 'edwoca:manifestation_delete' object.id %}"
-            {% if 'delete' in request.path %}class="active"{% endif %}
+            {% if 'delete' in request.path %}
+               class="text-primary active"
+           {% else %}
+               class="text-primary"
+           {% endif %}
             >
                 {% translate 'delete' %}
             </a>

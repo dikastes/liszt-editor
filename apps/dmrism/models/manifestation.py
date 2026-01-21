@@ -127,9 +127,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     places = models.ManyToManyField(
             'dmad.Place'
         )
-    dedicatees = models.ManyToManyField(
-            'dmad.Person'
-        )
     related_manifestations = models.ManyToManyField(
             'Manifestation',
             through = 'RelatedManifestation'
@@ -195,11 +192,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default=None,
             null=True,
             verbose_name = _('language')
-        )
-    dedication = models.TextField(
-            blank=True,
-            null=True,
-            verbose_name = _('dedication')
         )
     watermark = models.TextField(
             max_length=100,
@@ -288,12 +280,60 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = 'specific figure'
         )
-    plate_number = models.CharField(
-            max_length = 50,
-            null = True,
-            blank = True,
-            verbose_name = _('plate number')
+
+    def get_copy(self):
+        period = None
+        if self.period:
+            period = Period.objects.create(
+                    not_before = self.period.not_before,
+                    not_after = self.period.not_after,
+                    display = self.period.display,
+                    status = self.period.status
+                )
+
+        copy = Manifestation.objects.create(
+            working_title = f'{_("copy of")} {self.working_title}',
+            source_title = self.source_title,
+            rism_id_unaligned = True,
+            period = period,
+            manifestation_form = self.manifestation_form,
+            edition_type = self.edition_type,
+            source_type = self.source_type,
+            function = self.function,
+            print_type = self.print_type,
+            state = self.state,
+            history = self.history,
+            language = self.language,
+            watermark = self.watermark,
+            watermark_url = self.watermark_url,
+            is_singleton = self.is_singleton,
+            raw_data = self.raw_data,
+            date_diplomatic = self.date_diplomatic,
+            taken_information = self.taken_information,
+            stitcher = self.stitcher,
+            specific_figure = self.specific_figure,
+            print_extent = self.print_extent,
+            private_head_comment = self.private_head_comment,
+            private_relations_comment = self.private_relations_comment,
+            private_title_comment = self.private_title_comment,
+            private_history_comment = self.private_history_comment,
+            private_dedication_comment = self.private_dedication_comment,
+            private_print_comment = self.private_print_comment
         )
+        copy.places.set(self.places.all())
+
+        if self.is_singleton:
+            single_item_copy = self.get_single_item().get_copy(copy)
+            copy.items.set([single_item_copy])
+
+        for title in self.titles.all():
+            ManifestationTitle.objects.create(
+                    title = title.title,
+                    title_type = title.title_type,
+                    manifestation = copy
+                )
+
+        return copy
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})

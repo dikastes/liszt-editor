@@ -60,6 +60,35 @@ class Item(Sortable, WemiBaseClass):
 
     _group_field_name = 'manifestation'
 
+    def get_copy(self, manifestation):
+        copy = Item.objects.create(
+                rism_id = self.rism_id,
+                manifestation = manifestation,
+                is_template = self.is_template,
+                extent = self.extent,
+                measure = self.measure,
+                taken_information = self.taken_information,
+                public_provenance_comment = self.public_provenance_comment,
+                private_manuscript_comment = self.private_manuscript_comment,
+                private_dedication_comment = self.private_dedication_comment,
+                private_provenance_comment = self.private_provenance_comment
+            )
+        for signature in self.signatures.all():
+            ItemSignature.objects.create(
+                    item = copy,
+                    library = signature.library,
+                    status = signature.status,
+                    signature = signature.signature
+                )
+        for digital_copy in self.digital_copies.all():
+            ItemDigitalCopy.objects.create(
+                    url = digital_copy.url,
+                    link_type = digital_copy.link_type,
+                    item = copy
+                )
+
+        return copy
+
     def render_handwritings(self):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings)
 
@@ -78,11 +107,11 @@ class Item(Sortable, WemiBaseClass):
 
     def signature_with_former(self):
         former_string = ''
-        if self.signatures.filter(status = Signature.Status.FORMER):
+        if self.signatures.filter(status = BaseSignature.Status.FORMER):
             former_string = ', '.join(
                     former_signature.__str__() for 
                     former_signature in
-                    self.signatures.filter(status = Signature.Status.FORMER)
+                    self.signatures.filter(status = BaseSignature.Status.FORMER)
                 )
         return self.get_current_signature() + ', vormalig ' + former_string
 
