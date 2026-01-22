@@ -1361,3 +1361,9 @@ def manifestation_publication_remove_publisher(request, pk):
     publication.publisher = None
     publication.save()
     return redirect('edwoca:manifestation_print', pk=publication.manifestation.id)
+
+
+def manifestation_copy(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk = pk)
+    manifestation_copy = manifestation.get_copy()
+    return redirect('edwoca:manifestation_detail', pk = manifestation_copy.id)

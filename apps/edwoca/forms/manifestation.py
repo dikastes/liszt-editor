@@ -52,29 +52,8 @@ class ManifestationSourceTitleForm(GenericAsDaisyMixin, ModelForm):
                 'private_dedication_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
-                    }),
-                'plate_number': TextInput( attrs = {
-                        'class': SimpleFormMixin.text_input_classes,
-                        'form': 'form'
-                    }),
-            }
-
-
-class ManifestationDedicationForm(ModelForm, SimpleFormMixin):
-    class Meta:
-        model = Manifestation
-        fields = ['dedication', 'private_title_comment']
-        widgets = {
-                'dedication': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
-                    }),
-                'private_title_comment': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
                     })
             }
-        labels = {
-            'private_title_comment': 'Interner Widmungskommentar',
-        }
 
 
 class ManifestationTitleForm(ModelForm):

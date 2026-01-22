@@ -15,8 +15,12 @@ from dmad_on_django.models import Person, Corporation, Place
 from bib.models import ZotItem
 from liszt_util.tools import swap_order
 from django.contrib import messages
+from django.contrib.messages import get_messages
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.db import transaction
+from django.utils.html import mark_safe
+from haystack.query import SearchQuerySet
 
 
 def item_set_template(request, pk):
@@ -103,6 +107,66 @@ def item_swap_view(request, pk, direction):
         'edwoca/partials/manifestation/item_list.html',
         context
     )
+@require_POST
+def item_move_view(request, item_pk):
+    item = get_object_or_404(Item, pk=item_pk)
+    target_manifestation_pk = request.POST.get('target_manifestation_pk')
+
+    if not target_manifestation_pk:
+        return HttpResponse("Keine Ziel Manifestation ausgewählt", status=400)
+
+    target_manifestation = get_object_or_404(Manifestation, pk=target_manifestation_pk)
+
+    # Verschieben ausführen
+    old_manifestation = item.move_to_manifestation(target_manifestation)
+    
+    # Erfolgsmeldung für den Verschiebevorgang
+    messages.success(request, f'Exemplar wurde erfolgreich nach "{target_manifestation}" verschoben.')
+
+    # Sonderfall: Alte Manifestation ist jetzt leer
+    if not old_manifestation.items.exists():
+        msg = mark_safe(
+            f'Manifestation hat keine Exemplare mehr. '
+            f'<a href="{reverse("edwoca:manifestation_delete", kwargs={"pk":old_manifestation.id})}" '
+            f'style="text-decoration: underline; font-weight: bold; color: inherit;">Löschen?</a>'
+        )
+        messages.warning(request, msg, extra_tags='safe')
+
+    
+    response = render(
+        request, 'edwoca/partials/manifestation/item_list.html',
+        {'object': old_manifestation}
+    )
+
+    response.content += b'<div id="modal-container" hx-swap-oob="true"></div>'
+    
+    return response
+
+def item_move_modal(request, pk):
+    item = get_object_or_404(Item, pk=pk)
+    return render (
+        request,
+        'edwoca/partials/manifestation/item_move_modal.html',
+        {'item': item}
+    )
+
+def manifestation_autocomplete(request):
+    q = request.GET.get('q','')
+    results = (
+        SearchQuerySet().models(Manifestation)
+        .filter(is_singleton=False)
+        .autocomplete(text=q)[:10]
+        if len(q) >= 3 else []
+    )
+
+    return render (
+        request,
+        'edwoca/partials/manifestation/item_move_search_results.html',
+        {'results':results}
+    )
+
+
+
 """
 class ItemCreateView(EntityMixin, CreateView):
     model = EdwocaItem

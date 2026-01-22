@@ -36,8 +36,8 @@ class WorkName(models.Model):
         return workname
 
     def __str__(self):
-        if self.gnd_id:
-            return f'{self.name} ({self.gnd_id})'
+        if self.work.gnd_id:
+            return f'{self.name} ({self.work.gnd_id})'
         return self.interim_designator
 
 

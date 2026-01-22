@@ -1,7 +1,8 @@
 from .base import *
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, FieldError
 from django.db import models
-from django.db.models import Q, UniqueConstraint
+from django.db import transaction
+from django.db.models import Q, UniqueConstraint, F
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -59,6 +60,35 @@ class Item(Sortable, WemiBaseClass):
 
     _group_field_name = 'manifestation'
 
+    def get_copy(self, manifestation):
+        copy = Item.objects.create(
+                rism_id = self.rism_id,
+                manifestation = manifestation,
+                is_template = self.is_template,
+                extent = self.extent,
+                measure = self.measure,
+                taken_information = self.taken_information,
+                public_provenance_comment = self.public_provenance_comment,
+                private_manuscript_comment = self.private_manuscript_comment,
+                private_dedication_comment = self.private_dedication_comment,
+                private_provenance_comment = self.private_provenance_comment
+            )
+        for signature in self.signatures.all():
+            ItemSignature.objects.create(
+                    item = copy,
+                    library = signature.library,
+                    status = signature.status,
+                    signature = signature.signature
+                )
+        for digital_copy in self.digital_copies.all():
+            ItemDigitalCopy.objects.create(
+                    url = digital_copy.url,
+                    link_type = digital_copy.link_type,
+                    item = copy
+                )
+
+        return copy
+
     def render_handwritings(self):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings)
 
@@ -77,11 +107,11 @@ class Item(Sortable, WemiBaseClass):
 
     def signature_with_former(self):
         former_string = ''
-        if self.signatures.filter(status = Signature.Status.FORMER):
+        if self.signatures.filter(status = BaseSignature.Status.FORMER):
             former_string = ', '.join(
                     former_signature.__str__() for 
                     former_signature in
-                    self.signatures.filter(status = Signature.Status.FORMER)
+                    self.signatures.filter(status = BaseSignature.Status.FORMER)
                 )
         return self.get_current_signature() + ', vormalig ' + former_string
 
@@ -91,20 +121,64 @@ class Item(Sortable, WemiBaseClass):
     def current_signature(self):
         return self.signatures.filter(status=BaseSignature.Status.CURRENT).first()
 
-    def save(self, *args, **kwargs):
-        if self.manifestation.is_singleton and self.manifestation.items.count() > 1:
-            raise ValidationError("Cannot add another item to a singleton manifestation.")
+    def move_to_manifestation(self, target_manifestation):
+        if self.manifestation == target_manifestation:
+            return self.manifestation
         
-        if self.pk is None:
-            max_index = (
-                Item.objects
-                .filter(manifestation=self.manifestation)
-                .aggregate(models.Max('order_index'))['order_index__max']
+        if target_manifestation.is_singleton and target_manifestation.items.exists():
+            raise ValidationError("Ziel-Manifestation ist ein Singleton und hat bereits ein Item.")
+
+        with transaction.atomic():
+            old_manifestation = self.manifestation
+            old_order_index = self.order_index
+
+            # Neuen order index berechnen
+            max_idx = Item.objects.filter(manifestation=target_manifestation).aggregate(
+                models.Max('order_index'))['order_index__max']
+            new_index = (max_idx + 1) if max_idx is not None else 0
+
+            # Item verschieben und unique constraints umgehen
+            Item.objects.filter(pk=self.pk).update(
+                manifestation=target_manifestation,
+                order_index=new_index,
+                is_template=False  
             )
 
+            # Lücke in der alten Manifestation schließen
+            Item.objects.filter(
+                manifestation=old_manifestation,
+                order_index__gt=old_order_index
+            ).update(order_index=F('order_index') - 1)
+
+            # Sicherheitshalber das item nochmal aus der DB laden
+            self.refresh_from_db()
+            
+        return old_manifestation
+
+    def save(self, *args, **kwargs):
+    # 1. Singleton-Schutz
+        if self.manifestation.is_singleton:
+            other_items_exists = Item.objects.filter(
+                manifestation=self.manifestation
+            ).exclude(pk=self.pk).exists()
+            if other_items_exists:
+                raise ValidationError("Cannot add another item to a singleton manifestation.")
+
+        # 2. Index-Zuweisung für neue Items
+        # Wir prüfen auf pk is None (neues Objekt) 
+        # UND (Index ist None ODER Index ist der Default 0)
+        if self.pk is None and (self.order_index is None or self.order_index == 0):
+            max_index = Item.objects.filter(
+                manifestation=self.manifestation
+            ).aggregate(models.Max('order_index'))['order_index__max']
+            
+            # Wenn bereits Items existieren, nimm max + 1, sonst bleib bei 0
             if max_index is not None:
                 self.order_index = max_index + 1
+            else:
+                self.order_index = 0
 
+        # 3. Vererbungskette aufrufen (Sortable -> Models -> DB)
         super().save(*args, **kwargs)
 
     class Meta:

@@ -4,7 +4,7 @@ from abc import ABC, abstractproperty
 
 # Create your models here.
 class Sortable(models.Model):
-    order_index = models.PositiveIntegerField(
+    order_index = models.IntegerField(
         default=0,
         db_index=True,
         verbose_name="Sortier-Index"

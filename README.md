@@ -6,7 +6,7 @@ This is a prototype of the data input mask for the Liszt Catalog Raisonné
 Make sure python3 is installed. Run the install script: 
 
 ```{bash}
-# ./install.bash
+# ./install.sh
 ```
 
 ## Run the server
