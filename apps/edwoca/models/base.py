@@ -265,7 +265,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if EDITION_TYPE_KEY in raw_data:
             self.edition_type = Manifestation.parse_edition_type(raw_data[EDITION_TYPE_KEY])
 
-        self.dedication = raw_data[DEDICATION_KEY]
+        self.private_dedication_comment = raw_data[DEDICATION_KEY]
+        """
         if self.dedication:
             dedications = self.dedication.split('|')
             for dedication in dedications:
@@ -284,6 +285,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 dedicatee = Person.objects.get(interim_designator = person)
                                 self.dedicatees.add(dedicatee)
                                 break
+        """
 
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY]#.replace(' | ', '\n')
         if raw_data[MACHINE_READABLE_DATE_KEY]:
