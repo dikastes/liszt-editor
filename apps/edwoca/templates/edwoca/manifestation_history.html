@@ -10,7 +10,7 @@
     {% translate 'date' %}
 </h2>
 
-<form method="post">
+<form method="post" id="form">
     {% csrf_token %}
     {{ form.as_daisy }}
     <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">

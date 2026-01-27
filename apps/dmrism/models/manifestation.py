@@ -280,6 +280,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = 'specific figure'
         )
+    plate_number = models.CharField(
+            max_length=20,
+            null = True,
+            blank = True,
+            verbose_name = _('plate number')
+        )
 
     def get_copy(self):
         period = None
@@ -353,7 +359,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     def save(self, *args, **kwargs):
         if self.is_singleton and self.items.count() > 1:
             raise ValidationError("A singleton manifestation cannot have more than one item.")
-        super().save(*args, **kwargs)
+        old_manifestation = Manifestation.objects.filter(id = self.id).first()
+        if old_manifestation:
+            old_rism_id = old_manifestation.rism_id
+            if old_rism_id != self.rism_id:
+                self.rism_id_unaligned = True
+        super().save(**kwargs)
+
 
     def unset_singleton(self):
         self.is_singleton = False
@@ -535,14 +547,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
         return self
 
-    def save(self, **kwargs):
-        old_manifestation = Manifestation.objects.filter(id = self.id).first()
-        if old_manifestation:
-            old_rism_id = old_manifestation.rism_id
-            if old_rism_id != self.rism_id:
-                self.rism_id_unaligned = True
-        super().save(**kwargs)
-
     def get_or_create(rism_id, singleton):
         manifestation = Manifestation.objects.filter(rism_id = rism_id).first()
         if not manifestation:
@@ -555,6 +559,11 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         if self.is_singleton:
             return self.items.first()
         raise Exception('You want to retrieve a single item from a non singleton manifestation.')
+
+    def get_current_signature(self):
+        if self.is_singleton and self.get_single_item():
+            return self.get_single_item().get_current_signature()
+        return ''
 
 
 class Publication(models.Model):

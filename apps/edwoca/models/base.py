@@ -880,6 +880,7 @@ class LetterMentioning(models.Model):
     def __str__(self):
         return f'{self.bib.zot_short_title}, {self.pages}'
 
+
 class ItemModification(models.Model):
     item = models.ForeignKey(
             'dmrism.Item',
@@ -898,7 +899,7 @@ class ItemModification(models.Model):
             on_delete = models.SET_NULL,
             null = True
         )
-    period = models.ForeignKey(
+    period = models.OneToOneField(
             'dmad.Period',
             related_name = 'modification',
             on_delete = models.SET_NULL,
@@ -917,6 +918,12 @@ class ItemModification(models.Model):
             return f"{self.period} ({handwriting.writer.__str__()}, {handwriting.medium})"
         else:
             return f"{self.period} <Handschrift>"
+
+    def ensure_period(self):
+        if self.period is None:
+            self.period = Period.objects.create()
+            self.save(update_fields=['period'])
+        return self.period
 
 
 class ModificationHandwriting(BaseHandwriting):

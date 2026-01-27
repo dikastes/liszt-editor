@@ -1,9 +1,12 @@
 import dominate.tags as tags
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField
+from django.utils.translation import gettext_lazy as _
+from django.conf import settings
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateTimeField, SelectDateWidget, BooleanField
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe
 from dominate.util import raw
 from dmad_on_django.forms import SearchForm
+from dmad_on_django.models import Period
 
 
 class SimpleFormMixin:
@@ -201,7 +204,123 @@ class HandwritingForm(ModelForm):
             'form': 'form'
         })
         dubious_writer_label.add(raw(str(dubious_writer_field)))
-        
+
         form.add(dubious_writer_label)
 
         return mark_safe(str(form))
+
+
+class DateFormMixin:
+    # these properties need to be copied to every inheriting form class
+    kwargs = {
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+            }
+        }
+    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if self.is_bound:
+            return
+
+        period = getattr(self.instance, 'period', None)
+        if period:
+            self.initial.update({
+                'not_before': period.not_before,
+                'not_after': period.not_after,
+                'display': period.display,
+                'inferred': period.inferred,
+                'assumed': period.assumed
+            })
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        # Ensure period exists or create it
+        if not instance.period:
+            instance.period = Period()
+
+        period_instance = instance.period
+        period_instance.not_before = self.cleaned_data['not_before']
+        period_instance.not_after = self.cleaned_data['not_after']
+        period_instance.display = self.cleaned_data['display']
+        period_instance.inferred = self.cleaned_data['inferred']
+        period_instance.assumed = self.cleaned_data['assumed']
+
+        if commit:
+            period_instance.save()
+        else:
+            self._pending_save_period = period_instance
+
+        return instance
+
+    def get_date_div(self):
+        date_div = tags.div()
+        not_before_field = self['not_before']
+        not_after_field = self['not_after']
+        display_field = self['display']
+        #history_field = self['history']
+
+        not_before_container = tags.label(cls='form-control flex-0')
+        not_before_label = tags.div(_('not before'), cls='label-text')
+        not_before_selects = tags.div(cls='flex')
+        not_before_selects.add(raw(str(not_before_field)))
+        not_before_container.add(not_before_label)
+        not_before_container.add(not_before_selects)
+        if not_before_field.errors:
+            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
+
+        not_after_container = tags.label(cls='form-control flex-0')
+        not_after_label = tags.div(_('not after'), cls='label-text')
+        not_after_selects = tags.div(cls='flex')
+        not_after_selects.add(raw(str(not_after_field)))
+        not_after_container.add(not_after_label)
+        not_after_container.add(not_after_selects)
+        if not_after_field.errors:
+            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
+
+        calculate_input = tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=f'{self.prefix}-calculate-machine-readable-date')
+        clear_input = tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=f'{self.prefix}-clear-machine-readable-date')
+
+        display_container = tags.label(_('standardized date'), _for = display_field.id_for_label, cls=SimpleFormMixin.text_label_classes + ' flex-1')
+        display_container.add(raw(str(display_field)))
+        if display_field.errors:
+            display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
+        display_palette = tags.div(cls='flex flex-rows w-full gap-10 my-5 items-end')
+        display_palette.add(display_container)
+
+        assumed_field = self['assumed']
+        assumed_label = tags.label(cls='label cursor-pointer flex items-center gap-2')
+        assumed_label.add(tags.span(_(assumed_field.label.lower()), cls='label-text'))
+        assumed_label.add(raw(str(assumed_field)))
+
+        inferred_field = self['inferred']
+        inferred_label = tags.label(cls='label cursor-pointer flex items-center gap-2')
+        inferred_label.add(tags.span(_(inferred_field.label.lower()), cls='label-text'))
+        inferred_label.add(raw(str(inferred_field)))
+
+        period_palette = tags.div(cls='flex flex-rows w-full gap-10 my-5 items-end')
+        period_palette.add(not_before_container)
+        period_palette.add(not_after_container)
+        period_palette.add(tags.div(cls='flex-1'))
+
+        control_palette = tags.div(cls='flex flex-rows w-full gap-10 my-5 items-end')
+        control_palette.add(assumed_label)
+        control_palette.add(inferred_label)
+        control_palette.add(tags.div(cls='flex-1'))
+        control_palette.add(calculate_input)
+        control_palette.add(clear_input)
+
+        date_div.add(display_palette)
+        date_div.add(period_palette)
+        date_div.add(control_palette)
+
+        return date_div

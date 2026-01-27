@@ -21,7 +21,7 @@ class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
             use_template=True
         )
     signature = indexes.CharField(
-            model_attr = 'get_single_item__get_current_signature'
+            model_attr = 'get_current_signature'
         )
     is_singleton = indexes.BooleanField(model_attr = 'is_singleton')
 

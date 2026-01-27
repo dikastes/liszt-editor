@@ -1,3 +1,4 @@
+from .period_calculation import MONTHS, PERIOD_CODES, resolve_month, resolve_period
 from calendar import monthrange
 from django.utils.translation import gettext_lazy as _
 from django.db import models
@@ -31,6 +32,14 @@ class Period(models.Model):
             blank = True,
             verbose_name = _("status")
         )
+    inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
+        )
 
     def render_detailed(self):
         if self.not_before == self.not_after:
@@ -38,33 +47,45 @@ class Period(models.Model):
         return f"{self.display} ({self.not_before}–{self.not_after})"
 
     def __str__(self):
-        return self.display
+        return self.display or ''
 
     def parse_display(self):
+        self.initialize_patterns()
+
         ASSUMED_TOKEN = '[?]'
         display_value = self.display
+        INFERRED_TOKEN = ']'
 
-        self.status = self.Status.DOCUMENTED
         if ASSUMED_TOKEN in display_value:
-            self.status = self.Status.ASSUMED
+            self.assumed = True
             display_value = display_value.replace(ASSUMED_TOKEN, '').strip()
+        else:
+            self.assumed = False
+        if INFERRED_TOKEN in display_value:
+            self.inferred = True
+        else:
+            self.inferred = False
 
         if '[' in display_value:
             if ']' in display_value:
-                self.status = self.Status.INFERRED
                 display_value = display_value.replace('[', '').replace(']', '').strip()
             else:
                 raise Exception('Invalid display date. A [ was provided but no ].')
         if not '[' in display_value and ']' in display_value:
             raise Exception('Invalid display date. A ] was provided but no [.')
 
-        # 2 daten
+        # 2 dates
         if '/' in display_value:
-            dates = [ date.strip() for date in display_value.split('/') ]
-            if len(dates[1]) == 2:
-                dates[1] = dates[0][:2] + dates[1][2:]
+            if self.year_pattern.match(display_value):
+                dates = [ display_value ]
+            else:
+                dates = [ date.strip() for date in display_value.split('/') ]
+                if len(dates[1]) == 2:
+                    dates[1] = dates[0][:2] + dates[1]
         elif '-' in display_value:
             dates = [ date.strip() for date in display_value.split('-') ]
+        elif str(_('and')) in display_value:
+            dates = [ date.strip() for date in display_value.split(str(_('and'))) ]
         else:
             dates = [ display_value ]
 
@@ -74,21 +95,16 @@ class Period(models.Model):
         else:
             self.not_after = self._parse_date(dates[0], 'upper')
 
+    def initialize_patterns(self):
+        prefix_pipe_string = '|'.join(str(_(prefix)) for prefix in PERIOD_CODES)
+        month_pipe_string = '|'.join(str(_(month)) for month in MONTHS)
+
+        self.month_pattern = re.compile(rf'^({prefix_pipe_string})\s+({month_pipe_string})\s+(\d{{4}})$', re.IGNORECASE)
+        self.year_pattern = re.compile(rf'^({prefix_pipe_string})\s+(\d{{4}})(/\d{{2}})?$', re.IGNORECASE)
+        decade_suffix = _('ies')
+        self.decade_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{3}}0){decade_suffix}$', re.IGNORECASE)
+
     def _parse_date(self, date_string, bound):
-        MONTHS = {
-                'Januar': 1,
-                'Februar': 2,
-                'März': 3,
-                'April': 4,
-                'Mai': 5,
-                'Juni': 6,
-                'Juli': 7,
-                'August': 8,
-                'September': 9,
-                'Oktober': 10,
-                'November': 11,
-                'Dezember': 12
-            }
 
         match = re.search(r"[\d?]{4}", date_string)
         if match:
@@ -96,88 +112,59 @@ class Period(models.Model):
         else:
             raise ValueError(f'No year found in {date_string}')
 
-        for month in MONTHS:
-            if month in date_string:
-                month = MONTHS[month]
-                if 'Anfang' in date_string:
-                    if bound == 'lower':
-                        day = 1
-                    else:
-                        day = 10
-                if 'Mitte' in date_string:
-                    if bound == 'lower':
-                        day = 10
-                    else:
-                        day = 20
-                if 'Ende' in date_string:
-                    if bound == 'lower':
-                        day = 20
-                    else:
-                        day = monthrange(year, month)[1]
-                if 'Erste Hälfte' in date_string:
-                    if bound == 'lower':
-                        day = 1
-                    else:
-                        day = 14
-                if 'Zweite Hälfte' in date_string:
-                    if bound == 'lower':
-                        day = 15
-                    else:
-                        day = monthrange(year, month)[1]
-                return date(year, month, day)
+        month_match = self.month_pattern.match(date_string)
 
-        if 'er Jahre' in date_string:
-            if 'Anfang' in date_string:
-                if bound == 'lower':
-                    day = 1
-                    month = 1
-                else:
-                    day = 31
-                    month = 12
-                    year += 3
-            elif 'Mitte' in date_string:
-                if bound == 'lower':
-                    day = 1
-                    month = 1
-                    year += 4
-                else:
-                    day = 31
-                    month = 12
-                    year += 6
-            elif 'Ende' in date_string:
-                if bound == 'lower':
-                    day = 1
-                    month = 1
-                    year += 7
-                else:
-                    day = 31
-                    month = 12
-                    year += 9
-            elif 'Erste Hälfte' in date_string:
-                if bound == 'lower':
-                    day = 1
-                    month = 1
-                else:
-                    day = 31
-                    month = 12
-                    year += 4
-            elif 'Zweite Hälfte' in date_string:
-                if bound == 'lower':
-                    day = 1
-                    month = 1
-                    year += 5
-                else:
-                    day = 31
-                    month = 12
-                    year += 9
+        if month_match:
+            year = int(month_match.group(3))
+            month = MONTHS[resolve_month(month_match.group(2))]
+            prefix = resolve_period(month_match.group(1))
+            if bound == 'lower':
+                day = PERIOD_CODES[prefix]['month']['lower']['day']
             else:
-                if bound == 'lower':
+                if PERIOD_CODES[prefix]['month']['upper']['day'] == 'max':
+                    day = monthrange(year, month)[1]
+                else:
+                    day = PERIOD_CODES[prefix]['month']['upper']['day']
+            return date(year, month, day)
+
+        year_match = self.year_pattern.match(date_string)
+
+        if year_match:
+            year = int(year_match.group(2))
+            prefix = resolve_period(year_match.group(1))
+            if bound == 'lower':
+                day = PERIOD_CODES[prefix]['year']['lower']['day']
+                month = PERIOD_CODES[prefix]['year']['lower']['month']
+                year = year + PERIOD_CODES[prefix]['year']['lower']['year']
+            else:
+                day = PERIOD_CODES[prefix]['year']['upper']['day']
+                month = PERIOD_CODES[prefix]['year']['upper']['month']
+                year = year + PERIOD_CODES[prefix]['year']['upper']['year']
+            return date(year, month, day)
+
+        decade_match = self.decade_pattern.match(date_string)
+
+        if decade_match:
+            year = int(decade_match.group(2))
+            if decade_match.group(1):
+                prefix = resolve_period(decade_match.group(1))
+                if bound=='lower':
+                    day = PERIOD_CODES[prefix]['decade']['lower']['day']
+                    month = PERIOD_CODES[prefix]['decade']['lower']['month']
+                    year = year + PERIOD_CODES[prefix]['decade']['lower']['year']
+                else:
+                    day = PERIOD_CODES[prefix]['decade']['upper']['day']
+                    month = PERIOD_CODES[prefix]['decade']['upper']['month']
+                    year = year + PERIOD_CODES[prefix]['decade']['upper']['year']
+            else:
+                if bound=='lower':
                     day = 1
                     month = 1
+                    year = year
                 else:
                     day = 31
                     month = 12
-                    year += 9
+                    year = year + 9
             return date(year, month, day)
 
         date_parts = date_string.split('.')

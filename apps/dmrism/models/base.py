@@ -188,7 +188,7 @@ class BaseDedication(models.Model):
     class Meta:
         abstract = True
 
-    period = models.ForeignKey(
+    period = models.OneToOneField(
             'dmad.Period',
             on_delete = models.SET_NULL,
             null = True,

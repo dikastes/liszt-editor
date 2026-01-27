@@ -65,7 +65,9 @@ module.exports = {
           // graphics background
           "base-200": "#f9fcfd",
           // lines
-          "base-300": "#c7c9c4"
+          "base-300": "#c7c9c4",
+          // version color
+          "base-800": "#aaa"
         },
       },
     ],

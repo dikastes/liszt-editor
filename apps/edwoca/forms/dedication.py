@@ -1,7 +1,10 @@
-from .base import SimpleFormMixin
+import dominate.tags as tags
+from dominate.util import raw
+from .base import SimpleFormMixin, DateFormMixin
 from django import forms
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField
+from django.utils.safestring import mark_safe
 from liszt_util.forms import SelectDateWidget
 from dmrism.models.manifestation import ManifestationPersonDedication, ManifestationCorporationDedication
 from dmrism.models.item import ItemPersonDedication, ItemCorporationDedication
@@ -9,7 +12,7 @@ from edwoca.models.work import WorkPersonDedication, WorkCorporationDedication
 from dmad_on_django.models import Period
 
 
-class WorkPersonDedicationForm(forms.ModelForm):
+class WorkPersonDedicationForm(DateFormMixin, forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
@@ -20,6 +23,8 @@ class WorkPersonDedicationForm(forms.ModelForm):
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
         model = WorkPersonDedication
@@ -29,32 +34,6 @@ class WorkPersonDedicationForm(forms.ModelForm):
                 'class': SimpleFormMixin.text_area_classes
             }),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.period:
-            self.fields['not_before'].initial = self.instance.period.not_before
-            self.fields['not_after'].initial = self.instance.period.not_after
-            self.fields['display'].initial = self.instance.period.display
-
-    def save(self, commit=True):
-        dedication_instance = super().save(commit=False)
-
-        # Ensure period exists or create it
-        if not dedication_instance.period:
-            dedication_instance.period = Period()
-
-        period_instance = dedication_instance.period
-        period_instance.not_before = self.cleaned_data['not_before']
-        period_instance.not_after = self.cleaned_data['not_after']
-        period_instance.display = self.cleaned_data['display']
-
-        if commit:
-            period_instance.save()
-            dedication_instance.period = period_instance
-            dedication_instance.save()
-
-        return dedication_instance
 
 
 class WorkCorporationDedicationForm(forms.ModelForm):
@@ -67,6 +46,9 @@ class WorkCorporationDedicationForm(forms.ModelForm):
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
 
     class Meta:
         model = WorkCorporationDedication
@@ -77,34 +59,25 @@ class WorkCorporationDedicationForm(forms.ModelForm):
             }),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.period:
-            self.fields['not_before'].initial = self.instance.period.not_before
-            self.fields['not_after'].initial = self.instance.period.not_after
-            self.fields['display'].initial = self.instance.period.display
 
-    def save(self, commit=True):
-        dedication_instance = super().save(commit=False)
+class ManifestationBaseDedicationMixin:
+    def as_daisy(self):
+        date_div = self.get_date_div()
+        form = tags.div()
 
-        # Ensure period exists or create it
-        if not dedication_instance.period:
-            dedication_instance.period = Period()
+        dedication_field = self['diplomatic_dedication']
+        dedication_label = tags.label()
+        dedication_label_text = tags.span(dedication_field.label, cls='label-text')
+        dedication_label.add(dedication_label_text)
+        dedication_label.add(raw(str(dedication_field)))
 
-        period_instance = dedication_instance.period
-        period_instance.not_before = self.cleaned_data['not_before']
-        period_instance.not_after = self.cleaned_data['not_after']
-        period_instance.display = self.cleaned_data['display']
+        form.add(date_div)
+        form.add(dedication_label)
 
-        if commit:
-            period_instance.save()
-            dedication_instance.period = period_instance
-            dedication_instance.save()
-
-        return dedication_instance
+        return mark_safe(str(form))
 
 
-class ManifestationPersonDedicationForm(forms.ModelForm):
+class ManifestationPersonDedicationForm(DateFormMixin, ManifestationBaseDedicationMixin, forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
@@ -112,9 +85,12 @@ class ManifestationPersonDedicationForm(forms.ModelForm):
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': 'grow input input-bordered border-black bg-white w-full'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
 
     class Meta:
         model = ManifestationPersonDedication
@@ -126,33 +102,8 @@ class ManifestationPersonDedicationForm(forms.ModelForm):
             }),
         }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.period:
-            self.fields['not_before'].initial = self.instance.period.not_before
-            self.fields['not_after'].initial = self.instance.period.not_after
-            self.fields['display'].initial = self.instance.period.display
 
-    def save(self, commit=True):
-        dedication_instance = super().save(commit=False)
-
-        # Ensure period exists or create it
-        if not dedication_instance.period:
-            dedication_instance.period = Period()
-
-        period_instance = dedication_instance.period
-        period_instance.not_before = self.cleaned_data['not_before']
-        period_instance.not_after = self.cleaned_data['not_after']
-        period_instance.display = self.cleaned_data['display']
-
-        if commit:
-            period_instance.save()
-            dedication_instance.period = period_instance
-            dedication_instance.save()
-
-        return dedication_instance
-
-class ManifestationCorporationDedicationForm(forms.ModelForm):
+class ManifestationCorporationDedicationForm(DateFormMixin, ManifestationBaseDedicationMixin, forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
@@ -160,9 +111,12 @@ class ManifestationCorporationDedicationForm(forms.ModelForm):
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': 'grow input input-bordered border-black bg-white w-full'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': 'grow'}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
 
     class Meta:
         model = ManifestationCorporationDedication
@@ -173,32 +127,6 @@ class ManifestationCorporationDedicationForm(forms.ModelForm):
                 'class': SimpleFormMixin.text_area_classes
             }),
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.period:
-            self.fields['not_before'].initial = self.instance.period.not_before
-            self.fields['not_after'].initial = self.instance.period.not_after
-            self.fields['display'].initial = self.instance.period.display
-
-    def save(self, commit=True):
-        dedication_instance = super().save(commit=False)
-
-        # Ensure period exists or create it
-        if not dedication_instance.period:
-            dedication_instance.period = Period()
-
-        period_instance = dedication_instance.period
-        period_instance.not_before = self.cleaned_data['not_before']
-        period_instance.not_after = self.cleaned_data['not_after']
-        period_instance.display = self.cleaned_data['display']
-
-        if commit:
-            period_instance.save()
-            dedication_instance.period = period_instance
-            dedication_instance.save()
-
-        return dedication_instance
 
 
 class ItemPersonDedicationForm(forms.ModelForm):

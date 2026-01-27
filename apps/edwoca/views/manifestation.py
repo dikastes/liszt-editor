@@ -261,6 +261,7 @@ def manifestation_title_update(request, pk):
         if print_form.is_valid():
             print_form.save()
         # Handle existing title forms
+        title_forms = []
         for title_obj in manifestation.titles.all():
             prefix = f'title_{title_obj.id}'
             title_form = ManifestationTitleForm(request.POST, instance=title_obj, prefix=prefix)
@@ -276,13 +277,15 @@ def manifestation_title_update(request, pk):
                 handwriting_form = ManifestationTitleHandwritingForm(data, instance=handwriting_obj, prefix=handwriting_prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
+            title_forms.append(title_form)
+        context['title_forms'] = title_forms
 
         # Handle new title form
-        new_title_form = ManifestationTitleForm(request.POST, prefix='new_title')
-        if new_title_form.is_valid() and new_title_form.has_changed():
-            new_title = new_title_form.save(commit=False)
-            new_title.manifestation = manifestation
-            new_title.save()
+        #new_title_form = ManifestationTitleForm(request.POST, prefix='new_title')
+        #if new_title_form.is_valid() and new_title_form.has_changed():
+            #new_title = new_title_form.save(commit=False)
+            #new_title.manifestation = manifestation
+            #new_title.save()
 
         # Handle adding new ManifestationTitleHandwriting
         if 'add_title_handwriting' in request.POST:
@@ -292,20 +295,51 @@ def manifestation_title_update(request, pk):
                 ManifestationTitleHandwriting.objects.create(manifestation_title=title_obj)
 
         # Handle existing PersonDedication forms
+        person_dedication_forms = []
         for person_dedication in manifestation.manifestation_person_dedications.all():
             prefix = f'person_dedication_{person_dedication.id}'
             form = ManifestationPersonDedicationForm(request.POST, instance=person_dedication, prefix=prefix)
             if form.is_valid():
                 form.save()
+            if f'{prefix}-calculate-machine-readable-date' in request.POST:
+                period = person_dedication.period
+                period.parse_display()
+                period.save()
+                form = ManifestationPersonDedicationForm(instance=person_dedication, prefix=prefix)
+            if f'{prefix}-clear-machine-readable-date' in request.POST:
+                period = person_dedication.period
+                period.not_before = None
+                period.not_after = None
+                period.inferred = False
+                period.assumed = False
+                period.save()
+                form = ManifestationPersonDedicationForm(instance=person_dedication, prefix=prefix)
+            person_dedication_forms.append(form)
+        context['person_dedication_forms'] = person_dedication_forms
 
         # Handle existing CorporationDedication forms
+        corporation_dedication_forms = []
         for corporation_dedication in manifestation.manifestation_corporation_dedications.all():
             prefix = f'corporation_dedication_{corporation_dedication.id}'
             form = ManifestationCorporationDedicationForm(request.POST, instance=corporation_dedication, prefix=prefix)
             if form.is_valid():
                 form.save()
+            if f'{prefix}-calculate-machine-readable-date' in request.POST:
+                period = corporation_dedication.period
+                period.parse_display()
+                period.save()
+                form = ManifestationCorporationDedicationForm(instance=corporation_dedication, prefix=prefix)
+            if f'{prefix}-clear-machine-readable-date' in request.POST:
+                period = corporation_dedication.period
+                period.not_before = None
+                period.not_after = None
+                period.inferred = False
+                period.assumed = False
+                period.save()
+                form = ManifestationCorporationDedicationForm(instance=corporation_dedication, prefix=prefix)
+            corporation_dedication_forms.append(form)
+        context['corporation_dedication_forms'] = corporation_dedication_forms
 
-        return redirect('edwoca:manifestation_title', pk=pk)
     else:
         # Initialize forms for existing titles
         source_title_form = ManifestationSourceTitleForm(instance=manifestation)
@@ -326,10 +360,6 @@ def manifestation_title_update(request, pk):
             title_forms.append(title_form) # Append the form instance to the list
 
         context['title_forms'] = title_forms
-
-        # Initialize form for new title
-        new_title_form = ManifestationTitleForm(prefix='new_title', initial = {'manifestation': manifestation})
-        context['new_title_form'] = new_title_form
 
         # Initialize forms for existing PersonDedication
         person_dedication_forms = []
@@ -544,6 +574,11 @@ class ManifestationHistoryUpdateView(SimpleFormView):
         if 'calculate-machine-readable-date' in request.POST:
             period = self.object.period
             period.parse_display()
+            period.save()
+        if 'clear-machine-readable-date' in request.POST:
+            period = self.object.period
+            period.not_before = None
+            period.not_after = None
             period.save()
 
         return response
@@ -769,25 +804,57 @@ def manifestation_provenance(request, pk):
 
     if request.method == 'POST':
         # Handle existing PersonProvenanceStation forms
+        person_provenance_forms = []
         for pps_obj in item.person_provenance_stations.all():
             prefix = f'person_provenance_{pps_obj.id}'
             pps_form = PersonProvenanceStationForm(request.POST, instance=pps_obj, prefix=prefix)
             if pps_form.is_valid():
                 pps_form.save()
+            if f'{prefix}-calculate-machine-readable-date' in request.POST:
+                period = pps_obj.period
+                period.parse_display()
+                period.save()
+                pps_form = PersonProvenanceStationForm(instance=pps_obj, prefix=prefix)
+            if f'{prefix}-clear-machine-readable-date' in request.POST:
+                period = pps_obj.period
+                period.not_before = None
+                period.not_after = None
+                period.assumed = False
+                period.inferred = False
+                period.save()
+                pps_form = PersonProvenanceStationForm(instance=pps_obj, prefix=prefix)
+            person_provenance_forms.append(pps_form)
+        context['person_provenance_forms'] = person_provenance_forms
 
         # Handle existing CorporationProvenanceStation forms
+        corporation_provenance_forms = []
         for cps_obj in item.corporation_provenance_stations.all():
             prefix = f'corporation_provenance_{cps_obj.id}'
             cps_form = CorporationProvenanceStationForm(request.POST, instance=cps_obj, prefix=prefix)
             if cps_form.is_valid():
                 cps_form.save()
+            if f'{prefix}-calculate-machine-readable-date' in request.POST:
+                period = cps_obj.period
+                period.parse_display()
+                period.save()
+                cps_form = PersonProvenanceStationForm(instance=cps_obj, prefix=prefix)
+            if f'{prefix}-clear-machine-readable-date' in request.POST:
+                period = cps_obj.period
+                period.not_before = None
+                period.not_after = None
+                period.assumed = False
+                period.inferred = False
+                period.save()
+                cps_form = PersonProvenanceStationForm(instance=pps_obj, prefix=prefix)
+            corporation_provenance_forms.append(cps_form)
+        context['corporation_provenance_forms'] = corporation_provenance_forms
 
         # Handle private_provenance_comment form
         provenance_comment_form = ItemProvenanceCommentForm(request.POST, instance=item)
         if provenance_comment_form.is_valid():
             provenance_comment_form.save()
+        context['provenance_comment_form'] = provenance_comment_form
 
-        return redirect('edwoca:manifestation_provenance', pk=pk)
     else:
         # Initialize forms for existing PersonProvenanceStation
         person_provenance_forms = []
@@ -903,36 +970,78 @@ def manifestation_manuscript_update(request, pk):
         form = ItemManuscriptForm(request.POST, instance=item)
         if form.is_valid():
             form.save()
+        context['form'] = form
 
+        handwriting_forms = []
         for handwriting in item.handwritings.all():
             prefix = f'handwriting_{handwriting.id}'
             handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
             if handwriting_form.is_valid():
                 handwriting_form.save()
+            handwriting_forms.append(handwriting_form)
+        context['handwriting_forms'] = handwriting_forms
+
+        modifications = []
 
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
-            modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
-            if modification_form.is_valid():
-                modification_form.save()
-
             for handwriting in modification.handwritings.all():
                 prefix = f'modification_handwriting_{handwriting.id}'
                 handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
 
+            modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
+            if modification_form.is_valid():
+                modification_form.save()
+
+            if f'{prefix}-calculate-machine-readable-date' in request.POST:
+                period = modification.period
+                period.parse_display()
+                period.save()
+                modification_form = ItemModificationForm(instance=modification, prefix=prefix)
+            if f'{prefix}-clear-machine-readable-date' in request.POST:
+                period = modification.period
+                period.not_before = None
+                period.not_after = None
+                period.assumed = False
+                period.inferred = False
+                period.save()
+                modification_form = ItemModificationForm(instance=modification, prefix=prefix)
+
+
+            handwriting_forms = []
+            for handwriting in modification.handwritings.all():
+                prefix = f'modification_handwriting_{handwriting.id}'
+                handwriting_form = ItemModificationHandwritingForm(instance=handwriting, prefix = prefix)
+                if handwriting_form.is_valid():
+                    handwriting_form.save()
+                handwriting_forms.append(handwriting_form)
+
+            modifications.append({
+                'form': modification_form,
+                'handwriting_forms': handwriting_forms
+            })
+
         if 'add_handwriting' in request.POST:
             ItemHandwriting.objects.create(item=item)
 
         if 'add_modification' in request.POST:
-            ItemModification.objects.create(item=item)
+            modification = ItemModification.objects.create(item=item)
+            prefix = f'modification_{modification.id}'
+
+            modifications.append({
+                'form': ItemModificationForm(instance = modification, prefix = prefix),
+                'handwriting_forms': []
+            })
+
+        context['modifications'] = modifications
 
         if 'add_modification_handwriting' in request.POST:
             modification_id = request.POST.get('add_modification_handwriting')
             modification = get_object_or_404(ItemModification, pk=modification_id)
             ModificationHandwriting.objects.create(modification=modification)
-        
+
         if 'delete_modification' in request.POST:
             modification_id = request.POST.get('delete_modification')
             modification = get_object_or_404(ItemModification, pk=modification_id)
@@ -945,7 +1054,7 @@ def manifestation_manuscript_update(request, pk):
                 open_modifications.append(mod_id)
         request.session['open_modifications'] = open_modifications
 
-        return redirect('edwoca:manifestation_manuscript', pk=pk)
+        return render(request, 'edwoca/manifestation_manuscript.html', context)
 
     else:
         open_modifications = request.session.get('open_modifications', [])
@@ -974,6 +1083,7 @@ def manifestation_manuscript_update(request, pk):
 
         modifications = []
         for modification in item.modifications.all():
+            #modification.ensure_period()
             prefix = f'modification_{modification.id}'
             modification_form = ItemModificationForm(instance=modification, prefix=prefix)
 
@@ -1011,15 +1121,15 @@ def manifestation_manuscript_update(request, pk):
             parts = key.split('-')
             modification_id = int(parts[1])
             model_name = parts[2]
-            
+
             context['modification_id'] = modification_id
             if modification_id not in open_modifications:
                 open_modifications.append(modification_id)
 
             query = request.GET.get(key)
-            
+
             search_form = SearchForm({'q': query})
-            
+
             if model_name == 'work':
                 context['query_work'] = query
                 context['found_works'] = search_form.search().models(Work)
@@ -1178,53 +1288,23 @@ def corporation_provenance_remove_owner(request, pk, cps_id):
 
 
 def corporation_provenance_remove_bib(request, pk, cps_id):
-
-
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-
-
     cps.bib = None
-
-
     cps.save()
-
-
     return redirect('edwoca:manifestation_provenance', pk=pk)
-
-
-
 
 
 def corporation_provenance_add_letter(request, pk, cps_id, letter_pk):
-
-
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-
-
     letter = get_object_or_404(Letter, pk=letter_pk)
-
-
     letter.corporation_provenance.add(cps)
-
-
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-
-
-
 def corporation_provenance_remove_letter(request, pk, cps_id, letter_pk):
-
-
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-
-
     letter = get_object_or_404(Letter, pk=letter_pk)
-
-
     letter.corporation_provenance.remove(cps)
-
-
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
@@ -1275,13 +1355,15 @@ class ManifestationDigitalCopyDeleteView(DeleteView):
 
 def person_dedication_add(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
-    ManifestationPersonDedication.objects.create(manifestation=manifestation)
+    period = Period.objects.create()
+    ManifestationPersonDedication.objects.create(manifestation=manifestation, period=period)
     return redirect('edwoca:manifestation_title', pk=pk)
 
 
 def corporation_dedication_add(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
-    ManifestationCorporationDedication.objects.create(manifestation=manifestation)
+    period = Period.objects.create()
+    ManifestationCorporationDedication.objects.create(manifestation=manifestation, period=period)
     return redirect('edwoca:manifestation_title', pk=pk)
 
 

@@ -117,13 +117,27 @@
     <div class="collapse bg-base-100 collapse-arrow my-5">
         <input type="checkbox" />
         <div class="bg-base-100 collapse-title truncate">
-            {{ person_dedication_form.instance.place.concise }}
-            ({{ person_dedication_form.instance.period}}):
-            {{ person_dedication_form.instance.diplomatic_dedication }}
-            ({{ person_dedication_form.instance.dedicatee.concise }})
+            {% if person_dedication_form.instance.place %}
+                {{ person_dedication_form.instance.place.concise }}
+                ({{ person_dedication_form.instance.period}}):
+            {% else %}
+                {% if person_dedication_form.instance.period %}
+                    {{ person_dedication_form.instance.period }}:
+                {% endif %}
+            {% endif %}
+            {% if person_dedication_form.instance.diplomatic_dedication %}
+                {{ person_dedication_form.instance.diplomatic_dedication }}
+            {% else %}
+                {% translate 'dedication' %}
+            {% endif %}
+            {% if person_dedication_form.instance.dedicatee %}
+                ({{ person_dedication_form.instance.dedicatee.concise }})
+            {% endif %}
         </div>
         <div class="collapse-content mt-5">
             <h3> {% translate 'date' %} </h3>
+            {{ person_dedication_form.as_daisy }}
+            {% comment %}
             <label>
                 <div class="label">
                     <span class="label-text">
@@ -155,6 +169,7 @@
                 </div>
                 {{ person_dedication_form.diplomatic_dedication }}
             </label>
+            {% endcomment %}
 
             {% if person_dedication_form.instance.dedicatee %}
                 <div class="flex items-center my-5">
@@ -172,7 +187,14 @@
                         <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
                             <label class="input input-bordered border-black bg-white flex items-center gap-2 flex-1">
                                 {% translate 'dedicatee' %}
-                                <input type="text" name="dedicatee-q" class="grow" {% if query_dedicatee %}value="{{ query_dedicatee }}"{% endif %}>
+                                <input
+                                    type="text"
+                                    name="dedicatee-q"
+                                    class="grow"
+                                    {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
+                                        value="{{ query_dedicatee }}"
+                                    {% endif %}
+                                    >
                             </label>
                             <input type="hidden" name="person_dedication_id" value="{{ person_dedication_form.instance.id }}">
                             <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
@@ -250,10 +272,27 @@
     <div class="collapse bg-base-100 collapse-arrow my-5">
         <input type="checkbox" />
         <div class="bg-base-100 collapse-title truncate">
-            {{ corporation_dedication_form.instance.diplomatic_dedication }}
+            {% if corporation_dedication_form.instance.place %}
+                {{ corporation_dedication_form.instance.place.concise }}
+                ({{ corporation_dedication_form.instance.period}}):
+            {% else %}
+                {% if corporation_dedication_form.instance.period %}
+                    {{ corporation_dedication_form.instance.period }}:
+                {% endif %}
+            {% endif %}
+            {% if corporation_dedication_form.instance.diplomatic_dedication %}
+                {{ corporation_dedication_form.instance.diplomatic_dedication }}
+            {% else %}
+                {% translate 'dedication' %}
+            {% endif %}
+            {% if corporation_dedication_form.instance.dedicatee %}
+                ({{ corporation_dedication_form.instance.dedicatee.concise }})
+            {% endif %}
         </div>
         <div class="collapse-content mt-5">
             <h3> {% translate 'date' %} </h3>
+            {{ corporation_dedication_form.as_daisy }}
+            {% comment %}
             <label>
                 <div class="label">
                     <span class="label-text">
@@ -285,6 +324,7 @@
                 </div>
                 {{ corporation_dedication_form.diplomatic_dedication }}
             </label>
+            {% endcomment %}
 
             {% if corporation_dedication_form.instance.dedicatee %}
                 <div class="flex items-center my-5">
@@ -302,7 +342,14 @@
                         <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
                             <label class="input input-bordered border-black bg-white flex items-center gap-2 flex-1">
                                 {% translate 'dedicatee' %}
-                                <input type="text" name="dedicatee-q" class="grow" {% if query_dedicatee %}value="{{ query_dedicatee }}"{% endif %}>
+                                <input
+                                    type="text"
+                                    name="dedicatee-q"
+                                    class="grow"
+                                    {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
+                                        value="{{ query_dedicatee }}"
+                                    {% endif %}
+                                    >
                             </label>
                             <input type="hidden" name="corporation_dedication_id" value="{{ corporation_dedication_form.instance.id }}">
                             <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>

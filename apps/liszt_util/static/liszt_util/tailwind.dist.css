@@ -654,6 +654,7 @@ html {
   --b1: 97.7333% 0.002491 165.076152;
   --b2: 98.9086% 0.003458 219.532142;
   --b3: 83.2891% 0.007194 124.468857;
+  base-800: #aaa;
 }
 
 .container {
@@ -4464,6 +4465,11 @@ details.collapse summary::-webkit-details-marker {
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity, 1));
+}
+
+.text-gray-800 {
+  --tw-text-opacity: 1;
+  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
 }
 
 .text-primary {

@@ -27,6 +27,9 @@ else:
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
+# App version
+APP_VERSION = "0.0.1"
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-g562zyg%dply65c+z#rb4_eg=wr(=3u3m5=f(vp9a%lr=9%1eh'
 
@@ -86,6 +89,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'apps.liszt_util.context_processors.current_app_name',
+                'apps.liszt_util.context_processors.app_version',
                 'apps.edwoca.context_processors.entity_type',
             ],
         },
