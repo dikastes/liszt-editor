@@ -287,60 +287,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             verbose_name = _('plate number')
         )
 
-    def get_copy(self):
-        period = None
-        if self.period:
-            period = Period.objects.create(
-                    not_before = self.period.not_before,
-                    not_after = self.period.not_after,
-                    display = self.period.display,
-                    status = self.period.status
-                )
-
-        copy = Manifestation.objects.create(
-            working_title = f'{_("copy of")} {self.working_title}',
-            source_title = self.source_title,
-            rism_id_unaligned = True,
-            period = period,
-            manifestation_form = self.manifestation_form,
-            edition_type = self.edition_type,
-            source_type = self.source_type,
-            function = self.function,
-            print_type = self.print_type,
-            state = self.state,
-            history = self.history,
-            language = self.language,
-            watermark = self.watermark,
-            watermark_url = self.watermark_url,
-            is_singleton = self.is_singleton,
-            raw_data = self.raw_data,
-            date_diplomatic = self.date_diplomatic,
-            taken_information = self.taken_information,
-            stitcher = self.stitcher,
-            specific_figure = self.specific_figure,
-            print_extent = self.print_extent,
-            private_head_comment = self.private_head_comment,
-            private_relations_comment = self.private_relations_comment,
-            private_title_comment = self.private_title_comment,
-            private_history_comment = self.private_history_comment,
-            private_dedication_comment = self.private_dedication_comment,
-            private_print_comment = self.private_print_comment
-        )
-        copy.places.set(self.places.all())
-
-        if self.is_singleton:
-            single_item_copy = self.get_single_item().get_copy(copy)
-            copy.items.set([single_item_copy])
-
-        for title in self.titles.all():
-            ManifestationTitle.objects.create(
-                    title = title.title,
-                    title_type = title.title_type,
-                    manifestation = copy
-                )
-
-        return copy
-
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
 
@@ -357,14 +303,19 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         return '<Fehler: keine Items>'
 
     def save(self, *args, **kwargs):
-        if self.is_singleton and self.items.count() > 1:
-            raise ValidationError("A singleton manifestation cannot have more than one item.")
-        old_manifestation = Manifestation.objects.filter(id = self.id).first()
-        if old_manifestation:
-            old_rism_id = old_manifestation.rism_id
-            if old_rism_id != self.rism_id:
-                self.rism_id_unaligned = True
-        super().save(**kwargs)
+        if not self.period:
+            self.period = Period.objects.create()
+        # chatgpt sagt das soll nach clean und nicht nach save
+        if self.pk:
+            old_manifestation = Manifestation.objects.filter(id = self.id).first()
+            if old_manifestation:
+                old_rism_id = old_manifestation.rism_id
+                if old_rism_id != self.rism_id:
+                    self.rism_id_unaligned = True
+            if self.is_singleton and self.items.count() > 1:
+                raise ValidationError("A singleton manifestation cannot have more than one item.")
+
+        super().save(*args, **kwargs)
 
 
     def unset_singleton(self):

@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -71,6 +71,182 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 replace('(', '').\
                 replace(')', '').\
                 strip()
+
+    def get_copy(self):
+        period = None
+        if self.period:
+            period = Period.objects.create(
+                    not_before = self.period.not_before,
+                    not_after = self.period.not_after,
+                    display = self.period.display,
+                    status = self.period.status
+                )
+
+        copy_of = _('copy of')
+        copy = Manifestation.objects.create(
+            working_title = f'{copy_of} {self.working_title}',
+            source_title = self.source_title,
+            rism_id_unaligned = True,
+            rism_id = self.rism_id,
+            period = period,
+            manifestation_form = self.manifestation_form,
+            edition_type = self.edition_type,
+            source_type = self.source_type,
+            function = self.function,
+            print_type = self.print_type,
+            state = self.state,
+            history = self.history,
+            language = self.language,
+            watermark = self.watermark,
+            watermark_url = self.watermark_url,
+            is_singleton = self.is_singleton,
+            raw_data = self.raw_data,
+            date_diplomatic = self.date_diplomatic,
+            taken_information = self.taken_information,
+            stitcher = self.stitcher,
+            specific_figure = self.specific_figure,
+            print_extent = self.print_extent,
+            private_head_comment = self.private_head_comment,
+            private_relations_comment = self.private_relations_comment,
+            private_title_comment = self.private_title_comment,
+            private_history_comment = self.private_history_comment,
+            private_dedication_comment = self.private_dedication_comment,
+            private_print_comment = self.private_print_comment
+        )
+        copy.save()
+        copy.places.set(self.places.all())
+        copy.bib.set(self.bib.all())
+        copy.letters.set(self.letters.all())
+
+        if self.is_singleton:
+            # most of this logic should move to the item copy function
+            single_item_copy = self.get_single_item().get_copy(copy)
+            copy.items.set([single_item_copy])
+            for pps in self.get_single_item().person_provenance_stations.all():
+                period = None
+                if pps.period:
+                    period = Period.objects.create(
+                            not_before = pps.period.not_before,
+                            not_after = pps.period.not_after,
+                            assumed = pps.period.assumed,
+                            inferred = pps.period.inferred
+                        )
+                pps_copy = PersonProvenanceStation.objects.create(
+                        item = single_item_copy,
+                        owner = pps.owner,
+                        period = period
+                    )
+                pps_copy.bib.set(pps.bib.all())
+
+            for cps in self.get_single_item().corporation_provenance_stations.all():
+                period = None
+                if cps.period:
+                    period = Period.objects.create(
+                            not_before = cps.period.not_before,
+                            not_after = cps.period.not_after,
+                            assumed = cps.period.assumed,
+                            inferred = cps.period.inferred
+                        )
+                cps_copy = CorporationProvenanceStation.objects.create(
+                        item = single_item_copy,
+                        owner = cps.owner,
+                        period = period
+                    )
+                cps_copy.bib.set(cps.bib.all())
+
+            for modification in self.get_single_item().modifications.all():
+                if modification.period:
+                    period = Period.objects.create(
+                            not_before = modification.period.not_before,
+                            not_after = modification.period.not_after,
+                            assumed = modification.period.assumed,
+                            inferred = modification.period.inferred
+                        )
+                modification_copy = ItemModification.objects.create(
+                        item = single_item_copy,
+                        note = modification.note,
+                        related_work = modification.related_work,
+                        related_expression = modification.related_expression
+                    )
+                for handwriting in modification.handwritings.all():
+                    ModificationHandwriting.objects.create(
+                            modification = modification_copy,
+                            writer = handwriting.writer,
+                            medium = handwriting.medium,
+                            dubious_writer = handwriting.dubious_writer
+                        )
+
+        for title in self.titles.all():
+            title_copy = ManifestationTitle.objects.create(
+                    title = title.title,
+                    title_type = title.title_type,
+                    manifestation = copy
+                )
+            for handwriting in title.handwritings.all():
+                ManifestationTitleHandwriting.objects.create(
+                        manifestation_title = title_copy,
+                        writer = handwriting.writer,
+                        medium = handwriting.medium,
+                        dubious_writer = handwriting.dubious_writer
+                    )
+
+            for handwriting in self.get_single_item().handwritings.all():
+                ItemHandwriting.objects.create(
+                        item = single_item_copy,
+                        writer = handwriting.writer,
+                        medium = handwriting.medium,
+                        dubious_writer = handwriting.dubious_writer
+                )
+
+        for related_manifestation in self.target_manifestation_of.all():
+            RelatedManifestation.objects.create(
+                    source_manifestation = related_manifestation.source_manifestation,
+                    target_manifestation = copy,
+                    label = related_manifestation.label,
+                    order = related_manifestation.order
+                )
+
+        for related_manifestation in self.source_manifestation_of.all():
+            RelatedManifestation.objects.create(
+                    source_manifestation = copy,
+                    target_manifestation = related_manifestation.target_manifestation,
+                    label = related_manifestation.label,
+                    order = related_manifestation.order
+                )
+
+        for person_dedication in self.manifestation_person_dedications.all():
+            period = Period.objects.create(
+                    display = person_dedication.period.display,
+                    not_before = person_dedication.period.not_before,
+                    not_after = person_dedication.period.not_after,
+                    assumed = person_dedication.period.assumed,
+                    inferred = person_dedication.period.inferred
+                    )
+            ManifestationPersonDedication.objects.create(
+                    manifestation = copy,
+                    period = period,
+                    diplomatic_dedication = person_dedication.diplomatic_dedication,
+                    place = person_dedication.place,
+                    dedicatee = person_dedication.dedicatee
+                )
+
+        for corporation_dedication in self.manifestation_corporation_dedications.all():
+            period = Period.objects.create(
+                    display = corporation_dedication.period.display,
+                    not_before = corporation_dedication.period.not_before,
+                    not_after = corporation_dedication.period.not_after,
+                    assumed = corporation_dedication.period.assumed,
+                    inferred = corporation_dedication.period.inferred
+                    )
+            ManifestationCorporationDedication.objects.create(
+                    manifestation = copy,
+                    period = period,
+                    diplomatic_dedication = corporation_dedication.diplomatic_dedication,
+                    place = corporation_dedication.place,
+                    dedicatee = corporation_dedication.dedicatee
+                )
+
+        return copy
 
     def parse_csv(self, raw_data, source_type, manifestation_form = None, function = None, singleton = True):
         # Head keys
