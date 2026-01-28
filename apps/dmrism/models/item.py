@@ -295,16 +295,14 @@ class ProvenanceStationRenderMixin:
     def __str__(self):
         owner_string = self.owner or 'unbekannt'
         period_string = self.period or 'ohne Zeitraum'
-        
         parts = [f'{str(owner_string)} ({str(period_string)})']
-        
-        if hasattr(self, 'bib') and self.bib:
-            parts.append(f'Bib: {self.bib}')
-        
+        if hasattr(self, 'bib') and self.bib.count():
+            parts.append(f'Bib: {",".join(str(bib) for bib in self.bib.all())}')
+
         if hasattr(self, 'letters') and self.letters.exists():
             letter_strings = ', '.join(str(letter) for letter in self.letters.all())
             parts.append(f'Letter: {letter_strings}')
-            
+
         return ' | '.join(parts)
 
 
@@ -320,12 +318,9 @@ class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             related_name = 'provenance_stations',
             null = True
         )
-    bib = models.ForeignKey(
+    bib = models.ManyToManyField(
             'bib.ZotItem',
-            on_delete = models.SET_NULL,
-            related_name = 'person_provenance_stations',
-            null = True,
-            blank = True
+            related_name = 'person_provenance_stations'
         )
     period = models.ForeignKey(
             'dmad.Period',
@@ -333,7 +328,7 @@ class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             blank = True,
             null = True,
             related_name = 'person_provenance_stations'
-            )
+        )
 
 
 class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
@@ -348,12 +343,9 @@ class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             related_name = 'provenance_stations',
             null = True
         )
-    bib = models.ForeignKey(
+    bib = models.ManyToManyField(
             'bib.ZotItem',
-            on_delete = models.SET_NULL,
-            related_name = 'corporation_provenance_stations',
-            null = True,
-            blank = True
+            related_name = 'corporation_provenance_stations'
         )
     period = models.ForeignKey(
             'dmad.Period',
