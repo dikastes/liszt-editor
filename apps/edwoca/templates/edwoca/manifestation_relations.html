@@ -127,9 +127,10 @@
     {% endfor %}
 </ul>
 
-<form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get" class="w-full flex">
+<form action="{% url 'edwoca:manifestation_relations' object.id %}" method="post" class="w-full flex">
+    {% csrf_token %}
     {{ manuscript_search_form.q }}
-    <input type="submit" value="{% translate 'search' %}" id="submit-form" class="btn btn-outline border-l-0" />
+    <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />
 </form>
 
 {% if manuscript_query %}
@@ -170,7 +171,7 @@
         {% csrf_token %}
         {{ object }} mit {{ manuscript_link }} verknüpfen als:
         {{ manuscript_link_form }}
-        <input type="submit" id="submit-form" class="btn" />
+        <input type="submit" class="btn" />
     </form>
 {% endif %}
 
@@ -224,7 +225,7 @@
 
 <form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get" class="w-full flex">
     {{ print_search_form.q }}
-    <input type="submit" value="{% translate 'search' %}" id="submit-form" class="btn btn-outline border-l-0" />
+    <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />
 </form>
 
 {% if print_query %}
@@ -282,7 +283,7 @@
 <form method="post">
     {% csrf_token %}
     {{ relations_comment_form.as_daisy }}
-    <input id="submit-form" type="submit" value="Speichern" class="hidden">
+    <input type="submit" id="submit-form" value="Speichern" class="hidden">
 </form>
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_epilog.html' %}

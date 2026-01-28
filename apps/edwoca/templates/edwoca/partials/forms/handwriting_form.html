@@ -48,7 +48,8 @@
 {{ form.as_daisy }}
 
 <div class="flex justify-end mt-3 mb-10">
-    <form action="{% url 'edwoca:manifestation_handwriting_delete' form.instance.id %}" method="post" class="flex-0 m-0">
+    {{ form.model }}
+    <form action="{% url 'edwoca:'|add:class|add:'_delete' form.instance.id %}" method="post" class="flex-0 m-0">
         {% csrf_token %}
         <input type="submit" class="btn btn-outline text-primary" value="{% translate 'remove' %}"/>
     </form>

@@ -71,7 +71,7 @@
                                 {% translate 'bibliography' %}
                                 <input type="text" class="grow" disabled value="{{ bib }}" />
                             </label>
-                            <form method="post" action="{% url 'edwoca:person_provenance_remove_bib' item.id pps_form.instance.id bib.id %}" class="flex-0">
+                            <form method="post" action="{% url 'edwoca:person_provenance_remove_bib' item.id pps_form.instance.id bib.zot_key %}" class="flex-0">
                                 {% csrf_token %}
                                 <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
                             </form>
@@ -215,7 +215,7 @@
                                 {% translate 'bibliography' %}
                                 <input type="text" class="grow" disabled value="{{ bib }}" />
                             </label>
-                            <form method="post" action="{% url 'edwoca:corporation_provenance_remove_bib' item.id cps_form.instance.id bib.id %}" class="flex-0">
+                            <form method="post" action="{% url 'edwoca:corporation_provenance_remove_bib' item.id cps_form.instance.id bib.zot_key %}" class="flex-0">
                                 {% csrf_token %}
                                 <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
                             </form>

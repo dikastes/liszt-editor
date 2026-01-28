@@ -20,7 +20,7 @@
     <div class="mt-5">
         <h3>{% translate 'writers / hands' %}</h3>
         {% for form in handwriting_forms %}
-            {% include 'edwoca/partials/forms/handwriting_form.html' %}
+            {% include 'edwoca/partials/forms/handwriting_form.html' with class='manifestation_handwriting' %}
         {% endfor %}
         <div class="flex justify-end">
                 <input type="submit" name="add_handwriting" value="{% translate 'create writer' %}" class="btn btn-outline mt-3">

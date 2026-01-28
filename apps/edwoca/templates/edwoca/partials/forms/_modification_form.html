@@ -21,7 +21,7 @@
                 {% translate 'modification writers / hands' %}
             </h4>
             {% for form in modification.handwriting_forms %}
-                {% include 'edwoca/partials/forms/handwriting_form.html' %}
+                {% include 'edwoca/partials/forms/handwriting_form.html' with class='modification_handwriting' %}
             {% endfor %}
 
             <div class="flex">
