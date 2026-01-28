@@ -252,6 +252,7 @@ def manifestation_title_update(request, pk):
     }
 
     if request.method == 'POST':
+        # collect any invalid forms and create a global render method in case one is invalid
         source_title_form = ManifestationSourceTitleForm(request.POST, instance=manifestation)
         if source_title_form.is_valid():
             source_title_form.save()
@@ -339,6 +340,8 @@ def manifestation_title_update(request, pk):
                 form = ManifestationCorporationDedicationForm(instance=corporation_dedication, prefix=prefix)
             corporation_dedication_forms.append(form)
         context['corporation_dedication_forms'] = corporation_dedication_forms
+
+        return redirect('edwoca:manifestation_title', pk = manifestation.id)
 
     else:
         # Initialize forms for existing titles
@@ -526,6 +529,7 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
             context['print_query'] = print_search_form.cleaned_data.get('q')
             context['found_prints'] = print_search_form.search().models(Manifestation).filter(is_singleton = False)
 
+        # this needs to go to a post action
         if 'manifestation-link-type' in self.request.GET:
             manifestation_link = get_object_or_404(Manifestation, pk = self.request.GET['manifestation-link'])
             link_type = getattr(RelatedManifestation.Label, self.request.GET['manifestation-link-type'].upper())
@@ -538,15 +542,18 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
         return context
 
     def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
+        response = super().post(request, *args, **kwargs)
         relations_comment_form = ManifestationRelationsCommentForm(request.POST, instance=self.object)
+        context = self.get_context_data(**kwargs)
+        context['relations_comment_form'] = relations_comment_form
         if relations_comment_form.is_valid():
             relations_comment_form.save()
-            return redirect(self.object.get_absolute_url())
+            return redirect('edwoca:manifestation_relations', pk = self.object.id)
         else:
             context = self.get_context_data(**kwargs)
             context['relations_comment_form'] = relations_comment_form
             return self.render_to_response(context)
+        return response
 
 
 def manifestation_expression_add(request, pk, expression_pk):
@@ -570,19 +577,26 @@ class ManifestationHistoryUpdateView(SimpleFormView):
     form_class = ManifestationHistoryForm
 
     def post(self, request, *args, **kwargs):
-        response = super().post(self, request, *args, **kwargs)
+        self.object = self.get_object()
+        form = self.get_form()
+
+        if not form.is_valid():
+            return self.form_invalid(form)
+
+        self.object = form.save()
+        period = self.object.period
+
         if 'calculate-machine-readable-date' in request.POST:
-            period = self.object.period
             period.parse_display()
             period.save()
-        if 'clear-machine-readable-date' in request.POST:
-            period = self.object.period
+        elif 'clear-machine-readable-date' in request.POST:
             period.not_before = None
             period.not_after = None
+            period.assumed = False
+            period.inferred = False
             period.save()
 
-        return response
-
+        return redirect('edwoca:manifestation_history', pk = self.object.id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -970,6 +984,8 @@ def manifestation_manuscript_update(request, pk):
         form = ItemManuscriptForm(request.POST, instance=item)
         if form.is_valid():
             form.save()
+        else:
+            return render(request, 'edwoca/manifestation_manuscript.html', context)
         context['form'] = form
 
         handwriting_forms = []
@@ -984,13 +1000,13 @@ def manifestation_manuscript_update(request, pk):
         modifications = []
 
         for modification in item.modifications.all():
-            prefix = f'modification_{modification.id}'
             for handwriting in modification.handwritings.all():
                 prefix = f'modification_handwriting_{handwriting.id}'
                 handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
 
+            prefix = f'modification_{modification.id}'
             modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
             if modification_form.is_valid():
                 modification_form.save()
@@ -1013,7 +1029,7 @@ def manifestation_manuscript_update(request, pk):
             handwriting_forms = []
             for handwriting in modification.handwritings.all():
                 prefix = f'modification_handwriting_{handwriting.id}'
-                handwriting_form = ItemModificationHandwritingForm(instance=handwriting, prefix = prefix)
+                handwriting_form = ModificationHandwritingForm(instance=handwriting, prefix = prefix)
                 if handwriting_form.is_valid():
                     handwriting_form.save()
                 handwriting_forms.append(handwriting_form)
@@ -1054,7 +1070,7 @@ def manifestation_manuscript_update(request, pk):
                 open_modifications.append(mod_id)
         request.session['open_modifications'] = open_modifications
 
-        return render(request, 'edwoca/manifestation_manuscript.html', context)
+        return redirect('edwoca:manifestation_manuscript', pk = manifestation.id)
 
     else:
         open_modifications = request.session.get('open_modifications', [])
@@ -1233,7 +1249,7 @@ def person_provenance_add_owner(request, pk, pps_id, person_id):
 def person_provenance_add_bib(request, pk, pps_id, bib_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     bib = get_object_or_404(ZotItem, pk=bib_id)
-    pps.bib = bib
+    pps.bib.add(bib)
     pps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
@@ -1261,9 +1277,10 @@ def person_provenance_remove_owner(request, pk, pps_id):
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def person_provenance_remove_bib(request, pk, pps_id):
+def person_provenance_remove_bib(request, pk, pps_id, bib_id):
+    bib = get_object_or_404(ZotItem, pk=bib_id)
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
-    pps.bib = None
+    pps.bib.remove(bib)
     pps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
@@ -1288,8 +1305,9 @@ def corporation_provenance_remove_owner(request, pk, cps_id):
 
 
 def corporation_provenance_remove_bib(request, pk, cps_id):
+    bib = get_object_or_404(ZotItem, pk=bib_id)
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
-    cps.bib = None
+    cps.bib.remove(bib)
     cps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
