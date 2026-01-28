@@ -246,7 +246,7 @@ class DateFormMixin:
 
         # Ensure period exists or create it
         if not instance.period:
-            instance.period = Period()
+            instance.period = Period.objects.create()
 
         period_instance = instance.period
         period_instance.not_before = self.cleaned_data['not_before']
@@ -257,6 +257,7 @@ class DateFormMixin:
 
         if commit:
             period_instance.save()
+            instance.save()
         else:
             self._pending_save_period = period_instance
 
@@ -287,8 +288,13 @@ class DateFormMixin:
         if not_after_field.errors:
             not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        calculate_input = tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=f'{self.prefix}-calculate-machine-readable-date')
-        clear_input = tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=f'{self.prefix}-clear-machine-readable-date')
+        calculate = 'calculate'
+        clear = 'clear'
+        postfix = 'machine-readable-date'
+        calculate_name = f'{self.prefix}-{calculate}-{postfix}' if self.prefix else f'{calculate}-{postfix}'
+        calculate_input = tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=calculate_name)
+        clear_name = f'{self.prefix}-{clear}-{postfix}' if self.prefix else f'{clear}-{postfix}'
+        clear_input = tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=clear_name)
 
         display_container = tags.label(_('standardized date'), _for = display_field.id_for_label, cls=SimpleFormMixin.text_label_classes + ' flex-1')
         display_container.add(raw(str(display_field)))

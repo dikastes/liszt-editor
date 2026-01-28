@@ -209,7 +209,7 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
         return mark_safe(str(form))
 
 
-class CorporationProvenanceStationForm(ModelForm):
+class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
         'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
         'attrs': {
