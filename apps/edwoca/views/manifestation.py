@@ -79,14 +79,9 @@ def singleton_create(request):
         if form.is_valid():
             manifestation = EdwocaManifestation.objects.create(
                 is_singleton=True,
-                source_type=form.cleaned_data.get('source_type')
+                source_type=form.cleaned_data.get('source_type'),
+                working_title = form.cleaned_data['temporary_title']
             )
-            if form.cleaned_data.get('temporary_title'):
-                ManifestationTitle.objects.create(
-                    manifestation=manifestation,
-                    title=form.cleaned_data['temporary_title'],
-                    status=Status.TEMPORARY
-                )
 
             item = Item.objects.create(manifestation=manifestation)
 

@@ -1,8 +1,11 @@
 {% extends 'edwoca/base.html' %}
 
+{% load i18n %}
+
 {% block content %}
-<div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0">Neue Handschrift anlegen</h2>
+    <h2>
+        {% translate 'create manuscript' %}
+    </h2>
 
     <form method="post" class="mt-5">
         {% csrf_token %}
@@ -10,6 +13,4 @@
 
         <input type="submit" id="submit-form" value="Speichern" class="hidden">
     </form>
-
-</div>
 {% endblock %}

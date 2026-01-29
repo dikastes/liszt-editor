@@ -296,9 +296,9 @@ class ManifestationCreateForm(forms.Form):
             }
         }
     read_only_fields = ['publisher']
-    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
-    plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': 'input input-bordered w-full'}))
-    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
+    plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
+    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
@@ -405,10 +405,28 @@ class ManifestationCreateForm(forms.Form):
 
 class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
     layout = Layouts.LABEL_OUTSIDE
-    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False)
-    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices)
-    library = forms.ModelChoiceField(queryset=Library.objects.all(), label=_('library'), empty_label=_('choose library'))
-    signature = forms.CharField(label='Signatur', max_length=255)
+    temporary_title = forms.CharField(
+            label = _('Temporary'),
+            max_length = 255,
+            required = False,
+            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
+        )
+    source_type = forms.ChoiceField(
+            label = _('source type'),
+            choices = Manifestation.SourceType.choices,
+            widget = Select(attrs={'class': SimpleFormMixin.select_classes})
+        )
+    library = forms.ModelChoiceField(
+            queryset = Library.objects.all(),
+            label = _('library'),
+            empty_label = _('choose library'),
+            widget = Select(attrs={'class': SimpleFormMixin.select_classes})
+        )
+    signature = forms.CharField(
+            label = _('Signature'),
+            max_length = 255,
+            widget = TextInput(attrs={'clss': SimpleFormMixin.text_input_classes})
+        )
 
     def as_daisy(self):
         root = div(cls="flex flex-col gap-5")
@@ -435,9 +453,9 @@ class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
             top.add(span(field.help_text, cls="label-text-alt"))
         wrap.add(top)
 
-        cls = "input input-bordered w-full"
+        cls = "input input-bordered w-full bg-white border-black"
         if isinstance(widget, forms.Select):
-            cls = "select select-bordered w-full"
+            cls = "select select-bordered w-full bg-white border-black"
 
         wrap.add(raw(field.as_widget(attrs={"class" : cls})))
         return wrap
