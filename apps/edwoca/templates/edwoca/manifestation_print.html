@@ -7,55 +7,160 @@
 
 <h2 class="mb-5"> {% translate 'publisher and print characteristics' %} </h2>
 
-<h3> {% translate 'print' %}</h3>
+<h3 class="my-5"> {% translate 'publication' %}</h3>
+
 <form method="post" id="form"> {% csrf_token %} <input type="submit" class="hidden" id="submit-form"> </form>
-<div class="my-5">
-    {% for form in publication_forms %}
-        <div class="flex gap-5">
-            {% if form.instance.publisher %}
-                <div class="flex flex-1">
-                    <label class="pseudo-input border-black border border-r-0 flex items-center gap-2 flex-1">
-                        Verlag
-                        <input type="text" class="grow truncate" disabled value="{{ form.instance.publisher.get_designator }}" />
-                        <input name="publication_{{ form.instance.id }}-publisher" form="form" class="hidden" value="{{ form.instance.publisher.id }}" />
-                    </label>
-                    <a class="flex-0 btn btn-outline" href="{% url 'edwoca:manifestation_publication_remove_publisher' form.instance.id %}"> {% translate 'remove' %} </a>
-                </div>
-                <label class="input input-bordered border-black bg-white flex items-center gap-2 w-64 flex-0">
-                    {{ form.plate_number.label }}
-                    {{ form.plate_number }}
-                </label>
-            {% else %}
-                <form method="get" class="flex-1 flex">
-                    <div class="flex-1 min-w-0">
-                        <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2">
-                            {% translate 'publisher' %}
-                            <input type="text" name="q" class="grow" placeholder="{% translate 'search publisher' %}" />
-                        </label>
-                        {% if request.GET.q %}
-                            <ul class="border border-black p-2 h-32 overflow-auto">
-                                {% for publisher in found_publishers %}
-                                    <li>
-                                        <a href="{% url 'edwoca:manifestation_add_publication_publisher' object.id form.instance.id publisher.object.id %}">{{ publisher.object.get_designator }}</a>
-                                    </li>
-                                {% empty %}
-                                    <li> {% translate 'no search results' %} </li>
-                                {% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                    <input type="submit" class="btn btn-outline" value="{% translate 'search' %}"/>
-                </form>
-            {% endif %}
-            <div class="flex-0">
-                <form action="{% url 'edwoca:manifestation_publication_delete' form.instance.id %}" method="POST">
-                    {% csrf_token %}
-                    <input type="submit" class="btn btn-outline" value="{% translate 'remove' %}" />
-                </form>
-            </div>
+
+{% for form in publication_forms %}
+    {% if form.publication_form.instance.publisher %}
+        <div class="flex flex-1 my-5">
+            <label class="pseudo-input border-black border border-r-0 flex items-center gap-2 flex-1">
+                {% translate 'publisher' %}
+                <input type="text" class="grow truncate" disabled value="{{ form.publication_form.instance.publisher.get_designator }}" />
+                <input name="publication_{{ form.publication_form.instance.id }}-publisher" form="form" class="hidden" value="{{ form.publication_form.instance.publisher.id }}" />
+            </label>
+            <a class="flex-0 btn btn-outline" href="{% url 'edwoca:manifestation_remove_publication_publisher' object.id form.publication_form.instance.id %}"> {% translate 'remove' %} </a>
         </div>
-    {% endfor %}
-</div>
+    {% else %}
+        <form method="get" class="flex-1 flex">
+            <div class="flex-1 min-w-0">
+                <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2">
+                    {% translate 'publisher' %}
+                    {{ form.publisher_search_form.q }}
+                </label>
+                {% if form.found_publishers %}
+                    <ul class="border border-black p-2 h-32 overflow-auto">
+                        {% for publisher in form.found_publishers %}
+                            <li>
+                                <a href="{% url 'edwoca:manifestation_add_publication_publisher' object.id form.publication_form.instance.id publisher.object.id %}">{{ publisher.object.get_designator }}</a>
+                            </li>
+                        {% empty %}
+                            <li> {% translate 'no search results' %} </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <input type="submit" class="btn btn-outline" value="{% translate 'search' %}"/>
+        </form>
+    {% endif %}
+    <ul class="m-5 mr-0 list-disc">
+        {% for place in form.publication_form.instance.place.all %}
+            <li>
+                <div class="flex">
+                    <a href="{% url 'dmad_on_django:place_update' place.id %}" class="flex-1">
+                        {{ place }}
+                    </a>
+                    <form method="post" action="{% url 'edwoca:manifestation_remove_publication_place' object.id form.publication_form.instance.id place.id %}" class="flex-0">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-sm btn-outline" value="{% translate 'remove place' %}">
+                    </form>
+                </div>
+            </li>
+        {% endfor %}
+    </ul>
+    <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex">
+        <label class="w-full input input-bordered border-black bg-white flex items-center gap-2">
+            {% translate 'place' %}
+            {{ form.place_search_form.q }}
+        </label>
+        <input type="submit" id="submit-form" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
+    </form>
+
+    {% if form.found_places %}
+        <ul class="border border-black p-2 h-32 overflow-auto">
+            {% for found_place in form.found_places %}
+                <li>
+                    <a href="{% url 'edwoca:manifestation_add_publication_place' object.id form.publication_form.instance.id found_place.object.id %}">
+                        {{ found_place.object }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>
+                    <em>
+                        {% translate 'no search results' %}
+                    </em>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% comment %}
+    {% if form.publication_form.instance.place %}
+        <div class="flex flex-1 my-5 gap-5">
+            <label class="pseudo-input border-black border flex items-center gap-2 flex-1">
+                {% translate 'place' %}
+                <input type="text" class="grow truncate" disabled value="{{ form.publication_form.instance.place.get_designator }}" />
+                <input name="publication_{{ form.publication_form.instance.id }}-publisher" form="form" class="hidden" value="{{ form.instance.publisher.id }}" />
+            </label>
+            <a class="flex-0 btn btn-outline" href="{% url 'edwoca:manifestation_remove_publication_place' object.id form.publication_form.instance.id %}"> {% translate 'remove' %} </a>
+        </div>
+    {% else %}
+        <form method="get" class="flex-1 flex">
+            <div class="flex-1 min-w-0">
+                <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2">
+                    {% translate 'place' %}
+                    {{ form.place_search_form.q }}
+                </label>
+                {% if form.found_places %}
+                    <ul class="border border-black p-2 h-32 overflow-auto">
+                        {% for place in form.found_places %}
+                            <li>
+                                <a href="{% url 'edwoca:manifestation_add_publication_place' object.id form.publication_form.instance.id place.object.id %}">
+                                    {{ place.object.get_designator }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li> {% translate 'no search results' %} </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+            <input type="submit" class="btn btn-outline" value="{% translate 'search' %}"/>
+        </form>
+    {% endif %}
+    {% endcomment %}
+    <div class="flex gap-5 items-center">
+        <div class="flex-1"></div>
+        <div class="flex-0 mr-10">
+            {% if form.publication_form.instance.assumed %}
+                {% if form.publication_form.instance.inferred %}
+                    {% translate 'place inferred assumed' %}
+                {% else %}
+                    {% translate 'place assumed' %}
+                {% endif %}
+            {% else %}
+                {% if form.publication_form.instance.inferred %}
+                    {% translate 'place inferred' %}
+                {% else %}
+                    {% translate 'place as documented' %}
+                {% endif %}
+            {% endif %}
+        </div>
+        <div class="form-control flex-0">
+            <label class="label cursor-pointer">
+                <span class="label-text mr-5">
+                    {% translate 'inferred' %}
+                </span>
+                {{ form.publication_form.inferred }}
+            </label>
+        </div>
+        <div class="form-control flex-0">
+            <label class="label cursor-pointer">
+                <span class="label-text mr-5">
+                    {% translate 'assumed' %}
+                </span>
+                {{ form.publication_form.assumed }}
+            </label>
+        </div>
+    </div>
+    <div class="flex my-5">
+        <div class="flex-1"></div>
+        <form class="flex-0" action="{% url 'edwoca:manifestation_publication_delete' form.publication_form.instance.id %}" method="POST">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove publication' %}" />
+        </form>
+    </div>
+{% endfor %}
+
 
 <div class="flex">
     <div class="flex-1"></div>
@@ -65,40 +170,49 @@
     </form>
 </div>
 
-{% if not object.is_singleton %}
+<div class="my-5">
+    {{ form.platenumber_as_daisy }}
+</div>
 
-    <h3 class="my-5">{% translate 'stitcher' %}</h3>
-    {% if object.stitcher %}
-        <div class="flex">
-            <label class="flex-1 pseudo-input border border-black bg-white flex items-center gap-2 border-r-0">
-                {% translate 'stitcher' %}
-                <input type="text" class="grow" disabled value="{{ object.stitcher.get_designator }}" />
-            </label>
-            <a class="flex-0 btn btn-outline" href="{% url 'edwoca:manifestation_remove_stitcher' object.id %}"> {% translate 'remove' %} </a>
-        </div>
-    {% else %}
-        <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1 flex">
-            <label class="input input-bordered border-black border-r-0 bg-white flex items-center gap-2 flex-1">
-                {% translate 'stitcher' %}
-                {%comment%}{{ stitcher_searchform.q }}{%endcomment%}
-                <input type="text" name="stitcher-q" class="grow" placeholder="{% translate 'search stitcher' %}"/>
-            </label>
-            <input type="submit" id="submit-form-stitcher" class="btn btn-outline" value="{% translate 'search' %}"/>
-        </form>
-        {% if stitcher_query %}
-            <ul class="h-32 overflow-auto border border-black p-2">
-            {% for stitcher in found_stitchers %}
-                <li>
-                    <a href="{% url 'edwoca:manifestation_add_stitcher' object.id stitcher.object.id %}">{{ stitcher.object.get_designator }}</a>
-                </li>
-            {% empty %}
-                <li> {% translate 'no search results' %}</li>
-            {% endfor %}
-            </ul>
-        {% endif %}
+{% if object.stitcher %}
+    <div class="flex my-5">
+        <label class="flex-1 pseudo-input border border-black bg-white flex items-center gap-2 border-r-0">
+            {% translate 'stitcher' %}
+            <input type="text" class="grow" disabled value="{{ object.stitcher.get_designator }}" />
+        </label>
+        <a class="flex-0 btn btn-outline" href="{% url 'edwoca:manifestation_remove_stitcher' object.id %}"> {% translate 'remove' %} </a>
+    </div>
+{% else %}
+    <form action="{% url 'edwoca:manifestation_print' object.id %}" method="get" class="flex-1 my-5 flex">
+        <label class="input input-bordered border-black border-r-0 bg-white flex items-center gap-2 flex-1">
+            {% translate 'stitcher' %}
+            {%comment%}{{ stitcher_searchform.q }}{%endcomment%}
+            <input type="text" name="stitcher-q" class="grow" placeholder="{% translate 'search stitcher' %}"/>
+        </label>
+        <input type="submit" id="submit-form-stitcher" class="btn btn-outline" value="{% translate 'search' %}"/>
+    </form>
+    {% if stitcher_query %}
+        <ul class="h-32 overflow-auto border border-black p-2">
+        {% for stitcher in found_stitchers %}
+            <li>
+                <a href="{% url 'edwoca:manifestation_add_stitcher' object.id stitcher.object.id %}">{{ stitcher.object.get_designator }}</a>
+            </li>
+        {% empty %}
+            <li> {% translate 'no search results' %}</li>
+        {% endfor %}
+        </ul>
     {% endif %}
-
 {% endif %}
+
+<div class="my-5">
+    {{ form.publication_characteristics_as_daisy }}
+</div>
+
+<h2 class="my-5">
+    {% translate 'print' %}
+</h2>
+
+{{ form.print_characteristics_as_daisy }}
 
 {% include 'edwoca/partials/manifestation/preview-divs/print_epilog.html' %}
 

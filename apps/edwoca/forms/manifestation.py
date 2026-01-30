@@ -461,14 +461,111 @@ class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
         return wrap
 
 
-class ManifestationPrintForm(ModelForm):
+class ManifestationPrintForm(DateFormMixin, ModelForm):
+    kwargs = {
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+            },
+        }
+    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow', 'form': 'form'}))
+    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
     class Meta:
         model = Manifestation
-        fields = ['print_type']
+        fields = [
+                'plate_number',
+                'private_print_comment',
+                'print_type',
+                'extent',
+                'edition'
+            ]
         widgets = {
-            'print_type': Select(attrs={'class': 'select select-bordered w-full'}),
+            'plate_number': TextInput(
+                    attrs={
+                            'class': SimpleFormMixin.text_input_classes,
+                            'form': 'form'
+                        }
+                ),
+            'private_print_comment': Textarea(
+                    attrs={
+                            'class': SimpleFormMixin.text_area_classes,
+                            'form': 'form'
+                        }
+                ),
+            'print_type': Select(
+                    attrs={
+                            'class': SimpleFormMixin.select_classes,
+                            'form': 'form'
+                        }
+                ),
+            'extent': Textarea(
+                    attrs={
+                            'class': SimpleFormMixin.text_area_classes,
+                            'form': 'form'
+                        }
+                ),
+            'edition': Select(
+                    attrs={
+                            'class': SimpleFormMixin.select_classes,
+                            'form': 'form'
+                        }
+                ),
         }
 
+    def platenumber_as_daisy(self):
+        form = div()
+        plate_number_field = self['plate_number']
+
+        with form:
+            with label(cls='form-control w-full'):
+                with div(cls='label'):
+                    span(plate_number_field.label, cls='label-text')
+                raw(str(plate_number_field))
+
+        return mark_safe(str(form))
+
+
+    def publication_characteristics_as_daisy(self):
+        form = div()
+        comment_field = self['private_print_comment']
+
+        with form:
+            with div(cls='my-10'):
+                self.get_date_div()
+            with label(cls='form-control w-full'):
+                with div(cls='label'):
+                    span(comment_field.label, cls='label-text')
+                raw(str(comment_field))
+
+        return mark_safe(str(form))
+
+    def print_characteristics_as_daisy(self):
+        form = div()
+        type_field = self['print_type']
+        extent_field = self['extent']
+        edition_field = self['edition']
+
+        with form:
+            with div(cls='flex gap-5'):
+                with label(cls='flex-1 form-control w-full'):
+                    with div(cls='label'):
+                        span(type_field.label, cls='label-text')
+                    raw(str(type_field))
+                with label(cls='flex-1 form-control w-full'):
+                    with div(cls='label'):
+                        span(edition_field.label, cls='label-text')
+                    raw(str(edition_field))
+            with label(cls='form-control w-full'):
+                with div(cls='label'):
+                    span(extent_field.label, cls='label-text')
+                raw(str(extent_field))
+
+        return mark_safe(str(form))
 
 class ManifestationTitleHandwritingForm(HandwritingForm):
     class Meta(HandwritingForm.Meta):

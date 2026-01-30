@@ -318,9 +318,23 @@ class DateFormMixin:
         period_palette.add(not_after_container)
         period_palette.add(tags.div(cls='flex-1'))
 
-        control_palette = tags.div(cls='flex flex-rows w-full gap-10 my-5 items-end')
-        control_palette.add(assumed_label)
+        documentation_label = ''
+        if self.instance.period.assumed:
+            if self.instance.period.inferred:
+                documentation_label = _('date inferred assumed')
+            else:
+                documentation_label = _('date assumed')
+        else:
+            if self.instance.period.inferred:
+                documentation_label = _('date inferred')
+            else:
+                documentation_label = _('date as documented')
+
+        control_palette = tags.div(cls='flex flex-rows w-full gap-10 my-5 items-center')
+        control_palette.add(tags.div(cls='flex-1'))
+        control_palette.add(tags.div(documentation_label, cls='flex-0 mr-10'))
         control_palette.add(inferred_label)
+        control_palette.add(assumed_label)
         control_palette.add(tags.div(cls='flex-1'))
         control_palette.add(calculate_input)
         control_palette.add(clear_input)

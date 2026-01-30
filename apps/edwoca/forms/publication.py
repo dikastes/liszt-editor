@@ -6,8 +6,8 @@ from liszt_util.forms.forms import GenericAsDaisyMixin
 class PublicationForm(GenericAsDaisyMixin, ModelForm):
     class Meta:
         model = Publication
-        fields = ['publisher', 'place_status']
+        fields = ['assumed', 'inferred']
         widgets = {
-            'publisher': HiddenInput(),
-            'place_status': Select(attrs={'form': 'form', 'class': SimpleFormMixin.select_classes })
+            'assumed': CheckboxInput(attrs={'form': 'form', 'class': 'toggle' }),
+            'inferred': CheckboxInput(attrs={'form': 'form', 'class': 'toggle' })
         }

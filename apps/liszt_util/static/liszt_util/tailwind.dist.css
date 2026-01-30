@@ -3997,6 +3997,14 @@ details.collapse summary::-webkit-details-marker {
   margin-left: 1.25rem;
 }
 
+.mr-0 {
+  margin-right: 0px;
+}
+
+.mr-10 {
+  margin-right: 2.5rem;
+}
+
 .mr-2 {
   margin-right: 0.5rem;
 }
@@ -4119,10 +4127,6 @@ details.collapse summary::-webkit-details-marker {
 
 .w-56 {
   width: 14rem;
-}
-
-.w-64 {
-  width: 16rem;
 }
 
 .w-full {
@@ -4465,11 +4469,6 @@ details.collapse summary::-webkit-details-marker {
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity, 1));
-}
-
-.text-gray-800 {
-  --tw-text-opacity: 1;
-  color: rgb(31 41 55 / var(--tw-text-opacity, 1));
 }
 
 .text-primary {

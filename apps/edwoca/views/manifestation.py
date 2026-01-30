@@ -117,19 +117,14 @@ def manifestation_create(request, publisher_pk=None):
             #manifestation.publisher = form.cleaned_data.get('publisher')
             #manifestation.plate_number = form.cleaned_data.get('plate_number')
             manifestation.source_type = form.cleaned_data.get('source_type')
+            manifestation.plate_number = form.cleaned_data.get('plate_number'),
+            manifestation.working_title = form.cleaned_data['temporary_title']
             manifestation.save()
             Publication.objects.create(
                     publisher = form.cleaned_data.get('publisher'),
-                    plate_number = form.cleaned_data.get('plate_number'),
                     manifestation = manifestation
                 )
 
-            if form.cleaned_data.get('temporary_title'):
-                ManifestationTitle.objects.create(
-                    manifestation=manifestation,
-                    title=form.cleaned_data['temporary_title'],
-                    status=Status.TEMPORARY
-                )
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
     else:
         form = ManifestationCreateForm(initial = {'publisher':publisher}) if publisher else None
@@ -741,15 +736,49 @@ def manifestation_print_update(request, pk):
 
         for publication in manifestation.publications.all():
             prefix = f'publication_{publication.id}'
-            form = PublicationForm(request.POST, instance=publication, prefix=prefix)
-            if form.is_valid():
-                form.save()
+            publication_form = PublicationForm(request.POST, instance=publication, prefix=prefix)
+            if publication_form.is_valid():
+                publication_form.save()
+
+        form = ManifestationPrintForm(request.POST, instance=manifestation)
+        if form.is_valid():
+            form.save()
+
+        if 'calculate-machine-readable-date' in request.POST:
+            manifestation.period.parse_display()
+            manifestation.period.save()
+        if 'clear-machine-readable-date' in request.POST:
+            manifestation.period.not_before = None
+            manifestation.period.not_after = None
+            manifestation.period.assumed = False
+            manifestation.period.inferred = False
+            manifestation.period.save()
+
         return redirect('edwoca:manifestation_print', pk=pk)
+
+    context['form'] = ManifestationPrintForm(instance = manifestation)
 
     publication_forms = []
     for publication in manifestation.publications.all():
         prefix = f'publication_{publication.id}'
-        publication_forms.append(PublicationForm(instance=publication, prefix=prefix))
+
+        publisher_search_form = SearchForm(request.GET or None, prefix='publisher')
+        found_publishers = []
+        if publisher_search_form.is_valid() and publisher_search_form.cleaned_data.get('q'):
+            found_publishers = publisher_search_form.search().models(Corporation)
+
+        place_search_form = SearchForm(request.GET or None, prefix='place')
+        found_places = []
+        if place_search_form.is_valid() and place_search_form.cleaned_data.get('q'):
+            found_places = place_search_form.search().models(Place)
+
+        publication_forms.append({
+                'publication_form': PublicationForm(instance=publication, prefix=prefix),
+                'publisher_search_form': publisher_search_form,
+                'found_publishers': found_publishers,
+                'place_search_form': place_search_form,
+                'found_places':found_places
+            })
 
     context['publication_forms'] = publication_forms
 
@@ -762,16 +791,25 @@ def manifestation_print_update(request, pk):
 
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['stitcher_query'] = search_form.cleaned_data.get('q')
-            context[f"found_stitchers"] = search_form.search().models(Corporation)
-
-    search_form = SearchForm(request.GET or None)
-    if search_form.is_valid() and search_form.cleaned_data.get('q'):
-        context['query'] = search_form.cleaned_data.get('q')
-        context[f"found_publishers"] = search_form.search().models(Corporation)
-
-    context['search_form'] = search_form
+            context[f'found_stitchers'] = search_form.search().models(Corporation)
 
     return render(request, 'edwoca/manifestation_print.html', context)
+
+
+def manifestation_add_publication_place(request, pk, publication_id, place_id):
+    publication = get_object_or_404(Publication, pk=publication_id)
+    place = get_object_or_404(Place, pk=place_id)
+    publication.place.add(place)
+    publication.save()
+    return redirect('edwoca:manifestation_print', pk=pk)
+
+
+def manifestation_remove_publication_place(request, pk, publication_id, place_id):
+    publication = get_object_or_404(Publication, pk=publication_id)
+    place = get_object_or_404(Place, pk=place_id)
+    publication.place.remove(place)
+    publication.save()
+    return redirect('edwoca:manifestation_print', pk=pk)
 
 
 def manifestation_add_publication_publisher(request, pk, publication_id, publisher_id):
@@ -1447,15 +1485,6 @@ def manifestation_dedication_remove_place(request, pk, dedication_id):
     dedication.place = None
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
-
-
-def manifestation_publication_remove_publisher(request, pk):
-    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
-    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
-    publication = get_object_or_404(Publication, pk=pk)
-    publication.publisher = None
-    publication.save()
-    return redirect('edwoca:manifestation_print', pk=publication.manifestation.id)
 
 
 def manifestation_copy(request, pk):

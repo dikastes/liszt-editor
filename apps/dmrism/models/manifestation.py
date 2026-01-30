@@ -73,6 +73,10 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 case 'plattendruck' | 'platte': return Manifestation.PrintType.PLATE_PRINTING
                 case 'lithographie': return Manifestation.PrintType.LITHOGRAPH
 
+    class Edition(models.TextChoices):
+        FIRST_EDITION = '1', _('first edition')
+        FOLLOWING_EDITION = 'F', _('following edition')
+
     class SourceType(models.TextChoices):
         TRANSCRIPT = 'TSC', _('transcript')
         CORRECTED_TRANSCRIPT = 'CTS', _('transcript with autograph entries')
@@ -171,11 +175,22 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             verbose_name = _('print type')
         )
+    edition = models.CharField(
+            max_length = 10,
+            choices = Edition,
+            default = Edition.FOLLOWING_EDITION,
+            verbose_name = _('edition')
+        )
     state = models.CharField(
-            max_length=10,
-            choices=State,
-            default=State.COMPLETE,
+            max_length = 10,
+            choices = State,
+            default = State.COMPLETE,
             verbose_name = _('state')
+        )
+    extent = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('extent')
         )
     history = models.TextField(
             blank = True,
@@ -187,16 +202,16 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             through = 'ManifestationBib'
         )
     language = models.CharField(
-            max_length=15,
-            choices=Language,
-            default=None,
-            null=True,
+            max_length = 15,
+            choices = Language,
+            default = None,
+            null = True,
             verbose_name = _('language')
         )
     watermark = models.TextField(
-            max_length=100,
-            blank=True,
-            null=True,
+            max_length = 100,
+            blank = True,
+            null = True,
             verbose_name = _('watermark')
         )
     watermark_url = models.URLField(
@@ -529,18 +544,17 @@ class Publication(models.Model):
             null = True,
             on_delete = models.SET_NULL
         )
-    place = models.ForeignKey(
+    place = models.ManyToManyField(
             'dmad.Place',
-            related_name = 'published_manifestations',
-            null = True,
-            on_delete = models.SET_NULL
+            related_name = 'published_manifestations'
         )
-    place_status = models.CharField(
-            max_length = 1,
-            choices = DocumentationStatus,
-            default = None,
-            null = True,
-            verbose_name = _('title type')
+    inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
         )
 
 
