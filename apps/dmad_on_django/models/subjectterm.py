@@ -38,7 +38,7 @@ class SubjectTerm(DisplayableModel):
     def get_parent_subject_table(self):
         return [
         (
-            "Übergeordnetes Sachschlagwort",
+            _("broader subject term"),
             f'<a href="{s.get_absolute_url()}"class = "link link-primary">{s.get_default_name()} ({s.gnd_id})</a>'
         )
         for s in self.parent_subjects.all()

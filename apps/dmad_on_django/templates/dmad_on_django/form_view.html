@@ -7,18 +7,18 @@
 
     {% if object.gnd_id %}
     <div class="tabs tabs-border">
-	<input type="radio" class="tab" aria-label="{% translate 'edit' %}" name="data-raw-toggle" checked="checked">
+	<input type="radio" class="tab" aria-label="{% trans 'edit' %}" name="data-raw-toggle" checked="checked">
 	<div class="tab-content px-5 bg-white border border-base-300">
 	    <div class="prose">
-		<h4> Kurzbeschreibung </h4>
+		<h4> {% trans "Short description" %} </h4>
 		<p>
 		    {{ object.get_description }}
 		</p>
-		<h4> {% translate "Lobid-Info" %} </h4>
+		<h4> {% trans "Lobid-Info" %} </h4>
 		<p>
 		    {{ object.interim_designator }}
 		</p>
-		<h4> Anpassen </h4>
+		<h4> {% trans "Customize" %} </h4>
 		<form method="post">
 		    {% csrf_token %}
 		    {{ form.as_daisy }}
@@ -26,24 +26,24 @@
 		</form>
 	    </div>
 	</div>
-	<input type="radio" class="tab" aria-label="{% translate 'data overview' %}" name="data-raw-toggle">
+	<input type="radio" class="tab" aria-label="{% trans 'data overview' %}" name="data-raw-toggle">
 	<div class="tab-content px-5 overflow-auto max-w-full h-screen bg-white border border-base-300">
 	    <div class="collapse collapse-plus">
 	        <input type="checkbox" />
-	        <div class="collapse-title">{% translate "identification" %}</div>
+	        <div class="collapse-title">{% trans "identification" %}</div>
 		<div class="collapse-content">
 		    <table class="table table-zebra">
 			<tr>
-			    <td> {% translate "gnd-id" %} </td>
+			    <td> {% trans "gnd-id" %} </td>
 			    <td> {{ object.gnd_id }} </td>
 			</tr>
 			<tr>
-			    <td> {% translate "default name" %} </td>
+			    <td> {% trans "default name" %} </td>
 			    <td> {{ object.get_default_name }} </td>
 			</tr>
 			{% for alt_name in object.get_alt_names %}
 			    <tr>
-				<td> {% translate "alternate_name" %} </td>
+				<td> {% trans "alternate_name" %} </td>
 				<td> {{ alt_name }} </td>
 			    </tr>
 			{% endfor %}
@@ -56,7 +56,7 @@
 			{{object.as_daisy}}
 	    </div>
 	</div>
-	<input type="radio" class="tab" aria-label="{% translate 'raw data'%}" name="data-raw-toggle" >
+	<input type="radio" class="tab" aria-label="{% trans 'raw data'%}" name="data-raw-toggle" >
 	<div class="tab-content px-5 overflow-auto max-w-full h-screen bg-white border border-base-300">
 	    <pre class="whitespace-pre text-sm leading-snug"><code class="language-json">{{ object.render_raw | escape }}</code></pre>
 	</div>
@@ -82,24 +82,24 @@
     <ul class="menu gap-5 flex-0">
         <li>
             <a class="btn" href="{% url prefix|add:'_create' %}">
-                {% translate "create entry" %}
+                {% trans "create entry" %}
             </a>
         </li>
         {% if object.gnd_id %}
             <li>
                 <a class="btn" href="{% url prefix|add:'_unlink' object.id %}">
-                    {% translate "remove gnd" %}
+                    {% trans "remove gnd" %}
                 </a>
             </li>
         {% else %}
             <li>
                 <a class="btn" href="{% url prefix|add:'_link' object.id %}">
-                    {% translate "connect gnd" %}
+                    {% trans "connect gnd" %}
                 </a>
             </li>
         {% endif %}
 		<li>
-			<label class="btn btn-primary" for="submit-form"> {% translate "save" %} </label>
+			<label class="btn btn-primary" for="submit-form"> {% trans "save" %} </label>
 		</li>
     </ul>
 </div>

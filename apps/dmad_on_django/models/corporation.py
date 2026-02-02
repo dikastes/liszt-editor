@@ -169,4 +169,4 @@ class Corporation(DisplayableModel):
         return self
 
     def get_overview_title(self):
-        return "Angaben"
+        return _("information")

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-19 17:08+0000\n"
+"POT-Creation-Date: 2026-02-02 12:27+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,12 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: apps/dmad_on_django/forms.py:27
+#: apps/dmad_on_django/templates/dmad_on_django/partials/search_form.html:14
+#: apps/dmad_on_django/templates/dmad_on_django/partials/search_form.html:17
+msgid "Search"
+msgstr "Suchen"
 
 #: apps/dmad_on_django/models/base.py:22
 msgid "Primary"
@@ -46,6 +52,7 @@ msgid "gnd subject category"
 msgstr "GND Sachgruppe"
 
 #: apps/dmad_on_django/models/corporation.py:140
+#: apps/dmad_on_django/models/person.py:205
 #: apps/dmad_on_django/models/place.py:117
 #: apps/dmad_on_django/models/subjectterm.py:118
 #: apps/dmad_on_django/models/work.py:146
@@ -64,6 +71,11 @@ msgstr "Zeitraum"
 #: apps/dmad_on_django/models/corporation.py:153
 msgid "category corporation"
 msgstr "Kategorie"
+
+#: apps/dmad_on_django/models/corporation.py:172
+#| msgid "identification"
+msgid "information"
+msgstr "Idendifikation"
 
 #: apps/dmad_on_django/models/geographicareacodes.py:18
 msgid "geographic area code"
@@ -96,6 +108,15 @@ msgstr "bis"
 #: apps/dmad_on_django/models/period.py:330
 msgid "unknown period"
 msgstr "unbekannter Zeitraumm"
+
+#: apps/dmad_on_django/models/person.py:101
+#: apps/dmad_on_django/models/person.py:102
+msgid "n.d."
+msgstr "o.N"
+
+#: apps/dmad_on_django/models/person.py:179
+msgid "GND API error. Retry."
+msgstr "GND API Fehler. Erneut versuchen..."
 
 #: apps/dmad_on_django/models/person.py:209
 msgid "gender"
@@ -139,6 +160,11 @@ msgstr "Breitengrad"
 msgid "description"
 msgstr "Angaben"
 
+#: apps/dmad_on_django/models/subjectterm.py:41
+#| msgid "broader terms"
+msgid "broader subject term"
+msgstr "Oberbegriffe"
+
 #: apps/dmad_on_django/models/work.py:163
 msgid "date of creation"
 msgstr "Entstehungszeit"
@@ -163,13 +189,99 @@ msgstr "Schöpfer:in"
 msgid "broader terms"
 msgstr "Oberbegriffe"
 
+#: apps/dmad_on_django/templates/dmad_on_django/corporation_list.html:8
+#: apps/dmad_on_django/templates/dmad_on_django/person_list.html:9
+#: apps/dmad_on_django/templates/dmad_on_django/place_list.html:10
+#: apps/dmad_on_django/templates/dmad_on_django/subjectterm_list.html:10
+#: apps/dmad_on_django/templates/dmad_on_django/work_list.html:8
+msgid "List"
+msgstr "Liste"
+
+#: apps/dmad_on_django/templates/dmad_on_django/corporation_list.html:22
+#: apps/dmad_on_django/templates/dmad_on_django/person_list.html:21
+#: apps/dmad_on_django/templates/dmad_on_django/place_list.html:24
+#: apps/dmad_on_django/templates/dmad_on_django/subjectterm_list.html:24
+#: apps/dmad_on_django/templates/dmad_on_django/work_list.html:22
+msgid "Filter"
+msgstr "Filter"
+
+#: apps/dmad_on_django/templates/dmad_on_django/corporation_list.html:26
+#: apps/dmad_on_django/templates/dmad_on_django/corporation_list.html:37
+#: apps/dmad_on_django/templates/dmad_on_django/corporation_list.html:39
+#: apps/dmad_on_django/templates/dmad_on_django/person_list.html:35
+#: apps/dmad_on_django/templates/dmad_on_django/person_list.html:37
+#: apps/dmad_on_django/templates/dmad_on_django/place_list.html:28
+#: apps/dmad_on_django/templates/dmad_on_django/place_list.html:39
+#: apps/dmad_on_django/templates/dmad_on_django/place_list.html:41
+#: apps/dmad_on_django/templates/dmad_on_django/subjectterm_list.html:38
+#: apps/dmad_on_django/templates/dmad_on_django/subjectterm_list.html:40
+#: apps/dmad_on_django/templates/dmad_on_django/work_list.html:26
+#: apps/dmad_on_django/templates/dmad_on_django/work_list.html:37
+#: apps/dmad_on_django/templates/dmad_on_django/work_list.html:39
+msgid "Stub records"
+msgstr "Rumpfdatensätze"
+
+#: apps/dmad_on_django/templates/dmad_on_django/corporation_list.html:28
+#: apps/dmad_on_django/templates/dmad_on_django/corporation_list.html:30
+#: apps/dmad_on_django/templates/dmad_on_django/person_list.html:26
+#: apps/dmad_on_django/templates/dmad_on_django/person_list.html:28
+#: apps/dmad_on_django/templates/dmad_on_django/place_list.html:30
+#: apps/dmad_on_django/templates/dmad_on_django/place_list.html:32
+#: apps/dmad_on_django/templates/dmad_on_django/subjectterm_list.html:29
+#: apps/dmad_on_django/templates/dmad_on_django/subjectterm_list.html:31
+#: apps/dmad_on_django/templates/dmad_on_django/work_list.html:28
+#: apps/dmad_on_django/templates/dmad_on_django/work_list.html:30
+msgid "rework"
+msgstr "nachbearbeiten"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:12
+msgid "Search GND"
+msgstr "GND Suche"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:14
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:15
+#: apps/dmad_on_django/templates/dmad_on_django/partials/search_results.html:12
+msgid "please enter a search term"
+msgstr "Bitte Suchbegriff eingeben"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:14
+msgid "no results yet"
+msgstr "Keine Ergebnisse"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:14
+#| msgid "raw data"
+msgid "Take data"
+msgstr "Rohdaten"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:22
+msgid "Information"
+msgstr "Informationen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:48
+msgid "Save"
+msgstr "Speichern"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:52
+#: apps/dmad_on_django/templates/dmad_on_django/unlink.html:28
+msgid "Cancel"
+msgstr "Abbrechen"
+
 #: apps/dmad_on_django/templates/dmad_on_django/form_view.html:10
 msgid "edit"
 msgstr "Bearbeiten"
 
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:13
+#| msgid "description"
+msgid "Short description"
+msgstr "Angaben"
+
 #: apps/dmad_on_django/templates/dmad_on_django/form_view.html:17
 msgid "Lobid-Info"
 msgstr "Lobid-Info"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:21
+msgid "Customize"
+msgstr "Bearbeiten"
 
 #: apps/dmad_on_django/templates/dmad_on_django/form_view.html:29
 msgid "data overview"
@@ -210,6 +322,58 @@ msgstr "GND Datensatz verknüpfen"
 #: apps/dmad_on_django/templates/dmad_on_django/form_view.html:102
 msgid "save"
 msgstr "Speichern"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:2
+#: apps/dmad_on_django/views/base.py:100
+#| msgid "raw data"
+msgid "Create dataset"
+msgstr "Datensatz anlegen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:6
+msgid "Persons"
+msgstr "Personen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:12
+msgid "Works"
+msgstr "Werke"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:18
+msgid "Places"
+msgstr "Orte"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:24
+#| msgid "broader terms"
+msgid "Subject terms"
+msgstr "Sachschlagworte"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:30
+#| msgid "category corporation"
+msgid "Corporations"
+msgstr "Körperschaften"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/search_results.html:9
+msgid "no search results"
+msgstr "keine Suchergebnisse"
+
+#: apps/dmad_on_django/templates/dmad_on_django/unlink.html:11
+#, python-format
+msgid ""
+"The link to the GND will be removed. The dataset will then be referred to as "
+"<em>%(object.interim_designator)s</em>. Please confirm."
+msgstr "Die GND Verknüpfung wird aufgehoben. Der Datensatz wird unter "
+"<em>%(object.interim_designator)s</em> gespeichert. Bitte bestätigen."
+
+#: apps/dmad_on_django/templates/dmad_on_django/unlink.html:32
+msgid "Confirm"
+msgstr "Bestätigen"
+
+#: apps/dmad_on_django/views/base.py:49
+msgid " (S)"
+msgstr ""
+
+#: apps/dmad_on_django/views/base.py:155
+msgid "Link dataset with GND"
+msgstr "Mit der GND verknüpfen"
 
 #~ msgid "Periods"
 #~ msgstr "Zeiträume"

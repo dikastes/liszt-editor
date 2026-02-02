@@ -1,12 +1,13 @@
 {% extends 'liszt_util/base.html' %}
 {% load static %}
+{% load i18n %}
 
 
 {% block content %}
 
 <div class="bg-white p-5 border border-base-300 h-96 w-full">
     <div class="prose">
-        <h2> Liste </h2>
+        <h2>{% trans "List" %}</h2>
         <div id="search-results">
             {% include 'dmad_on_django/partials/search_results.html' %}
         </div>
@@ -20,24 +21,24 @@
     {% if rework_count > 0 or stub_count > 0 %}
         <ul class="menu">
             <li>
-                <h2 class="menu-title"> Filter </h2>
+                <h2 class="menu-title">{% trans "Filter" %}</h2>
                 <ul>
                     {% if rework_count > 0 %}
                         <li>
-                            <button id="stub-toggle"> Rumpfdatensätze </button>
+                            <button id="stub-toggle">{% trans "Stub records" %}</button>
                             {% if type == 'rework' %}
-                                <a href="{% url 'dmad_on_django:place_list' %}" class="active"> nachbearbeiten ({{ rework_count }}) </a> 
+                                <a href="{% url 'dmad_on_django:place_list' %}" class="active">{% trans "rework" %} ({{ rework_count }})</a>
                             {% else %}
-                                <a href="{% url 'dmad_on_django:place_list' 'rework' %}"> nachbearbeiten ({{ rework_count }}) </a> 
+                                <a href="{% url 'dmad_on_django:place_list' 'rework' %}">{% trans "rework" %} ({{ rework_count }})</a>
                             {% endif %}
                         </li>
                     {% endif %}
                     {% if stub_count > 0 %}
                         <li>
                             {% if type == 'stub' %}
-                                <a href="{% url 'dmad_on_django:place_list' %}" class="active"> Rumpfdatensätze ({{ stub_count }})</a>
+                                <a href="{% url 'dmad_on_django:place_list' %}" class="active">{% trans "Stub records" %} ({{ stub_count }})</a>
                             {% else %}
-                                <a href="{% url 'dmad_on_django:place_list' 'stub' %}"> Rumpfdatensätze ({{ stub_count }})</a>
+                                <a href="{% url 'dmad_on_django:place_list' 'stub' %}">{% trans "Stub records" %} ({{ stub_count }})</a>
                             {% endif %}
                         </li>
                     {% endif %}

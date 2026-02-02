@@ -1,4 +1,5 @@
 from haystack.forms import SearchForm
+from django.utils.translation import gettext_lazy as _
 from django.forms import TextInput, Textarea, ModelForm
 from .models import Person
 from liszt_util.forms.forms import GenericAsDaisyMixin
@@ -23,7 +24,7 @@ class SearchForm(GenericAsDaisyMixin, SearchForm):
         super().__init__(*args, **kwargs)
         self.fields['q'].widget.attrs.update({
                 'class': 'w-full',
-                'placeholder': 'Suche'
+                'placeholder': _('Search')
             })
         self.fields['q'].label = ''
 

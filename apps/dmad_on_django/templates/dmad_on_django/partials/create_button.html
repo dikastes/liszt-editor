@@ -1,1 +1,2 @@
-<a href="{% url 'dmad_on_django:'|add:active|add:'_create' %}" class="btn btn-primary min-h-inherit rounded-none"> Datensatz anlegen </a>
+{% load i18n %}
+<a href="{% url 'dmad_on_django:'|add:active|add:'_create' %}" class="btn btn-primary min-h-inherit rounded-none">{% trans "Create dataset" %}</a>

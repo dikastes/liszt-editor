@@ -1,5 +1,6 @@
 {% extends 'liszt_util/base.html' %}
 {% load static %}
+{% load i18n %}
 
 {% block content %}
 
@@ -8,17 +9,17 @@
 
     <div class="bg-white p-5 border my-5 border-base-300">
 	<div class="prose">
-	    <h3>GND durchsuchen</h3>
+	    <h3>{% trans "Search GND" %}</h3>
 	    <input class="input input-bordered" id="gnd-search" />
-	    <ul class="list-disc h-64 text-sm" id="gnd-search-results">
-		<li> <em> bitte Suchbegriff eingeben </em> </li>
+	    <ul class="list-disc h-64 text-sm" id="gnd-search-results" data-enter-search-term="{% trans "please enter a search term" %}" data-no-results="{% trans "no results yet" %}" data-take-data="{% trans "Take data" %}">
+		<li> <em> {% trans "please enter a search term" %} </em> </li>
 	    </ul>
 	</div>
     </div>
 
     <div class="bg-white p-5 border border-base-300">
 	<div class="prose">
-	    <h3> Informationen </h3>
+	    <h3> {% trans "Information" %} </h3>
 	    <form method="post">
 		{% csrf_token %}
 		{{ form.as_daisy }}
@@ -44,15 +45,14 @@
     <div class="flex-1"></div>
     <ul class="menu gap-5 flex-0">
 	<li>
-	    <label class="btn btn-primary" for="submit-form"> speichern </label>
+	    <label class="btn btn-primary" for="submit-form"> {% trans "Save" %} </label>
 	</li>
 	<li>
 		<a href="{% url 'dmad_on_django:'|add:entity_type|add:'_list' %}" class="btn btn-primary">
-			Abbrechen
+			{% trans "Cancel" %}
 		</a>
 		
 	</li>
     </ul>
 </div>
 {% endblock %}
-

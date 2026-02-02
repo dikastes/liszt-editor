@@ -8,11 +8,15 @@ const dmadOnDjangoSearchGnd = {
 		this.designatorTarget = document.querySelector(`[name="${designatorTargetName}"]`);
 		this.target = document.querySelector(`#${config['target']}`);
 		const baseUrl = '/dmad/search-gnd/'
+        this.enterSearchTerm = this.target.dataset.enterSearchTerm;
+        this.noResults = this.target.dataset.noResults;
+        this.takeData = this.target.dataset.takeData;
+
 
 		input.addEventListener('input', _ => {
 			const searchString = input.value;
 			if (searchString.length < 3) {
-				target.innerHTML = '<li><em> bitte Suchbegriff eingeben </em></li>';
+				this.target.innerHTML = `<li><em> ${this.enterSearchTerm} </em></li>`;
 			} else {
 				fetch(`${baseUrl}${type}/${searchString}`)
 					.then(response => { return response.json(); })
@@ -23,7 +27,7 @@ const dmadOnDjangoSearchGnd = {
 
 	process: data => {
 		if (data.length > 0) {
-			target.innerHTML = data.map(r => dmadOnDjangoSearchGnd.buildLink(r.id, r.label)).join('');
+			this.target.innerHTML = data.map(r => dmadOnDjangoSearchGnd.buildLink(r.id, r.label)).join('');
 			document.querySelectorAll('.data-link').forEach(target => {
 				target.addEventListener('click', e => {
 					this.designatorTarget.value = e.target.dataset['label'];
@@ -31,10 +35,10 @@ const dmadOnDjangoSearchGnd = {
 				})
 			})
 		} else {
-			target.innerHTML = '<li><em> keine Suchergebnisse </em></li>';
+			this.target.innerHTML = `<li><em> ${this.noResults} </em></li>`;
 		}
 
 	},
 
-	buildLink : (url, label) => `<li>${label} <button href="#" class="data-link badge badge-primary" data-url="${url}" data-label="${label}">Daten übernehmen</button></li>`
+	buildLink : (url, label) => `<li>${label} <button href="#" class="data-link badge badge-primary" data-url="${url}" data-label="${label}">${this.takeData}</button></li>`
 }

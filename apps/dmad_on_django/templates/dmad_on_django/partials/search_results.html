@@ -1,3 +1,4 @@
+{% load i18n %}
 <ul id="search-results">
     {% if query or type %}
 	{% for result in object_list %}
@@ -5,9 +6,9 @@
 		<a href="{{ result.get_absolute_url }}">{{ result.get_designator }}</a>
 	    </li>
 	{% empty %}
-	    <li> <em> keine Suchergebnisse</em> </li>
+	    <li> <em> {% trans "no search results" %}</em> </li>
 	{% endfor %}
     {% else %}
-	<li> <em> bitte Suchbegriff eingeben </em> </li>
+	<li> <em> {% trans "please enter a search term" %} </em> </li>
     {% endif %}
 </ul>

@@ -2,6 +2,7 @@ from django import forms
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView, DeleteView
+from django.utils.translation import gettext_lazy as _
 from django.http import JsonResponse, HttpResponseRedirect
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm, Corporation
@@ -45,7 +46,7 @@ def get_link(model_object, model):
     link = reverse_lazy(f"dmad_on_django:{model}_update", kwargs={'pk': model_object.id})
     title = model_object.get_designator()
     if model_object.gnd_id == '':
-        title += ' (R)'
+        title += _(' (S)')
     return f"<li><a href={link}>{title}</a></li>"
 
 
@@ -96,7 +97,7 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = 'Datensatz anlegen'
+        context['view_title'] = _('Create dataset')
         return context
 
     def post(self, request, *args, **kwargs):
@@ -151,7 +152,7 @@ class LinkView(DmadBaseViewMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = 'Datensatz mit der GND verknüpfen'
+        context['view_title'] = _('Link dataset with GND')
         return context
 
     def post(self, request, **kwargs):
@@ -188,6 +189,10 @@ class PullView(UpdateView):
 
 
 class DmadSearchView(NavbarContextMixin, SearchView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.models(self.model)
+
     def form_invalid(self, form):
         if self.request.htmx:
             context = self.get_context_data()
@@ -198,7 +203,7 @@ class DmadSearchView(NavbarContextMixin, SearchView):
 
     def form_valid(self, form):
         if self.request.htmx:
-            self.queryset = form.search().models(self.model)
+            self.queryset = self.get_queryset()
             context = self.get_context_data(**{
                     self.form_name: form,
                     'query': form.cleaned_data.get(self.search_field),

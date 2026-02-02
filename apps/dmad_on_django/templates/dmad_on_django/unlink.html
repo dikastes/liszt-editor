@@ -1,4 +1,5 @@
 {% extends 'liszt_util/base.html' %}
+{% load i18n %}
 
 {% block content %}
 
@@ -7,9 +8,7 @@
 	<h2 class="card-title mt-0"> {{ object.get_designator }} </h2>
 
 	<p>
-	    Die Verknüpfung zur GND wird entfernt.
-	    Der Datensatz wird danach als <em> {{ object.interim_designator }} </em> bezeichnet.
-	    Bitte bestätigen.
+        {% blocktrans %}The link to the GND will be removed. The dataset will then be referred to as <em>{{ object.interim_designator }}</em>. Please confirm.{% endblocktrans %}
 	</p>
     </div>
 
@@ -26,11 +25,11 @@
     <ul class="menu gap-5 flex-0">
 	<li> 
 	    <a class="btn" href="{% url prefix|add:'_update' object.id %}">
-		abbrechen
+		{% trans "Cancel" %}
 	    </a>
 	</li>
 	<li>
-	    <label class="btn btn-primary" for="submit-form"> bestätigen </label>
+	    <label class="btn btn-primary" for="submit-form">{% trans "Confirm" %}</label>
 	</li>
     </ul>
 </div>

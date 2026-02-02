@@ -98,8 +98,8 @@ class Person(DisplayableModel):
 
 
     def get_description(self):
-        birth_date = self.birth_date.strftime('%d.%m.%Y') if self.birth_date else 'o.D.'
-        death_date = self.death_date.strftime('%d.%m.%Y') if self.death_date else 'o.D.'
+        birth_date = self.birth_date.strftime('%d.%m.%Y') if self.birth_date else _('n.d.')
+        death_date = self.death_date.strftime('%d.%m.%Y') if self.death_date else _('n.d.')
 
         birth_place = self.birth_place.get_default_name() if self.birth_place else '?'
         death_place = self.death_place.get_default_name() if self.death_place else '?'
@@ -176,7 +176,7 @@ class Person(DisplayableModel):
             try:
                 pl_person = PyLobidPerson(url, fetch_related=False)
             except GNDAPIError:
-                print("GND API error. Retry.")
+                print(_("GND API error. Retry."))
                 trials -= 1
                 continue
             break
@@ -202,7 +202,7 @@ class Person(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _('without name')
 
     def get_table(self):
             rows = [

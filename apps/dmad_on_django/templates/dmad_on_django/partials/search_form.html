@@ -1,3 +1,4 @@
+{% load i18n %}
 <form
     method="get"
     action="{{ action_url }}"
@@ -10,8 +11,8 @@
     {% endif %}
 >
     <label class="input input-bordered flex items-center gap-2 flex-1">
-        Suche
+        {% trans "Search" %}
         {{ form.q }}
     </label>
-    <input class="btn" type="submit" value="Suchen" />
+    <input class="btn" type="submit" value="{% trans "Search" %}" />
 </form>
