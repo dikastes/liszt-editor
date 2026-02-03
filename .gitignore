@@ -1,3 +1,7 @@
+# error logs
+
+error.log*
+
 # Whoosh index
 
 liszteditor/whoosh_index/

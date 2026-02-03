@@ -2,7 +2,7 @@
 # Usage: ./import_manifestations.sh [path_prefix]
 # Example: ./import_manifestations.sh ../some_other_dir/
 
-CSV_PATH_PREFIX=${1:-../liszt_csv/}
+CSV_PATH_PREFIX=${1:-liszt_csv/}
 
 echo importing 1b fragments
 python manage.py import_manifestations_from_csv "${CSV_PATH_PREFIX}liszt_1b_long.csv" -st autograph -mf fragment

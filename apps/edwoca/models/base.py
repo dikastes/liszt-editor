@@ -26,19 +26,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
     class Meta:
         proxy = True
 
-    def parse_edition_type(csv_representation):
-        match csv_representation:
-            case 'Partitur':
-                return Manifestation.EditionType.SCORE
-            case 'Stimmen' | 'Stimme':
-                return Manifestation.EditionType.PARTS
-            case 'Particell':
-                return Manifestation.EditionType.PARTICELL
-            case 'Klavierauszug':
-                return Manifestation.EditionType.PIANO_REDUCTION
-            case 'Chorpartitur':
-                return Manifestation.EditionType.CHOIR_SCORE
-
     def __str__(self):
         if self.is_singleton:
             return super().__str__()
@@ -90,9 +77,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             rism_id = self.rism_id,
             period = period,
             manifestation_form = self.manifestation_form,
-            edition_type = self.edition_type,
             source_type = self.source_type,
-            function = self.function,
             print_type = self.print_type,
             state = self.state,
             history = self.history,
@@ -105,6 +90,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             taken_information = self.taken_information,
             stitcher = self.stitcher,
             specific_figure = self.specific_figure,
+            album_page = self.album_page,
+            performance_material = self.performance_material,
+            correction_sheet = self.correction_sheet,
+            stitch_template = self.stitch_template,
+            dedication_item = self.dedication_item,
+            choir_score = self.choir_score,
+            piano_reduction = self.piano_reduction,
+            particell = self.particell,
+            score = self.score,
+            parts = self.parts,
             print_extent = self.print_extent,
             private_head_comment = self.private_head_comment,
             private_relations_comment = self.private_relations_comment,
@@ -308,6 +303,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         DEDUCED_PLACE_NAME_KEY = 'Ort ermittelt (normiert)'
         DEDUCED_PLACE_ID_KEY = 'Ort ermittelt GND-Nr.'
+        DEDUCED_DATE_KEY = 'Datierung ermittelt (maschinenlesbar)'
 
         PROVENANCE_KEY = 'Provenienz'
         PROVSTATION_SUFFIX = ' Station '
@@ -317,10 +313,23 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         COMMENT_QUESTION_KEY = 'Kommentar intern / Fragen (interne Kommunikation)'
         FURTHER_INFORMATION_KEY = 'Weiterführende Informationen (Ausgaben, Permalinks etc.) (intern)'
 
+        WATERMARK_KEY = 'Wasserzeichen (intern)'
+
         single_item = Item.objects.create(manifestation = self)
 
         self.manifestation_form = manifestation_form
-        self.function = function
+        for function_option in [
+                'album page',
+                'performance material',
+                'correction sheet',
+                'stitch template',
+                'dedication item'
+                ]:
+            if function and function in function_option:
+                setattr(self, function_option, True)
+            if FUNCTION_KEY in raw_data:
+                if str(_(function_option)) in raw_data[FUNCTION_KEY]:
+                    setattr(self, function_option.replace(' ', '_'), True)
 
         taken_information = []
         if MANIFESTATION_NOTES_KEY in raw_data and (manifestation_notes := raw_data[MANIFESTATION_NOTES_KEY]):
@@ -375,9 +384,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if DATE_COMMENT_KEY in raw_data and (comment := raw_data[DATE_COMMENT_KEY]):
             self.private_history_comment = f"Datierung Kommentar: {comment}"
 
-        if FUNCTION_KEY in raw_data:
-            self.function = Manifestation.Function.parse_from_german(raw_data[FUNCTION_KEY])
-
         if self.RISM_ID_KEY in raw_data and\
             raw_data[self.RISM_ID_KEY] and\
             raw_data[self.RISM_ID_KEY].isnumeric():
@@ -412,7 +418,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     )
                 ]
             if PROVENANCE_KEY + PROVSTATION_SUFFIX + '4' in raw_data:
-                provenance_comment += f'\n {raw_data[PROVENANCE_KEY + PROVSTATION_SUFFIX + "4"]}'
+                provenance_comment += [ f'\n {raw_data[PROVENANCE_KEY + PROVSTATION_SUFFIX + "4"]}' ]
 
         if PROVENANCE_KEY in raw_data and (provenance := raw_data[PROVENANCE_KEY]):
             provenance_comment += [ provenance ]
@@ -427,19 +433,39 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         single_item.extent = raw_data[EXTENT_KEY]
         single_item.measure = raw_data[MEASURE_KEY]
-        single_item.private_provenance_comment = '\n'.join(provenance_comment)
+        single_item.private_provenance_comment = '\n'.join([comment for comment in provenance_comment if comment])
+        private_manuscript_comment = []
+        if WATERMARK_KEY in raw_data and (watermark := raw_data[WATERMARK_KEY]):
+            private_manuscript_comment += [ 'Wasserzeichen: ' + watermark ]
+        if PHYSICAL_FEATURES_KEY in raw_data and (phys_features := raw_data[PHYSICAL_FEATURES_KEY]):
+            private_manuscript_comment += [ f'Beschreibung physischer Merkmale: {phys_features}' ]
+        single_item.private_manuscript_comment = '\n'.join(private_manuscript_comment)
+
         single_item.save()
 
         if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY]:
             for gnd_id in raw_data[LOCATION_KEY].split('|'):
                 place = Place.fetch_or_get(gnd_id.strip())
                 self.places.add(place)
+        elif DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY]:
+            for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
+                place = Place.fetch_or_get(gnd_id.strip())
+                self.places.add(place)
+            self.place_inferred = True
 
         if raw_data[TITLE_KEY]:
             self.working_title = raw_data[TITLE_KEY]
 
         if EDITION_TYPE_KEY in raw_data:
-            self.edition_type = Manifestation.parse_edition_type(raw_data[EDITION_TYPE_KEY])
+            for edition_type in [
+                    'choir score',
+                    'piano reduction',
+                    'particell',
+                    'score',
+                    'parts'
+            ]:
+                if str(_(edition_type)) in raw_data[EDITION_TYPE_KEY]:
+                    setattr(self, edition_type.replace(' ', '_'), True)
 
         self.private_dedication_comment = raw_data[DEDICATION_KEY]
         """
@@ -466,6 +492,15 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY]#.replace(' | ', '\n')
         if raw_data[MACHINE_READABLE_DATE_KEY]:
             self.period = Period.parse(raw_data[MACHINE_READABLE_DATE_KEY])
+            if 'x' in raw_data[MACHINE_READABLE_DATE_KEY]:
+                self.period.assumed = True
+            self.period.save()
+        elif raw_data[DEDUCED_DATE_KEY]:
+            self.period = Period.parse(raw_data[DEDUCED_DATE_KEY])
+            self.period.inferred = True
+            if 'x' in raw_data[DEDUCED_DATE_KEY]:
+                self.period.assumed = True
+            self.period.save()
 
         if RELATED_PRINT_PUBLISHER_KEY in raw_data:
             if raw_data[RELATED_PRINT_PUBLISHER_KEY]:
@@ -550,7 +585,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             writer_medium_list = []
             if ENVELOPE_TITLE_WRITER_KEY in raw_data:
                 for entry in split('\$|\),', raw_data[ENVELOPE_TITLE_WRITER_KEY]):
-                    writer_gnd_id = Manifestation.extract_gnd_id(etry)
+                    writer_gnd_id = Manifestation.extract_gnd_id(entry)
                     if writer_gnd_id:
                         writer_medium_list += [{
                                 'writer': Person.fetch_or_get(writer_gnd_id),
@@ -591,7 +626,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             manifestation_title_list = []
             for i, title in enumerate(raw_data[ENVELOPE_TITLE_KEY].split('$')):
                 manifestation_title_list += [ ManifestationTitle.objects.create(
-                        title = '\n'.join(title_line.strip() for title_line in title.split('|')),
+                        title = title,
                         title_type = TitleTypes.ENVELOPE_OR_TITLE_PAGE,
                         manifestation = self
                     ) ]
@@ -684,7 +719,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             manifestation_title_list = []
             for i, title in enumerate(raw_data[HEAD_TITLE_KEY].split('$')):
                 manifestation_title_list += [ ManifestationTitle.objects.create(
-                        title = '\n'.join(title_line.strip() for title_line in title.split('|')),
+                        title = title,
                         title_type = TitleTypes.HEAD_TITLE,
                         manifestation = self
                     ) ]
@@ -736,13 +771,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             private_title_comments += ['Kommentar Umschlagstitel: ' + comment]
         if HEAD_TITLE_COMMENT_KEY in raw_data and (comment := raw_data[HEAD_TITLE_COMMENT_KEY]):
             private_title_comments += ['Kommentar Kopftitel: ' + comment]
-        if DEDICATION_COMMENT_KEY in raw_data and (comment := raw_data[DEDICATION_COMMENT_KEY]):
-            private_title_comments += ['Kommentar Widmung: ' + comment]
 
         self.private_title_comment = '\n'.join(private_title_comments)
 
-        if PHYSICAL_FEATURES_KEY in raw_data and (phys_features := raw_data[PHYSICAL_FEATURES_KEY]):
-            self.private_manuscript_comment = f'Beschreiung physischer Merkmale: {phys_features}'
+        if DEDICATION_COMMENT_KEY in raw_data and (comment := raw_data[DEDICATION_COMMENT_KEY]):
+            self.private_dedication_comment = comment
 
         if raw_data[DIGITAL_COPY_KEY]:
             ItemDigitalCopy.objects.create(

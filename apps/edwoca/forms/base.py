@@ -15,6 +15,13 @@ class SimpleFormMixin:
     text_label_classes = 'input input-bordered w-full border-black bg-white flex gap-2 items-center'
     autocomplete_classes = 'autocomplete-select select select-bordered w-full border-black bg-white'
     select_classes = 'select select-bordered w-full border-black bg-white'
+    toggle_classes = 'toggle'
+    palette_classes = 'flex w-full gap-10 my-5'
+    form_control_classes = 'form-control'
+    palette_form_control_classes = 'form-control flex-1'
+    label_classes = 'label'
+    toggle_label_classes = 'cursor-pointer label'
+    label_text_classes = 'label-text'
 
     def as_daisy(self):
         form = tags.div()
@@ -319,13 +326,13 @@ class DateFormMixin:
         period_palette.add(tags.div(cls='flex-1'))
 
         documentation_label = ''
-        if self.instance.period.assumed:
+        if self.instance.period and self.instance.period.assumed:
             if self.instance.period.inferred:
                 documentation_label = _('date inferred assumed')
             else:
                 documentation_label = _('date assumed')
         else:
-            if self.instance.period.inferred:
+            if self.instance.period and self.instance.period.inferred:
                 documentation_label = _('date inferred')
             else:
                 documentation_label = _('date as documented')

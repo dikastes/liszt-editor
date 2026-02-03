@@ -77,7 +77,7 @@ class EdwocaSearchView(SearchView):
         context['item_count'] = Item.objects.filter(manifestation__is_singleton = False).count()
         context['library_count'] = Library.objects.count()
         context['letter_count'] = Letter.objects.count()
-        context['object_list'] = [ result.object for result in context['object_list'] ]
+        context['object_list'] = [ result.object for result in context['object_list'] if result ]
 
         total_results = context['form'].search().count()
         current_page = int(self.request.GET.get('page', 1))

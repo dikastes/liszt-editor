@@ -12,14 +12,7 @@
 
 <h3 class="my-5"> {% translate 'title setting' %} </h3>
 
-<label>
-    <div class="label">
-        <span class="label-text">
-            {% translate source_title_form.source_title.label %}
-        </span>
-    </div>
-    {{ source_title_form.source_title }}
-</label>
+{{ form.source_title_as_daisy }}
 
 <div class="mt-5">
 {% for title_form in title_forms %}
@@ -111,6 +104,8 @@
 </div>
 
 <h2 class="mb-5"> {% translate 'dedications' %} </h2>
+
+{{ form.title_comment_as_daisy }}
 
 <h3> {% translate 'person dedications' %} </h3>
 {% for person_dedication_form in person_dedication_forms %}
@@ -437,14 +432,7 @@
 
 <h2 class="my-5"> {% translate 'comment' %} </h2>
 
-<label>
-    <div class="label">
-        <span class="label-text">
-            {% translate source_title_form.private_dedication_comment.label %}
-        </span>
-    </div>
-    {{ source_title_form.private_dedication_comment }}
-</label>
+{{ form.dedication_comment_as_daisy }}
 
 {% include 'edwoca/partials/manifestation/preview-divs/title_epilog.html' %}
 

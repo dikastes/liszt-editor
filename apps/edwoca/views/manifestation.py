@@ -243,10 +243,10 @@ def manifestation_title_update(request, pk):
 
     if request.method == 'POST':
         # collect any invalid forms and create a global render method in case one is invalid
-        source_title_form = ManifestationSourceTitleForm(request.POST, instance=manifestation)
-        if source_title_form.is_valid():
-            source_title_form.save()
-        context['source_title_form'] = source_title_form
+        form = ManifestationTitleDedicationForm(request.POST, instance=manifestation)
+        if form.is_valid():
+            form.save()
+        context['form'] = form
 
         print_form = ManifestationPrintForm(request.POST, instance=manifestation)
         if print_form.is_valid():
@@ -335,8 +335,8 @@ def manifestation_title_update(request, pk):
 
     else:
         # Initialize forms for existing titles
-        source_title_form = ManifestationSourceTitleForm(instance=manifestation)
-        context['source_title_form'] = source_title_form
+        form = ManifestationTitleDedicationForm(instance=manifestation)
+        context['form'] = form
 
         title_forms = []
         for title_obj in manifestation.titles.all():

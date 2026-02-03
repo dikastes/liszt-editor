@@ -10,7 +10,7 @@ from dmad_on_django.models import Period, Corporation
 from dmad_on_django.models.base import DocumentationStatus
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting
-from dominate.tags import div, label, span, _input
+from dominate.tags import div, label, span, _input, h1
 from dominate.util import raw
 from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
@@ -38,12 +38,16 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
             }
 
 
-class ManifestationSourceTitleForm(GenericAsDaisyMixin, ModelForm):
+class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
 
     class Meta:
         model = Manifestation
-        fields = ['source_title', 'private_dedication_comment']
+        fields = [
+                'source_title',
+                'private_dedication_comment',
+                'private_title_comment'
+            ]
         widgets = {
                 'source_title': TextInput( attrs = {
                         'class': SimpleFormMixin.text_input_classes,
@@ -52,8 +56,45 @@ class ManifestationSourceTitleForm(GenericAsDaisyMixin, ModelForm):
                 'private_dedication_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
+                    }),
+                'private_title_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     })
             }
+
+    def source_title_as_daisy(self):
+        source_title_field = self['source_title']
+
+        form_control = div(cls=SimpleFormMixin.form_control_classes)
+        with form_control:
+            with div(cls=SimpleFormMixin.label_classes):
+                span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
+            raw(str(source_title_field))
+
+        return mark_safe(str(form_control))
+
+    def dedication_comment_as_daisy(self):
+        dedication_comment_field = self['private_dedication_comment']
+
+        form_control = div(cls=SimpleFormMixin.form_control_classes)
+        with form_control:
+            with div(cls=SimpleFormMixin.label_classes):
+                span(dedication_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+            raw(str(dedication_comment_field))
+
+        return mark_safe(str(form_control))
+
+    def title_comment_as_daisy(self):
+        title_comment_field = self['private_title_comment']
+
+        form_control = div(cls=SimpleFormMixin.form_control_classes)
+        with form_control:
+            with div(cls=SimpleFormMixin.label_classes):
+                span(title_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+            raw(str(title_comment_field))
+
+        return mark_safe(str(form_control))
 
 
 class ManifestationTitleForm(ModelForm):
@@ -129,7 +170,9 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
             'not_after',
             'display',
             'inferred',
-            'assumed'
+            'assumed',
+            'place_inferred',
+            'place_assumed'
         ]
         widgets = {
                 'history': Textarea( attrs = {
@@ -140,6 +183,14 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
                     }),
                 'private_history_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
+                    }),
+                'place_inferred': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    }),
+                'place_assumed': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
                     })
             }
 
@@ -168,6 +219,36 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
         form.add(date_diplomatic_wrap)
 
         return mark_safe(str(form))
+
+    def place_panel_as_daisy(self):
+        palette = div(cls='flex gap-10 items-center')
+
+        place_assumed_field = self['place_assumed']
+        place_inferred_field = self['place_inferred']
+
+        place_documentation_label = _('place as documented')
+        if self.instance.place_assumed:
+            if self.instance.place_inferred:
+                place_documentation_label = _('place inferred assumed')
+            else:
+                place_documentation_label = _('place assumed')
+        else:
+            if self.instance.place_inferred:
+                place_documentation_label = _('place inferred')
+
+        with palette:
+            div(cls='flex-1')
+            div(place_documentation_label, cls='flex-0 mr-10')
+            with div(cls=SimpleFormMixin.palette_form_control_classes):
+                with label(cls=SimpleFormMixin.toggle_label_classes):
+                    span(place_inferred_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(place_inferred_field))
+            with div(cls=SimpleFormMixin.palette_form_control_classes):
+                with label(cls=SimpleFormMixin.toggle_label_classes):
+                    span(place_assumed_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(place_assumed_field))
+
+        return mark_safe(str(palette))
 
 
 class RelatedManifestationForm(ModelForm):
@@ -198,23 +279,55 @@ class ManifestationClassificationForm(ModelForm):
         model = Manifestation
         fields = [
                 'manifestation_form',
-                'edition_type',
-                'function',
-                'source_type'
+                'source_type',
+                'album_page',
+                'performance_material',
+                'correction_sheet',
+                'stitch_template',
+                'dedication_item',
+                'choir_score',
+                'piano_reduction',
+                'particell',
+                'score',
+                'parts'
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
                         'class': SimpleFormMixin.select_classes,
                     }),
-                'edition_type': Select( attrs = {
-                        'class': SimpleFormMixin.select_classes,
-                    }),
-                'function': Select( attrs = {
-                        'class': SimpleFormMixin.select_classes,
-                    }),
                 'source_type': Select( attrs = {
                         'class': SimpleFormMixin.select_classes,
                     }),
+                'album_page': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'performance_material': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'correction_sheet': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'stitch_template': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'dedication_item': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'choir_score': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'piano_reduction': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'particell': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'score': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'parts': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    })
             }
 
     def __init__(self, *args, **kwargs):
@@ -235,33 +348,78 @@ class ManifestationClassificationForm(ModelForm):
     def as_daisy(self):
         form = div(cls='mb-10')
 
-        manifestation_form_field = self['manifestation_form']
-        edition_type_field = self['edition_type']
-        function_field = self['function']
         source_type_field = self['source_type']
+        manifestation_form_field = self['manifestation_form']
 
-        manifestation_form_label = label(manifestation_form_field.label, cls='flex-1')
-        manifestation_form_label.add(raw(str(manifestation_form_field)))
+        album_page_field = self['album_page']
+        performance_material_field = self['performance_material']
+        correction_sheet_field = self['correction_sheet']
+        stitch_template_field = self['stitch_template']
+        dedication_item_field = self['dedication_item']
+        choir_score_field = self['choir_score']
+        piano_reduction_field = self['piano_reduction']
 
-        edition_type_label = label(edition_type_field.label, cls='flex-1')
-        edition_type_label.add(raw(str(edition_type_field)))
+        particell_field = self['particell']
+        score_field = self['score']
+        parts_field = self['parts']
 
-        function_label = label(function_field.label, cls='flex-1')
-        function_label.add(raw(str(function_field)))
-
-        source_type_label = label(source_type_field.label, cls='flex-1')
-        source_type_label.add(raw(str(source_type_field)))
-
-        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette1.add(source_type_label)
-        palette1.add(edition_type_label)
-
-        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette2.add(manifestation_form_label)
-        palette2.add(function_label)
-
-        form.add(palette1)
-        form.add(palette2)
+        with form:
+            # upper palette with source type and manifestaion form
+            with div(cls=SimpleFormMixin.palette_classes):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(source_type_field))
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(manifestation_form_field))
+            # lower palette with toggles
+            with div(cls=SimpleFormMixin.palette_classes):
+                with div(cls='flex-1'):
+                    h1(_('function'), cls='text-lg my-5')
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(album_page_field))
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(performance_material_field))
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(correction_sheet_field))
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(stitch_template_field))
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(dedication_item_field))
+                with div(cls='flex-1'):
+                    h1(_('edition type'), cls='text-lg my-5')
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(choir_score_field))
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(piano_reduction_field))
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(particell_field))
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(score_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(score_field))
+                    with div(cls=SimpleFormMixin.form_control_classes):
+                        with label(cls=SimpleFormMixin.toggle_label_classes):
+                            span(parts_field.label, cls=SimpleFormMixin.label_text_classes)
+                            raw(str(parts_field))
 
         return mark_safe(str(form))
 

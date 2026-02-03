@@ -32,38 +32,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 case 'fragment' | 'fragments': return Manifestation.ManifestationForm.FRAGMENTS
                 case 'excerpt' | 'excerpts': return Manifestation.ManifestationForm.EXCERPTS
 
-    class EditionType(models.TextChoices):
-        CHOIR_SCORE = 'CSC', _('Choir Score')
-        PIANO_REDUCTION = 'PNR', _('Piano Reduction')
-        PARTICELL = 'PTC', _('Particell')
-        SCORE = 'SCO', _('Score')
-        PARTS = 'PTS', _('Parts')
-
-    class Function(models.TextChoices):
-        ALBUM_PAGE = 'ABP', _('Album Page')
-        PERFORMANCE_MATERIAL = 'PFM', _('Performance Material')
-        CORRECTION_SHEET = 'CRS', _('Correction Sheet')
-        STITCH_TEMPLATE = 'STT', _('Stitch Template')
-        DEDICATION_ITEM = 'DDI', _('Dedication Item')
-
-        def parse(string):
-            match string.lower():
-                case 'album' | 'albumpage': return Manifestation.Function.ALBUM_PAGE
-                case 'performance material' | 'performancematerial': return Manifestation.Function.PERFORMANCE_MATERIAL
-                case 'correction sheet' | 'correctionsheet' | 'correction': return Manifestation.Function.CORRECTION_SHEET
-                case 'stitch template' | 'stitchtemplate' | 'stitch' | 'template': return Manifestation.Function.STITCH_TEMPLATE
-                case 'dedicationitem' | 'dedication item' | 'dedication': return Manifestation.Function.DEDICATION_ITEM
-
-        def parse_from_german(german_string):
-            match german_string:
-                case 'Abschrift': return Manifestation.Function.COPY
-                case 'Albumblatt': return Manifestation.Function.ALBUM_PAGE
-                case 'Chorstimmenauszug': return Manifestation.Function.PERFORMANCE_MATERIAL
-                case 'Dedikationsexemplar': return Manifestation.Function.DEDICATION_ITEM
-                case 'Stichvorlage': return Manifestation.Function.STITCH_TEMPLATE
-                case 'korrigierte Stichvorlage': return Manifestation.Function.STITCH_TEMPLATE
-                case 'Korrekturblatt': return Manifestation.Function.CORRECTION_SHEET
-
     class PrintType(models.TextChoices):
         PLATE_PRINTING = 'P', _('Plate Print')
         LITHOGRAPH = 'L', _('Lithograph')
@@ -131,6 +99,14 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     places = models.ManyToManyField(
             'dmad.Place'
         )
+    place_inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    place_assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
+        )
     related_manifestations = models.ManyToManyField(
             'Manifestation',
             through = 'RelatedManifestation'
@@ -143,14 +119,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             verbose_name = _('manifestation form')
         )
-    edition_type = models.CharField(
-            max_length = 10,
-            choices = EditionType.choices,
-            default = None,
-            null = True,
-            blank = True,
-            verbose_name = _('edition type')
-        )
     source_type = models.CharField(
             max_length = 5,
             choices = SourceType.choices,
@@ -158,14 +126,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null = True,
             blank = True,
             verbose_name = _('source type')
-        )
-    function = models.CharField(
-            max_length = 5,
-            choices = Function.choices,
-            default = None,
-            null = True,
-            blank = True,
-            verbose_name = _('function')
         )
     print_type = models.CharField(
             max_length = 10,
@@ -236,10 +196,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             blank = True,
             null = True
         )
-    #handwriting = models.TextField(
-            #blank = True,
-            #null = True
-        #)
     date_diplomatic = models.TextField(
             blank = True,
             null = True,
@@ -300,6 +256,46 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null = True,
             blank = True,
             verbose_name = _('plate number')
+        )
+    album_page = models.BooleanField(
+            default = False,
+            verbose_name = _('album page')
+        )
+    performance_material = models.BooleanField(
+            default = False,
+            verbose_name = _('performance material')
+        )
+    correction_sheet = models.BooleanField(
+            default = False,
+            verbose_name = _('correction sheet')
+        )
+    stitch_template = models.BooleanField(
+            default = False,
+            verbose_name = _('stitch template')
+        )
+    dedication_item = models.BooleanField(
+            default = False,
+            verbose_name = _('dedication item')
+        )
+    choir_score = models.BooleanField(
+            default = False,
+            verbose_name = _('choir score')
+        )
+    piano_reduction = models.BooleanField(
+            default = False,
+            verbose_name = _('piano reduction')
+        )
+    particell = models.BooleanField(
+            default = False,
+            verbose_name = _('particell')
+        )
+    score = models.BooleanField(
+            default = False,
+            verbose_name = _('score')
+        )
+    parts = models.BooleanField(
+            default = False,
+            verbose_name = _('parts')
         )
 
     def get_absolute_url(self):
@@ -504,7 +500,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 in general_notes
                 if general_note.get('a').startswith(HANDWRITING_MARKER)
             ]
-        self.private_comment = '\n'.join(comment)
+        self.private_comment = '\n'.join(line for line in comment if line)
 
         if singleton != None:
             self.is_singleton = singleton

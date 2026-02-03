@@ -29,7 +29,15 @@ class Command(BaseCommand):
                 type=str,
                 help=' or '.join([', '.join(manifestation_forms[:-1]), manifestation_forms[-1]])
             )
-        functions = [ s.lower().replace('_', '') for s in Manifestation.Function._member_names_ ]
+        functions = [
+                'album page',
+                'performance material',
+                'correction sheet',
+                'stitch template',
+                'dedication item',
+                'choir score',
+                'piano reduction'
+            ]
         parser.add_argument(
                 '-f',
                 '--function',
