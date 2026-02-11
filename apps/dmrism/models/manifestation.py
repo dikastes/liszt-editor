@@ -495,11 +495,14 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         for host_item_entry in data.get_fields('773'):
             target_rism_id = host_item_entry.get('w').replace('sources/', '')
             target_manifestation = Manifestation.get_or_create(target_rism_id, singleton)
-            RelatedManifestation.objects.create(
-                    source_manifestation = self,
-                    target_manifestation = target_manifestation,
-                    label = RelatedManifestation.Label.IS_PART_OF
-                )
+            target_manifestation.is_collection = True
+            target_manifestation.save()
+            self.part_of = target_manifestation
+            #RelatedManifestation.objects.create(
+                    #source_manifestation = self,
+                    #target_manifestation = target_manifestation,
+                    #label = RelatedManifestation.Label.IS_PART_OF
+                #)
 
         for electronic_location in data.get_fields('856'):
             ItemDigitalCopy.objects.create(
