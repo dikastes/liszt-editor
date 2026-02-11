@@ -1,0 +1,185 @@
+<ul class="menu p-0">
+{% if object.is_collection %}
+    <li class="list-row mb-2">
+        <a
+            href="{% url 'edwoca:manifestation_update' object.id %}"
+            title="{{ object }}"
+            class="active"> M/I-{{ object.id }} </a>
+    </li>
+    {% for part in object.collection_parts.all %}
+        <li>
+            <a
+                href="{% url 'edwoca:manifestation_update' part.id %}"
+                title="{{ part }}">
+                {% if part.is_singleton %}
+                    M/I-{{ part.id }}
+                {% else %}
+                    M-{{ part.id }}
+                    <ul>
+                        {% for item in part.items.all %}
+                            <li>
+                                <a 
+                                    href="{% url 'edwoca:item_update' item.id %}"
+                                    {% if item.id == object.id %}class="active"{% endif %}
+                                    title="{{ item }}">
+                                    I-{{ item.id }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </a>
+        </li>
+    {% endfor %}
+    {% for component in object.collection_components.all %}
+        <li>
+            <a
+                href="{% url 'edwoca:manifestation_update' component.id %}"
+                title="{{ component }}">
+                {% if part.is_singleton %}
+                    M/I-{{ part.id }}
+                {% else %}
+                    M-{{ part.id }}
+                    <ul>
+                        {% for item in part.items.all %}
+                            <li>
+                                <a 
+                                    href="{% url 'edwoca:item_update' item.id %}"
+                                    {% if item.id == object.id %}class="active"{% endif %}
+                                    title="{{ item }}">
+                                    I-{{ item.id }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                M/I-{{ component.id }}
+            </a>
+        </li>
+    {% endfor %}
+{% else %}
+    {% if object.part_of %}
+        <li class="list-row mb-2">
+            <a
+                href="{% url 'edwoca:manifestation_update' object.part_of.id %}"
+                title="{{ object.part_of }}"
+                class="active"> M/I-{{ object.part_of.id }} </a>
+        </li>
+        {% for part in object.part_of.collection_parts.all %}
+            <li>
+                <a
+                    href="{% url 'edwoca:manifestation_update' part.id %}"
+                    title="{{ part }}">
+                    {% if part.is_singleton %}
+                        M/I-{{ part.id }}
+                    {% else %}
+                        M-{{ part.id }}
+                        <ul>
+                            {% for item in part.items.all %}
+                                <li>
+                                    <a 
+                                        href="{% url 'edwoca:item_update' item.id %}"
+                                        {% if item.id == object.id %}class="active"{% endif %}
+                                        title="{{ item }}">
+                                        I-{{ item.id }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+        {% for component in object.part_of.collection_components.all %}
+            <li>
+                <a
+                    href="{% url 'edwoca:manifestation_update' component.id %}"
+                    title="{{ component }}">
+                    {% if part.is_singleton %}
+                        M/I-{{ part.id }}
+                    {% else %}
+                        M-{{ part.id }}
+                        <ul>
+                            {% for item in part.items.all %}
+                                <li>
+                                    <a 
+                                        href="{% url 'edwoca:item_update' item.id %}"
+                                        {% if item.id == object.id %}class="active"{% endif %}
+                                        title="{{ item }}">
+                                        I-{{ item.id }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </a>
+            </li>
+        {% endfor %}
+    {% else %}
+        {% if object.component_of %}
+            <li class="list-row mb-2">
+                <a
+                    href="{% url 'edwoca:manifestation_update' object.component_of.id %}"
+                    title="{{ object.component_of }}"
+                    class="active"> M/I-{{ object.component_of.id }} </a>
+            </li>
+            {% for component in object.component_of.collection_components.all %}
+                <li>
+                    <a
+                        href="{% url 'edwoca:manifestation_update' component.id %}"
+                        title="{{ component }}">
+                        {% if part.is_singleton %}
+                            M/I-{{ part.id }}
+                        {% else %}
+                            M-{{ part.id }}
+                            <ul>
+                                {% for item in part.items.all %}
+                                    <li>
+                                        <a 
+                                            href="{% url 'edwoca:item_update' item.id %}"
+                                            {% if item.id == object.id %}class="active"{% endif %}
+                                            title="{{ item }}">
+                                            I-{{ item.id }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+            {% for component in object.component_of.collection_components.all %}
+                <li>
+                    <a
+                        href="{% url 'edwoca:manifestation_update' component.id %}"
+                        title="{{ component }}">
+                        {% if part.is_singleton %}
+                            M/I-{{ part.id }}
+                        {% else %}
+                            M-{{ part.id }}
+                            <ul>
+                                {% for item in part.items.all %}
+                                    <li>
+                                        <a 
+                                            href="{% url 'edwoca:item_update' item.id %}"
+                                            {% if item.id == object.id %}class="active"{% endif %}
+                                            title="{{ item }}">
+                                            I-{{ item.id }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </a>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li class="list-row mb-2">
+                <a
+                    href="{% url 'edwoca:manifestation_update' object.id %}"
+                    title="{{ object }}"
+                    class="active"> M/I-{{ object.id }} </a>
+            </li>
+        {% endif %}
+    {% endif %}
+{% endif %}

@@ -180,6 +180,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             verbose_name = _('watermark url')
         )
     is_singleton = models.BooleanField(default=False)
+    is_collection = models.BooleanField(default=False)
     missing_item = models.BooleanField(default=False)
     # move to edwoca?
     numerus_currens = models.IntegerField(
@@ -297,6 +298,18 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = _('parts')
         )
+    part_of = models.ForeignKey(
+            'Manifestation',
+            related_name = 'collection_parts',
+            on_delete = models.SET_NULL,
+            null = True
+        )
+    component_of = models.ForeignKey(
+            'Manifestation',
+            related_name = 'collection_components',
+            on_delete = models.SET_NULL,
+            null = True
+        )
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -307,9 +320,25 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     def get_pref_title(self):
         return self.__str__()
 
+    def render_title(self, title):
+        if self.is_collection:
+            collection = _('coll')
+            return f'({collection}) {title}'
+
+        source_typed_title = f'{title} ({self.get_source_type_display()})'
+        if self.part_of:
+            part = _('pt')
+            return f'({part}) {source_typed_title}'
+        if self.component_of:
+            component = _('cmp')
+            return f'({component}) {source_typed_title}'
+
+        return source_typed_title
+
     def __str__(self):
         if self.items.count():
-            return f"{self.items.all()[0].get_current_signature()},  {self.working_title}"
+            title = f'{self.items.all()[0].get_current_signature()}, {self.working_title}'
+            return self.render_title(title)
 
         return '<Fehler: keine Items>'
 
@@ -599,8 +628,8 @@ class ManifestationBib(BaseBib):
 
 class RelatedManifestation(RelatedEntity):
     class Label(models.TextChoices):
-        IS_PART_OF = 'P', _('is part of')
-        IS_COMPONENT_OF = 'C', _('is component of')
+        #IS_PART_OF = 'P', _('is part of')
+        #IS_COMPONENT_OF = 'C', _('is component of')
         HAS_ALTERNATIVE = 'A', _('has alternative')
 
     source_manifestation = models.ForeignKey(

@@ -26,6 +26,32 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
     class Meta:
         proxy = True
 
+    @property
+    def collection_parts(self):
+        return Manifestation.objects.filter(part_of = self)
+
+    @property
+    def collection_components(self):
+        return Manifestation.objects.filter(component_of = self)
+
+    @property
+    def part_of(self):
+        if (candidates := Manifestation.objects.filter(pk = self.part_of_id)):
+            return candidates.first()
+
+    @property
+    def component_of(self):
+        if (candidates := Manifestation.objects.filter(pk = self.component_of_id)):
+            return candidates.first()
+
+    @component_of.setter
+    def component_of(self, value):
+        self.component_of_id = value.pk
+
+    @part_of.setter
+    def part_of(self, value):
+        self.part_of_id = value.pk
+
     def __str__(self):
         if self.is_singleton:
             return super().__str__()
@@ -37,9 +63,13 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.plate_number:
             publisher_addition = self.plate_number
 
+        publisher_string = '<< Verlag >>'
         if self.publications.first() and self.publications.first().publisher:
-            return f"{self.publications.first().publisher.get_designator()} {publisher_addition}, {self.working_title} ({self.get_source_type_display()})"
-        return f"<< Verlag >> {publisher_addition}, {self.working_title} ({self.get_source_type_display()})"
+            publisher_string = self.publications.first().publisher.get_designator()
+
+        title = f"{publisher_string} {publisher_addition}, {self.working_title}"
+
+        return self.render_title(title)
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'

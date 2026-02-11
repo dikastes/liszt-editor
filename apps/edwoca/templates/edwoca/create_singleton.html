@@ -3,9 +3,11 @@
 {% load i18n %}
 
 {% block content %}
-    <h2>
-        {% translate 'create manuscript' %}
-    </h2>
+    {% if 'collection' in request.path %}
+        <h2>Neue Handschriftensammlung anlegen</h2>
+    {% else %}
+        <h2>Neue Handschrift anlegen</h2>
+    {% endif %}
 
     <form method="post" class="mt-5">
         {% csrf_token %}

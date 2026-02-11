@@ -455,21 +455,22 @@ class ManifestationCreateForm(forms.Form):
         }
     read_only_fields = ['publisher']
     temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
+    source_title = forms.CharField(label=_('source title'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
-    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}))
+    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
     publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label=_('publisher'), empty_label=_('choose publisher'), widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
 
     def __init__(self, *args, **kwargs):
+        self.is_collection = kwargs.pop('is_collection', False)
         self.publisher_instance = kwargs.pop('publisher', None)
+        #if self.publisher_instance:
+            #self.initial['publisher'] = self.publisher_instance
+            #self.fields['publisher'].queryset = Corporation.objects.filter(pk=self.publisher_instance.pk)
+            #self.fields['publisher'].widget.attrs['disabled'] = True
         super().__init__(*args, **kwargs)
-        if 'initial' in kwargs and 'publisher' in kwargs['initial'] and \
-            (publisher_instance := kwargs['initial']['publisher']):
-            self.initial['publisher'] = publisher_instance
-            self.fields['publisher'].queryset = Corporation.objects.filter(pk=publisher_instance.pk)
-            self.fields['publisher'].widget.attrs['disabled'] = True
 
     def clean(self):
         cleaned_data = super().clean()
@@ -481,15 +482,26 @@ class ManifestationCreateForm(forms.Form):
         form = div(cls='mb-10')
 
         # Temporary Title
-        temporary_title_field = self['temporary_title']
-        temporary_title_container = label(cls='form-control w-full')
-        temporary_title_label = div(cls='label')
-        temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
-        temporary_title_container.add(temporary_title_label)
-        temporary_title_container.add(raw(str(temporary_title_field)))
-        if temporary_title_field.errors:
-            temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(temporary_title_container)
+        if self.is_collection:
+            source_title_field = self['source_title']
+            source_title_container = label(cls='form-control w-full')
+            source_title_label = div(cls='label')
+            source_title_label.add(span(source_title_field.label, cls='label-text'))
+            source_title_container.add(source_title_label)
+            source_title_container.add(raw(str(source_title_field)))
+            if source_title_field.errors:
+                source_title_container.add(div(span(source_title_field.errors, cls='text-primary text-sm'), cls='label'))
+            form.add(source_title_container)
+        else:
+            temporary_title_field = self['temporary_title']
+            temporary_title_container = label(cls='form-control w-full')
+            temporary_title_label = div(cls='label')
+            temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
+            temporary_title_container.add(temporary_title_label)
+            temporary_title_container.add(raw(str(temporary_title_field)))
+            if temporary_title_field.errors:
+                temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
+            form.add(temporary_title_container)
 
         # Publisher
         publisher_field = self['publisher']
@@ -514,15 +526,16 @@ class ManifestationCreateForm(forms.Form):
         form.add(plate_number_container)
 
         # Source Type
-        source_type_field = self['source_type']
-        source_type_container = label(cls='form-control w-full')
-        source_type_label = div(cls='label')
-        source_type_label.add(span(source_type_field.label, cls='label-text'))
-        source_type_container.add(source_type_label)
-        source_type_container.add(raw(str(source_type_field)))
-        if source_type_field.errors:
-            source_type_container.add(div(span(source_type_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(source_type_container)
+        if not self.is_collection:
+            source_type_field = self['source_type']
+            source_type_container = label(cls='form-control w-full')
+            source_type_label = div(cls='label')
+            source_type_label.add(span(source_type_field.label, cls='label-text'))
+            source_type_container.add(source_type_label)
+            source_type_container.add(raw(str(source_type_field)))
+            if source_type_field.errors:
+                source_type_container.add(div(span(source_type_field.errors, cls='text-primary text-sm'), cls='label'))
+            form.add(source_type_container)
 
         # Date Fields
         not_before_field = self['not_before']
@@ -561,10 +574,95 @@ class ManifestationCreateForm(forms.Form):
         return mark_safe(str(form))
 
 
+class SingletonCreateForm(forms.ModelForm):
+    class Meta:
+        model = Manifestation
+        fields = [
+                'working_title',
+                'source_title',
+                'source_type',
+                'library',
+                'signature'
+            ]
+
+    working_title = forms.CharField(
+            label = _('working title'),
+            max_length = 255,
+            required = False,
+            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
+        )
+    source_title = forms.CharField(
+            label = _('source title'),
+            max_length = 255,
+            required = False,
+            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
+        )
+    source_type = forms.ChoiceField(
+            label = _('source type'),
+            choices = Manifestation.SourceType.choices,
+            widget = Select(attrs={'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    library = forms.ModelChoiceField(
+            queryset = Library.objects.all(),
+            label = _('library'),
+            empty_label = _('choose library'),
+            widget = Select(attrs={'class': SimpleFormMixin.select_classes})
+        )
+    signature = forms.CharField(
+            label = _('Signature'),
+            max_length = 255,
+            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
+        )
+
+    def __init__(self, *args, **kwargs):
+        self.is_collection = kwargs.pop('is_collection', False)
+        super().__init__(*args, **kwargs)
+
+    def as_daisy(self):
+        root = div(cls="flex flex-col gap-5")
+        source_title_field = self['source_title']
+        working_title_field = self['working_title']
+        source_type_field = self['source_type']
+        library_field = self['library']
+        signature_field = self['signature']
+
+        with root:
+            with div(cls='flex w-full gap-10 my-5'):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    if self.is_collection:
+                        with div(cls=SimpleFormMixin.label_classes):
+                            span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                        raw(str(source_title_field))
+                    else:
+                        with div(cls=SimpleFormMixin.label_classes):
+                            span(working_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                        raw(str(working_title_field))
+                if not self.is_collection:
+                    with label(cls=SimpleFormMixin.palette_form_control_classes):
+                        with div(cls=SimpleFormMixin.label_classes):
+                            span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
+                        raw(str(source_type_field))
+            with div(cls='flex w-full gap-10 my-5'):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(library_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(library_field))
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(signature_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(signature_field))
+
+        return mark_safe(root.render())
+
+
+"""
 class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
     layout = Layouts.LABEL_OUTSIDE
-    temporary_title = forms.CharField(
-            label = _('Temporary'),
+    # this label is overridden in the views using
+    # form.fields['title'].label = ...
+    title = forms.CharField(
+            label = _('title'),
             max_length = 255,
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
@@ -590,7 +688,7 @@ class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
         root = div(cls="flex flex-col gap-5")
 
         palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette1.add(self._render_field('temporary_title'))
+        palette1.add(self._render_field('title'))
         palette1.add(self._render_field('source_type'))
         root.add(palette1)
 
@@ -617,6 +715,7 @@ class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
 
         wrap.add(raw(field.as_widget(attrs={"class" : cls})))
         return wrap
+"""
 
 
 class ManifestationPrintForm(DateFormMixin, ModelForm):

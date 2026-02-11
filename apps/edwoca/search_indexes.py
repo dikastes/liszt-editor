@@ -24,6 +24,7 @@ class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
             model_attr = 'get_current_signature'
         )
     is_singleton = indexes.BooleanField(model_attr = 'is_singleton')
+    is_collection = indexes.BooleanField(model_attr = 'is_collection')
 
     def get_model(self):
         return Manifestation

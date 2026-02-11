@@ -8,7 +8,9 @@
         <a href="{% url 'edwoca:work_search' %}"
             class="flex {% if list_entity_type == 'work' %}active{% endif %}"
             >
-            <span class="flex-1">Werke</span>
+            <span class="flex-1">
+                {% translate 'works' %}
+            </span>
             <span class="flex-0 ml-5"> {{ work_count }} </span>
         </a>
     </li>
@@ -16,7 +18,9 @@
         <a href="{% url 'edwoca:expression_search' %}"
             class="flex {% if list_entity_type == 'expression' %}active{% endif %}"
             >
-            <span class="flex-1">Fassungen</span>
+            <span class="flex-1">
+                {% translate 'expressions' %}
+            </span>
             <span class="flex-0 ml-5"> {{ expression_count }} </span>
         </a>
     </li>
@@ -24,7 +28,9 @@
         <a href="{% url 'edwoca:singleton_search' %}"
             class="flex {% if list_entity_type == 'singleton' %}active{% endif %}"
             >
-            <span class="flex-1">Handschriften</span>
+            <span class="flex-1">
+                {% translate 'manuscripts' %}
+            </span>
             <span class="flex-0 ml-5"> {{ singleton_count }} </span>
         </a>
     </li>
@@ -32,7 +38,9 @@
         <a href="{% url 'edwoca:manifestation_search' %}"
             class="flex {% if list_entity_type == 'manifestation' %}active{% endif %}"
             >
-            <span class="flex-1">Drucke</span>
+            <span class="flex-1">
+                {% translate 'prints' %}
+            </span>
             <span class="flex-0 ml-5"> {{ manifestation_count }} </span>
         </a>
     </li>
@@ -40,7 +48,9 @@
         <a href="{% url 'edwoca:item_search' %}"
             class="flex {% if list_entity_type == 'item' %}active{% endif %}"
             >
-            <span class="flex-1">Druckexemplare</span>
+            <span class="flex-1">
+                {% translate 'items' %}
+            </span>
             <span class="flex-0 ml-5"> {{ item_count }} </span>
         </a>
     </li>
@@ -48,7 +58,9 @@
         <a href="{% url 'edwoca:composite_search' %}"
             class="flex {% if list_entity_type == 'composite' %}active{% endif %}"
             >
-            <span class="flex-1">Konvolute</span>
+            <span class="flex-1">
+                {% translate 'composites' %}
+            </span>
             <span class="flex-0 ml-5"> {{ composite_count }} </span>
         </a>
     </li>
@@ -56,7 +68,9 @@
         <a href="{% url 'edwoca:library_search' %}"
             class="flex {% if list_entity_type == 'library' %}active{% endif %}"
             >
-            <span class="flex-1">Bibliotheken</span>
+            <span class="flex-1">
+                {% translate 'libraries' %}
+            </span>
             <span class="flex-0 ml-5"> {{ library_count }} </span>
         </a>
     </li>
@@ -64,7 +78,9 @@
         <a href="{% url 'edwoca:letter_search' %}"
             class="flex {% if list_entity_type == 'letter' %}active{% endif %}"
             >
-            <span class="flex-1">Briefe</span>
+            <span class="flex-1">
+                {% translate 'letters' %}
+            </span>
             <span class="flex-0 ml-5"> {{ letter_count }} </span>
         </a>
     </li>
@@ -131,7 +147,13 @@
             <a href="{% url 'edwoca:singleton_create' %}">{% translate 'manuscript' %}</a>
         </li>
         <li>
+            <a href="{% url 'edwoca:singleton_collection_create' %}">{% translate 'manuscript collection' %}</a>
+        </li>
+        <li>
             <a href="{% url 'edwoca:manifestation_create' %}">{% translate 'print' %}</a>
+        </li>
+        <li>
+            <a href="{% url 'edwoca:manifestation_collection_create' %}">{% translate 'print collection' %}</a>
         </li>
         <li>
             <a href="{% url 'edwoca:composite_create' %}">{% translate 'composite' %}</a>

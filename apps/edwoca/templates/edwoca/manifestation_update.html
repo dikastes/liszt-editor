@@ -52,58 +52,60 @@
         </div>
     {% endif %}
 
-    <h2 class="my-5">
-        {% translate 'identification' %}
-    </h2>
-    <label>
-        <div class="label">
-            <span class="label-text">
-                {% translate manifestation_form.working_title.label %}
-            </span>
-        </div>
-        {{ manifestation_form.working_title }}
-    </label>
-
-    <h2 class="my-5"> 
-        {% translate 'expressions' %}
-    </h2>
-
-    <ul class="list-disc ml-5 mb-5">
-    {% for expression in object.expressions.all %}
-        <li>
-            <div class="flex items-center">
-                <a href="{% url 'edwoca:expression_update' expression.id %}" class="flex-1">
-                    {{ expression }}
-                </a>
-                <a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-sm btn-outline text-primary ml-4">
-                    entfernen
-                </a>
+    {% if not object.is_collection %}
+        <h2 class="my-5">
+            {% translate 'identification' %}
+        </h2>
+        <label>
+            <div class="label">
+                <span class="label-text">
+                    {% translate manifestation_form.working_title.label %}
+                </span>
             </div>
-        </li>
-    {% endfor %}
-    </ul>
+            {{ manifestation_form.working_title }}
+        </label>
 
-    <form class="flex w-full" method="get">
-        {{ expression_search_form.q }}
-        <input type="submit" id="submit-form" class="btn btn-outline flex-0 border-l-0" value="{% translate 'search' %}" />
-    </form>
+        <h2 class="my-5"> 
+            {% translate 'expressions' %}
+        </h2>
 
-    {% if expression_query %}
-        <ul class="border border-black p-2 h-32 overflow-auto">
-            {% for found_expression in found_expressions %}
-                <li>
-                    <a href="{% url 'edwoca:manifestation_expression_add' object.id found_expression.object.id %}">
-                        {{ found_expression.object }}
+        <ul class="list-disc ml-5 mb-5">
+        {% for expression in object.expressions.all %}
+            <li>
+                <div class="flex items-center">
+                    <a href="{% url 'edwoca:expression_update' expression.id %}" class="flex-1">
+                        {{ expression }}
                     </a>
-                </li>
-            {% empty %}
-                <li>
-                    <em>
-                        {% translate 'no search results' %}
-                    </em>
-                </li>
-            {% endfor %}
+                    <a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-sm btn-outline text-primary ml-4">
+                        entfernen
+                    </a>
+                </div>
+            </li>
+        {% endfor %}
         </ul>
+
+        <form class="flex w-full" method="get">
+            {{ expression_search_form.q }}
+            <input type="submit" id="submit-form" class="btn btn-outline flex-0 border-l-0" value="{% translate 'search' %}" />
+        </form>
+
+        {% if expression_query %}
+            <ul class="border border-black p-2 h-32 overflow-auto">
+                {% for found_expression in found_expressions %}
+                    <li>
+                        <a href="{% url 'edwoca:manifestation_expression_add' object.id found_expression.object.id %}">
+                            {{ found_expression.object }}
+                        </a>
+                    </li>
+                {% empty %}
+                    <li>
+                        <em>
+                            {% translate 'no search results' %}
+                        </em>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
     {% endif %}
 
     <h2 class="my-5">

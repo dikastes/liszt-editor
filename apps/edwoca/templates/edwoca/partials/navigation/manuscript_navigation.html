@@ -1,0 +1,273 @@
+{% load i18n %}
+
+{% comment %}
+    probably much logic in this template may be moved to the model by declaring some kind of short name function
+{% endcomment %}
+
+<ul class="menu p-0">
+    {% if object.is_collection %}
+        <li class="list-row mb-2">
+            <a
+                href="{% url 'edwoca:manifestation_update' object.id %}"
+                title="{{ object }}"
+                class="active">
+                {% if object.is_singleton %}
+                    ({% translate 'coll' %}) M/I-{{ object.id }}
+                {% else %}
+                    ({% translate 'coll' %}) M-{{ object.id }}
+                {% endif %}
+            </a>
+            {% if not object.is_singleton %}
+                <ul>
+                    {% for item in object.items.all %}
+                        <li>
+                            <a 
+                                href="{% url 'edwoca:item_update' item.id %}"
+                                title="{{ item }}">
+                                ({% translate 'coll' %}) I-{{ item.id }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </li>
+        {% for part in object.collection_parts.all %}
+            <li>
+                <a
+                    href="{% url 'edwoca:manifestation_update' part.id %}"
+                    title="{{ part }}">
+                    {% if part.is_singleton %}
+                        ({% translate 'pt' %}) M/I-{{ part.id }}
+                    {% else %}
+                        ({% translate 'pt' %}) M-{{ part.id }}
+                    {% endif %}
+                </a>
+                {% if not part.is_singleton %}
+                    <ul>
+                        {% for item in part.items.all %}
+                            <li>
+                                <a
+                                    href="{% url 'edwoca:item_update' item.id %}"
+                                    title="{{ item }}">
+                                    ({% translate 'pt' %}) I-{{ item.id }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+        {% for component in object.collection_components.all %}
+            <li>
+                <a
+                    href="{% url 'edwoca:manifestation_update' component.id %}"
+                    title="{{ component }}">
+                    {% if component.is_singleton %}
+                        ({% translate 'cmp' %}) M/I-{{ component.id }}
+                    {% else %}
+                        ({% translate 'cmp' %}) M-{{ component.id }}
+                    {% endif %}
+                </a>
+                {% if not component.is_singleton %}
+                    <ul>
+                        {% for item in component.items.all %}
+                            <li>
+                                <a 
+                                    href="{% url 'edwoca:item_update' item.id %}"
+                                    title="{{ item }}">
+                                    ({% translate 'cmp' %}) I-{{ item.id }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+        {% endfor %}
+    {% else %}
+        {% if object.part_of %}
+            <li class="list-row mb-2">
+                <a
+                    href="{% url 'edwoca:manifestation_update' object.part_of.id %}"
+                    title="{{ object.part_of }}">
+                    {% if object.part_of.is_singleton %}
+                        ({% translate 'coll' %}) M/I-{{ object.part_of.id }}
+                    {% else %}
+                        ({% translate 'coll' %}) M-{{ object.part_of.id }}
+                    {% endif %}
+                </a>
+                {% if not object.part_of.is_singleton %}
+                    <ul>
+                        {% for item in object.part_of.items.all %}
+                            <li>
+                                <a 
+                                    href="{% url 'edwoca:item_update' item.id %}"
+                                    title="{{ item }}">
+                                    ({% translate 'coll' %}) I-{{ item.id }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </li>
+            {% for part in object.part_of.collection_parts.all %}
+                <li>
+                    <a
+                        href="{% url 'edwoca:manifestation_update' part.id %}"
+                        title="{{ part }}"
+                        {% if object.id == part.id %}class="active"{% endif %}>
+                        {% if part.is_singleton %}
+                            ({% translate 'pt' %}) M/I-{{ part.id }}
+                        {% else %}
+                            ({% translate 'pt' %}) M-{{ part.id }}
+                        {% endif %}
+                    </a>
+                    {% if not part.is_singleton %}
+                        <ul>
+                            {% for item in part.items.all %}
+                                <li>
+                                    <a 
+                                        href="{% url 'edwoca:item_update' item.id %}"
+                                        title="{{ item }}">
+                                        ({% translate 'pt' %}) I-{{ item.id }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+            {% for component in object.part_of.collection_components.all %}
+                <li>
+                    <a
+                        href="{% url 'edwoca:manifestation_update' component.id %}"
+                        title="{{ component }}">
+                        {% if component.is_singleton %}
+                            ({% translate 'cmp' %}) M/I-{{ component.id }}
+                        {% else %}
+                            ({% translate 'cmp' %}) M-{{ component.id }}
+                        {% endif %}
+                    </a>
+                    {% if not component.is_singleton %}
+                        <ul>
+                            {% for item in component.items.all %}
+                                <li>
+                                    <a 
+                                        href="{% url 'edwoca:item_update' item.id %}"
+                                        title="{{ item }}">
+                                        ({% translate 'cmp' %}) I-{{ item.id }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        {% else %}
+            {% if object.component_of %}
+                <li class="list-row mb-2">
+                    <a
+                        href="{% url 'edwoca:manifestation_update' object.component_of.id %}"
+                        title="{{ object.component_of }}">
+                        {% if object.component_of.is_singleton %}
+                            ({% translate 'coll' %}) M/I-{{ object.component_of.id }}
+                        {% else %}
+                            ({% translate 'coll' %}) M-{{ object.component_of.id }}
+                        {% endif %}
+                    </a>
+                    {% if not object.component_of.is_singleton %}
+                        <ul>
+                            {% for item in object.component_of.items.all %}
+                                <li>
+                                    <a 
+                                        href="{% url 'edwoca:item_update' item.id %}"
+                                        title="{{ item }}">
+                                        ({% translate 'coll' %}) I-{{ item.id }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+                {% for part in object.component_of.collection_parts.all %}
+                    <li>
+                        <a
+                            href="{% url 'edwoca:manifestation_update' part.id %}"
+                            title="{{ part }}">
+                            {% if part.is_singleton %}
+                                ({% translate 'pt' %}) M/I-{{ part.id }}
+                            {% else %}
+                                ({% translate 'pt' %}) M-{{ part.id }}
+                            {% endif %}
+                        </a>
+                        {% if not part.is_singleton %}
+                            <ul>
+                                {% for item in part.items.all %}
+                                    <li>
+                                        <a
+                                            href="{% url 'edwoca:item_update' item.id %}"
+                                            title="{{ item }}">
+                                            ({% translate 'pt' %}) I-{{ item.id }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+                {% for component in object.component_of.collection_components.all %}
+                    <li>
+                        <a
+                            href="{% url 'edwoca:manifestation_update' component.id %}"
+                            title="{{ component }}"
+                            {% if object.id == component.id %}class="active"{% endif %}>
+                            {% if component.is_singleton %}
+                                ({% translate 'cmp' %}) M/I-{{ component.id }}
+                            {% else %}
+                                ({% translate 'cmp' %}) M-{{ component.id }}
+                            {% endif %}
+                        </a>
+                        {% if not component.is_singleton %}
+                            <ul>
+                                {% for item in component.items.all %}
+                                    <li>
+                                        <a 
+                                            href="{% url 'edwoca:item_update' item.id %}"
+                                            title="{{ item }}">
+                                            ({% translate 'cmp' %}) I-{{ item.id }}
+                                        </a>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            {% else %}
+                <li class="list-row mb-2">
+                    <a
+                        href="{% url 'edwoca:manifestation_update' object.id %}"
+                        title="{{ object }}"
+                        class="active">
+                        {% if object.component_of.is_singleton %}
+                            M/I-{{ object.component_of.id }}
+                        {% else %}
+                            M-{{ object.component_of.id }}
+                        {% endif %}
+                    </a>
+                    {% if not object.is_singleton %}
+                        <ul>
+                            {% for item in object.items.all %}
+                                <li>
+                                    <a 
+                                        href="{% url 'edwoca:item_update' item.id %}"
+                                        title="{{ item }}">
+                                        I-{{ item.id }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+</ul>

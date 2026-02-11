@@ -79,6 +79,127 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
 
+{% if object.is_collection %}
+    <h2 class="mb-5">
+        {% translate 'collection parts' %}
+    </h2>
+
+    {% if object.collection_parts.all %}
+        <ul class="list-disc m-5">
+            {% for collection_part in object.collection_parts.all %}
+                <li class="list-disc">
+                    <a href="{% url 'edwoca:manifestation_relations' collection_part.id %}">
+                        {{ collection_part }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="flex gap-5">
+        <div class="flex-1"></div>
+        <a class="flex-0 btn btn-outline" href="{% url 'edwoca:part_create' object.id %}">
+            {% translate 'create print part' %}
+        </a>
+        <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_part_create' object.id %}">
+            {% translate 'create manuscript part' %}
+        </a>
+    </div>
+
+    <h2 class="mb-5"> 
+        {% translate 'collection components' %}
+    </h2>
+
+    {% if object.collection_components.all %}
+        <ul class="list-disc m-5">
+            {% for collection_component in object.collection_components.all %}
+                <li class="list-disc">
+                    <a href="{% url 'edwoca:manifestation_relations' collection_component.id %}">
+                        {{ collection_component }}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <div class="flex gap-5">
+        <div class="flex-1"></div>
+        <a class="flex-0 btn btn-outline" href="{% url 'edwoca:component_create' object.id %}">
+            {% translate 'create print component' %}
+        </a>
+        <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_component_create' object.id %}">
+            {% translate 'create manuscript component' %}
+        </a>
+    </div>
+
+{% else %}
+    <h2 class="mb-5"> 
+        {% translate 'collection' %}
+    </h2>
+
+    {% if object.part_of %}
+        <p>
+            {% translate 'this object is part of' %}
+            <a class="font-bold" href="{% url 'edwoca:manifestation_relations' object.part_of.id %}">
+                → {{ object.part_of }}.
+            </a>
+        </p>
+        <div class="flex my-5">
+            <div class="flex-1"></div>
+            <form class="flex-0" method="post" action="{% url 'edwoca:collection_remove' object.id %}">
+                {% csrf_token %}
+                <input type="submit" class="btn btn-primary btn-outline btn-sm" value="{% translate 'remove collection' %}" />
+            </form>
+        </div>
+        {% else %}
+        {% if object.component_of %}
+            <p>
+                {% translate 'this object is component of' %}
+                <a class="font-bold" href="{% url 'edwoca:manifestation_relations' object.component_of.id %}">
+                    → {{ object.component_of }}.
+                </a>
+            </p>
+            <div class="flex my-5" method="post">
+                <div class="flex-1"></div>
+                <form class="flex-0" action="{% url 'edwoca:collection_remove' object.id %}">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary btn-outline btn-sm" value="{% translate 'remove collection' %}" />
+                </form>
+            </div>
+        {% else %}
+            <form action="{% url 'edwoca:manifestation_relations' object.id %}" class="w-full flex">
+                {{ collection_search_form.q }}
+                <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />
+            </form>
+            {% if found_collections %}
+                <ul class="border border-black p-2 h-32 overflow-auto">
+                    {% for found_collection in found_collections %}
+                        <li>
+                            {{ found_collection.object }}
+                            <div class="flex mb-2 mx-2 gap-2">
+                                <form class="flex-0">
+                                    <input type="hidden" name="link-collection-part" value="{{ found_collection.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part of' %}" />
+                                </form>
+                                <form class="flex-0">
+                                    <input type="hidden" name="link-collection-component" value="{{ found_collection.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is component of' %}" />
+                                </form>
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li>
+                            <em>
+                                {% translate 'no search results' %}
+                            </em>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endif %}
+    {% endif %}
+{% endif %}
+
 <h2 class="mb-5"> 
     {% translate 'manuscripts' %}
 </h2>
@@ -139,16 +260,18 @@
             <li>
                 {{ found_manuscript.object }}
                 <div class="flex mb-2 mx-2 gap-2">
-                    <form class="flex-0">
-                        <input type="hidden" name="manifestation-link-type" value="is_part_of" />
-                        <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
-                        <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part of' %}" />
-                    </form>
-                    <form class="flex-0">
-                        <input type="hidden" name="manifestation-link-type" value="is_component_of" />
-                        <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
-                        <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is component of' %}" />
-                    </form>
+                    {% comment %}
+                        <form class="flex-0">
+                            <input type="hidden" name="manifestation-link-type" value="is_part_of" />
+                            <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
+                            <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part of' %}" />
+                        </form>
+                        <form class="flex-0">
+                            <input type="hidden" name="manifestation-link-type" value="is_component_of" />
+                            <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
+                            <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is component of' %}" />
+                        </form>
+                    {% endcomment %}
                     <form class="flex-0">
                         <input type="hidden" name="manifestation-link-type" value="has_alternative" />
                         <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />

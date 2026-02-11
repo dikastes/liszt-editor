@@ -3,37 +3,58 @@
 {% load i18n %}
 
 {% block content %}
-<h2 class="card-title mt-0">Neuen Druck anlegen</h2>
-
-{% if search_form %}
-    <form class="flex mt-5">
-        <label class="flex gap-2 input input-bordered border-r-0 border-black items-center bg-white flex-1">
-            <span class="flex-0">
-                {% translate 'publisher' %}
-            </span>
-            <input type="text" class="flex-1 grow" placeholder="{% translate 'search publisher' %}" name="q" />
-        </label>
-        <input id="submit-form" type="submit" value="{% translate 'search' %}" class="flex-0 btn btn-outline" />
-    </form>
-    {% if publisher_list %}
-    <ul class="p-2 border border-black h-32 overflow-auto">
-        {% for publisher in publisher_list %}
-            <li>
-                <a href="{% url 'edwoca:manifestation_create' publisher.object.id %}">
-                    {{ publisher.object }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+    {% if 'collection' in request.path %}
+        <h2>Neue Drucksammlung anlegen</h2>
+    {% else %}
+        <h2>Neuen Druck anlegen</h2>
     {% endif %}
-{% endif %}
 
-{% if form %}
-<form method="post" class="mt-5">
-    {% csrf_token %}
-    {{ form.as_daisy }}
-    <input type="submit" value="Speichern" class="btn mt-5">
-</form>
-{% endif %}
+    {% if search_form %}
+        <form class="flex mt-5">
+            <label class="flex gap-2 input input-bordered border-r-0 border-black items-center bg-white flex-1">
+                <span class="flex-0">
+                    {% translate 'publisher' %}
+                </span>
+                <input type="text" class="flex-1 grow" placeholder="{% translate 'search publisher' %}" name="q" />
+            </label>
+            <input id="submit-form" type="submit" value="{% translate 'search' %}" class="flex-0 btn btn-outline" />
+        </form>
+        {% if publisher_list %}
+        <ul class="p-2 border border-black h-32 overflow-auto">
+            {% for publisher in publisher_list %}
+                <li>
+                    {% if referrer == 'manifestation_collection_create' %}
+                        <a href="{% url 'edwoca:manifestation_collection_create' publisher.object.id %}">
+                            {{ publisher.object }}
+                        </a>
+                    {% endif %}
+                    {% if referrer == 'manifestation_create' %}
+                        <a href="{% url 'edwoca:manifestation_create' publisher.object.id %}">
+                            {{ publisher.object }}
+                        </a>
+                    {% endif %}
+                    {% if referrer == 'component_create' %}
+                        <a href="{% url 'edwoca:component_create' existing_manifestation.id publisher.object.id %}">
+                            {{ publisher.object }}
+                        </a>
+                    {% endif %}
+                    {% if referrer == 'part_create' %}
+                        <a href="{% url 'edwoca:part_create' existing_manifestation.id publisher.object.id %}">
+                            {{ publisher.object }}
+                        </a>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+    {% endif %}
+
+    {% if form %}
+        <form method="post" class="mt-5">
+            {% csrf_token %}
+            {{ form.as_daisy }}
+            <input type="submit" id="submit-form" class="hidden">
+        </form>
+    {% endif %}
 
 {% endblock %}

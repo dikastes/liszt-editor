@@ -27,20 +27,22 @@
         </div>
     </div>
 
-    <div class="mt-5">
-        <h3>
-            {% translate 'modifications' %}
-        </h3>
-        {% for modification in modifications %}
-            {% include 'edwoca/partials/forms/_modification_form.html' with modification=modification %}
-        {% endfor %}
-        <div class="flex">
-            <div class="flex-1"></div>
-            <div class="flex-0">
-                <input type="submit" name="add_modification" value="{% translate 'create modification' %}" class="btn btn-outline mt-3" form="form">
+    {% if not object.is_collection %}
+        <div class="mt-5">
+            <h3>
+                {% translate 'modifications' %}
+            </h3>
+            {% for modification in modifications %}
+                {% include 'edwoca/partials/forms/_modification_form.html' with modification=modification %}
+            {% endfor %}
+            <div class="flex">
+                <div class="flex-1"></div>
+                <div class="flex-0">
+                    <input type="submit" name="add_modification" value="{% translate 'create modification' %}" class="btn btn-outline mt-3" form="form">
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 
     {% include 'edwoca/partials/manifestation/preview-divs/manuscript_epilog.html' %}
 </form>
