@@ -248,7 +248,7 @@
     {% endfor %}
 </ul>
 
-<form action="{% url 'edwoca:manifestation_relations' object.id %}" method="post" class="w-full flex">
+<form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get" class="w-full flex">
     {% csrf_token %}
     {{ manuscript_search_form.q }}
     <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />

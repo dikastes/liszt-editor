@@ -55,6 +55,11 @@ class ItemSearchView(EdwocaSearchView):
 class ItemSignatureDeleteView(DeleteView):
     model = ItemSignature
 
+    def post(self, request, *args, **kwargs):
+        response = super().post(self, request, *args, **kwargs)
+        self.object.item.manifestation.save()
+        return response
+
     def get_success_url(self):
         if self.object.item.manifestation.is_singleton:
             return reverse_lazy('edwoca:manifestation_update', kwargs={'pk': self.object.item.manifestation.id})

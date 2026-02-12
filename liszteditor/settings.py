@@ -226,3 +226,6 @@ GLOBAL_NAVIGATION = {
                 'href': reverse_lazy('dmrism:index')
             }
     }
+
+USE_TZ = True
+TIME_ZONE = 'Europe/Berlin'

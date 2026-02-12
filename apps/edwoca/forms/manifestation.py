@@ -131,9 +131,15 @@ class ManifestationTitleForm(ModelForm):
 class ManifestationCommentForm(CommentForm):
     class Meta:
         model = Manifestation
-        fields = CommentForm.Meta.fields + ['taken_information']
+        fields = CommentForm.Meta.fields + ['taken_information', 'first_editor', 'editing_history']
         widgets = dict(CommentForm.Meta.widgets, **{
                 'taken_information': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes
+                    }),
+                'first_editor': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes
+                    }),
+                'editing_history': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     })
             })

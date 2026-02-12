@@ -248,9 +248,9 @@
                         title="{{ object }}"
                         class="active">
                         {% if object.component_of.is_singleton %}
-                            M/I-{{ object.component_of.id }}
+                            M/I-{{ object.id }}
                         {% else %}
-                            M-{{ object.component_of.id }}
+                            M-{{ object.id }}
                         {% endif %}
                     </a>
                     {% if not object.is_singleton %}

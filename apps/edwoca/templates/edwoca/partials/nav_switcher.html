@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="flex flex-col h-full">
+<div class="flex flex-col h-full items-stretch">
     <div class="flex-1">
     {% if entity_type == 'work' %}
         -- Navigation --
@@ -9,13 +9,41 @@
         -- Navigation --
     {% endif %}
     {% if entity_type == 'manifestation' %}
-        {% include 'edwoca/partials/navigation/manuscript_navigation.html' %}
+        {% include 'edwoca/partials/navigation/manifestation_navigation.html' %}
     {% endif %}
     {% if entity_type == 'item' %}
             {% include 'edwoca/partials/navigation/item_navigation.html' %}
     {% endif %}
     </div>
+    {% if entity_type == 'manifestation' %}
+        <div class="flex-0 text-sm text-gray-500 mb-10">
+            <p>
+                {% translate 'created' %}
+            </p>
+            <p>
+                {{ object.first_save|date:"d.m.Y H:i:s" }}
+            </p>
+            {% if object.first_editor %}
+                </p>
+                    {% translate 'by' %}
+                    {{ object.first_editor }}
+                </p>
+            {% else %}
+                <p class="text-primary">
+                    {% translate 'missing first editor' %}
+                </p>
+            {% endif %}
+        </div>
+        <div class="flex-0 text-sm text-gray-500 mb-10">
+            <p>
+                {% translate 'last update' %}
+            </p>
+            <p>
+                {{ object.last_save|date:"d.m.Y H:i:s" }}
+            </p>
+        </div>
+    {% endif %}
     <div class="flex-0">
-        <label for="submit-form" class="btn text-primary btn-outline"> {% translate 'save' %} </label>
+        <label for="submit-form" class="w-full btn text-primary btn-outline"> {% translate 'save' %} </label>
     </div>
 </div>

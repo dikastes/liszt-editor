@@ -46,11 +46,17 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
     @component_of.setter
     def component_of(self, value):
-        self.component_of_id = value.pk
+        if value:
+            self.component_of_id = value.pk
+        else:
+            self.component_of_id = None
 
     @part_of.setter
     def part_of(self, value):
-        self.part_of_id = value.pk
+        if value:
+            self.part_of_id = value.pk
+        else:
+            self.part_of_id = None
 
     def __str__(self):
         if self.is_singleton:
@@ -63,13 +69,13 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.plate_number:
             publisher_addition = self.plate_number
 
-        publisher_string = '<< Verlag >>'
+        publisher_string = _('<< publisher >>')
         if self.publications.first() and self.publications.first().publisher:
             publisher_string = self.publications.first().publisher.get_designator()
 
-        title = f"{publisher_string} {publisher_addition}, {self.working_title}"
+        prefix = f"{publisher_string} {publisher_addition}"
 
-        return self.render_title(title)
+        return self.render_title(prefix)
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
@@ -345,9 +351,13 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         WATERMARK_KEY = 'Wasserzeichen (intern)'
 
+        USER_KEY = 'Bearbeiter'
+
         single_item = Item.objects.create(manifestation = self)
 
         self.manifestation_form = manifestation_form
+        self.first_editor = raw_data[USER_KEY]
+
         for function_option in [
                 'album page',
                 'performance material',

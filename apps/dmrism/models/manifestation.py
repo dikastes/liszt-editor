@@ -70,13 +70,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         INCOMPLETE= 'INC', _('incomplete')
 
     working_title = models.TextField(
-            max_length = 100,
+            max_length = 200,
             blank = True,
             null = True,
             verbose_name = _('working title')
         )
     source_title = models.TextField(
-            max_length = 100,
+            max_length = 200,
             blank = True,
             null = True,
             verbose_name = _('source title')
@@ -310,6 +310,25 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             on_delete = models.SET_NULL,
             null = True
         )
+    first_save = models.DateTimeField(
+            auto_now_add = True,
+            verbose_name = _('first save')
+        )
+    last_save = models.DateTimeField(
+            auto_now = True,
+            verbose_name = _('last save')
+        )
+    first_editor = models.CharField(
+            max_length = 50,
+            blank = True,
+            null = True,
+            verbose_name = _('first editor')
+        )
+    editing_history = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = ('editing history')
+        )
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -320,12 +339,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     def get_pref_title(self):
         return self.__str__()
 
-    def render_title(self, title):
+    def render_title(self, prefix):
         if self.is_collection:
             collection = _('coll')
-            return f'({collection}) {title}'
+            return f'({collection}) {prefix} {self.source_title}'
 
-        source_typed_title = f'{title} ({self.get_source_type_display()})'
+        source_typed_title = f'{prefix} {self.working_title} ({self.get_source_type_display()})'
         if self.part_of:
             part = _('pt')
             return f'({part}) {source_typed_title}'
@@ -337,8 +356,8 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
     def __str__(self):
         if self.items.count():
-            title = f'{self.items.all()[0].get_current_signature()}, {self.working_title}'
-            return self.render_title(title)
+            prefix = self.items.first().get_current_signature()
+            return self.render_title(prefix)
 
         return '<Fehler: keine Items>'
 
