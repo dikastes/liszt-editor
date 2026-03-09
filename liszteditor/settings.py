@@ -180,6 +180,8 @@ EDWOCA_FIXED_PERSONS = {
         'Dr': None
     }
 
+EDWOCA_EMPTY_LIBRARIES = [ 'Privatbesitz', 'unbekannt' ]
+
 EDWOCA_FIXED_DATES = {
         'birth': {
             'day': 22,
