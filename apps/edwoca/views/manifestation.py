@@ -1,3 +1,5 @@
+import re
+from haystack.query import SQ
 from ..forms.manifestation import *
 from calendar import monthrange
 from ..forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
@@ -36,6 +38,7 @@ class ManifestationListView(EdwocaListView):
 
 class ManifestationSearchView(EdwocaSearchView):
     model = EdwocaManifestation
+    form_class = ManifestationSearchForm
 
     def get_queryset(self):
         return super().get_queryset().filter(is_singleton = False)
@@ -55,6 +58,7 @@ class SingletonListView(EdwocaListView):
 
 class SingletonSearchView(EdwocaSearchView):
     model = EdwocaManifestation
+    form_class = ManifestationSearchForm
 
     def get_queryset(self):
         return super().get_queryset().filter(is_singleton = True)

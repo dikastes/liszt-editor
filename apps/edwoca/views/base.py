@@ -79,7 +79,7 @@ class EdwocaSearchView(SearchView):
         context['letter_count'] = Letter.objects.count()
         context['object_list'] = [ result.object for result in context['object_list'] if result ]
 
-        total_results = context['form'].search().count()
+        total_results = context['paginator'].count
         current_page = int(self.request.GET.get('page', 1))
         first_result_on_page = (current_page - 1) * 10 + 1 if total_results > 0 else 0
         last_result_on_page = first_result_on_page + 9 if first_result_on_page + 9 <= total_results else total_results

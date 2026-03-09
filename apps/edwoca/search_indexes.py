@@ -20,8 +20,10 @@ class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
             document=True,
             use_template=True
         )
-    signature = indexes.CharField(
-            model_attr = 'get_current_signature'
+    signature_normalized = indexes.CharField(
+            model_attr = 'get_current_signature_normalized',
+            indexed=True,
+            stored=True
         )
     is_singleton = indexes.BooleanField(model_attr = 'is_singleton')
     is_collection = indexes.BooleanField(model_attr = 'is_collection')

@@ -1,9 +1,4 @@
 {{ object.get_pref_title }}
-{% for item in object.item_set.all %}
-{% if item.current_signature %}
-{{ item.current_signature.signature }}
-{% endif %}
-{% endfor %}
 {{ object.private_head_comment }}
 {% if object.is_singleton %}
 M/I-{{ object.id }}

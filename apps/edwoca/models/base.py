@@ -425,9 +425,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             self.private_history_comment = f"Datierung Kommentar: {comment}"
 
         if self.RISM_ID_KEY in raw_data and\
-            raw_data[self.RISM_ID_KEY] and\
-            raw_data[self.RISM_ID_KEY].isnumeric():
-            self.rism_id = raw_data[self.RISM_ID_KEY]
+            (rism_id := raw_data[self.RISM_ID_KEY].replace('Eintrag', '').replace('besteht', '').replace('schon', '').replace('[', '').replace(']', '').strip()) and\
+            rism_id.isnumeric():
+            self.rism_id = rism_id
 
         library = Library.objects.filter(siglum = raw_data[INSTITUTION_KEY]).first() or \
             Library.objects.create(siglum = raw_data[INSTITUTION_KEY])
@@ -623,7 +623,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if ENVELOPE_TITLE_KEY in raw_data and\
             raw_data[ENVELOPE_TITLE_KEY]:
             writer_medium_list = []
-            if ENVELOPE_TITLE_WRITER_KEY in raw_data:
+            if ENVELOPE_TITLE_WRITER_KEY in raw_data and\
+                raw_data[ENVELOPE_TITLE_WRITER_KEY]:
                 for entry in split('\$|\),', raw_data[ENVELOPE_TITLE_WRITER_KEY]):
                     writer_gnd_id = Manifestation.extract_gnd_id(entry)
                     if writer_gnd_id:
@@ -705,18 +706,20 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             if len(manifestation_title_list) > 1 and len(writer_medium_list) > 1:
                 if len(manifestation_title_list) != len(writer_medium_list):
                     print('length of manifestation title list and writer medium list differ')
-                for i, writer_medium in enumerate(writer_medium_list):
-                    ManifestationTitleHandwriting.objects.create(
-                            writer = writer_medium['writer'],
-                            medium = writer_medium['medium'],
-                            dubious_writer = writer_medium['dubious_writer'],
-                            manifestation_title = manifestation_title_list[i],
-                        )
+                else:
+                    for i, writer_medium in enumerate(writer_medium_list):
+                        ManifestationTitleHandwriting.objects.create(
+                                writer = writer_medium['writer'],
+                                medium = writer_medium['medium'],
+                                dubious_writer = writer_medium['dubious_writer'],
+                                manifestation_title = manifestation_title_list[i],
+                            )
 
         if HEAD_TITLE_KEY in raw_data and\
             raw_data[HEAD_TITLE_KEY]:
             writer_medium_list = []
-            if HEAD_TITLE_WRITER_KEY in raw_data:
+            if HEAD_TITLE_WRITER_KEY in raw_data and\
+                raw_data[HEAD_TITLE_WRITER_KEY]:
                 for entry in split('\$|\),', raw_data[HEAD_TITLE_WRITER_KEY]):
                     writer_gnd_id = Manifestation.extract_gnd_id(entry)
                     if writer_gnd_id:
@@ -798,13 +801,14 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             if len(manifestation_title_list) > 1 and len(writer_medium_list) > 1:
                 if len(manifestation_title_list) != len(writer_medium_list):
                     print('length of manifestation title list and writer medium list differ')
-                for i, writer_medium in enumerate(writer_medium_list):
-                    ManifestationTitleHandwriting.objects.create(
-                            writer = writer_medium['writer'],
-                            medium = writer_medium['medium'],
-                            dubious_writer = writer_medium['dubious_writer'],
-                            manifestation_title = manifestation_title_list[i]
-                        )
+                else:
+                    for i, writer_medium in enumerate(writer_medium_list):
+                        ManifestationTitleHandwriting.objects.create(
+                                writer = writer_medium['writer'],
+                                medium = writer_medium['medium'],
+                                dubious_writer = writer_medium['dubious_writer'],
+                                manifestation_title = manifestation_title_list[i]
+                            )
 
         private_title_comments = []
         if ENVELOPE_TITLE_COMMENT_KEY in raw_data and (comment := raw_data[ENVELOPE_TITLE_COMMENT_KEY]):
