@@ -1,6 +1,7 @@
+import re
 from .base import *
 from ..rism_tools import get_rism_data
-from .item import ItemDigitalCopy, BaseDigitalCopy
+from .item import ItemDigitalCopy, BaseDigitalCopy, BaseSignature
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -14,10 +15,10 @@ from liszt_util.tools import RenderRawJSONMixin
 
 
 class TitleTypes(models.TextChoices):
-    ENVELOPE = 'EN', _('Envelope')
-    TITLE_PAGE = 'TP', _('Title Page')
-    ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
     HEAD_TITLE = 'HT', _('Head Title')
+    TITLE_PAGE = 'TP', _('Title Page')
+    ENVELOPE = 'EN', _('Envelope')
+    ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
 
 
 class Manifestation(RenderRawJSONMixin, WemiBaseClass):
@@ -42,8 +43,8 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 case 'lithographie': return Manifestation.PrintType.LITHOGRAPH
 
     class Edition(models.TextChoices):
-        FIRST_EDITION = '1', _('first edition')
-        FOLLOWING_EDITION = 'F', _('following edition')
+        FIRST_EDITION = '1', _('first issue')
+        FOLLOWING_EDITION = 'F', _('following issue')
 
     class SourceType(models.TextChoices):
         TRANSCRIPT = 'TSC', _('transcript')
@@ -265,6 +266,26 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     performance_material = models.BooleanField(
             default = False,
             verbose_name = _('performance material')
+        )
+    authorized_edition = models.BooleanField(
+            default = False,
+            verbose_name = _('authorized edition')
+        )
+    first_edition = models.BooleanField(
+            default = False,
+            verbose_name = _('first edition')
+        )
+    proof = models.BooleanField(
+            default = False,
+            verbose_name = _('proof')
+        )
+    part = models.BooleanField(
+            default = False,
+            verbose_name = _('part')
+        )
+    further_edition = models.BooleanField(
+            default = False,
+            verbose_name = _('further edition')
         )
     correction_sheet = models.BooleanField(
             default = False,
@@ -577,6 +598,15 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         if self.is_singleton and self.get_single_item():
             return self.get_single_item().get_current_signature()
         return ''
+
+    def get_current_signature_normalized(self):
+        try:
+            single_item = self.get_single_item()
+        except:
+            return ''
+
+        signature = single_item.signatures.filter(status = BaseSignature.Status.CURRENT).first()
+        return re.sub(r'[^A-Za-z0-9]', '', signature.signature).lower()
 
 
 class Publication(models.Model):

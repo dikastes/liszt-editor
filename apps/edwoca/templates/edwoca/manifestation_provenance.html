@@ -61,7 +61,7 @@
                 {{ pps_form.as_daisy }}
 
                 <h3>
-                    {% translate 'bibliography' %}
+                    {% translate 'provenance proof (bibliography)' %}
                 </h3>
                 <ul>
                 {% for bib in pps_form.instance.bib.all %}
@@ -102,7 +102,7 @@
                 {% endif %}
 
                 <h3>
-                    {% translate 'letters' %}
+                    {% translate 'provenance proof (letter)' %}
                 </h3>
                 <ul>
                 {% for letter in pps_form.instance.letters.all %}
@@ -205,7 +205,7 @@
                 {{ cps_form.as_daisy }}
 
                 <h3>
-                    {% translate 'bibliography' %}
+                    {% translate 'provenance proof (bibliography)' %}
                 </h3>
                 <ul>
                 {% for bib in cps_form.instance.bib.all %}
@@ -246,7 +246,7 @@
                 {% endif %}
 
                 <h3>
-                    {% translate 'letters' %}
+                    {% translate 'provenance proof (letter)' %}
                 </h3>
                 <ul>
                 {% for letter in cps_form.instance.letters.all %}

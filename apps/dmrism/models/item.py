@@ -213,7 +213,7 @@ class Library(models.Model):
         return reverse('edwoca:library_update', kwargs = {'pk' : self.id})
 
     def __str__(self):
-        return f"{self.name} ({self.siglum})"
+        return f"{self.siglum} {self.name}"
 
 
 class BaseSignature(models.Model):
@@ -364,6 +364,7 @@ class BaseDigitalCopy(models.Model):
         DIGITIZED = 'Dig', _('Digitized')
         IIIF_MANIFEST = 'IIIF', _('IIIF Manifest')
         PRIVATE = 'Prv', _('Private')
+        WORKING = 'Wor', _('Working copy')
 
         def parse(string):
             if 'iiif' in string:

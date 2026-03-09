@@ -4209,6 +4209,10 @@ details.collapse summary::-webkit-details-marker {
   align-items: stretch;
 }
 
+.justify-start {
+  justify-content: flex-start;
+}
+
 .justify-end {
   justify-content: flex-end;
 }

@@ -21,6 +21,7 @@ class SimpleFormMixin:
     palette_form_control_classes = 'form-control flex-1'
     label_classes = 'label'
     toggle_label_classes = 'cursor-pointer label'
+    toggle_inverted_classes = 'cursor-pointer label justify-start gap-5'
     label_text_classes = 'label-text'
 
     def as_daisy(self):

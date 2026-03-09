@@ -1,4 +1,7 @@
+import re
+from haystack.query import SQ
 from .base import *
+from liszt_util.forms import FramedSearchForm
 from bib.models import ZotItem
 from django import forms
 from django.conf import settings
@@ -288,7 +291,12 @@ class ManifestationClassificationForm(ModelForm):
                 'source_type',
                 'album_page',
                 'performance_material',
+                'authorized_edition',
+                'first_edition',
+                'part',
+                'further_edition',
                 'correction_sheet',
+                'proof',
                 'stitch_template',
                 'dedication_item',
                 'choir_score',
@@ -308,6 +316,21 @@ class ManifestationClassificationForm(ModelForm):
                         'class': 'toggle'
                     }),
                 'performance_material': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'authorized_edition': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'first_edition': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'part': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'further_edition': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
+                'proof': CheckboxInput( attrs = {
                         'class': 'toggle'
                     }),
                 'correction_sheet': CheckboxInput( attrs = {
@@ -357,75 +380,90 @@ class ManifestationClassificationForm(ModelForm):
         source_type_field = self['source_type']
         manifestation_form_field = self['manifestation_form']
 
+        # common source functions
         album_page_field = self['album_page']
         performance_material_field = self['performance_material']
+
+        # print source functions
+        authorized_edition_field = self['authorized_edition']
+        first_edition_field = self['first_edition']
+        proof_field = self['proof']
+        part_field = self['part']
+        further_edition_field = self['further_edition']
+
+        # manuscript source functions
         correction_sheet_field = self['correction_sheet']
         stitch_template_field = self['stitch_template']
         dedication_item_field = self['dedication_item']
+
+        # editions types
         choir_score_field = self['choir_score']
         piano_reduction_field = self['piano_reduction']
-
         particell_field = self['particell']
         score_field = self['score']
         parts_field = self['parts']
 
         with form:
             # upper palette with source type and manifestaion form
-            with div(cls=SimpleFormMixin.palette_classes):
-                with label(cls=SimpleFormMixin.palette_form_control_classes):
-                    with div(cls=SimpleFormMixin.label_classes):
-                        span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
-                    raw(str(source_type_field))
-                with label(cls=SimpleFormMixin.palette_form_control_classes):
-                    with div(cls=SimpleFormMixin.label_classes):
-                        span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
-                    raw(str(manifestation_form_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(source_type_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(manifestation_form_field))
             # lower palette with toggles
-            with div(cls=SimpleFormMixin.palette_classes):
-                with div(cls='flex-1'):
-                    h1(_('function'), cls='text-lg my-5')
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(album_page_field))
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(performance_material_field))
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(correction_sheet_field))
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(stitch_template_field))
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(dedication_item_field))
-                with div(cls='flex-1'):
-                    h1(_('edition type'), cls='text-lg my-5')
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(choir_score_field))
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(piano_reduction_field))
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(particell_field))
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(score_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(score_field))
-                    with div(cls=SimpleFormMixin.form_control_classes):
-                        with label(cls=SimpleFormMixin.toggle_label_classes):
-                            span(parts_field.label, cls=SimpleFormMixin.label_text_classes)
-                            raw(str(parts_field))
+            h1(_('function'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(album_page_field))
+                span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(performance_material_field))
+                span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
+            if self.instance.is_singleton:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(correction_sheet_field))
+                    span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(stitch_template_field))
+                    span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(dedication_item_field))
+                    span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
+            else:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(authorized_edition_field))
+                    span(authorized_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(first_edition_field))
+                    span(first_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(proof_field))
+                    span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(part_field))
+                    span(part_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(further_edition_field))
+                    span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+
+            h1(_('edition type'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(choir_score_field))
+                span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(piano_reduction_field))
+                span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(particell_field))
+                span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(score_field))
+                span(score_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(parts_field))
+                span(parts_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
 
@@ -611,7 +649,7 @@ class SingletonCreateForm(forms.ModelForm):
         )
     library = forms.ModelChoiceField(
             queryset = Library.objects.all(),
-            label = _('library'),
+            label = _('holding institution'),
             empty_label = _('choose library'),
             widget = Select(attrs={'class': SimpleFormMixin.select_classes})
         )
@@ -833,3 +871,25 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
 class ManifestationTitleHandwritingForm(HandwritingForm):
     class Meta(HandwritingForm.Meta):
         model = ManifestationTitleHandwriting
+
+
+class ManifestationSearchForm(FramedSearchForm):
+    def search(self):
+        if not self.is_valid():
+            return self.no_query_found()
+
+        query = self.cleaned_data.get('q')
+
+        if not query:
+            return self.searchqueryset
+
+        #sqs = self.searchqueryset.auto_query(query)
+
+        query_norm = re.sub(r'[^A-Za-z0-9]', '', query).lower()
+
+        sqs = self.searchqueryset.filter(
+                SQ(content = query) |
+                SQ(signature_normalized = query_norm)
+            )
+
+        return sqs

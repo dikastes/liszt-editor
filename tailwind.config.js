@@ -7,6 +7,7 @@ module.exports = {
     "./apps/**/templates/**/*.js",
   ],
   safelist: [
+    'justify-start',
     'text-primary-content',
     'items-center',
     'items-end',

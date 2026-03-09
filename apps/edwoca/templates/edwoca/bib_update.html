@@ -95,7 +95,7 @@
     {% if show_letter_search_form == True %}
 
     <form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex">
-        <input type="text" class="input input-bordered border-black bg-white flex-1 border-r-0" name="letter-q" placeholder="{% translate 'search bibliography' %}" value="{{ letter_query }}" />
+        <input type="text" class="input input-bordered border-black bg-white flex-1 border-r-0" name="letter-q" placeholder="{% translate 'search letters' %}" value="{{ letter_query }}" />
         <input type="hidden" name="target_model" value="{{ entity_type }}" />
         <input type="submit" id="submit-form" class="btn btn-outline" value="{% translate 'search' %}"/>
     </form>
