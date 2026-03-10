@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -145,9 +145,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             private_print_comment = self.private_print_comment
         )
         copy.save()
-        copy.places.set(self.places.all())
+        #copy.places.set(self.places.all())
+
         copy.bib.set(self.bib.all())
         copy.letters.set(self.letters.all())
+
+        for place in self.places.all():
+            place_copy = ManifestationPlace.objects.create(
+                    place = place,
+                    manifestation = copy
+                )
 
         if self.is_singleton:
             # most of this logic should move to the item copy function
@@ -487,11 +494,19 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY]:
             for gnd_id in raw_data[LOCATION_KEY].split('|'):
                 place = Place.fetch_or_get(gnd_id.strip())
-                self.places.add(place)
+                ManifestationPlace.objects.create(
+                        place = place,
+                        manifestation = self
+                    )
+                #self.places.add(place)
         elif DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY]:
             for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
                 place = Place.fetch_or_get(gnd_id.strip())
-                self.places.add(place)
+                ManifestationPlace.objects.create(
+                        manifestation = self,
+                        place = place
+                    )
+                #self.places.add(place)
             self.place_inferred = True
 
         if raw_data[TITLE_KEY]:

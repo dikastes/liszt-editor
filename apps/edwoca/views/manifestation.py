@@ -690,6 +690,16 @@ class ManifestationHistoryUpdateView(SimpleFormView):
         if not form.is_valid():
             return self.form_invalid(form)
 
+        place_forms = []
+        for manifestation_place in self.object.manifestationplace_set.all():
+            place_form = ManifestationPlaceForm(request.POST, instance = manifestation_place, prefix=f'manifestation-place-{manifestation_place.id}')
+            if not place_form.is_valid():
+                return self.form_invalid(form)
+            place_forms.append(place_form)
+
+        for place_form in place_forms:
+            place_form.save()
+
         self.object = form.save()
         period = self.object.period
 
@@ -710,6 +720,11 @@ class ManifestationHistoryUpdateView(SimpleFormView):
         search_form = SearchForm(self.request.GET or None)
         context['searchform'] = search_form
         context['show_search_form'] = True
+
+        context['place_forms'] = []
+        for manifestation_place in self.object.manifestationplace_set.all():
+            place_form = ManifestationPlaceForm(instance = manifestation_place, prefix=f'manifestation-place-{manifestation_place.id}')
+            context['place_forms'].append(place_form)
 
         if search_form.is_valid() and search_form.cleaned_data.get('q'):
             context['query'] = search_form.cleaned_data.get('q')
@@ -732,9 +747,9 @@ def manifestation_add_place_view(request, pk, place_id):
 
 def manifestation_remove_place_view(request, pk, place_id):
     manifestation = get_object_or_404(Manifestation, pk=pk)
-    place = get_object_or_404(Place, pk=place_id)
+    manifestation_place = get_object_or_404(ManifestationPlace, pk=place_id)
 
-    manifestation.places.remove(place)
+    manifestation_place.delete()
 
     return redirect('edwoca:manifestation_history', pk=pk)
 

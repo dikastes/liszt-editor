@@ -12,7 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period, Corporation
 from dmad_on_django.models.base import DocumentationStatus
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
-from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting
+from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting, ManifestationPlace
 from dominate.tags import div, label, span, _input, h1
 from dominate.util import raw
 from liszt_util.forms.forms import GenericAsDaisyMixin
@@ -180,8 +180,8 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
             'display',
             'inferred',
             'assumed',
-            'place_inferred',
-            'place_assumed'
+            #'place_inferred',
+            #'place_assumed'
         ]
         widgets = {
                 'history': Textarea( attrs = {
@@ -193,14 +193,14 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
                 'private_history_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     }),
-                'place_inferred': CheckboxInput( attrs = {
-                        'class': SimpleFormMixin.toggle_classes,
-                        'form': 'form'
-                    }),
-                'place_assumed': CheckboxInput( attrs = {
-                        'class': SimpleFormMixin.toggle_classes,
-                        'form': 'form'
-                    })
+                #'place_inferred': CheckboxInput( attrs = {
+                        #'class': SimpleFormMixin.toggle_classes,
+                        #'form': 'form'
+                    #}),
+                #'place_assumed': CheckboxInput( attrs = {
+                        #'class': SimpleFormMixin.toggle_classes,
+                        #'form': 'form'
+                    #})
             }
 
     def as_daisy(self):
@@ -228,36 +228,6 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
         form.add(date_diplomatic_wrap)
 
         return mark_safe(str(form))
-
-    def place_panel_as_daisy(self):
-        palette = div(cls='flex gap-10 items-center')
-
-        place_assumed_field = self['place_assumed']
-        place_inferred_field = self['place_inferred']
-
-        place_documentation_label = _('place as documented')
-        if self.instance.place_assumed:
-            if self.instance.place_inferred:
-                place_documentation_label = _('place inferred assumed')
-            else:
-                place_documentation_label = _('place assumed')
-        else:
-            if self.instance.place_inferred:
-                place_documentation_label = _('place inferred')
-
-        with palette:
-            div(cls='flex-1')
-            div(place_documentation_label, cls='flex-0 mr-10')
-            with div(cls=SimpleFormMixin.palette_form_control_classes):
-                with label(cls=SimpleFormMixin.toggle_label_classes):
-                    span(place_inferred_field.label, cls=SimpleFormMixin.label_text_classes)
-                    raw(str(place_inferred_field))
-            with div(cls=SimpleFormMixin.palette_form_control_classes):
-                with label(cls=SimpleFormMixin.toggle_label_classes):
-                    span(place_assumed_field.label, cls=SimpleFormMixin.label_text_classes)
-                    raw(str(place_assumed_field))
-
-        return mark_safe(str(palette))
 
 
 class RelatedManifestationForm(ModelForm):
@@ -700,68 +670,6 @@ class SingletonCreateForm(forms.ModelForm):
         return mark_safe(root.render())
 
 
-"""
-class SingletonCreateForm(GenericAsDaisyMixin, forms.Form):
-    layout = Layouts.LABEL_OUTSIDE
-    # this label is overridden in the views using
-    # form.fields['title'].label = ...
-    title = forms.CharField(
-            label = _('title'),
-            max_length = 255,
-            required = False,
-            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
-        )
-    source_type = forms.ChoiceField(
-            label = _('source type'),
-            choices = Manifestation.SourceType.choices,
-            widget = Select(attrs={'class': SimpleFormMixin.select_classes})
-        )
-    library = forms.ModelChoiceField(
-            queryset = Library.objects.all(),
-            label = _('library'),
-            empty_label = _('choose library'),
-            widget = Select(attrs={'class': SimpleFormMixin.select_classes})
-        )
-    signature = forms.CharField(
-            label = _('Signature'),
-            max_length = 255,
-            widget = TextInput(attrs={'clss': SimpleFormMixin.text_input_classes})
-        )
-
-    def as_daisy(self):
-        root = div(cls="flex flex-col gap-5")
-
-        palette1 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette1.add(self._render_field('title'))
-        palette1.add(self._render_field('source_type'))
-        root.add(palette1)
-
-        palette2 = div(cls='flex flex-rows w-full gap-10 my-5')
-        palette2.add(self._render_field('library'))
-        palette2.add(self._render_field('signature'))
-        root.add(palette2)
-
-        return mark_safe(root.render())
-
-    def _render_field(self, field_name):
-        field = self[field_name]
-        widget = field.field.widget
-        wrap = label(cls="form-control w-full")
-        top = div(cls="label")
-        top.add(span((field.label or field.name), cls="label-text"))
-        if field.help_text:
-            top.add(span(field.help_text, cls="label-text-alt"))
-        wrap.add(top)
-
-        cls = "input input-bordered w-full bg-white border-black"
-        if isinstance(widget, forms.Select):
-            cls = "select select-bordered w-full bg-white border-black"
-
-        wrap.add(raw(field.as_widget(attrs={"class" : cls})))
-        return wrap
-"""
-
-
 class ManifestationPrintForm(DateFormMixin, ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
@@ -893,3 +801,55 @@ class ManifestationSearchForm(FramedSearchForm):
             )
 
         return sqs
+
+
+class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
+    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
+    class Meta:
+        model = ManifestationPlace
+        fields = [
+            'inferred',
+            'assumed'
+        ]
+        widgets = {
+                'inferred': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    }),
+                'assumed': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        palette = div(cls='flex gap-10 items-center')
+
+        place_assumed_field = self['assumed']
+        place_inferred_field = self['inferred']
+
+        place_documentation_label = _('place as documented')
+        if self.instance.assumed:
+            if self.instance.inferred:
+                place_documentation_label = _('place inferred assumed')
+            else:
+                place_documentation_label = _('place assumed')
+        else:
+            if self.instance.inferred:
+                place_documentation_label = _('place inferred')
+
+        with palette:
+            div(cls='flex-1')
+            div(place_documentation_label, cls='flex-0 mr-10')
+            with div(cls=SimpleFormMixin.palette_form_control_classes):
+                with label(cls=SimpleFormMixin.toggle_label_classes):
+                    span(_(place_inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(place_inferred_field))
+            with div(cls=SimpleFormMixin.palette_form_control_classes):
+                with label(cls=SimpleFormMixin.toggle_label_classes):
+                    span(_(place_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(place_assumed_field))
+
+        return mark_safe(str(palette))

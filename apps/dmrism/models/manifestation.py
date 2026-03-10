@@ -98,16 +98,17 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null = True
         )
     places = models.ManyToManyField(
-            'dmad.Place'
+            'dmad.Place',
+            through = 'ManifestationPlace'
         )
-    place_inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
-        )
-    place_assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
-        )
+    #place_inferred = models.BooleanField(
+            #default=False,
+            #verbose_name = _("inferred")
+            #)
+    #place_assumed = models.BooleanField(
+            #default=False,
+            #verbose_name = _("assumed")
+            #)
     related_manifestations = models.ManyToManyField(
             'Manifestation',
             through = 'RelatedManifestation'
@@ -635,8 +636,26 @@ class Publication(models.Model):
         )
 
 
-class ManifestationTitle(models.Model):
+class ManifestationPlace(models.Model):
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE
+        )
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.CASCADE
+        )
+    inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
+        )
 
+
+class ManifestationTitle(models.Model):
     title = models.TextField(
             null=True,
             blank=True,
