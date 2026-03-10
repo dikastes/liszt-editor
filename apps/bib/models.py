@@ -89,7 +89,13 @@ class ZotItem(models.Model):
         ordering = ['-zot_version']
 
     def __str__(self):
-        return f"{self.author}: {self.zot_title}; {self.zot_pub_title}"
+        if self.zot_pub_title == 'None':
+            if self.author:
+                return f"{self.author}: {self.zot_title}"
+            return f"{self.zot_title}"
+        if self.author:
+            return f"{self.author}: {self.zot_title}; {self.zot_pub_title}"
+        return f"{self.zot_title}; {self.zot_pub_title}"
 
     def preview(self):
         return f"{self.author} ({self.zot_date}): {self.zot_title}"

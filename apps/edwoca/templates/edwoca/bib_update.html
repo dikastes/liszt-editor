@@ -13,11 +13,13 @@
     <ul>
         {% for bib in object.bib_set.all %}
             <li>
-                <div class="flex">
-                    {{ bib.bib }}
+                <div class="flex gap-5">
+                    <div class="flex-1">
+                        {{ bib.bib }}
+                    </div>
                     <form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_bib_remove' bib.id %}" class="flex-0">
                         {% csrf_token %}
-                        <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
+                        <input type="submit" class="btn btn-sm btn-outline btn-primary" value="{% translate 'remove' %}">
                     </form>
                 </div>
             </li>
@@ -71,11 +73,13 @@
     <ul>
         {% for letter in object.letters.all %}
             <li>
-                <div class="flex">
-                    {{ letter }}
+                <div class="flex gap-5">
+                    <div class="flex-1">
+                        {{ letter }}
+                    </div>
                     <form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_letter_remove' object.id letter.id %}" class="flex-0">
                         {% csrf_token %}
-                        <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
+                        <input type="submit" class="btn btn-sm btn-outline btn-primary" value="{% translate 'remove' %}">
                     </form>
                 </div>
             </li>
