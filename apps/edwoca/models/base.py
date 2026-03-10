@@ -429,8 +429,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             rism_id.isnumeric():
             self.rism_id = rism_id
 
-        library = Library.objects.filter(siglum = raw_data[INSTITUTION_KEY]).first() or \
-            Library.objects.create(siglum = raw_data[INSTITUTION_KEY])
+        siglum = raw_data[INSTITUTION_KEY].strip()
+        library = Library.objects.filter(siglum = siglum).first() or \
+            Library.objects.create(siglum = siglum)
         signature = ItemSignature.objects.create(
                 library = library,
                 status = BaseSignature.Status.CURRENT,
