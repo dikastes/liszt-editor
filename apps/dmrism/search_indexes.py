@@ -1,5 +1,5 @@
 from haystack import indexes
-from .models import Manifestation, Item
+from .models import Manifestation, Item, Library
 
 class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(
@@ -22,6 +22,19 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
 
     def get_model(self):
         return Item
+
+    def index_queryset(self, using=None):
+        return self.get_model().objects
+
+
+class LibraryIndex(indexes.SearchIndex, indexes.Indexable):
+    text = indexes.NgramField(
+            document=True,
+            use_template=True
+        )
+
+    def get_model(self):
+        return Library
 
     def index_queryset(self, using=None):
         return self.get_model().objects
