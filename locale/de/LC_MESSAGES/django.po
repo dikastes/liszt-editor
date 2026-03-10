@@ -639,7 +639,7 @@ msgstr "Datierung unsicher"
 
 #: apps/edwoca/forms/base.py:337
 msgid "date inferred"
-msgstr "Datierung ertmittelt"
+msgstr "Datierung ermittelt"
 
 #: apps/edwoca/forms/base.py:339
 msgid "date as documented"
@@ -663,7 +663,7 @@ msgstr "Ort unsicher"
 #: apps/edwoca/forms/manifestation.py:246
 #: apps/edwoca/templates/edwoca/manifestation_print.html:133
 msgid "place inferred"
-msgstr "Ort ertmittelt"
+msgstr "Ort ermittelt"
 
 #: apps/edwoca/forms/manifestation.py:417
 msgid "function"
