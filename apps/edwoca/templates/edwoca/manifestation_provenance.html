@@ -142,7 +142,13 @@
                     </ul>
                 {% endif %}
 
-
+                <div class="flex">
+                    <div class="flex-1"></div>
+                    <form action="{% url 'edwoca:person_provenance_delete' pps_form.instance.id %}" method="post" class="flex-0">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove provenance station' %}" />
+                    </form>
+                </div>
             </div>
         </div>
     {% endfor %}
@@ -286,7 +292,13 @@
                     </ul>
                 {% endif %}
 
-
+                <div class="flex">
+                    <div class="flex-1"></div>
+                    <form action="{% url 'edwoca:corporation_provenance_delete' cps_form.instance.id %}" method="post" class="flex-0">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove provenance station' %}" />
+                    </form>
+                </div>
             </div>
         </div>
     {% endfor %}
