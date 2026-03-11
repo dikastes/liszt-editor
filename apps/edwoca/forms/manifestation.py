@@ -418,7 +418,7 @@ class ManifestationClassificationForm(ModelForm):
                     raw(str(further_edition_field))
                     span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
 
-            h1(_('edition type'), cls='text-lg my-5')
+            h1(_('edition type') + '*', cls='text-lg my-5')
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(choir_score_field))
                 span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)

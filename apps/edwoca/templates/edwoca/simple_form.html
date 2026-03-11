@@ -3,20 +3,22 @@
 {% block content %}
 
 {% if property %}
-	{% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_prolog.html' %}
+    {% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_prolog.html' %}
 {% endif %}
 
-<h2> {{ view_title }} </h2>
+<h2 class="my-5">
+    {{ view_title }}
+</h2>
 
 <form method="post">
-	{% csrf_token %}
-	{{ form.as_daisy }}
+    {% csrf_token %}
+    {{ form.as_daisy }}
 
-	<input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
 </form>
 
 {% if property %}
-	{% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_epilog.html' %}
+    {% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_epilog.html' %}
 {% endif %}
 
 {% endblock %}

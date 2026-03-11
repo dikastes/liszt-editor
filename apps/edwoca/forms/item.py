@@ -118,23 +118,6 @@ NewItemSignatureFormSet = inlineformset_factory(
     )
 
 
-#class ItemDedicationForm(ModelForm, SimpleFormMixin):
-    #class Meta:
-        #model = Item
-        #fields = ['dedication', 'private_dedication_comment']
-        #widgets = {
-                #'dedication': Textarea( attrs = {
-                        #'class': SimpleFormMixin.text_area_classes
-                    #}),
-                #'private_dedication_comment': Textarea( attrs = {
-                        #'class': SimpleFormMixin.text_area_classes
-                    #})
-            #}
-        #labels = {
-            #'private_dedication_comment': 'Interner Widmungskommentar',
-        #}
-
-
 class ItemCommentForm(CommentForm):
     class Meta:
         model = Item

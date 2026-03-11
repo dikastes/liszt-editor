@@ -206,6 +206,27 @@ class BaseDedication(models.Model):
             verbose_name = _('dedication text')
         )
 
+    def __str__(self):
+        diplomatic_dedication = self.diplomatic_dedication or _('<< new dedication >>')
+
+        colon = ''
+        if self.place or self.period and self.period.display:
+            colon = ':'
+
+        if self.period and self.period.display:
+            if self.place:
+                period = f' ({self.period})'
+            else:
+                period = str(self.period)
+        else:
+            period = ''
+
+        place = ''
+        if self.place:
+            place = self.place.get_default_name()
+
+        return f'{place}{period}{colon} {diplomatic_dedication}'
+
 
 class BasePersonDedication(BaseDedication):
     class Meta:
@@ -218,6 +239,14 @@ class BasePersonDedication(BaseDedication):
             related_name = '%(class)s'
         )
 
+    def __str__(self):
+        super_str = super().__str__()
+
+        if self.dedicatee:
+            return f'{super_str} ({self.dedicatee.get_default_name()})'
+
+        return super_str
+
 
 class BaseCorporationDedication(BaseDedication):
     class Meta:
@@ -229,3 +258,11 @@ class BaseCorporationDedication(BaseDedication):
             null = True,
             related_name = '%(class)s'
         )
+
+    def __str__(self):
+        super_str = super().__str__()
+
+        if self.dedicatee:
+            return f'{super_str} ({self.dedicatee.get_default_name()})'
+
+        return super_str

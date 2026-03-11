@@ -677,16 +677,20 @@ class ManifestationTitle(models.Model):
     def render_handwritings(self):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings.all())
 
-    def render_summary(self):
-        result = ''
-        if self.title_type:
-            result += self.title_type
-            if self.handwritings.count():
-                result += ', '
-        if self.handwritings.count():
-            result += self.render_handwritings()
+    def render_first_writer(self):
+        if self.handwritings.count() and self.handwritings.first().writer:
+            return f'({self.handwritings.first().writer.get_default_name()})'
+        return ''
 
-        return result
+    def render_summary(self):
+        if (title_type := self.get_title_type_display()):
+            title_type += ':'
+        else:
+            title_type = ''
+
+        title = self.title or _('<< new title >>')
+
+        return f'{title_type} {title} {self.render_first_writer()}'
 
 
 class ManifestationBib(BaseBib):

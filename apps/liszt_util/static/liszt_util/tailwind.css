@@ -45,6 +45,10 @@ h3 {
     @apply text-xl;
 }
 
+p.note {
+    @apply italic;
+}
+
 .textarea:focus-within, .select:focus-within, .input:focus-within {
     border-color: black;
     outline-style: solid;

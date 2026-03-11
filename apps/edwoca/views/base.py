@@ -103,6 +103,8 @@ class SimpleFormView(EntityMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        if self.view_title:
+            context['view_title'] = self.view_title
         context['property'] = self.property
         return context
 

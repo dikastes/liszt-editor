@@ -3969,6 +3969,10 @@ details.collapse summary::-webkit-details-marker {
   margin-bottom: 1.25rem;
 }
 
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+
 .mb-10 {
   margin-bottom: 2.5rem;
 }
@@ -4591,6 +4595,10 @@ h2 {
 h3 {
   font-size: 1.25rem;
   line-height: 1.75rem;
+}
+
+p.note {
+  font-style: italic;
 }
 
 .textarea:focus-within, .select:focus-within, .input:focus-within {

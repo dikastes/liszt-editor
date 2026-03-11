@@ -62,18 +62,24 @@ class WorkCorporationDedicationForm(forms.ModelForm):
 
 class ManifestationBaseDedicationMixin:
     def as_daisy(self):
-        date_div = self.get_date_div()
         form = tags.div()
 
         dedication_field = self['diplomatic_dedication']
         dedication_label = tags.label()
+        dedication_label_div = tags.div(cls='label')
         dedication_label_text = tags.span(dedication_field.label, cls='label-text')
-        dedication_label.add(dedication_label_text)
+        dedication_label_div.add(dedication_label_text)
+        dedication_label.add(dedication_label_div)
         dedication_label.add(raw(str(dedication_field)))
 
-        form.add(date_div)
         form.add(dedication_label)
 
+        return mark_safe(str(form))
+
+    def date_as_daisy(self):
+        form = tags.div()
+        date_div = self.get_date_div()
+        form.add(date_div)
         return mark_safe(str(form))
 
 

@@ -16,11 +16,15 @@ class SearchForm(GenericAsDaisyMixin, SearchForm):
 class FramedSearchForm(SearchForm):
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
         if 'entity_type' in kwargs:
-            placeholder = _(kwargs['entity_type'])
+            placeholder = _(kwargs.pop('entity_type'))
+        elif 'placeholder' in kwargs:
+            placeholder = kwargs.pop('placeholder')
         else:
             placeholder = _('search')
+
+        super().__init__(*args, **kwargs)
+
         self.fields['q'].widget.attrs.update({
                 'class': 'input input-bordered border-black bg-white flex-1 grow',
                 'placeholder': placeholder

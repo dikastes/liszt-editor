@@ -239,7 +239,7 @@ def manifestation_update(request, pk):
         'entity_type': 'manifestation'
     }
 
-    expression_search_form = FramedSearchForm(request.GET or None, prefix='expression')
+    expression_search_form = FramedSearchForm(request.GET or None, prefix='expression', placeholder = _('search expressions'))
     context['expression_search_form'] = expression_search_form
     if 'expression_link' in request.GET:
         expression_link = get_object_or_404(Expression, pk = request.GET['expression_link'])
@@ -465,21 +465,21 @@ def manifestation_title_update(request, pk):
     q_place = request.GET.get('place-q')
 
     if q_dedicatee:
-        dedicatee_search_form = SearchForm(request.GET, prefix='dedicatee')
+        dedicatee_search_form = FramedSearchForm(request.GET, prefix='dedicatee', placeholder=_('search persons'))
         if dedicatee_search_form.is_valid():
             context['query_dedicatee'] = dedicatee_search_form.cleaned_data.get('q')
             context['found_persons'] = dedicatee_search_form.search().models(Person)
             context['found_corporations'] = dedicatee_search_form.search().models(Corporation)
     else:
-        dedicatee_search_form = SearchForm(prefix='dedicatee')
+        dedicatee_search_form = FramedSearchForm(prefix='dedicatee', placeholder=_('search persons'))
 
     if q_place:
-        place_search_form = SearchForm(request.GET, prefix='place')
+        place_search_form = FramedSearchForm(request.GET, prefix='place', placeholder=_('search place'))
         if place_search_form.is_valid():
             context['query_place'] = place_search_form.cleaned_data.get('q')
             context['found_places'] = place_search_form.search().models(Place)
     else:
-        place_search_form = SearchForm(prefix='place')
+        place_search_form = FramedSearchForm(prefix='place', placeholder=_('search place'))
 
     context['dedicatee_search_form'] = dedicatee_search_form
     context['place_search_form'] = place_search_form
@@ -489,7 +489,7 @@ def manifestation_title_update(request, pk):
     if request.GET.get('corporation_dedication_id'):
         context['corporation_dedication_id'] = int(request.GET.get('corporation_dedication_id'))
 
-    search_form = SearchForm(request.GET or None)
+    search_form = FramedSearchForm(request.GET or None, placeholder=_('search persons'))
     context['search_form'] = search_form
 
     if search_form.is_valid() and search_form.cleaned_data.get('q'):
@@ -969,6 +969,7 @@ class ManifestationPublicationDeleteView(DeleteView):
 class ManifestationClassificationUpdateView(SimpleFormView):
     model = Manifestation
     property = 'classification'
+    view_title = _('source category')
 
 
 def manifestation_provenance(request, pk):
@@ -1594,26 +1595,31 @@ def manifestation_corporation_dedication_remove_dedicatee(request, pk, dedicatio
     return redirect('edwoca:manifestation_title', pk=pk)
 
 
-def manifestation_dedication_add_place(request, pk, dedication_id, place_id):
-    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
-    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
-    try:
-        dedication = ManifestationPersonDedication.objects.get(pk=dedication_id)
-    except ManifestationPersonDedication.DoesNotExist:
-        dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
+def manifestation_person_dedication_add_place(request, pk, dedication_id, place_id):
+    dedication = ManifestationPersonDedication.objects.get(pk=dedication_id)
     place = get_object_or_404(Place, pk=place_id)
     dedication.place = place
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
 
-def manifestation_dedication_remove_place(request, pk, dedication_id):
-    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
-    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
-    try:
-        dedication = ManifestationPersonDedication.objects.get(pk=dedication_id)
-    except ManifestationPersonDedication.DoesNotExist:
-        dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
+def manifestation_person_dedication_remove_place(request, pk, dedication_id):
+    dedication = ManifestationPersonDedication.objects.get(pk=dedication_id)
+    dedication.place = None
+    dedication.save()
+    return redirect('edwoca:manifestation_title', pk=pk)
+
+
+def manifestation_corporation_dedication_add_place(request, pk, dedication_id, place_id):
+    dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
+    place = get_object_or_404(Place, pk=place_id)
+    dedication.place = place
+    dedication.save()
+    return redirect('edwoca:manifestation_title', pk=pk)
+
+
+def manifestation_corporation_dedication_remove_place(request, pk, dedication_id):
+    dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
     dedication.place = None
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)

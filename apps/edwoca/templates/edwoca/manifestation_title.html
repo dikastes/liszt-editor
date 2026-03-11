@@ -6,7 +6,7 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/title_prolog.html' %}
 
-<h2 class="my-5"> {% translate 'title and dedication' %} </h2>
+<h2 class="my-5"> {% translate 'front matter' %} </h2>
 
 <form id="form" class="hidden" method="post"> {% csrf_token %} <input id="submit-form" type="submit" /> </form>
 
@@ -14,29 +14,39 @@
 
 {{ form.source_title_as_daisy }}
 
+<h3 class="my-5"> {% translate 'diplomatic titles' %} </h3>
+
 <div class="mt-5">
 {% for title_form in title_forms %}
     <div class="collapse collapse-arrow bg-base-100 my-5">
         <input type="checkbox" />
         <div class="bg-base-100 collapse-title truncate">
-            {{ title_form.instance.title }}
+            {{ title_form.instance.render_summary }}
         </div>
         <div class="collapse-content mt-5">
             {{ title_form.as_daisy }}
 
             <div class="mt-5">
-                <h4 class="text-lg font-bold mb-5">{% translate 'writers/hands' %}</h4>
+                <h3>
+                    {% translate 'writers/hands' %}
+                </h3>
                 {% for handwriting_form in title_form.handwriting_forms %}
-                    {% if handwriting_form.instance.writer %}
-                        <div class="flex items-center mb-5">
-                            <label class="pseudo-input border border-black border-r-0 flex-1 flex items-center gap-2">
-                                {% translate 'writer' %}
-                                <input type="text" class="grow" disabled value="{{ handwriting_form.instance.writer }}" />
-                            </label>
-                            <a class="btn btn-outline" href="{% url 'edwoca:manifestation_title_remove_handwriting_writer' object.id handwriting_form.instance.id %}">{% translate 'remove' %}</a>
-                        </div>
-                    {% else %}
-                        <div class="mb-5">
+                    <div class="border border-black p-5 my-5">
+                        {% if handwriting_form.instance.writer %}
+                            <div class="flex items-center mb-5">
+                                <label class="flex-1 items-center">
+                                    <div class="label">
+                                        <span class="label-text">
+                                            {% translate 'writer' %}
+                                        </span>
+                                    </div>
+                                    <div class="flex">
+                                        <input type="text" class="grow pseudo-input bg-white border border-black" disabled value="{{ handwriting_form.instance.writer }}" />
+                                        <a class="btn btn-outline btn-primary border-l-0" href="{% url 'edwoca:manifestation_title_remove_handwriting_writer' object.id handwriting_form.instance.id %}">{% translate 'remove' %}</a>
+                                    </div>
+                                </label>
+                            </div>
+                        {% else %}
                             <div class="items-center">
                                 <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get">
                                     <label class="items-center flex-1">
@@ -54,7 +64,7 @@
                                 </form>
                             </div>
                             {% if query and request.GET.title_handwriting_id|add:"0" == handwriting_form.instance.id %}
-                                <ul class="border border-black p-2 h-32 overflow-auto">
+                                <ul class="border border-black p-2 h-32 bg-white mb-5 overflow-auto">
                                 {% for person in found_persons %}
                                     <li>
                                         <a href="{% url 'edwoca:manifestation_title_add_handwriting_writer' object.id handwriting_form.instance.id person.pk %}">{{ person.object }}</a>
@@ -64,16 +74,16 @@
                                 {% endfor %}
                                 </ul>
                             {% endif %}
+                        {% endif %}
+                        <div class="flex gap-5 items-end rounded-lg">
+                            <div class="flex-1">
+                                {{ handwriting_form.as_daisy }}
+                            </div>
+                            <form action="{% url 'edwoca:manifestation_title_handwriting_delete' handwriting_form.instance.id %}" method="post" class="flex-0 m-0">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-outline text-primary" value="{% translate 'remove writer' %}"/>
+                            </form>
                         </div>
-                    {% endif %}
-                    <div class="flex gap-5 items-center mb-5 rounded-lg">
-                        <div class="flex-1">
-                            {{ handwriting_form.as_daisy }}
-                        </div>
-                        <form action="{% url 'edwoca:manifestation_title_handwriting_delete' handwriting_form.instance.id %}" method="post" class="flex-0 m-0">
-                            {% csrf_token %}
-                            <input type="submit" class="btn btn-outline text-primary" value="{% translate 'remove' %}"/>
-                        </form>
                     </div>
                 {% endfor %}
                 <div class="flex">
@@ -107,96 +117,59 @@
 
 {{ form.title_comment_as_daisy }}
 
-<h3> {% translate 'person dedications' %} </h3>
+<h3 class="my-5"> {% translate 'person dedications' %} </h3>
 {% for person_dedication_form in person_dedication_forms %}
     <div class="collapse bg-base-100 collapse-arrow my-5">
         <input type="checkbox" />
         <div class="bg-base-100 collapse-title truncate">
-            {% if person_dedication_form.instance.place %}
-                {{ person_dedication_form.instance.place.concise }}
-                ({{ person_dedication_form.instance.period}}):
-            {% else %}
-                {% if person_dedication_form.instance.period %}
-                    {{ person_dedication_form.instance.period }}:
-                {% endif %}
-            {% endif %}
-            {% if person_dedication_form.instance.diplomatic_dedication %}
-                {{ person_dedication_form.instance.diplomatic_dedication }}
-            {% else %}
-                {% translate 'dedication' %}
-            {% endif %}
-            {% if person_dedication_form.instance.dedicatee %}
-                ({{ person_dedication_form.instance.dedicatee.concise }})
-            {% endif %}
+            {{ person_dedication_form.instance }}
         </div>
         <div class="collapse-content mt-5">
-            <h3> {% translate 'date' %} </h3>
             {{ person_dedication_form.as_daisy }}
-            {% comment %}
-            <label>
-                <div class="label">
-                    <span class="label-text">
-                        {% translate 'standardized date' %}
-                    </span>
-                </div>
-                {{ person_dedication_form.display }}
-            </label>
-            <div class="flex flex-rows w-full gap-10 my-5">
-                <div class="form-control">
-                    <label class="label-text">{{ person_dedication_form.not_before.label }}</label>
-                    <div class="flex">
-                        {{ person_dedication_form.not_before }}
-                    </div>
-                </div>
-                <div class="form-control">
-                    <label class="label-text">{{ person_dedication_form.not_after.label }}</label>
-                    <div class="flex">
-                        {{ person_dedication_form.not_after }}
-                    </div>
-                </div>
-            </div>
-
-            <label>
-                <div class="label">
-                    <span class="label-text">
-                        {% translate 'dedication text' %}
-                    </span>
-                </div>
-                {{ person_dedication_form.diplomatic_dedication }}
-            </label>
-            {% endcomment %}
-
             {% if person_dedication_form.instance.dedicatee %}
                 <div class="flex items-center my-5">
-                    <label class="pseudo-input border border-black bg-white border-r-0 flex-1 flex items-center gap-2">
-                        {% translate 'dedicatee' %}
-                        <input type="text" class="grow" disabled value="{{ person_dedication_form.instance.dedicatee }}" />
+                    <label class="flex-1 gap-2">
+                        <div class="label">
+                            <span class="label-text">
+                                {% translate 'dedicatee' %}
+                            </span>
+                        </div>
+                        <div class="flex gap-5">
+                            <input type="text" class="flex-1 grow pseudo-input border border-black bg-white" disabled value="{{ person_dedication_form.instance.dedicatee }}" />
+                            <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_person_dedication_remove_dedicatee' object.id person_dedication_form.instance.id %}">
+                                {% translate 'remove' %}
+                            </a>
+                        </div>
                     </label>
-                    <a class="btn btn-outline" href="{% url 'edwoca:manifestation_person_dedication_remove_dedicatee' object.id person_dedication_form.instance.id %}">
-                        {% translate 'remove' %}
-                    </a>
                 </div>
             {% else %}
                 <div class="my-5">
                     <div class="items-center">
                         <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
-                            <label class="input input-bordered border-black bg-white flex items-center gap-2 flex-1">
-                                {% translate 'dedicatee' %}
-                                <input
-                                    type="text"
-                                    name="dedicatee-q"
-                                    class="grow"
-                                    {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
-                                        value="{{ query_dedicatee }}"
-                                    {% endif %}
-                                    >
+                            <label class="flex-1">
+                                <div class="label">
+                                    <span class="label-text">
+                                        {% translate 'dedicatee' %}
+                                    </span>
+                                </div>
+                                <div class="flex">
+                                    <input
+                                        type="text"
+                                        name="dedicatee-q"
+                                        class="input input-bordered border-black bg-white flex-1"
+                                        placeholder="{% translate 'search persons' %}"
+                                        {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
+                                            value="{{ query_dedicatee }}"
+                                        {% endif %}
+                                        >
+                                    <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
+                                </div>
                             </label>
                             <input type="hidden" name="person_dedication_id" value="{{ person_dedication_form.instance.id }}">
-                            <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
                         </form>
                     </div>
                     {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
-                        <ul class="border border-black p-3 overflow-auto h-32">
+                        <ul class="border border-black p-3 overflow-auto h-32 bg-white">
                         {% for person in found_persons %}
                             <li>
                                 <a href="{% url 'edwoca:manifestation_person_dedication_add_dedicatee' object.id person_dedication_form.instance.id person.pk %}">{{ person.object }}</a>
@@ -213,29 +186,45 @@
 
             {% if person_dedication_form.instance.place %}
                 <div class="flex items-center my-5">
-                    <label class="pseudo-input flex-1 border border-black bg-white border-r-0 flex items-center gap-2">
-                        {% translate 'place' %}
-                        <input type="text" class="grow" disabled value="{{ person_dedication_form.instance.place }}" />
+                    <label class="grow">
+                        <div class="label">
+                            <span class="label-text">
+                                {% translate 'place' %}
+                            </span>
+                        </div>
+                        <div class="flex gap-5">
+                            <input type="text" class="flex-1 grow pseudo-input flex-1 border border-black bg-white" disabled value="{{ person_dedication_form.instance.place }}" />
+                            <a class="btn btn-outline btn-primary flex-0" href="{% url 'edwoca:manifestation_person_dedication_remove_place' object.id person_dedication_form.instance.id %}">
+                                {% translate 'remove' %}
+                            </a>
+                        </div>
                     </label>
-                    <a class="btn btn-outline" href="{% url 'edwoca:manifestation_dedication_remove_place' object.id person_dedication_form.instance.id %}">Entfernen</a>
                 </div>
             {% else %}
                 <div class="my-5">
                     <div class="items-center">
-                        <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
-                            <label class="input input-bordered border-black bg-white flex items-center gap-2 flex-1">
-                                {% translate 'place' %}
-                                <input type="text" name="place-q" class="grow" {% if query_place %}value="{{ query_place }}"{% endif %}>
+                        <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get">
+                            <label class="grow">
+                                <div class="label">
+                                    <span class="label-text">
+                                        {% translate 'place' %}
+                                    </span>
+                                </div>
+                                <div class="flex">
+                                    <input type="text" name="place-q" class="grow input input-bordered border-black bg-white" {% if query_place %}value="{{ query_place }}"{% endif %} placeholder="{% translate 'search places' %}">
+                                    <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
+                                </div>
                             </label>
                             <input type="hidden" name="person_dedication_id" value="{{ person_dedication_form.instance.id }}">
-                            <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
                         </form>
                     </div>
                     {% if query_place and person_dedication_id == person_dedication_form.instance.id %}
-                        <ul class="border border-black p-3 overflow-auto h-32">
+                        <ul class="border border-black p-3 overflow-auto h-32 bg-white">
                         {% for place in found_places %}
                             <li>
-                                <a href="{% url 'edwoca:manifestation_dedication_add_place' object.id person_dedication_form.instance.id place.pk %}">{{ place.object }}</a>
+                                <a href="{% url 'edwoca:manifestation_person_dedication_add_place' object.id person_dedication_form.instance.id place.pk %}">
+                                    {{ place.object }}
+                                </a>
                             </li>
                         {% empty %}
                         <li>{% translate 'no search results' %}</li>
@@ -244,6 +233,9 @@
                     {% endif %}
                 </div>
             {% endif %}
+
+            <h3> {% translate 'date' %} </h3>
+            {{ person_dedication_form.date_as_daisy }}
             <div class="flex">
                 <div class="flex-1"></div>
                 <form action="{% url 'edwoca:manifestation_person_dedication_delete' person_dedication_form.instance.id %}" method="post" class="flex-0">
@@ -254,7 +246,7 @@
         </div>
     </div>
 {% empty %}
-<p> {% translate 'no person dedications' %} </p>
+<p class="note"> {% translate 'no person dedications' %} </p>
 {% endfor %}
 
 <div class="flex items-center">
@@ -262,96 +254,60 @@
     <a href="{% url 'edwoca:person_dedication_add' object.id %}" class="btn-outline btn flex-0"> {% translate 'create person dedication' %} </a>
 </div>
 
-<h3> {% translate 'corporation dedications' %} </h3>
+<h3 class="my-5"> {% translate 'corporation dedications' %} </h3>
 {% for corporation_dedication_form in corporation_dedication_forms %}
     <div class="collapse bg-base-100 collapse-arrow my-5">
         <input type="checkbox" />
         <div class="bg-base-100 collapse-title truncate">
-            {% if corporation_dedication_form.instance.place %}
-                {{ corporation_dedication_form.instance.place.concise }}
-                ({{ corporation_dedication_form.instance.period}}):
-            {% else %}
-                {% if corporation_dedication_form.instance.period %}
-                    {{ corporation_dedication_form.instance.period }}:
-                {% endif %}
-            {% endif %}
-            {% if corporation_dedication_form.instance.diplomatic_dedication %}
-                {{ corporation_dedication_form.instance.diplomatic_dedication }}
-            {% else %}
-                {% translate 'dedication' %}
-            {% endif %}
-            {% if corporation_dedication_form.instance.dedicatee %}
-                ({{ corporation_dedication_form.instance.dedicatee.concise }})
-            {% endif %}
+            {{ corporation_dedication_form.instance }}
         </div>
         <div class="collapse-content mt-5">
-            <h3> {% translate 'date' %} </h3>
             {{ corporation_dedication_form.as_daisy }}
-            {% comment %}
-            <label>
-                <div class="label">
-                    <span class="label-text">
-                        {% translate 'standardized date' %}
-                    </span>
-                </div>
-                {{ corporation_dedication_form.display }}
-            </label>
-            <div class="flex flex-rows w-full gap-10 my-5">
-                <div class="form-control">
-                    <label class="label-text">{{ corporation_dedication_form.not_before.label }}</label>
-                    <div class="flex">
-                        {{ corporation_dedication_form.not_before }}
-                    </div>
-                </div>
-                <div class="form-control">
-                    <label class="label-text">{{ corporation_dedication_form.not_after.label }}</label>
-                    <div class="flex">
-                        {{ corporation_dedication_form.not_after }}
-                    </div>
-                </div>
-            </div>
-
-            <label>
-                <div class="label">
-                    <span class="label-text">
-                        {% translate 'dedication text' %}
-                    </span>
-                </div>
-                {{ corporation_dedication_form.diplomatic_dedication }}
-            </label>
-            {% endcomment %}
 
             {% if corporation_dedication_form.instance.dedicatee %}
                 <div class="flex items-center my-5">
-                    <label class="pseudo-input border border-black bg-white border-r-0 flex-1 flex items-center gap-2">
-                        {% translate 'dedicatee' %}
-                        <input type="text" class="grow" disabled value="{{ corporation_dedication_form.instance.dedicatee }}" />
+                    <label class="flex-1 gap-2">
+                        <div class="label">
+                            <span class="label-text">
+                                {% translate 'dedicatee' %}
+                            </span>
+                        </div>
+                        <div class="flex gap-5">
+                            <input type="text" class="flex-1 grow pseudo-input border border-black bg-white" disabled value="{{ corporation_dedication_form.instance.dedicatee }}" />
+                            <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_corporation_dedication_remove_dedicatee' object.id corporation_dedication_form.instance.id %}">
+                                {% translate 'remove' %}
+                            </a>
+                        </div>
                     </label>
-                    <a class="btn btn-outline" href="{% url 'edwoca:manifestation_corporation_dedication_remove_dedicatee' object.id corporation_dedication_form.instance.id %}">
-                        {% translate 'remove' %}
-                    </a>
                 </div>
             {% else %}
                 <div class="my-5">
                     <div class="items-center">
                         <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
-                            <label class="input input-bordered border-black bg-white flex items-center gap-2 flex-1">
-                                {% translate 'dedicatee' %}
-                                <input
-                                    type="text"
-                                    name="dedicatee-q"
-                                    class="grow"
-                                    {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
-                                        value="{{ query_dedicatee }}"
-                                    {% endif %}
-                                    >
+                            <label class="flex-1">
+                                <div class="label">
+                                    <span class="label-text">
+                                        {% translate 'dedicatee' %}
+                                    </span>
+                                </div>
+                                <div class="flex">
+                                    <input
+                                        type="text"
+                                        name="dedicatee-q"
+                                        class="input input-bordered border-black bg-white flex-1"
+                                        placeholder="{% translate 'search corporations' %}"
+                                        {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
+                                            value="{{ query_dedicatee }}"
+                                        {% endif %}
+                                        >
+                                    <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
+                                </div>
                             </label>
                             <input type="hidden" name="corporation_dedication_id" value="{{ corporation_dedication_form.instance.id }}">
-                            <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
                         </form>
                     </div>
                     {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
-                        <ul class="border border-black p-3 overflow-auto h-32">
+                        <ul class="border border-black p-3 overflow-auto h-32 bg-white">
                         {% for corporation in found_corporations %}
                             <li>
                                 <a href="{% url 'edwoca:manifestation_corporation_dedication_add_dedicatee' object.id corporation_dedication_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
@@ -368,29 +324,45 @@
 
             {% if corporation_dedication_form.instance.place %}
                 <div class="flex items-center my-5">
-                    <label class="pseudo-input flex-1 border border-black bg-white border-r-0 flex items-center gap-2">
-                        {% translate 'place' %}
-                        <input type="text" class="grow" disabled value="{{ corporation_dedication_form.instance.place }}" />
+                    <label class="grow">
+                        <div class="label">
+                            <span class="label-text">
+                                {% translate 'place' %}
+                            </span>
+                        </div>
+                        <div class="flex gap-5">
+                            <input type="text" class="flex-1 grow pseudo-input flex-1 border border-black bg-white" disabled value="{{ corporation_dedication_form.instance.place }}" />
+                            <a class="btn btn-outline btn-primary flex-0" href="{% url 'edwoca:manifestation_corporation_dedication_remove_place' object.id corporation_dedication_form.instance.id %}">
+                                {% translate 'remove' %}
+                            </a>
+                        </div>
                     </label>
-                    <a class="btn btn-outline" href="{% url 'edwoca:manifestation_dedication_remove_place' object.id corporation_dedication_form.instance.id %}">Entfernen</a>
                 </div>
             {% else %}
                 <div class="my-5">
                     <div class="items-center">
-                        <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
-                            <label class="input input-bordered border-black bg-white flex items-center gap-2 flex-1">
-                                {% translate 'place' %}
-                                <input type="text" name="place-q" class="grow" {% if query_place %}value="{{ query_place }}"{% endif %}>
+                        <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get">
+                            <label class="grow">
+                                <div class="label">
+                                    <span class="label-text">
+                                        {% translate 'place' %}
+                                    </span>
+                                </div>
+                                <div class="flex">
+                                    <input type="text" name="place-q" class="grow input input-bordered border-black bg-white" {% if query_place %}value="{{ query_place }}"{% endif %} placeholder="{% translate 'search places' %}">
+                                    <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
+                                </div>
                             </label>
                             <input type="hidden" name="corporation_dedication_id" value="{{ corporation_dedication_form.instance.id }}">
-                            <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
                         </form>
                     </div>
                     {% if query_place and corporation_dedication_id == corporation_dedication_form.instance.id %}
-                        <ul class="border border-black p-3 overflow-auto h-32">
+                        <ul class="border border-black p-3 overflow-auto h-32 bg-white">
                         {% for place in found_places %}
                             <li>
-                                <a href="{% url 'edwoca:manifestation_dedication_add_place' object.id corporation_dedication_form.instance.id place.pk %}">{{ place.object }}</a>
+                                <a href="{% url 'edwoca:manifestation_corporation_dedication_add_place' object.id corporation_dedication_form.instance.id place.pk %}">
+                                    {{ place.object }}
+                                </a>
                             </li>
                         {% empty %}
                         <li>{% translate 'no search results' %}</li>
@@ -399,6 +371,9 @@
                     {% endif %}
                 </div>
             {% endif %}
+
+            <h3> {% translate 'date' %} </h3>
+            {{ corporation_dedication_form.date_as_daisy }}
             <div class="flex">
                 <div class="flex-1"></div>
                 <form action="{% url 'edwoca:manifestation_corporation_dedication_delete' corporation_dedication_form.instance.id %}" method="post" class="flex-0">
@@ -409,7 +384,7 @@
         </div>
     </div>
 {% empty %}
-<p> {% translate 'no corporation dedications' %} </p>
+<p class="note"> {% translate 'no corporation dedications' %} </p>
 {% endfor %}
 
 <div class="flex items-center">

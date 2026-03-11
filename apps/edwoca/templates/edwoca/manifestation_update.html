@@ -29,9 +29,9 @@
             <p> Dieses Manuskript ist verschollen. </p>
         {% endcomment %}
     {% else %}
-        <h2 class="my-5">
+        <h3 class="my-5">
             {% translate 'locations' %}
-        </h2>
+        </h3>
         {{ signature_formset.management_form }}
         {% for form in signature_forms %}
             <div class="my-5">
@@ -65,9 +65,9 @@
             {{ manifestation_form.working_title }}
         </label>
 
-        <h2 class="my-5"> 
-            {% translate 'expressions' %}
-        </h2>
+        <h3 class="my-5"> 
+            {% translate 'expression' %}
+        </h3>
 
         <ul class="list-disc ml-5 mb-5">
         {% for expression in object.expressions.all %}
@@ -77,7 +77,7 @@
                         {{ expression }}
                     </a>
                     <a href="{% url 'edwoca:manifestation_expression_remove' object.id expression.id %}" class="btn btn-sm btn-outline text-primary ml-4">
-                        entfernen
+                        {% translate 'remove' %}
                     </a>
                 </div>
             </li>
@@ -108,9 +108,9 @@
         {% endif %}
     {% endif %}
 
-    <h2 class="my-5">
+    <h3 class="my-5">
         {% translate 'comment' %}
-    </h2>
+    </h3>
 
     <label>
         <div class="label">
