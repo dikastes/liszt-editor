@@ -1058,33 +1058,33 @@ def manifestation_provenance(request, pk):
     q_owner = request.GET.get('owner-q')
 
     if q_bib:
-        bib_search_form = SearchForm(request.GET, prefix='bib')
+        bib_search_form = FramedSearchForm(request.GET, prefix='bib')
         if bib_search_form.is_valid():
             context['query_bib'] = bib_search_form.cleaned_data.get('q')
             context['found_bibs'] = bib_search_form.search().models(ZotItem)
     else:
-        bib_search_form = SearchForm(prefix='bib')
+        bib_search_form = FramedSearchForm(prefix='bib', placeholder=_('search zotero'))
 
     if q_owner:
-        owner_search_form = SearchForm(request.GET, prefix='owner')
+        owner_search_form = FramedSearchForm(request.GET, prefix='owner')
         if owner_search_form.is_valid():
             context['query_owner'] = owner_search_form.cleaned_data.get('q')
             context['found_persons'] = owner_search_form.search().models(Person)
             context['found_corporations'] = owner_search_form.search().models(Corporation)
     else:
-        owner_search_form = SearchForm(prefix='owner')
+        owner_search_form = FramedSearchForm(prefix='owner', placeholder=_('search persons'))
 
     context['bib_search_form'] = bib_search_form
     context['owner_search_form'] = owner_search_form
 
     q_letter = request.GET.get('letter-q')
     if q_letter:
-        letter_search_form = SearchForm(request.GET, prefix='letter')
+        letter_search_form = FramedSearchForm(request.GET, prefix='letter')
         if letter_search_form.is_valid():
             context['query_letter'] = letter_search_form.cleaned_data.get('q')
             context['found_letters'] = letter_search_form.search().models(Letter)
     else:
-        letter_search_form = SearchForm(prefix='letter')
+        letter_search_form = FramedSearchForm(prefix='letter', placeholder=_('search letters'))
     context['letter_search_form'] = letter_search_form
 
     return render(request, 'edwoca/manifestation_provenance.html', context)

@@ -169,7 +169,7 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     }
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow', 'form': 'form'}))
+    display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
     inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
@@ -202,7 +202,7 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     }
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': 'grow', 'form': 'form'}))
+    display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
     inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 

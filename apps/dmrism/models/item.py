@@ -293,17 +293,10 @@ class ItemContributor(BaseContributor):
 
 class ProvenanceStationRenderMixin:
     def __str__(self):
-        owner_string = self.owner or 'unbekannt'
+        if not self.owner:
+            return str(_('<< new provenance station >>'))
         period_string = self.period or 'ohne Zeitraum'
-        parts = [f'{str(owner_string)} ({str(period_string)})']
-        if hasattr(self, 'bib') and self.bib.count():
-            parts.append(f'Bib: {",".join(str(bib) for bib in self.bib.all())}')
-
-        if hasattr(self, 'letters') and self.letters.exists():
-            letter_strings = ', '.join(str(letter) for letter in self.letters.all())
-            parts.append(f'Letter: {letter_strings}')
-
-        return ' | '.join(parts)
+        return f'{str(self.owner)} ({str(period_string)})'
 
 
 class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):

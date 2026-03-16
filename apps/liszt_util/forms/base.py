@@ -26,7 +26,7 @@ class FramedSearchForm(SearchForm):
         super().__init__(*args, **kwargs)
 
         self.fields['q'].widget.attrs.update({
-                'class': 'input input-bordered border-black bg-white flex-1 grow',
+                'class': 'input input-bordered border-black bg-white flex-1 grow w-full',
                 'placeholder': placeholder
             })
         self.fields['q'].label = ''
