@@ -164,7 +164,7 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
         }
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes }))
     inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
@@ -215,6 +215,14 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
         date_diplomatic_wrap.add(date_diplomatic_label)
         date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
 
+        form.add(date_diplomatic_wrap)
+        form.add(date_div)
+
+        return mark_safe(str(form))
+
+    def comment_as_daisy(self):
+        form = div(cls='mb-10')
+
         private_history_comment_field = self['private_history_comment']
         private_history_comment_wrap = label(cls='form-control')
         private_history_comment_label = div(cls='label')
@@ -223,10 +231,7 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
         private_history_comment_wrap.add(private_history_comment_label)
         private_history_comment_wrap.add(raw(str(private_history_comment_field)))
 
-        form.add(date_div)
         form.add(private_history_comment_wrap)
-        form.add(date_diplomatic_wrap)
-
         return mark_safe(str(form))
 
 

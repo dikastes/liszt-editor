@@ -17,42 +17,49 @@
 </form>
 
 <h2 class="my-5">
-    {% translate 'place (standardized)' %}
+    {% translate 'places' %}
 </h2>
 
 <div class="my-5">
     {% for place_form in place_forms %}
-        <div class="flex gap-5">
-            <div class="flex-1 pseudo-input border border-black items-center flex gap-5">
-                <span>
-                    {% translate 'place' %}
-                </span>
-                <span>
+            {% comment %}
+            <div class="flex-1">
+                <div class="label">
+                    <span class="label-text">
+                        {% translate 'place' %}
+                    </span>
+                </div>
+                <div class="flex-1 pseudo-input border border-black items-center flex gap-5">
                     {{ place_form.instance.place }}
-                </span>
+                </div>
             </div>
-            <form method="post" action="{% url 'edwoca:manifestation_remove_place' object.id place_form.instance.id %}" class="flex-0">
-                {% csrf_token %}
-                <input type="submit" class="btn btn-small btn-primary btn-outline" value="{% translate 'remove' %}">
-            </form>
-        </div>
+            {% endcomment %}
+        <form method="post" action="{% url 'edwoca:manifestation_remove_place' object.id place_form.instance.id %}" class="flex gap-5 mb-0">
+            <div class="flex-1 pseudo-input border border-black items-center flex">
+                {{ place_form.instance.place }}
+            </div>
+            {% csrf_token %}
+            <input type="submit" class="flex-0 btn btn-small btn-primary btn-outline" value="{% translate 'remove' %}">
+        </form>
         {{ place_form.as_daisy }}
     {% empty %}
-        <em>
+        <p class="note">
             {% translate 'no linked place' %}
-        </em>
+        </p>
     {% endfor %}
 </div>
 
-<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get" class="flex">
-    <label class="input input-bordered flex items-center gap-2 flex-1 border-black bg-white">
-        <span class="flex-0">
-            {% translate 'place' %}
-        </span>
-        <input type="text" name="q" value="{{ query }}" class="flex-1" />
+<form action="{% url 'edwoca:manifestation_history' object.id %}" method="get" class="flex w-full items-end">
+    <label class="flex-1">
+        <div class="label">
+            <span class="label-text">
+                {% translate 'place' %}
+            </span>
+        </div>
+        <input type="text" name="q" value="{{ query }}" placeholder="{% translate 'search places' %}" class="w-full input bg-white border-black input-bordered flex-1" />
     </label>
+    <input type="submit" id="submit-form" class="flex-0 btn btn-outline border-l-0" value="{% translate 'search' %}"/>
     <input type="hidden" name="target_model" value="manifestation" />
-    <input type="submit" id="submit-form" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
 </form>
 
 {% if query %}
@@ -72,6 +79,12 @@
         {% endfor %}
     </ul>
 {% endif %}
+
+<h2 class="my-5">
+    {% translate 'comment' %}
+</h2>
+
+{{ form.comment_as_daisy }}
 
 {% include 'edwoca/partials/manifestation/preview-divs/history_epilog.html' %}
 
