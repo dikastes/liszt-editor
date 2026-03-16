@@ -91,7 +91,7 @@ class ManifestationPersonDedicationForm(DateFormMixin, ManifestationBaseDedicati
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': SimpleFormMixin.text_input_classes}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
@@ -117,7 +117,7 @@ class ManifestationCorporationDedicationForm(DateFormMixin, ManifestationBaseDed
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': SimpleFormMixin.text_input_classes}))
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)

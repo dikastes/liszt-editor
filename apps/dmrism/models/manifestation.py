@@ -34,12 +34,12 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 case 'excerpt' | 'excerpts': return Manifestation.ManifestationForm.EXCERPTS
 
     class PrintType(models.TextChoices):
-        PLATE_PRINTING = 'P', _('Plate Print')
+        PLATE_PRINT = 'P', _('Plate Print')
         LITHOGRAPH = 'L', _('Lithograph')
 
         def parse_from_german(german_string):
             match german_string.lower():
-                case 'plattendruck' | 'platte': return Manifestation.PrintType.PLATE_PRINTING
+                case 'plattendruck' | 'platte': return Manifestation.PrintType.PLATE_PRINT
                 case 'lithographie': return Manifestation.PrintType.LITHOGRAPH
 
     class Edition(models.TextChoices):

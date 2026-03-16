@@ -20,7 +20,7 @@ class SimpleFormMixin:
     form_control_classes = 'form-control'
     palette_form_control_classes = 'form-control flex-1'
     label_classes = 'label'
-    toggle_label_classes = 'cursor-pointer label'
+    toggle_label_classes = 'cursor-pointer label flex gap-2'
     toggle_inverted_classes = 'cursor-pointer label justify-start gap-5'
     label_text_classes = 'label-text'
 
@@ -239,7 +239,7 @@ class DateFormMixin:
         }
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))
     inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
@@ -286,55 +286,15 @@ class DateFormMixin:
         not_before_field = self['not_before']
         not_after_field = self['not_after']
         display_field = self['display']
-        #history_field = self['history']
-
-        not_before_container = tags.label(cls='form-control flex-0')
-        not_before_label = tags.div(_('not before'), cls='label-text')
-        not_before_selects = tags.div(cls='flex')
-        not_before_selects.add(raw(str(not_before_field)))
-        not_before_container.add(not_before_label)
-        not_before_container.add(not_before_selects)
-        if not_before_field.errors:
-            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        not_after_container = tags.label(cls='form-control flex-0')
-        not_after_label = tags.div(_('not after'), cls='label-text')
-        not_after_selects = tags.div(cls='flex')
-        not_after_selects.add(raw(str(not_after_field)))
-        not_after_container.add(not_after_label)
-        not_after_container.add(not_after_selects)
-        if not_after_field.errors:
-            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
+        assumed_field = self['assumed']
+        inferred_field = self['inferred']
 
         calculate = 'calculate'
         clear = 'clear'
         postfix = 'machine-readable-date'
+
         calculate_name = f'{self.prefix}-{calculate}-{postfix}' if self.prefix else f'{calculate}-{postfix}'
-        calculate_input = tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=calculate_name)
         clear_name = f'{self.prefix}-{clear}-{postfix}' if self.prefix else f'{clear}-{postfix}'
-        clear_input = tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=clear_name)
-
-        display_container = tags.label(_('standardized date'), _for = display_field.id_for_label, cls=SimpleFormMixin.text_label_classes + ' flex-1')
-        display_container.add(raw(str(display_field)))
-        if display_field.errors:
-            display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
-        display_palette = tags.div(cls='flex flex-rows w-full gap-10 my-5 items-end')
-        display_palette.add(display_container)
-
-        assumed_field = self['assumed']
-        assumed_label = tags.label(cls='label cursor-pointer flex items-center gap-2')
-        assumed_label.add(tags.span(_(assumed_field.label.lower()), cls='label-text'))
-        assumed_label.add(raw(str(assumed_field)))
-
-        inferred_field = self['inferred']
-        inferred_label = tags.label(cls='label cursor-pointer flex items-center gap-2')
-        inferred_label.add(tags.span(_(inferred_field.label.lower()), cls='label-text'))
-        inferred_label.add(raw(str(inferred_field)))
-
-        period_palette = tags.div(cls='flex flex-rows w-full gap-10 my-5 items-end')
-        period_palette.add(not_before_container)
-        period_palette.add(not_after_container)
-        period_palette.add(tags.div(cls='flex-1'))
 
         documentation_label = ''
         if self.instance.period and self.instance.period.assumed:
@@ -348,17 +308,48 @@ class DateFormMixin:
             else:
                 documentation_label = _('date as documented')
 
-        control_palette = tags.div(cls='flex flex-rows w-full gap-10 my-5 items-center')
-        control_palette.add(tags.div(cls='flex-1'))
-        control_palette.add(tags.div(documentation_label, cls='flex-0 mr-10'))
-        control_palette.add(inferred_label)
-        control_palette.add(assumed_label)
-        control_palette.add(tags.div(cls='flex-1'))
-        control_palette.add(calculate_input)
-        control_palette.add(clear_input)
-
-        date_div.add(display_palette)
-        date_div.add(period_palette)
-        date_div.add(control_palette)
+        with date_div:
+            # first row: standardized date
+            with tags.div(cls='flex gap-5 items-end w-full'):
+                with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with tags.div(cls=SimpleFormMixin.label_classes):
+                        tags.label(_('standardized date'), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(display_field))
+                    if display_field.errors:
+                        with div(cls='label'):
+                            with span(cls='text-primary text-sm'):
+                                display_field.errors
+                tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=calculate_name)
+            # second row: not before & not after
+            with tags.div(cls=SimpleFormMixin.palette_classes):
+                with tags.label(cls='form-control flex-0'):
+                    tags.div(_('not before'), cls=SimpleFormMixin.label_text_classes)
+                    with tags.div(cls='flex'):
+                        raw(str(not_after_field))
+                    if not_before_field.errors:
+                        with div(cls='label'):
+                            with span(cls='text-primary text-sm'):
+                                not_before_field.errors
+                with tags.label(cls='form-control flex-0'):
+                    tags.div(_('not after'), cls=SimpleFormMixin.label_text_classes)
+                    with tags.div(cls='flex'):
+                        raw(str(not_after_field))
+                    if not_after_field.errors:
+                        with div(cls='label'):
+                            with span(cls='text-primary text-sm'):
+                                not_after_field.errors
+                tags.div(cls='flex-1')
+            # third row: controls
+            with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
+                tags.div(documentation_label, cls='flex-0 mr-10')
+                tags.div(cls='flex-1')
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+                    tags.span(_(assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(assumed_field))
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+                    tags.span(_(inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(inferred_field))
+                tags.div(cls='flex-1')
+                tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=clear_name)
 
         return date_div

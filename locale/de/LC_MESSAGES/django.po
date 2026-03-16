@@ -242,7 +242,7 @@ msgstr "RISM ID Nr."
 
 #: apps/dmrism/models/item.py:27 apps/dmrism/models/manifestation.py:235
 msgid "private dedication comment"
-msgstr "interner Kommentar zur Widmung"
+msgstr "interner Kommentar"
 
 #: apps/dmrism/models/item.py:32
 msgid "private provenance comment"
