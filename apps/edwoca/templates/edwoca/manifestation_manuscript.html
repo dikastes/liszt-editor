@@ -29,11 +29,15 @@
 
     {% if not object.is_collection %}
         <div class="mt-5">
-            <h3>
+            <h2 class="my-5">
                 {% translate 'modifications' %}
-            </h3>
+            </h2>
             {% for modification in modifications %}
                 {% include 'edwoca/partials/forms/_modification_form.html' with modification=modification %}
+            {% empty %}
+                <p class="note">
+                    {% translate 'no modifications' %}
+                </p>
             {% endfor %}
             <div class="flex">
                 <div class="flex-1"></div>
@@ -43,6 +47,12 @@
             </div>
         </div>
     {% endif %}
+
+    <h2 class="my-5">
+        {% translate 'comment' %}
+    </h2>
+
+    {{ form.comment_as_daisy }}
 
     {% include 'edwoca/partials/manifestation/preview-divs/manuscript_epilog.html' %}
 </form>

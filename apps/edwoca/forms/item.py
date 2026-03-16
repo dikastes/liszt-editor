@@ -313,6 +313,34 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                     })
             }
 
+    def as_daisy(self):
+        extent_field = self['extent']
+        measure_field = self['measure']
+        form = div()
+
+        with form:
+            with label():
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
+                raw(str(extent_field))
+            with label():
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_(measure_field.label), cls=SimpleFormMixin.label_text_classes)
+                raw(str(measure_field))
+
+        return mark_safe(str(form))
+
+    def comment_as_daisy(self):
+        private_manuscript_comment_field = self['private_manuscript_comment']
+        form = div()
+
+        with form:
+            with div(cls=SimpleFormMixin.label_classes):
+                span(_(private_manuscript_comment_field.label), cls=SimpleFormMixin.label_text_classes)
+            raw(str(private_manuscript_comment_field))
+
+        return mark_safe(str(form))
+
 
 class ItemHandwritingForm(HandwritingForm):
     class Meta(HandwritingForm.Meta):
