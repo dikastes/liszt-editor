@@ -33,10 +33,6 @@
         {% endfor %}
     </ul>
 
-    <h3 class="my-5">
-        {% translate 'link new bibliographic dataset' %}
-    </h3>
-
     {% if show_zotitem_search_form == True %}
 
     <form action="{% url 'edwoca:'|add:entity_type|add:'_bibliography' object.id %}" method="get" class="flex">
@@ -91,10 +87,6 @@
             </li>
         {% endfor %}
     </ul>
-
-    <h3 class="my-5">
-        {% translate 'link new letter' %}
-    </h3>
 
     {% if show_letter_search_form == True %}
 
