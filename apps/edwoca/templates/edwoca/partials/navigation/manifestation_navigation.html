@@ -247,7 +247,7 @@
                         href="{% url 'edwoca:manifestation_update' object.id %}"
                         title="{{ object }}"
                         class="active">
-                        {% if object.component_of.is_singleton %}
+                        {% if object.is_singleton %}
                             M/I-{{ object.id }}
                         {% else %}
                             M-{{ object.id }}
