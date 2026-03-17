@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-17 11:03+0100\n"
+"POT-Creation-Date: 2026-03-17 17:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: German\n"
@@ -25,7 +25,7 @@ msgstr "Bevorzugter Titel"
 msgid "Alternative"
 msgstr "Titelvariante"
 
-#: apps/dmad_on_django/models/base.py:24 apps/edwoca/forms/manifestation.py:551
+#: apps/dmad_on_django/models/base.py:24 apps/edwoca/forms/manifestation.py:547
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
@@ -214,6 +214,7 @@ msgstr "bezogen"
 #: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:70
 #: apps/edwoca/templates/edwoca/partials/item/item_menu.html:58
 #: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:96
+#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:27
 #: apps/edwoca/templates/edwoca/partials/work/work_menu.html:56
 #: apps/edwoca/views/manifestation.py:855
 msgid "comment"
@@ -288,7 +289,7 @@ msgstr "aktuell"
 msgid "Former"
 msgstr "vormalig"
 
-#: apps/dmrism/models/item.py:233 apps/edwoca/forms/manifestation.py:702
+#: apps/dmrism/models/item.py:233 apps/edwoca/forms/manifestation.py:698
 msgid "holding institution"
 msgstr "Bestandshaltende Institution"
 
@@ -398,13 +399,13 @@ msgid "incomplete"
 msgstr "unvollständig"
 
 #: apps/dmrism/models/manifestation.py:77
-#: apps/edwoca/forms/manifestation.py:683
+#: apps/edwoca/forms/manifestation.py:679
 msgid "working title"
 msgstr "Arbeitstitel"
 
 #: apps/dmrism/models/manifestation.py:83
-#: apps/edwoca/forms/manifestation.py:552
-#: apps/edwoca/forms/manifestation.py:689
+#: apps/edwoca/forms/manifestation.py:548
+#: apps/edwoca/forms/manifestation.py:685
 msgid "source title"
 msgstr "Quellentitel"
 
@@ -413,8 +414,8 @@ msgid "manifestation form"
 msgstr "Quellenform"
 
 #: apps/dmrism/models/manifestation.py:130
-#: apps/edwoca/forms/manifestation.py:554
-#: apps/edwoca/forms/manifestation.py:695
+#: apps/edwoca/forms/manifestation.py:550
+#: apps/edwoca/forms/manifestation.py:691
 msgid "source type"
 msgstr "Quellentyp"
 
@@ -478,7 +479,7 @@ msgid "private print comment"
 msgstr "interner Kommentar zu den Druckspezifika"
 
 #: apps/dmrism/models/manifestation.py:261
-#: apps/edwoca/forms/manifestation.py:553
+#: apps/edwoca/forms/manifestation.py:549
 msgid "plate number"
 msgstr "Plattennummer"
 
@@ -544,11 +545,11 @@ msgstr "Stimmen"
 
 #: apps/dmrism/models/manifestation.py:337
 #: apps/edwoca/forms/manifestation.py:151
-#: apps/edwoca/forms/manifestation.py:162
 msgid "first save"
 msgstr "erste Bearbeitung"
 
 #: apps/dmrism/models/manifestation.py:341
+#: apps/edwoca/forms/manifestation.py:157
 msgid "last save"
 msgstr "letzte Bearbeitung"
 
@@ -557,7 +558,7 @@ msgid "first editor"
 msgstr "Erstbearbeiter"
 
 #: apps/dmrism/models/manifestation.py:352
-#: apps/edwoca/forms/manifestation.py:203
+#: apps/edwoca/forms/manifestation.py:193
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
@@ -668,57 +669,57 @@ msgstr "berechnen"
 msgid "clear"
 msgstr "leeren"
 
-#: apps/edwoca/forms/manifestation.py:204
+#: apps/edwoca/forms/manifestation.py:194
 msgid "initial recording"
 msgstr "Ersterfassung"
 
-#: apps/edwoca/forms/manifestation.py:213
+#: apps/edwoca/forms/manifestation.py:206
 msgid "further recording"
 msgstr "weitere Bearbeitung"
 
-#: apps/edwoca/forms/manifestation.py:467
+#: apps/edwoca/forms/manifestation.py:463
 msgid "function"
 msgstr "Quellenfunktion"
 
-#: apps/edwoca/forms/manifestation.py:501
+#: apps/edwoca/forms/manifestation.py:497
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: apps/edwoca/forms/manifestation.py:558
+#: apps/edwoca/forms/manifestation.py:554
 #: apps/edwoca/templates/edwoca/create_manifestation.html:16
 #: apps/edwoca/templates/edwoca/manifestation_print.html:18
 #: apps/edwoca/templates/edwoca/manifestation_print.html:28
 msgid "publisher"
 msgstr "Verlag"
 
-#: apps/edwoca/forms/manifestation.py:558
+#: apps/edwoca/forms/manifestation.py:554
 msgid "choose publisher"
 msgstr "Verlag auswählen"
 
-#: apps/edwoca/forms/manifestation.py:703
+#: apps/edwoca/forms/manifestation.py:699
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: apps/edwoca/forms/manifestation.py:707
+#: apps/edwoca/forms/manifestation.py:703
 msgid "Signature"
 msgstr "Signatur"
 
-#: apps/edwoca/forms/manifestation.py:913
+#: apps/edwoca/forms/manifestation.py:909
 #: apps/edwoca/templates/edwoca/manifestation_print.html:135
 msgid "place as documented"
 msgstr "Ort nach Vorlage"
 
-#: apps/edwoca/forms/manifestation.py:916
+#: apps/edwoca/forms/manifestation.py:912
 #: apps/edwoca/templates/edwoca/manifestation_print.html:127
 msgid "place inferred assumed"
 msgstr "Ort unsicher ermittelt"
 
-#: apps/edwoca/forms/manifestation.py:918
+#: apps/edwoca/forms/manifestation.py:914
 #: apps/edwoca/templates/edwoca/manifestation_print.html:129
 msgid "place assumed"
 msgstr "Ort unsicher"
 
-#: apps/edwoca/forms/manifestation.py:921
+#: apps/edwoca/forms/manifestation.py:917
 #: apps/edwoca/templates/edwoca/manifestation_print.html:133
 msgid "place inferred"
 msgstr "Ort ermittelt"
@@ -1266,6 +1267,7 @@ msgstr "Orte durchsuchen"
 
 #: apps/edwoca/templates/edwoca/manifestation_manuscript.html:15
 #: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:65
+#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:5
 msgid "manuscript characteristics"
 msgstr "Manuskriptspezifika"
 
@@ -1684,6 +1686,14 @@ msgstr "Datierung und Ort"
 #: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:104
 msgid "copy"
 msgstr "kopieren"
+
+#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:13
+msgid "extent not specified"
+msgstr "keine Formatangaben"
+
+#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:21
+msgid "measure not specified"
+msgstr "keine Umfangangaben"
 
 #: apps/edwoca/templates/edwoca/partials/nav_switcher.html:21
 msgid "created"
