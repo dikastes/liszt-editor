@@ -1,5 +1,7 @@
 {% extends 'edwoca/base.html' %}
 
+{% load i18n %}
+
 {% block modals %}
 {% endblock %}
 
@@ -9,29 +11,15 @@
 
 <h2> Digitalisate </h2>
 
-        {% comment %}
-        <div class="mt-5">
-        {% for digital_copy in item.digital_copies.all %}
-            <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
-                <div class="flex-1 m-0">
-                    <p class="font-bold">{{ digital_copy.url }}</p>
-                    <p>{{ digital_copy.get_link_type_display }}</p>
-                </div>
-                <a href="#digital-copy-modal-{{ digital_copy.id }}" class="btn flex-0"> bearbeiten </a>
-            </div>
-        {% empty %}
-            <p> keine digitalen Kopien vorhanden </p>
-        {% endfor %}
-        {% endcomment %}
 {% for form in forms %}
     <form action="{% url 'edwoca:manifestation_digital_copy_delete' form.instance.id %}" method="post" class="flex-0 m-0">
         {% csrf_token %}
-        <input type="submit" class="hidden" id="delete-{{ form.instance.id }}" value="löschen"/>
+        <input type="submit" class="hidden" id="delete-{{ form.instance.id }}" value="{% translate 'remove' %}"/>
     </form>
 {% endfor %}
 <form method="post" class="mt-5 flex flex-col gap-5 mb-10">
     {% for form in forms %}
-        <div class="flex gap-5">
+        <div class="flex gap-5 bg-base-100 p-5">
             <div class="flex-1">
                 {% csrf_token %}
                 {{ form.as_daisy }}
@@ -39,19 +27,23 @@
             <div class="flex-0 flex flex-col">
                 <div class="flex-1"></div>
                 <div class="flex-0">
-                    <label for="delete-{{ form.instance.id }}" class="btn btn-primary">löschen</label>
+                    <label for="delete-{{ form.instance.id }}" class="btn btn-primary btn-outline">{% translate 'remove' %}</label>
                     <input type="submit" name="save_changes" value="Speichern" class="hidden" id="submit-form">
                 </div>
             </div>
         </div>
     {% empty %}
-        <p> keine Digitalisate vorhanden </p>
+        <p class="note">
+            {% translate 'no digital copies' %}
+        </p>
     {% endfor %}
 </form>
 
 <div class="flex items-center">
     <div class="flex-1"></div>
-    <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn flex-0"> Digitalisat hinzufügen </a>
+    <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn-outline btn flex-0"> 
+        {% translate 'add digital copy' %}
+    </a>
 </div>
 
 {% endblock %}
