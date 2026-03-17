@@ -241,9 +241,8 @@
                 <li class="list-row mb-2">
                     <a
                         href="{% url 'edwoca:manifestation_update' object.manifestation.id %}"
-                        title="{{ object.manifestation }}"
-                        class="active">
-                        M-{{ object.manifestation.component_of.id }}
+                        title="{{ object.manifestation }}" >
+                        M-{{ object.manifestation.id }}
                     </a>
                     {% if not object.manifestation.is_singleton %}
                         <ul>
