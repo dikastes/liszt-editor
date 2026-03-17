@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-17 10:03+0100\n"
+"POT-Creation-Date: 2026-03-17 11:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: German\n"
@@ -25,7 +25,7 @@ msgstr "Bevorzugter Titel"
 msgid "Alternative"
 msgstr "Titelvariante"
 
-#: apps/dmad_on_django/models/base.py:24 apps/edwoca/forms/manifestation.py:476
+#: apps/dmad_on_django/models/base.py:24 apps/edwoca/forms/manifestation.py:551
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
@@ -215,6 +215,7 @@ msgstr "bezogen"
 #: apps/edwoca/templates/edwoca/partials/item/item_menu.html:58
 #: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:96
 #: apps/edwoca/templates/edwoca/partials/work/work_menu.html:56
+#: apps/edwoca/views/manifestation.py:855
 msgid "comment"
 msgstr "Kommentar"
 
@@ -287,7 +288,7 @@ msgstr "aktuell"
 msgid "Former"
 msgstr "vormalig"
 
-#: apps/dmrism/models/item.py:233 apps/edwoca/forms/manifestation.py:627
+#: apps/dmrism/models/item.py:233 apps/edwoca/forms/manifestation.py:702
 msgid "holding institution"
 msgstr "Bestandshaltende Institution"
 
@@ -397,13 +398,13 @@ msgid "incomplete"
 msgstr "unvollständig"
 
 #: apps/dmrism/models/manifestation.py:77
-#: apps/edwoca/forms/manifestation.py:608
+#: apps/edwoca/forms/manifestation.py:683
 msgid "working title"
 msgstr "Arbeitstitel"
 
 #: apps/dmrism/models/manifestation.py:83
-#: apps/edwoca/forms/manifestation.py:477
-#: apps/edwoca/forms/manifestation.py:614
+#: apps/edwoca/forms/manifestation.py:552
+#: apps/edwoca/forms/manifestation.py:689
 msgid "source title"
 msgstr "Quellentitel"
 
@@ -412,8 +413,8 @@ msgid "manifestation form"
 msgstr "Quellenform"
 
 #: apps/dmrism/models/manifestation.py:130
-#: apps/edwoca/forms/manifestation.py:479
-#: apps/edwoca/forms/manifestation.py:620
+#: apps/edwoca/forms/manifestation.py:554
+#: apps/edwoca/forms/manifestation.py:695
 msgid "source type"
 msgstr "Quellentyp"
 
@@ -477,7 +478,7 @@ msgid "private print comment"
 msgstr "interner Kommentar zu den Druckspezifika"
 
 #: apps/dmrism/models/manifestation.py:261
-#: apps/edwoca/forms/manifestation.py:478
+#: apps/edwoca/forms/manifestation.py:553
 msgid "plate number"
 msgstr "Plattennummer"
 
@@ -542,6 +543,8 @@ msgid "parts"
 msgstr "Stimmen"
 
 #: apps/dmrism/models/manifestation.py:337
+#: apps/edwoca/forms/manifestation.py:151
+#: apps/edwoca/forms/manifestation.py:162
 msgid "first save"
 msgstr "erste Bearbeitung"
 
@@ -552,6 +555,11 @@ msgstr "letzte Bearbeitung"
 #: apps/dmrism/models/manifestation.py:347
 msgid "first editor"
 msgstr "Erstbearbeiter"
+
+#: apps/dmrism/models/manifestation.py:352
+#: apps/edwoca/forms/manifestation.py:203
+msgid "editing history"
+msgstr "Bearbeitungshistorie"
 
 #: apps/dmrism/models/manifestation.py:366
 #: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:13
@@ -660,49 +668,57 @@ msgstr "berechnen"
 msgid "clear"
 msgstr "leeren"
 
-#: apps/edwoca/forms/manifestation.py:392
+#: apps/edwoca/forms/manifestation.py:204
+msgid "initial recording"
+msgstr "Ersterfassung"
+
+#: apps/edwoca/forms/manifestation.py:213
+msgid "further recording"
+msgstr "weitere Bearbeitung"
+
+#: apps/edwoca/forms/manifestation.py:467
 msgid "function"
 msgstr "Quellenfunktion"
 
-#: apps/edwoca/forms/manifestation.py:426
+#: apps/edwoca/forms/manifestation.py:501
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: apps/edwoca/forms/manifestation.py:483
+#: apps/edwoca/forms/manifestation.py:558
 #: apps/edwoca/templates/edwoca/create_manifestation.html:16
 #: apps/edwoca/templates/edwoca/manifestation_print.html:18
 #: apps/edwoca/templates/edwoca/manifestation_print.html:28
 msgid "publisher"
 msgstr "Verlag"
 
-#: apps/edwoca/forms/manifestation.py:483
+#: apps/edwoca/forms/manifestation.py:558
 msgid "choose publisher"
 msgstr "Verlag auswählen"
 
-#: apps/edwoca/forms/manifestation.py:628
+#: apps/edwoca/forms/manifestation.py:703
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: apps/edwoca/forms/manifestation.py:632
+#: apps/edwoca/forms/manifestation.py:707
 msgid "Signature"
 msgstr "Signatur"
 
-#: apps/edwoca/forms/manifestation.py:838
+#: apps/edwoca/forms/manifestation.py:913
 #: apps/edwoca/templates/edwoca/manifestation_print.html:135
 msgid "place as documented"
 msgstr "Ort nach Vorlage"
 
-#: apps/edwoca/forms/manifestation.py:841
+#: apps/edwoca/forms/manifestation.py:916
 #: apps/edwoca/templates/edwoca/manifestation_print.html:127
 msgid "place inferred assumed"
 msgstr "Ort unsicher ermittelt"
 
-#: apps/edwoca/forms/manifestation.py:843
+#: apps/edwoca/forms/manifestation.py:918
 #: apps/edwoca/templates/edwoca/manifestation_print.html:129
 msgid "place assumed"
 msgstr "Ort unsicher"
 
-#: apps/edwoca/forms/manifestation.py:846
+#: apps/edwoca/forms/manifestation.py:921
 #: apps/edwoca/templates/edwoca/manifestation_print.html:133
 msgid "place inferred"
 msgstr "Ort ermittelt"
@@ -1073,7 +1089,7 @@ msgid "link new letter"
 msgstr "Brief verknüpfen"
 
 #: apps/edwoca/templates/edwoca/bib_update.html:102
-#: apps/edwoca/views/manifestation.py:1087
+#: apps/edwoca/views/manifestation.py:1088
 msgid "search letters"
 msgstr "Briefe durchsuchen"
 
@@ -1508,7 +1524,7 @@ msgstr "Widmungsträger"
 #: apps/edwoca/views/manifestation.py:468
 #: apps/edwoca/views/manifestation.py:474
 #: apps/edwoca/views/manifestation.py:492
-#: apps/edwoca/views/manifestation.py:1075
+#: apps/edwoca/views/manifestation.py:1076
 msgid "search persons"
 msgstr "Personen durchsuchen"
 
@@ -1657,7 +1673,7 @@ msgid "digital copies"
 msgstr "Digitalisat"
 
 #: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:25
-#: apps/edwoca/views/manifestation.py:972
+#: apps/edwoca/views/manifestation.py:973
 msgid "source category"
 msgstr "Quellenart"
 
@@ -1723,7 +1739,7 @@ msgstr "Fassungen durchsuchen"
 msgid "search place"
 msgstr "Orte durchsuchen"
 
-#: apps/edwoca/views/manifestation.py:1066
+#: apps/edwoca/views/manifestation.py:1067
 msgid "search zotero"
 msgstr "Zotero durchsuchen"
 

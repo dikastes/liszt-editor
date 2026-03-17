@@ -349,7 +349,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     editing_history = models.TextField(
             blank = True,
             null = True,
-            verbose_name = ('editing history')
+            verbose_name = _('editing history')
         )
 
     def get_absolute_url(self):

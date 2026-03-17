@@ -852,6 +852,7 @@ class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
 class ManifestationCommentUpdateView(SimpleFormView):
     model = Manifestation
     property = 'comment'
+    view_title = _('comment')
 
 
 def manifestation_print_update(request, pk):
