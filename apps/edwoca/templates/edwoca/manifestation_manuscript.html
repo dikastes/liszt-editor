@@ -8,6 +8,7 @@
 <form id="form" method="post">
     {% csrf_token %}
     <input id="submit-form" type="submit" class="hidden" name="save_changes">
+</form>
 
     {% include 'edwoca/partials/manifestation/preview-divs/manuscript_prolog.html' %}
 
@@ -20,7 +21,9 @@
     <div class="mt-5">
         <h3>{% translate 'writers / hands' %}</h3>
         {% for form in handwriting_forms %}
-            {% include 'edwoca/partials/forms/handwriting_form.html' with class='manifestation_handwriting' %}
+            <div class="bg-base-100 p-5 my-5">
+                {% include 'edwoca/partials/forms/handwriting_form.html' with class='manifestation_handwriting' %}
+            </div>
         {% endfor %}
         <div class="flex justify-end">
                 <input type="submit" name="add_handwriting" value="{% translate 'create writer' %}" class="btn btn-outline mt-3">
@@ -55,6 +58,5 @@
     {{ form.comment_as_daisy }}
 
     {% include 'edwoca/partials/manifestation/preview-divs/manuscript_epilog.html' %}
-</form>
 
 {% endblock %}

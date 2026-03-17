@@ -592,8 +592,10 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
     def get_single_item(self):
         if self.is_singleton:
-            return self.items.first()
-        raise Exception('You want to retrieve a single item from a non singleton manifestation.')
+            if self.items.count():
+                return self.items.first()
+            raise Exception('You are trying to retrieve the single item of a singleton manifestation which has zero items.')
+        raise Exception('You are trying to retrieve a single item from a non singleton manifestation.')
 
     def get_current_signature(self):
         if self.is_singleton and self.get_single_item():
