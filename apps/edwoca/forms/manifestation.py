@@ -30,8 +30,8 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
                         'class': SimpleFormMixin.text_input_classes,
                         'form': 'form'
                     }),
-                'working_title': TextInput( attrs = {
-                        'class': SimpleFormMixin.text_input_classes,
+                'working_title': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
                 'private_head_comment': Textarea( attrs = {
@@ -52,8 +52,8 @@ class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
                 'private_title_comment'
             ]
         widgets = {
-                'source_title': TextInput( attrs = {
-                        'class': SimpleFormMixin.text_input_classes,
+                'source_title': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
                 'private_dedication_comment': Textarea( attrs = {
