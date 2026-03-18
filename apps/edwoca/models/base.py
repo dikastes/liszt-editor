@@ -558,13 +558,15 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 self.period.assumed = True
             self.period.save()
 
+        relations_comment = []
         if RELATED_PRINT_PUBLISHER_KEY in raw_data:
-            if raw_data[RELATED_PRINT_PUBLISHER_KEY]:
-                Publication.objects.create(
-                        manifestation = self,
-                        publisher = Corporation.fetch_or_get(raw_data[RELATED_PRINT_PUBLISHER_KEY]),
-                    )
-                self.plate_number = raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]
+            if (print_publisher := raw_data[RELATED_PRINT_PUBLISHER_KEY]):
+                relations_comment.append(print_publisher)
+        if RELATED_PRINT_PLATE_NUMBER_KEY in raw_data:
+            if (plate_number := raw_data[RELATED_PRINT_PLATE_NUMBER_KEY]):
+                relations_comment.append(plate_number)
+        if relations_comment:
+            self.private_relations_comment = f'Bezug zu Druck: {", ".join(relations_comment)}'
 
         if PUBLISHER_KEY in raw_data:
             if raw_data[PUBLISHER_KEY]:
@@ -592,7 +594,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if FOREIGN_HANDWRITING_KEY in raw_data\
             and raw_data[FOREIGN_HANDWRITING_KEY]:
-            for entry in raw_data[FOREIGN_HANDWRITING_KEY].split('$'):
+            for entry in raw_data[FOREIGN_HANDWRITING_KEY].split('),'):
                 dubious_writer = False
                 if '?' in entry:
                     dubious_writer = True
