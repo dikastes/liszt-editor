@@ -40,9 +40,9 @@
                                             {% translate 'writer' %}
                                         </span>
                                     </div>
-                                    <div class="flex">
+                                    <div class="flex gap-5">
                                         <input type="text" class="grow pseudo-input bg-white border border-black" disabled value="{{ handwriting_form.instance.writer }}" />
-                                        <a class="btn btn-outline btn-primary border-l-0" href="{% url 'edwoca:manifestation_title_remove_handwriting_writer' object.id handwriting_form.instance.id %}">{% translate 'remove' %}</a>
+                                        <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_title_remove_handwriting_writer' object.id handwriting_form.instance.id %}">{% translate 'remove' %}</a>
                                     </div>
                                 </label>
                             </div>

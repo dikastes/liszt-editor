@@ -252,11 +252,10 @@ class ItemDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
     layout = Layouts.LABEL_OUTSIDE
     class Meta:
         model = ItemDigitalCopy
-        fields = ['url', 'link_type', 'item']
+        fields = ['url', 'link_type']
         widgets = {
-            'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes}),
-            'link_type': Select(attrs={'class': SimpleFormMixin.select_classes}),
-            'item': HiddenInput(),
+                'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}),
+                'link_type': Select(attrs={'class': SimpleFormMixin.select_classes, 'form': 'form'})
         }
 
     def as_daisy(self):

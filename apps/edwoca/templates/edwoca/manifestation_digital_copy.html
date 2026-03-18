@@ -12,32 +12,42 @@
 <h2> Digitalisate </h2>
 
 {% for form in forms %}
-    <form action="{% url 'edwoca:manifestation_digital_copy_delete' form.instance.id %}" method="post" class="flex-0 m-0">
-        {% csrf_token %}
-        <input type="submit" class="hidden" id="delete-{{ form.instance.id }}" value="{% translate 'remove' %}"/>
-    </form>
 {% endfor %}
-<form method="post" class="mt-5 flex flex-col gap-5 mb-10">
-    {% for form in forms %}
-        <div class="flex gap-5 bg-base-100 p-5">
-            <div class="flex-1">
-                {% csrf_token %}
-                {{ form.as_daisy }}
-            </div>
-            <div class="flex-0 flex flex-col">
-                <div class="flex-1"></div>
-                <div class="flex-0">
-                    <label for="delete-{{ form.instance.id }}" class="btn btn-primary btn-outline">{% translate 'remove' %}</label>
-                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="submit-form">
-                </div>
+<form method="post" id="form" class="mt-5 flex flex-col gap-5 mb-10">
+    {% csrf_token %}
+    <input type="submit" name="save_changes" class="hidden" id="submit-form">
+</form>
+
+{% for form in forms %}
+    <div class="flex gap-5 bg-base-100 p-5 my-5">
+        <div class="flex-1">
+            {{ form.as_daisy }}
+        </div>
+        <div class="flex-0 flex flex-col">
+            <div class="flex-1"></div>
+            <div class="flex-0">
+                <a class="btn btn-outline w-full " href="{{ form.instance.url }}" target="_blank">
+                    {% translate 'open' %}
+                </a>
+                <label class="flex-0 m-0">
+                    <div class="label">
+                        <span class="label-text">
+                            &nbsp;
+                        </span>
+                    </div>
+                    <form action="{% url 'edwoca:manifestation_digital_copy_delete' form.instance.id %}" method="post" class="w-full m-0">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-primary btn-outline w-full" id="delete-{{ form.instance.id }}" value="{% translate 'remove' %}"/>
+                    </form>
+                </label>
             </div>
         </div>
-    {% empty %}
-        <p class="note">
-            {% translate 'no digital copies' %}
-        </p>
-    {% endfor %}
-</form>
+    </div>
+{% empty %}
+    <p class="note">
+        {% translate 'no digital copies' %}
+    </p>
+{% endfor %}
 
 <div class="flex items-center">
     <div class="flex-1"></div>
