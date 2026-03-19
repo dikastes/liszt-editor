@@ -357,6 +357,19 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     def get_pref_title(self):
         return self.__str__()
 
+    def set_collection(self, is_collection = False):
+        if is_collection:
+            # set collection
+            self.is_collection = True
+            if self.working_title and not self.source_title:
+                self.source_title = self.working_title
+        else:
+            # unset collection
+            if self.source_title and not self.working_title:
+                self.working_title = self.source_title
+            self.is_collection = False
+
+
     def render_title(self, prefix):
         if self.is_collection:
             collection = _('coll')
@@ -532,7 +545,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         for host_item_entry in data.get_fields('773'):
             target_rism_id = host_item_entry.get('w').replace('sources/', '')
             target_manifestation = Manifestation.get_or_create(target_rism_id, singleton)
-            target_manifestation.is_collection = True
+            target_manifestation.set_collection(True)
             target_manifestation.save()
             self.part_of = target_manifestation
             #RelatedManifestation.objects.create(
