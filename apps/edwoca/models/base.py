@@ -342,8 +342,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         DIGITAL_COPY_KEY = 'Digitalisat'
 
-        FUNCTION_KEY = 'Funktion'
-
         DEDUCED_PLACE_NAME_KEY = 'Ort ermittelt (normiert)'
         DEDUCED_PLACE_ID_KEY = 'Ort ermittelt GND-Nr.'
         DEDUCED_DATE_KEY = 'Datierung ermittelt (maschinenlesbar)'
@@ -518,7 +516,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     'piano reduction',
                     'particell',
                     'score',
-                    'parts'
+                    'part'
             ]:
                 if str(_(edition_type)) in raw_data[EDITION_TYPE_KEY]:
                     setattr(self, edition_type.replace(' ', '_'), True)

@@ -348,8 +348,7 @@ class ManifestationClassificationForm(ModelForm):
                 'choir_score',
                 'piano_reduction',
                 'particell',
-                'score',
-                'parts'
+                'score'
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
@@ -400,9 +399,6 @@ class ManifestationClassificationForm(ModelForm):
                 'score': CheckboxInput( attrs = {
                         'class': 'toggle'
                     }),
-                'parts': CheckboxInput( attrs = {
-                        'class': 'toggle'
-                    })
             }
 
     def __init__(self, *args, **kwargs):
@@ -447,7 +443,6 @@ class ManifestationClassificationForm(ModelForm):
         piano_reduction_field = self['piano_reduction']
         particell_field = self['particell']
         score_field = self['score']
-        parts_field = self['parts']
 
         with form:
             # upper palette with source type and manifestaion form
@@ -488,9 +483,6 @@ class ManifestationClassificationForm(ModelForm):
                     raw(str(proof_field))
                     span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(part_field))
-                    span(part_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
                     raw(str(further_edition_field))
                     span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
 
@@ -508,8 +500,8 @@ class ManifestationClassificationForm(ModelForm):
                 raw(str(score_field))
                 span(score_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(parts_field))
-                span(parts_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(part_field))
+                span(part_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
 

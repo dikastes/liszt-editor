@@ -505,7 +505,7 @@ msgstr "Korrekturabzug"
 
 #: apps/dmrism/models/manifestation.py:285
 msgid "part"
-msgstr "Stimmauszug"
+msgstr "Stimme"
 
 #: apps/dmrism/models/manifestation.py:289
 msgid "further edition"

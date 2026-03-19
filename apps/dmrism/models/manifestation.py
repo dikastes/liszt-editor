@@ -316,10 +316,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = _('score')
         )
-    parts = models.BooleanField(
-            default = False,
-            verbose_name = _('parts')
-        )
     part_of = models.ForeignKey(
             'Manifestation',
             related_name = 'collection_parts',
