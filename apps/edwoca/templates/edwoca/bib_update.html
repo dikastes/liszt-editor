@@ -14,12 +14,12 @@
         {% for bib in object.bib_set.all %}
             <li>
                 <div class="flex gap-5">
-                    <div class="flex-1">
+                    <div class="flex-1 pseudo-input border border-black flex items-center">
                         {{ bib.bib }}
                     </div>
                     <form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_bib_remove' bib.id %}" class="flex-0">
                         {% csrf_token %}
-                        <input type="submit" class="btn btn-sm btn-outline btn-primary" value="{% translate 'remove' %}">
+                        <input type="submit" class="btn btn-outline btn-primary" value="{% translate 'remove' %}">
                     </form>
                 </div>
             </li>
@@ -32,10 +32,6 @@
             </li>
         {% endfor %}
     </ul>
-
-    <h3 class="my-5">
-        {% translate 'link new bibliographic dataset' %}
-    </h3>
 
     {% if show_zotitem_search_form == True %}
 
@@ -74,12 +70,12 @@
         {% for letter in object.letters.all %}
             <li>
                 <div class="flex gap-5">
-                    <div class="flex-1">
+                    <div class="flex-1 pseudo-input border border-black flex items-center">
                         {{ letter }}
                     </div>
                     <form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_letter_remove' object.id letter.id %}" class="flex-0">
                         {% csrf_token %}
-                        <input type="submit" class="btn btn-sm btn-outline btn-primary" value="{% translate 'remove' %}">
+                        <input type="submit" class="btn btn-outline btn-primary" value="{% translate 'remove' %}">
                     </form>
                 </div>
             </li>
@@ -91,10 +87,6 @@
             </li>
         {% endfor %}
     </ul>
-
-    <h3 class="my-5">
-        {% translate 'link new letter' %}
-    </h3>
 
     {% if show_letter_search_form == True %}
 

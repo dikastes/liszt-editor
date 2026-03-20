@@ -7,6 +7,9 @@ module.exports = {
     "./apps/**/templates/**/*.js",
   ],
   safelist: [
+    'disabled:!bg-white',
+    'disabled:!border-black',
+    'disabled:!text-black',
     'mb-1',
     'justify-start',
     'text-primary-content',

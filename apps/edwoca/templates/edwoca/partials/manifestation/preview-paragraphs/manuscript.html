@@ -1,33 +1,30 @@
+{% load i18n %}
+
 <p class="m-0 truncate">
-	<span class="mr-5">
-		<em> Manuskriptspezifika: </em>
+	<span class="mr-5 align-middle">
+		<em> {% translate 'manuscript characteristics' %}: </em>
 	</span>
-	{% if object.paper %}
-		<span class="inline-block w-48 truncate mr-5">
-			{{ object.paper }}
+	{% if object.is_singleton and object.get_single_item.extent %}
+		<span class="inline-block w-48 truncate mr-5 align-middle">
+			{{ object.get_single_item.extent }}
 		</span>
 	{% else %}
-		<span class="badge badge-primary">!</span> keine Papierangaben
+		<span class="badge badge-primary ml-5">!</span>
+		{% translate 'extent not specified' %}
 	{% endif %}
-	{% if object.extent %}
-		<span class="inline-block w-48 truncate mr-5">
-			{{ object.extent }}
+	{% if object.is_singleton and object.get_single_item.measure %}
+		<span class="inline-block w-48 truncate mr-5 align-middle">
+			{{ object.get_single_item.measure }}
 		</span>
 	{% else %}
-		<span class="badge badge-primary">!</span> keine Umfangangaben
-	{% endif %}
-	{% if object.measure %}
-		<span class="inline-block w-48 truncate mr-5">
-			{{ object.measure }}
-		</span>
-	{% else %}
-		<span class="badge badge-primary">!</span> keine Maßangaben
+		<span class="badge badge-primary ml-5">!</span>
+		{% translate 'measure not specified' %}
 	{% endif %}
 </p>
 {% if object.private_manuscript_comment %}
 <p class="m-0 truncate">
 	<span class="badge badge-primary mr-5">
-		Kommentar
+		{% translate 'comment' %}
 	</span>
 	{{ object.private_manuscript_comment }}
 </p>

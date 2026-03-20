@@ -852,6 +852,7 @@ class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
 class ManifestationCommentUpdateView(SimpleFormView):
     model = Manifestation
     property = 'comment'
+    view_title = _('comment')
 
 
 def manifestation_print_update(request, pk):
@@ -1431,7 +1432,7 @@ def corporation_provenance_add_owner(request, pk, cps_id, corporation_id):
 def corporation_provenance_add_bib(request, pk, cps_id, bib_id):
     cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
     bib = get_object_or_404(ZotItem, pk=bib_id)
-    cps.bib = bib
+    cps.bib.add(bib)
     cps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
 

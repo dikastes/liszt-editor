@@ -13,7 +13,7 @@ from dmad_on_django.models import Period, Corporation
 from dmad_on_django.models.base import DocumentationStatus
 from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting, ManifestationPlace
-from dominate.tags import div, label, span, _input, h1
+from dominate.tags import div, label, span, _input, h1, h2, h3
 from dominate.util import raw
 from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
@@ -30,8 +30,8 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
                         'class': SimpleFormMixin.text_input_classes,
                         'form': 'form'
                     }),
-                'working_title': TextInput( attrs = {
-                        'class': SimpleFormMixin.text_input_classes,
+                'working_title': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
                 'private_head_comment': Textarea( attrs = {
@@ -52,8 +52,8 @@ class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
                 'private_title_comment'
             ]
         widgets = {
-                'source_title': TextInput( attrs = {
-                        'class': SimpleFormMixin.text_input_classes,
+                'source_title': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
                 'private_dedication_comment': Textarea( attrs = {
@@ -146,6 +146,77 @@ class ManifestationCommentForm(CommentForm):
                         'class': SimpleFormMixin.text_area_classes
                     })
             })
+
+    first_save = forms.DateTimeField(
+            label=_('first save'),
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black' })
+        )
+    last_save = forms.DateTimeField(
+            label=_('last save'),
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black'})
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['first_save'].initial = self.instance.first_save
+            self.fields['last_save'].initial = self.instance.last_save
+
+    def as_daisy(self):
+        form = div()
+
+        private_comment_field = self['private_comment']
+        public_comment_field = self['public_comment']
+        first_editor_field = self['first_editor']
+        taken_information_field = self['taken_information']
+        first_save_field = self['first_save']
+        last_save_field = self['last_save']
+        editing_history_field = self['editing_history']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(private_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(private_comment_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(public_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(public_comment_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(taken_information_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(taken_information_field))
+            h2(_('editing history'))
+            h3(_('initial recording'))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(first_editor_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(first_editor_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(first_save_field.label, cls=SimpleFormMixin.label_text_classes)
+                with div(cls='flex'):
+                    with div(cls='flex'):
+                        raw(str(first_save_field))
+                    div(cls='flex-1')
+            h3(_('further recording'))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(editing_history_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(editing_history_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
+                with div(cls='flex'):
+                    with div(cls='flex'):
+                        raw(str(last_save_field))
+                    div(cls='flex-1')
+
+        return mark_safe(str(form))
 
 
 class ManifestationBibForm(BaseBibForm):
@@ -277,8 +348,7 @@ class ManifestationClassificationForm(ModelForm):
                 'choir_score',
                 'piano_reduction',
                 'particell',
-                'score',
-                'parts'
+                'score'
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
@@ -329,9 +399,6 @@ class ManifestationClassificationForm(ModelForm):
                 'score': CheckboxInput( attrs = {
                         'class': 'toggle'
                     }),
-                'parts': CheckboxInput( attrs = {
-                        'class': 'toggle'
-                    })
             }
 
     def __init__(self, *args, **kwargs):
@@ -376,7 +443,6 @@ class ManifestationClassificationForm(ModelForm):
         piano_reduction_field = self['piano_reduction']
         particell_field = self['particell']
         score_field = self['score']
-        parts_field = self['parts']
 
         with form:
             # upper palette with source type and manifestaion form
@@ -417,9 +483,6 @@ class ManifestationClassificationForm(ModelForm):
                     raw(str(proof_field))
                     span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(part_field))
-                    span(part_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
                     raw(str(further_edition_field))
                     span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
 
@@ -437,8 +500,8 @@ class ManifestationClassificationForm(ModelForm):
                 raw(str(score_field))
                 span(score_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(parts_field))
-                span(parts_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(part_field))
+                span(part_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
 
