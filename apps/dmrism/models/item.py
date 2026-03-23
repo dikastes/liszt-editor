@@ -1,4 +1,5 @@
 from .base import *
+from dmrism.models.base import BaseBib
 from django.core.exceptions import ValidationError, FieldError
 from django.db import models
 from django.db import transaction
@@ -313,7 +314,8 @@ class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
         )
     bib = models.ManyToManyField(
             'bib.ZotItem',
-            related_name = 'person_provenance_stations'
+            related_name = 'person_provenance_stations',
+            through = 'PersonProvenanceStationBib'
         )
     period = models.ForeignKey(
             'dmad.Period',
@@ -338,7 +340,8 @@ class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
         )
     bib = models.ManyToManyField(
             'bib.ZotItem',
-            related_name = 'corporation_provenance_stations'
+            related_name = 'corporation_provenance_stations',
+            through = 'CorporationProvenanceStationBib'
         )
     period = models.ForeignKey(
             'dmad.Period',
@@ -347,6 +350,22 @@ class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             null = True,
             related_name = 'corporation_provenance_stations'
             )
+
+
+class PersonProvenanceStationBib(BaseBib):
+    person_provenance_station = models.ForeignKey(
+            'PersonProvenanceStation',
+            on_delete = models.CASCADE,
+            related_name = 'bib_set'
+        )
+
+
+class CorporationProvenanceStationBib(BaseBib):
+    corporation_provenance_station = models.ForeignKey(
+            'CorporationProvenanceStation',
+            on_delete = models.CASCADE,
+            related_name = 'bib_set'
+        )
 
 
 class BaseDigitalCopy(models.Model):

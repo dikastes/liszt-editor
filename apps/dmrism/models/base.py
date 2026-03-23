@@ -65,12 +65,27 @@ class BaseContributor(models.Model):
 class BaseBib(models.Model):
     class Meta:
         abstract = True
+    class LocationType(models.TextChoices):
+        PAGE = 'P', _('page')
+        COLUMN = 'C', _('column')
+        LOT = 'L', _('lot')
 
     bib = models.ForeignKey(
-        'bib.ZotItem',
-        on_delete=models.CASCADE,
-        #related_name='contributed_to'
-    )
+            'bib.ZotItem',
+            on_delete=models.CASCADE,
+        )
+    location = models.CharField(
+            max_length = 20,
+            null = True,
+            blank = True,
+            verbose_name = _('bib location')
+        )
+    location_type = models.CharField(
+            max_length = 1,
+            choices = LocationType,
+            default = LocationType.PAGE,
+            verbose_name = _('bib location type')
+        )
 
 
 class RelatedEntity(models.Model):

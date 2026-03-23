@@ -5,26 +5,39 @@
 {% block content %}
 
 {% include 'edwoca/partials/manifestation/preview-divs/bib_prolog.html' %}
+    <form class="hidden" method="post" id="form">
+        {% csrf_token %}
+        <input type="submit" id="submit-form">
+    </form>
 
     <h2 class="my-5">
         {% translate 'bibliography' %}
     </h2>
 
     <ul>
-        {% for bib in object.bib_set.all %}
+        {% for bib_form in manifestation_bib_forms %}
             <li>
-                <div class="flex gap-5">
-                    <div class="flex-1 pseudo-input border border-black flex items-center">
-                        {{ bib.bib }}
+                <div class="gap-5 items-end p-5 my-5 bg-base-100">
+                    <div class="label">
+                        <span class="label-text">
+                            {% translate 'title' %}
+                        </span>
                     </div>
-                    <form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_bib_remove' bib.id %}" class="flex-0">
-                        {% csrf_token %}
-                        <input type="submit" class="btn btn-outline btn-primary" value="{% translate 'remove' %}">
-                    </form>
+                    <div class="pseudo-input bg-white border border-black flex items-center">
+                        {{ bib_form.instance.bib }}
+                    </div>
+                    {{ bib_form.as_daisy }}
+                    <div class="flex">
+                        <div class="flex-1"></div>
+                        <form method="post" action="{% url 'edwoca:'|add:entity_type|add:'_bib_remove' bib_form.instance.id %}" class="flex-0 mb-0">
+                            {% csrf_token %}
+                            <input type="submit" class="btn btn-outline btn-primary" value="{% translate 'remove reference' %}">
+                        </form>
+                    </div>
                 </div>
             </li>
         {% empty %}
-            <li>
+            <li class='my-5'>
                 <em>
                     {% translate 'no bibliographic datasets have been linked' %}
                 </em>
@@ -80,7 +93,7 @@
                 </div>
             </li>
         {% empty %}
-            <li> 
+            <li class='my-5'>
                 <em>
                     {% translate 'no letters have been linked' %}
                 </em>

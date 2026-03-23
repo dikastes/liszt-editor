@@ -220,10 +220,10 @@ class ManifestationCommentForm(CommentForm):
 
 
 class ManifestationBibForm(BaseBibForm):
-    class Meta(BaseBibForm.Meta):
+    class Meta:
         model = ManifestationBib
-        fields = BaseBibForm.Meta.fields + [ 'manifestation' ]
-        widgets = dict(BaseBibForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
+        fields = BaseBibForm.Meta.fields
+        widgets = BaseBibForm.Meta.widgets
 
 
 class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
@@ -256,6 +256,7 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
         ]
         widgets = {
                 'history': Textarea( attrs = {
+
                         'class': SimpleFormMixin.text_area_classes
                     }),
                 'date_diplomatic': Textarea( attrs = {

@@ -187,6 +187,10 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
         form = div(cls='mb-10')
         date_div = self.get_date_div()
 
+        for hidden in self.hidden_fields():
+            hidden.field.widget.attrs['form'] = 'form'
+            form.add(raw(str(hidden)))
+
         form.add(date_div)
 
         return mark_safe(str(form))
@@ -219,6 +223,10 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     def as_daisy(self):
         form = div(cls='mb-10')
         date_div = self.get_date_div()
+
+        for hidden in self.hidden_fields():
+            hidden.field.widget.attrs['form'] = 'form'
+            form.add(raw(str(hidden)))
 
         form.add(date_div)
 
@@ -353,3 +361,50 @@ ItemHandwritingFormSet = inlineformset_factory(
         extra = 0,
         can_delete = True
     )
+
+
+class PersonProvenanceStationBibForm(BaseBibForm):
+    class Meta:
+        model = PersonProvenanceStationBib
+        fields = BaseBibForm.Meta.fields
+        widgets = BaseBibForm.Meta.widgets
+
+
+class CorporationProvenanceStationBibForm(BaseBibForm):
+    class Meta:
+        model = CorporationProvenanceStationBib
+        fields = BaseBibForm.Meta.fields
+        widgets = BaseBibForm.Meta.widgets
+
+
+PersonProvenanceFormSet = inlineformset_factory(
+    parent_model=Item,
+    model=PersonProvenanceStation,
+    form=PersonProvenanceStationForm,
+    extra=0,
+    can_delete=False
+)
+
+PersonProvenanceBibFormSet = inlineformset_factory(
+    parent_model=PersonProvenanceStation,
+    model=PersonProvenanceStationBib,
+    form=PersonProvenanceStationBibForm,
+    extra=0,
+    can_delete=False
+)
+
+CorporationProvenanceFormSet = inlineformset_factory(
+    parent_model=Item,
+    model=CorporationProvenanceStation,
+    form=CorporationProvenanceStationForm,
+    extra=0,
+    can_delete=False
+)
+
+CorporationProvenanceBibFormSet = inlineformset_factory(
+    parent_model=CorporationProvenanceStation,
+    model=CorporationProvenanceStationBib,
+    form=CorporationProvenanceStationBibForm,
+    extra=0,
+    can_delete=False
+)

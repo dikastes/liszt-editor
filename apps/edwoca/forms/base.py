@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 from dominate.util import raw
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Period
+from dominate.tags import div, label, span
 
 
 class SimpleFormMixin:
@@ -151,26 +152,42 @@ class CommentForm(ModelForm, SimpleFormMixin):
 
 class BaseBibForm(ModelForm):
     class Meta:
-        fields = [ 'bib', 'id' ]
+        fields = [
+                'location',
+                'location_type'
+            ]
         widgets = {
-                'bib': Select( attrs = {
-                        'class': 'autocomplete-select select select-bordered w-full'
+                'location': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
                     }),
-                'id': HiddenInput()
+                'location_type': Select( attrs = {
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
+                    })
             }
 
     def as_daisy(self):
-        form = div(cls='mb-10')
+        form = div()
 
-        if self.instance.pk:
-           form.add(raw(str(self['id'])))
+        location_field = self['location']
+        location_type_field = self['location_type']
 
-        bib_field = self['bib']
+        with form:
+            # palette
+            with div(cls=SimpleFormMixin.palette_classes):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(location_type_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(location_type_field))
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(location_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(location_field))
 
-        bib_container = div(cls='flex-1')
-        bib_container.add(raw(str(bib_field)))
-
-        form.add(bib_container)
+        for hidden in self.hidden_fields():
+            hidden.field.widget.attrs['form'] = 'form'
+            form.add(raw(str(hidden)))
 
         return mark_safe(str(form))
 
