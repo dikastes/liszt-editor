@@ -292,25 +292,15 @@ class ItemContributor(BaseContributor):
     )
 
 
-class ProvenanceStationRenderMixin:
-    def __str__(self):
-        if not self.owner:
-            return str(_('<< new provenance station >>'))
-        period_string = self.period or 'ohne Zeitraum'
-        return f'{str(self.owner)} ({str(period_string)})'
-
-
-class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
+class PersonProvenanceStation(models.Model):
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE,
             related_name = 'person_provenance_stations'
         )
-    owner = models.ForeignKey(
+    owner = models.ManyToManyField(
             'dmad.Person',
-            on_delete = models.CASCADE,
-            related_name = 'provenance_stations',
-            null = True
+            related_name = 'provenance_stations'
         )
     bib = models.ManyToManyField(
             'bib.ZotItem',
@@ -325,8 +315,18 @@ class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             related_name = 'person_provenance_stations'
         )
 
+    def __str__(self):
+        if len(self.owner.all()) > 1:
+            owner_string = str(self.owner.first()) + ' et al.'
+        elif len(self.owner.all()) == 1:
+            owner_string = str(self.owner.first())
+        else:
+            return str(_('<< new provenance station >>'))
+        period_string = self.period or 'ohne Zeitraum'
+        return f'{str(owner_string)} ({str(period_string)})'
 
-class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
+
+class CorporationProvenanceStation(models.Model):
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE,
@@ -350,6 +350,12 @@ class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             null = True,
             related_name = 'corporation_provenance_stations'
             )
+
+    def __str__(self):
+        if not self.owner:
+            return str(_('<< new provenance station >>'))
+        period_string = self.period or 'ohne Zeitraum'
+        return f'{str(self.owner)} ({str(period_string)})'
 
 
 class PersonProvenanceStationBib(BaseBib):

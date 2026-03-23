@@ -1661,7 +1661,7 @@ def modification_remove_related_expression(request, modification_pk):
 def person_provenance_add_owner(request, pk, pps_id, person_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
     person = get_object_or_404(Person, pk=person_id)
-    pps.owner = person
+    pps.owner.add(person)
     pps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
@@ -1691,9 +1691,10 @@ def corporation_provenance_add_bib(request, pk, cps_id, bib_id):
     return redirect('edwoca:manifestation_provenance', pk=pk)
 
 
-def person_provenance_remove_owner(request, pk, pps_id):
+def person_provenance_remove_owner(request, pk, pps_id, owner_id):
     pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
-    pps.owner = None
+    owner = get_object_or_404(Person, pk=owner_id)
+    pps.owner.remove(owner)
     pps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
 

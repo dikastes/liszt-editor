@@ -28,7 +28,7 @@
 
             <div class="collapse-content mt-5">
 
-                {% if entry.form.instance.owner %}
+                {% for owner in entry.form.instance.owner.all %}
                     <div class="flex items-end mt-5 gap-5">
                         <label class="flex-1 gap-2">
                             <div class="label">
@@ -37,38 +37,41 @@
                                 </span>
                             </div>
                             <div class="w-full bg-white border border-black pseudo-input flex items-center">
-                                {{ entry.form.instance.owner }}
+                                {{ owner }}
                             </div>
                         </label>
                         <a class="btn btn-outline btn-primary"
-                           href="{% url 'edwoca:person_provenance_remove_owner' item.id entry.form.instance.id %}">
+                           href="{% url 'edwoca:person_provenance_remove_owner' item.id entry.form.instance.id owner.id %}">
                             {% translate 'remove' %}
                         </a>
                     </div>
-                {% else %}
-                    <form method="get" class="flex mt-5 items-end">
-                        <label class="flex-1">
-                            <div class="label">
-                                <span class="label-text">{% translate 'owner' %}</span>
-                            </div>
-                            {{ entry.owner_search_form.q }}
-                        </label>
-                        <input type="submit" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
-                    </form>
+                {% empty %}
+                    <p class="note my-5">
+                        {% translate 'no owners' %}
+                    </p>
+                {% endfor %}
+                <form method="get" class="flex mt-5 items-end">
+                    <label class="flex-1">
+                        <div class="label">
+                            <span class="label-text">{% translate 'owner' %}</span>
+                        </div>
+                        {{ entry.owner_search_form.q }}
+                    </label>
+                    <input type="submit" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
+                </form>
 
-                    {% if entry.owner_results %}
-                        <ul class="border bg-white border-black p-2 h-32 overflow-auto">
-                            {% for person in entry.owner_results %}
-                                <li>
-                                    <a href="{% url 'edwoca:person_provenance_add_owner' item.id entry.form.instance.id person.pk %}">
-                                        {{ person.object }}
-                                    </a>
-                                </li>
-                            {% empty %}
-                                <li>{% translate 'no search results' %}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
+                {% if entry.owner_results %}
+                    <ul class="border bg-white border-black p-2 h-32 overflow-auto">
+                        {% for person in entry.owner_results %}
+                            <li>
+                                <a href="{% url 'edwoca:person_provenance_add_owner' item.id entry.form.instance.id person.pk %}">
+                                    {{ person.object }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>{% translate 'no search results' %}</li>
+                        {% endfor %}
+                    </ul>
                 {% endif %}
 
                 {{ entry.form.as_daisy }}
