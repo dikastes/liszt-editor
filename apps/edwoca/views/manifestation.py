@@ -1827,14 +1827,15 @@ def manifestation_corporation_dedication_delete(request, pk):
 def manifestation_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
     dedication = get_object_or_404(ManifestationPersonDedication, pk=dedication_id)
     person = get_object_or_404(Person, pk=person_id)
-    dedication.dedicatee = person
+    dedication.dedicatee.add(person)
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
 
-def manifestation_person_dedication_remove_dedicatee(request, pk, dedication_id):
+def manifestation_person_dedication_remove_dedicatee(request, pk, dedication_id, person_id):
     dedication = get_object_or_404(ManifestationPersonDedication, pk=dedication_id)
-    dedication.dedicatee = None
+    person = get_object_or_404(Person, pk=person_id)
+    dedication.dedicatee.remove(person)
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
@@ -1842,14 +1843,15 @@ def manifestation_person_dedication_remove_dedicatee(request, pk, dedication_id)
 def manifestation_corporation_dedication_add_dedicatee(request, pk, dedication_id, corporation_id):
     dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
     corporation = get_object_or_404(Corporation, pk=corporation_id)
-    dedication.dedicatee = corporation
+    dedication.dedicatee.add(corporation)
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
 
-def manifestation_corporation_dedication_remove_dedicatee(request, pk, dedication_id):
+def manifestation_corporation_dedication_remove_dedicatee(request, pk, dedication_id, corporation_id):
     dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
-    dedication.dedicatee = None
+    corporation = get_object_or_404(Corporation, pk=corporation_id)
+    dedication.dedicatee.remove(corporation)
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 

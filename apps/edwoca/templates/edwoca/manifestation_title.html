@@ -126,7 +126,7 @@
         </div>
         <div class="collapse-content mt-5">
             {{ person_dedication_form.as_daisy }}
-            {% if person_dedication_form.instance.dedicatee %}
+            {% for dedicatee in person_dedication_form.instance.dedicatee.all %}
                 <div class="flex items-center my-5">
                     <label class="flex-1 gap-2">
                         <div class="label">
@@ -135,54 +135,57 @@
                             </span>
                         </div>
                         <div class="flex gap-5">
-                            <input type="text" class="flex-1 grow pseudo-input border border-black bg-white" disabled value="{{ person_dedication_form.instance.dedicatee }}" />
-                            <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_person_dedication_remove_dedicatee' object.id person_dedication_form.instance.id %}">
+                            <input type="text" class="flex-1 grow pseudo-input border border-black bg-white" disabled value="{{ dedicatee }}" />
+                            <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_person_dedication_remove_dedicatee' object.id person_dedication_form.instance.id dedicatee.id %}">
                                 {% translate 'remove' %}
                             </a>
                         </div>
                     </label>
                 </div>
-            {% else %}
-                <div class="my-5">
-                    <div class="items-center">
-                        <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
-                            <label class="flex-1">
-                                <div class="label">
-                                    <span class="label-text">
-                                        {% translate 'dedicatee' %}
-                                    </span>
-                                </div>
-                                <div class="flex">
-                                    <input
-                                        type="text"
-                                        name="dedicatee-q"
-                                        class="input input-bordered border-black bg-white flex-1"
-                                        placeholder="{% translate 'search persons' %}"
-                                        {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
-                                            value="{{ query_dedicatee }}"
-                                        {% endif %}
-                                        >
-                                    <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
-                                </div>
-                            </label>
-                            <input type="hidden" name="person_dedication_id" value="{{ person_dedication_form.instance.id }}">
-                        </form>
-                    </div>
-                    {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
-                        <ul class="border border-black p-3 overflow-auto h-32 bg-white">
-                        {% for person in found_persons %}
-                            <li>
-                                <a href="{% url 'edwoca:manifestation_person_dedication_add_dedicatee' object.id person_dedication_form.instance.id person.pk %}">{{ person.object }}</a>
-                            </li>
-                        {% empty %}
-                            <li>
-                                {% translate 'no search results' %}
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
+            {% empty %}
+                <p class="note my-5">
+                    {% translate 'no dedicatees' %}
+                </p>
+            {% endfor %}
+            <div class="my-5">
+                <div class="items-center">
+                    <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
+                        <label class="flex-1">
+                            <div class="label">
+                                <span class="label-text">
+                                    {% translate 'dedicatee' %}
+                                </span>
+                            </div>
+                            <div class="flex">
+                                <input
+                                    type="text"
+                                    name="dedicatee-q"
+                                    class="input input-bordered border-black bg-white flex-1"
+                                    placeholder="{% translate 'search persons' %}"
+                                    {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
+                                        value="{{ query_dedicatee }}"
+                                    {% endif %}
+                                    >
+                                <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
+                            </div>
+                        </label>
+                        <input type="hidden" name="person_dedication_id" value="{{ person_dedication_form.instance.id }}">
+                    </form>
                 </div>
-            {% endif %}
+                {% if query_dedicatee and person_dedication_id == person_dedication_form.instance.id %}
+                    <ul class="border border-black p-3 overflow-auto h-32 bg-white">
+                    {% for person in found_persons %}
+                        <li>
+                            <a href="{% url 'edwoca:manifestation_person_dedication_add_dedicatee' object.id person_dedication_form.instance.id person.pk %}">{{ person.object }}</a>
+                        </li>
+                    {% empty %}
+                        <li>
+                            {% translate 'no search results' %}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
 
             {% if person_dedication_form.instance.place %}
                 <div class="flex items-center my-5">
@@ -263,7 +266,7 @@
         <div class="collapse-content mt-5">
             {{ corporation_dedication_form.as_daisy }}
 
-            {% if corporation_dedication_form.instance.dedicatee %}
+            {% for dedicatee in corporation_dedication_form.instance.dedicatee.all %}
                 <div class="flex items-center my-5">
                     <label class="flex-1 gap-2">
                         <div class="label">
@@ -272,54 +275,57 @@
                             </span>
                         </div>
                         <div class="flex gap-5">
-                            <input type="text" class="flex-1 grow pseudo-input border border-black bg-white" disabled value="{{ corporation_dedication_form.instance.dedicatee }}" />
-                            <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_corporation_dedication_remove_dedicatee' object.id corporation_dedication_form.instance.id %}">
+                            <input type="text" class="flex-1 grow pseudo-input border border-black bg-white" disabled value="{{ dedicatee }}" />
+                            <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_corporation_dedication_remove_dedicatee' object.id corporation_dedication_form.instance.id dedicatee.id %}">
                                 {% translate 'remove' %}
                             </a>
                         </div>
                     </label>
                 </div>
-            {% else %}
-                <div class="my-5">
-                    <div class="items-center">
-                        <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
-                            <label class="flex-1">
-                                <div class="label">
-                                    <span class="label-text">
-                                        {% translate 'dedicatee' %}
-                                    </span>
-                                </div>
-                                <div class="flex">
-                                    <input
-                                        type="text"
-                                        name="dedicatee-q"
-                                        class="input input-bordered border-black bg-white flex-1"
-                                        placeholder="{% translate 'search corporations' %}"
-                                        {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
-                                            value="{{ query_dedicatee }}"
-                                        {% endif %}
-                                        >
-                                    <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
-                                </div>
-                            </label>
-                            <input type="hidden" name="corporation_dedication_id" value="{{ corporation_dedication_form.instance.id }}">
-                        </form>
-                    </div>
-                    {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
-                        <ul class="border border-black p-3 overflow-auto h-32 bg-white">
-                        {% for corporation in found_corporations %}
-                            <li>
-                                <a href="{% url 'edwoca:manifestation_corporation_dedication_add_dedicatee' object.id corporation_dedication_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
-                            </li>
-                        {% empty %}
-                            <li>
-                                {% translate 'no search results' %}
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
+            {% empty %}
+                <p class="note my-5">
+                    {% translate 'no dedicatees' %}
+                </p>
+            {% endfor %}
+            <div class="my-5">
+                <div class="items-center">
+                    <form action="{% url 'edwoca:manifestation_title' object.id %}" method="get" class="flex">
+                        <label class="flex-1">
+                            <div class="label">
+                                <span class="label-text">
+                                    {% translate 'dedicatee' %}
+                                </span>
+                            </div>
+                            <div class="flex">
+                                <input
+                                    type="text"
+                                    name="dedicatee-q"
+                                    class="input input-bordered border-black bg-white flex-1"
+                                    placeholder="{% translate 'search corporations' %}"
+                                    {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
+                                        value="{{ query_dedicatee }}"
+                                    {% endif %}
+                                    >
+                                <input type="submit" class="btn flex-0 btn-outline border-l-0" value="{% translate 'search' %}"/>
+                            </div>
+                        </label>
+                        <input type="hidden" name="corporation_dedication_id" value="{{ corporation_dedication_form.instance.id }}">
+                    </form>
                 </div>
-            {% endif %}
+                {% if query_dedicatee and corporation_dedication_id == corporation_dedication_form.instance.id %}
+                    <ul class="border border-black p-3 overflow-auto h-32 bg-white">
+                    {% for corporation in found_corporations %}
+                        <li>
+                            <a href="{% url 'edwoca:manifestation_corporation_dedication_add_dedicatee' object.id corporation_dedication_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
+                        </li>
+                    {% empty %}
+                        <li>
+                            {% translate 'no search results' %}
+                        </li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
 
             {% if corporation_dedication_form.instance.place %}
                 <div class="flex items-center my-5">

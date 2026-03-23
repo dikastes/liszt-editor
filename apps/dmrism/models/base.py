@@ -247,37 +247,42 @@ class BasePersonDedication(BaseDedication):
     class Meta:
         abstract = True
 
-    dedicatee = models.ForeignKey(
+    dedicatee = models.ManyToManyField(
             'dmad.Person',
-            on_delete = models.SET_NULL,
-            null = True,
             related_name = '%(class)s'
         )
 
     def __str__(self):
         super_str = super().__str__()
 
-        if self.dedicatee:
-            return f'{super_str} ({self.dedicatee.get_default_name()})'
+        if len(self.dedicatee.all()) > 1:
+            dedicatee_str = self.dedicatee.first().get_default_name() + ' et. al.'
+        elif len(self.dedicatee.all()) == 1:
+            dedicatee_str = self.dedicatee.first().get_default_name()
+        else:
+            return super_str
 
-        return super_str
+        return f'{super_str} ({dedicatee_str})'
 
 
 class BaseCorporationDedication(BaseDedication):
     class Meta:
         abstract = True
 
-    dedicatee = models.ForeignKey(
+    dedicatee = models.ManyToManyField(
             'dmad.Corporation',
-            on_delete = models.SET_NULL,
-            null = True,
             related_name = '%(class)s'
         )
 
     def __str__(self):
         super_str = super().__str__()
 
-        if self.dedicatee:
-            return f'{super_str} ({self.dedicatee.get_default_name()})'
+        if len(self.dedicatee.all()) > 1:
+            dedicatee_str = self.dedicatee.first().get_default_name() + ' et. al.'
+        elif len(self.dedicatee.all()) == 1:
+            dedicatee_str = self.dedicatee.first().get_default_name()
+        else:
+            return super_str
 
-        return super_str
+        return f'{super_str} ({dedicatee_str})'
+
