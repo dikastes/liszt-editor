@@ -1555,9 +1555,9 @@ def manifestation_dedication_htmx_search(request):
 
         return render(request, 'edwoca/partials/manifestation/dedication_search_results.html', {
             'results': results,
-        }) if results else render(request, 'edwoca/partials/manifestation/dedication_search_results.html', {
-            'results' : _('no results')
+            'no_result_msg': _('no results') if not results else None
         })
+
 
     raise Http404
 
