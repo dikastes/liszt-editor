@@ -1,0 +1,22 @@
+{% load i18n %}
+
+<ul class="border border-black p-3 overflow-auto h-32 bg-white mt-2">
+{% for res in results %}
+    <li class="p-1 hover:bg-gray-100 flex justify-between items-center">
+        <span>{{ res.object }}</span>
+        <button class="btn btn-xs btn-outline"
+                hx-post="{% url 'name_deines_update_views' %}"
+                hx-target="#dedicatee-display-{{ dedication_model_id }}"
+                hx-vals='{
+                    "dedicatee_model_id": "{{ res.pk }}",
+                    "dedicatee_model": "{{ dedicatee_model }}",
+                    "dedication_model_id": "{{ dedication_model_id }}",
+                    "dedication_model": "{{ dedication_model_name }}"
+                }'>
+            {% translate 'select' %}
+        </button>
+    </li>
+{% empty %}
+    <li>{{ no_result_msg }}</li>
+{% endfor %}
+</ul>

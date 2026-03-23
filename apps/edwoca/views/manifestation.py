@@ -1540,6 +1540,10 @@ class ManifestationDigitalCopyDeleteView(DeleteView):
         return reverse('edwoca:manifestation_digital_copy',kwargs={'pk': manifestation.id})
 
 def manifestation_dedication_htmx_search(request):
+    dedication_model_name = request.GET.get('dedication_model')
+    dedicatee_model_name = request.GET.get('dedicatee_model')
+    dedication_model_id = request.GET.get('dedication_model_id')
+
 
     search_from = SearchForm(request.GET)
 
@@ -1555,6 +1559,9 @@ def manifestation_dedication_htmx_search(request):
 
         return render(request, 'edwoca/partials/manifestation/dedication_search_results.html', {
             'results': results,
+            'dedication_model_name' : dedication_model_name,
+            'dedicatee_model_name' : dedicatee_model_name,
+            'dedication_model_id' : dedication_model_id,
             'no_result_msg': _('no results') if not results else None
         })
 
