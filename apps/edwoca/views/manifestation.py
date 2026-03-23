@@ -1,4 +1,6 @@
 import re
+
+from django.http import Http404
 from haystack.query import SQ
 from ..forms.manifestation import *
 from calendar import monthrange
@@ -18,6 +20,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
+from django.apps import apps
 from liszt_util.forms import SearchForm
 from dmad_on_django.models import Place, Corporation, Status, Person
 from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting
@@ -1536,7 +1539,47 @@ class ManifestationDigitalCopyDeleteView(DeleteView):
         manifestation = self.object.item.manifestation
         return reverse('edwoca:manifestation_digital_copy',kwargs={'pk': manifestation.id})
 
+def manifestation_dedication_htmx_search(request):
 
+    search_from = SearchForm(request.GET)
+
+    if search_from.is_valid():
+        model_name = request.GET.get('model')
+
+        try:
+            model = apps.get_model('dmad', model_name)
+        except LookupError:
+            raise Http404
+
+        results = search_from.search().model(model)[:10]
+
+        return render(request, 'edwoca/partials/manifestation/dedication_search_results.html', {
+            'results': results,
+        }) if results else render(request, 'edwoca/partials/manifestation/dedication_search_results.html', {
+            'results' : _('no results')
+        })
+
+    raise Http404
+
+
+def manifestation_dedication_htmx_update(request):
+    dedication_model_name = request.POST.get('dedication_model')
+    dedicatee_model_name = request.POST.get('dedicatee_model')
+    dedication_model_id = request.POST.get('dedication_model_id')
+    dedicatee_model_id = request.POST.get('dedicatee_model_id')
+
+    try:
+        dedicatee_model = apps.get_model('dmad', dedicatee_model_name)
+        dedication_model = apps.get_model('dmrism', dedication_model_name)
+    except LookupError:
+        raise Http404
+
+    dedicatee = get_object_or_404(dedicatee_model, pk=dedicatee_model_id)
+    dedication_model.objects.filter(pk=dedication_model_id).update(dedicatee=dedicatee)
+
+    return render(request, 'edwoca/partials/manifestation/dedication_dedicatee_display.html',{
+        'dedicatee': dedicatee,
+    })
 
 def person_dedication_add(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
