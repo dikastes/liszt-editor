@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-24 14:57+0100\n"
+"POT-Creation-Date: 2026-03-24 16:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: German\n"
@@ -25,7 +25,7 @@ msgstr "Bevorzugter Titel"
 msgid "Alternative"
 msgstr "Titelvariante"
 
-#: apps/dmad_on_django/models/base.py:24 apps/edwoca/forms/manifestation.py:553
+#: apps/dmad_on_django/models/base.py:24 apps/edwoca/forms/manifestation.py:558
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
@@ -313,7 +313,7 @@ msgstr "aktuell"
 msgid "Former"
 msgstr "vormalig"
 
-#: apps/dmrism/models/item.py:236 apps/edwoca/forms/manifestation.py:704
+#: apps/dmrism/models/item.py:236 apps/edwoca/forms/manifestation.py:709
 msgid "holding institution"
 msgstr "Bestandshaltende Institution"
 
@@ -329,36 +329,56 @@ msgstr ""
 msgid "<< institution >>"
 msgstr ""
 
-#: apps/dmrism/models/item.py:329 apps/dmrism/models/item.py:361
+#: apps/dmrism/models/item.py:305
+msgid "acquisition"
+msgstr "Erwerb"
+
+#: apps/dmrism/models/item.py:306
+msgid "disposition"
+msgstr "Abgabe"
+
+#: apps/dmrism/models/item.py:307
+msgid "ownership period"
+msgstr "Besitzzeitraum"
+
+#: apps/dmrism/models/item.py:308
+msgid "ownership date"
+msgstr "Besitzzeitpunkt"
+
+#: apps/dmrism/models/item.py:336 apps/dmrism/models/item.py:378
+msgid "period status"
+msgstr "Datierungsereignis"
+
+#: apps/dmrism/models/item.py:345 apps/dmrism/models/item.py:383
 msgid "<< new provenance station >>"
 msgstr "<< neue Provenienz >>"
 
-#: apps/dmrism/models/item.py:387
+#: apps/dmrism/models/item.py:409
 msgid "Digitized"
 msgstr "Digitalisat"
 
-#: apps/dmrism/models/item.py:388
+#: apps/dmrism/models/item.py:410
 msgid "IIIF Manifest"
 msgstr "IIIF-Manifest"
 
-#: apps/dmrism/models/item.py:389
+#: apps/dmrism/models/item.py:411
 msgid "Private"
 msgstr "Privat"
 
-#: apps/dmrism/models/item.py:390
+#: apps/dmrism/models/item.py:412
 msgid "Working copy"
 msgstr "Arbeitsdigitalisat"
 
-#: apps/dmrism/models/item.py:399 apps/dmrism/models/item.py:445
+#: apps/dmrism/models/item.py:421 apps/dmrism/models/item.py:467
 #: venv/lib/python3.10/site-packages/django/db/models/fields/__init__.py:2642
 msgid "URL"
 msgstr "URL"
 
-#: apps/dmrism/models/item.py:406
+#: apps/dmrism/models/item.py:428
 msgid "link type"
 msgstr "Linktyp"
 
-#: apps/dmrism/models/item.py:450
+#: apps/dmrism/models/item.py:472
 msgid "web reference comment"
 msgstr "Kommentar"
 
@@ -435,13 +455,13 @@ msgid "incomplete"
 msgstr "unvollständig"
 
 #: apps/dmrism/models/manifestation.py:77
-#: apps/edwoca/forms/manifestation.py:685
+#: apps/edwoca/forms/manifestation.py:690
 msgid "working title"
 msgstr "Arbeitstitel"
 
 #: apps/dmrism/models/manifestation.py:83
-#: apps/edwoca/forms/manifestation.py:554
-#: apps/edwoca/forms/manifestation.py:691
+#: apps/edwoca/forms/manifestation.py:559
+#: apps/edwoca/forms/manifestation.py:696
 msgid "source title"
 msgstr "Quellentitel"
 
@@ -450,8 +470,8 @@ msgid "manifestation form"
 msgstr "Quellenform"
 
 #: apps/dmrism/models/manifestation.py:130
-#: apps/edwoca/forms/manifestation.py:556
-#: apps/edwoca/forms/manifestation.py:697
+#: apps/edwoca/forms/manifestation.py:561
+#: apps/edwoca/forms/manifestation.py:702
 msgid "source type"
 msgstr "Quellentyp"
 
@@ -515,7 +535,7 @@ msgid "private print comment"
 msgstr "interner Kommentar zu den Druckspezifika"
 
 #: apps/dmrism/models/manifestation.py:261
-#: apps/edwoca/forms/manifestation.py:555
+#: apps/edwoca/forms/manifestation.py:560
 msgid "plate number"
 msgstr "Plattennummer"
 
@@ -590,7 +610,7 @@ msgid "first editor"
 msgstr "Erstbearbeiter"
 
 #: apps/dmrism/models/manifestation.py:348
-#: apps/edwoca/forms/manifestation.py:201
+#: apps/edwoca/forms/manifestation.py:203
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
@@ -705,57 +725,57 @@ msgstr "berechnen"
 msgid "clear"
 msgstr "leeren"
 
-#: apps/edwoca/forms/manifestation.py:202
+#: apps/edwoca/forms/manifestation.py:204
 msgid "initial recording"
 msgstr "Ersterfassung"
 
-#: apps/edwoca/forms/manifestation.py:214
+#: apps/edwoca/forms/manifestation.py:216
 msgid "further recording"
 msgstr "weitere Bearbeitung"
 
-#: apps/edwoca/forms/manifestation.py:472
+#: apps/edwoca/forms/manifestation.py:477
 msgid "function"
 msgstr "Quellenfunktion"
 
-#: apps/edwoca/forms/manifestation.py:503
+#: apps/edwoca/forms/manifestation.py:508
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: apps/edwoca/forms/manifestation.py:560
+#: apps/edwoca/forms/manifestation.py:565
 #: apps/edwoca/templates/edwoca/create_manifestation.html:16
 #: apps/edwoca/templates/edwoca/manifestation_print.html:18
 #: apps/edwoca/templates/edwoca/manifestation_print.html:28
 msgid "publisher"
 msgstr "Verlag"
 
-#: apps/edwoca/forms/manifestation.py:560
+#: apps/edwoca/forms/manifestation.py:565
 msgid "choose publisher"
 msgstr "Verlag auswählen"
 
-#: apps/edwoca/forms/manifestation.py:705
+#: apps/edwoca/forms/manifestation.py:710
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: apps/edwoca/forms/manifestation.py:709
+#: apps/edwoca/forms/manifestation.py:714
 msgid "Signature"
 msgstr "Signatur"
 
-#: apps/edwoca/forms/manifestation.py:916
+#: apps/edwoca/forms/manifestation.py:921
 #: apps/edwoca/templates/edwoca/manifestation_print.html:135
 msgid "place as documented"
 msgstr "Ort nach Vorlage"
 
-#: apps/edwoca/forms/manifestation.py:919
+#: apps/edwoca/forms/manifestation.py:924
 #: apps/edwoca/templates/edwoca/manifestation_print.html:127
 msgid "place inferred assumed"
 msgstr "Ort unsicher ermittelt"
 
-#: apps/edwoca/forms/manifestation.py:921
+#: apps/edwoca/forms/manifestation.py:926
 #: apps/edwoca/templates/edwoca/manifestation_print.html:129
 msgid "place assumed"
 msgstr "Ort unsicher"
 
-#: apps/edwoca/forms/manifestation.py:924
+#: apps/edwoca/forms/manifestation.py:929
 #: apps/edwoca/templates/edwoca/manifestation_print.html:133
 msgid "place inferred"
 msgstr "Ort ermittelt"

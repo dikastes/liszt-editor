@@ -297,6 +297,16 @@ class ItemContributor(BaseContributor):
     )
 
 
+class BaseProvenanceStation(models.Model):
+    class Meta:
+        abstract = True
+
+    class PeriodStatus(models.TextChoices):
+        ACQUISITION = 'acq', _('acquisition')
+        DISPOSITION = 'dis', _('disposition')
+        OWNERSHIP_PERIOD = 'per', _('ownership period')
+        OWNERSHIP_DATE = 'dat', _('ownership date')
+
 class PersonProvenanceStation(models.Model):
     item = models.ForeignKey(
             'Item',
@@ -318,6 +328,12 @@ class PersonProvenanceStation(models.Model):
             blank = True,
             null = True,
             related_name = 'person_provenance_stations'
+        )
+    period_status = models.CharField(
+            max_length = 3,
+            choices = BaseProvenanceStation.PeriodStatus,
+            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP_PERIOD,
+            verbose_name = _('period status')
         )
 
     def __str__(self):
@@ -355,6 +371,12 @@ class CorporationProvenanceStation(models.Model):
             null = True,
             related_name = 'corporation_provenance_stations'
             )
+    period_status = models.CharField(
+            max_length = 3,
+            choices = BaseProvenanceStation.PeriodStatus,
+            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP_PERIOD,
+            verbose_name = _('period status')
+        )
 
     def __str__(self):
         if not self.owner:

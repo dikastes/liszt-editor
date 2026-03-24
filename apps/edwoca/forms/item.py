@@ -185,16 +185,30 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
             'not_after',
             'display',
             'inferred',
-            'assumed'
+            'assumed',
+            'period_status'
         ]
+        widgets = {
+                'period_status': Select( attrs = {
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
+                    })
+            }
 
     def as_daisy(self):
         form = div(cls='mb-10')
         date_div = self.get_date_div()
+        period_status_field = self['period_status']
 
         for hidden in self.hidden_fields():
             hidden.field.widget.attrs['form'] = 'form'
             form.add(raw(str(hidden)))
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(period_status_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(period_status_field))
 
         form.add(date_div)
 
@@ -222,16 +236,30 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
             'not_after',
             'display',
             'inferred',
-            'assumed'
+            'assumed',
+            'period_status'
         ]
+        widgets = {
+                'period_status': Select( attrs = {
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
+                    })
+            }
 
     def as_daisy(self):
         form = div(cls='mb-10')
         date_div = self.get_date_div()
+        period_status_field = self['period_status']
 
         for hidden in self.hidden_fields():
             hidden.field.widget.attrs['form'] = 'form'
             form.add(raw(str(hidden)))
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(period_status_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(period_status_field))
 
         form.add(date_div)
 
