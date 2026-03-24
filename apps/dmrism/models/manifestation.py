@@ -347,6 +347,10 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             null = True,
             verbose_name = _('editing history')
         )
+    needs_review = models.BooleanField(
+            default = False,
+            verbose_name = _('needs review')
+        )
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -371,19 +375,24 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
 
     def render_title(self, prefix):
+        review_string = ''
+        if self.needs_review:
+            review_string = '!'
+
         if self.is_collection:
             collection = _('coll')
-            return f'({collection}) {prefix} {self.source_title}'
+            return f'{review_string}({collection}) {prefix} {self.source_title}'
 
         source_typed_title = f'{prefix} {self.working_title} ({self.get_source_type_display()})'
+
         if self.part_of:
             part = _('pt')
-            return f'({part}) {source_typed_title}'
+            return f'{review_string}({part}) {source_typed_title}'
         if self.component_of:
             component = _('cmp')
-            return f'({component}) {source_typed_title}'
+            return f'{review_string}({component}) {source_typed_title}'
 
-        return source_typed_title
+        return review_string + source_typed_title
 
     def __str__(self):
         if self.items.count():

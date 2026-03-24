@@ -2,7 +2,7 @@ import re
 from haystack.query import SQ
 from ..forms.manifestation import *
 from calendar import monthrange
-from ..forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet
+from ..forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm
 from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
 from ..forms.publication import PublicationForm
 from ..forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
@@ -1020,17 +1020,24 @@ class ManifestationProvenanceView(UpdateView):
                     'model': Person,
                     'placeholder': _('search persons')
                 }
+            webref_form_class = PersonProvenanceStationWebReferenceForm
         else:
             search_structure['owner'] = {
                     'model': Corporation,
                     'placeholder': _('search corporations')
                 }
+            webref_form_class = CorporationProvenanceStationWebReferenceForm
 
         for form in parent_formset.forms:
             instance = form.instance
 
+            webref_forms = []
+            for webref in form.instance.web_references.all():
+                webref_forms.append(webref_form_class(instance = webref, data = data))
+
             entry = {
-                    'form': form
+                    'form': form,
+                    'web_reference_forms': webref_forms
                 }
 
             for model in search_structure:
@@ -1161,10 +1168,14 @@ class ManifestationProvenanceView(UpdateView):
     def _all_nested_valid(self):
         person_bib = [e['bib_formset'] for e in self.enriched_person]
         corp_bib = [e['bib_formset'] for e in self.enriched_corporation]
+        pwr_forms = [form for forms in self.enriched_person for form in forms['web_reference_forms']]
+        cwr_forms = [form for forms in self.enriched_corporation for form in forms['web_reference_forms']]
 
         return (
             all(fs.is_valid() for fs in person_bib)
             and all(fs.is_valid() for fs in corp_bib)
+            and all(fs.is_valid() for fs in pwr_forms)
+            and all(fs.is_valid() for fs in cwr_forms)
         )
 
     def _forms_valid(self, form):
@@ -1179,10 +1190,14 @@ class ManifestationProvenanceView(UpdateView):
         for entry in self.enriched_person:
             entry['bib_formset'].instance = entry['form'].instance
             entry['bib_formset'].save()
+            for form in entry['web_reference_forms']:
+                form.save()
 
         for entry in self.enriched_corporation:
             entry['bib_formset'].instance = entry['form'].instance
             entry['bib_formset'].save()
+            for form in entry['web_reference_forms']:
+                form.save()
 
         return redirect('edwoca:manifestation_provenance', pk=self.object.pk)
 
@@ -1673,6 +1688,46 @@ def person_provenance_add_bib(request, pk, pps_id, bib_id):
     pps.bib.add(bib)
     pps.save()
     return redirect('edwoca:manifestation_provenance', pk=pk)
+
+
+def person_provenance_add_webref(request, pk, pps_id):
+    pps = get_object_or_404(PersonProvenanceStation, pk=pps_id)
+    PersonProvenanceStationWebReference.objects.create(person_provenance_station = pps)
+
+    item = pps.item
+    if item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+    return redirect('edwoca:item_provenance', pk=item.id)
+
+
+def corporation_provenance_add_webref(request, pk, cps_id):
+    cps = get_object_or_404(CorporationProvenanceStation, pk=cps_id)
+    CorporationProvenanceStationWebReference.objects.create(corporation_provenance_station = cps)
+
+    item = cps.item
+    if item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+    return redirect('edwoca:item_provenance', pk=item.id)
+
+
+def person_provenance_remove_webref(request, webref_id):
+    webref = get_object_or_404(PersonProvenanceStationWebReference, pk=webref_id)
+    webref.delete()
+
+    item = webref.person_provenance_station.item
+    if item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+    return redirect('edwoca:item_provenance', pk=item.id)
+
+
+def corporation_provenance_remove_webref(request, webref_id):
+    webref = get_object_or_404(CorporationProvenanceStationWebReference, pk=webref_id)
+    webref.delete()
+
+    item = webref.corporation_provenance_station.item
+    if item.manifestation.is_singleton:
+        return redirect('edwoca:manifestation_provenance', pk=item.manifestation.id)
+    return redirect('edwoca:item_provenance', pk=item.id)
 
 
 def corporation_provenance_add_owner(request, pk, cps_id, corporation_id):

@@ -363,6 +363,47 @@ ItemHandwritingFormSet = inlineformset_factory(
     )
 
 
+class BaseProvenanceStationWebReferenceForm(ModelForm):
+    class Meta:
+        fields = [ 'url', 'comment' ]
+        widgets = {
+                'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}),
+                'comment': Textarea(attrs={'class': SimpleFormMixin.text_area_classes, 'form': 'form'})
+            }
+
+    def as_daisy(self):
+        form = div()
+
+        url_field = self['url']
+        comment_field = self['comment']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(url_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(url_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(comment_field))
+
+        return mark_safe(str(form))
+
+
+class PersonProvenanceStationWebReferenceForm(BaseProvenanceStationWebReferenceForm):
+    class Meta:
+        model = PersonProvenanceStationWebReference
+        fields = BaseProvenanceStationWebReferenceForm.Meta.fields
+        widgets = BaseProvenanceStationWebReferenceForm.Meta.widgets
+
+
+class CorporationProvenanceStationWebReferenceForm(BaseProvenanceStationWebReferenceForm):
+    class Meta:
+        model = CorporationProvenanceStationWebReference
+        fields = BaseProvenanceStationWebReferenceForm.Meta.fields
+        widgets = BaseProvenanceStationWebReferenceForm.Meta.widgets
+
+
 class PersonProvenanceStationBibForm(BaseBibForm):
     class Meta:
         model = PersonProvenanceStationBib

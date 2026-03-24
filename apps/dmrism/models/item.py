@@ -430,3 +430,33 @@ class ItemCorporationDedication(BaseCorporationDedication):
             'Item',
             on_delete = models.CASCADE
         )
+
+
+class BaseProvenanceStationWebReference(models.Model):
+    class Meta:
+        abstract = True
+
+    url = models.URLField(
+            verbose_name = _('URL')
+        )
+    comment = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('web reference comment')
+        )
+
+
+class PersonProvenanceStationWebReference(BaseProvenanceStationWebReference):
+    person_provenance_station = models.ForeignKey(
+            'PersonProvenanceStation',
+            on_delete = models.CASCADE,
+            related_name = 'web_references'
+        )
+
+
+class CorporationProvenanceStationWebReference(BaseProvenanceStationWebReference):
+    corporation_provenance_station = models.ForeignKey(
+            'CorporationProvenanceStation',
+            on_delete = models.CASCADE,
+            related_name = 'web_references'
+        )

@@ -181,6 +181,40 @@
                     </ul>
                 {% endif %}
 
+                <h3 class="my-5">
+                    {% translate 'provenance proof (web)' %}
+                </h3>
+
+                <ul>
+                    {% for web_reference_form in entry.web_reference_forms %}
+                        <li class="my-5 border border-black p-5 my-5">
+                                {{ web_reference_form.as_daisy }}
+                            <div class="flex mt-5">
+                                <div class="flex-1"></div>
+                                <form method="post"
+                                      action="{% url 'edwoca:person_provenance_remove_webref' web_reference_form.instance.id %}"
+                                      class="flex-0 mb-0">
+                                    {% csrf_token %}
+                                    <input type="submit"
+                                           class="btn btn-primary btn-outline"
+                                           value="{% translate 'remove web reference' %}" />
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="flex my-5">
+                    <div class="flex-1"></div>
+                    <form method="post"
+                          action="{% url 'edwoca:person_provenance_add_webref' item.id entry.form.instance.id %}">
+                        {% csrf_token %}
+                        <input type="submit"
+                               class="btn btn-outline"
+                               value="{% translate 'add web reference' %}" />
+                    </form>
+                </div>
+
                 <div class="flex">
                     <div class="flex-1"></div>
                     <form method="post"
@@ -374,6 +408,41 @@
                         {% endfor %}
                     </ul>
                 {% endif %}
+
+                <h3 class="my-5">
+                    {% translate 'provenance proof (web)' %}
+                </h3>
+
+                <ul>
+                    {% for web_reference_form in entry.web_reference_forms %}
+                        <li class="my-5 border border-black p-5 my-5">
+                                {{ web_reference_form.as_daisy }}
+                            <div class="flex mt-5">
+                                <div class="flex-1"></div>
+                                <form method="post"
+                                      action="{% url 'edwoca:corporation_provenance_remove_webref' web_reference_form.instance.id %}"
+                                      class="flex-0 mb-0">
+                                    {% csrf_token %}
+                                    <input type="submit"
+                                           class="btn btn-primary btn-outline"
+                                           value="{% translate 'remove web reference' %}" />
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="flex my-5">
+                    <div class="flex-1"></div>
+                    <form method="post"
+                          action="{% url 'edwoca:corporation_provenance_add_webref' item.id entry.form.instance.id %}">
+                        {% csrf_token %}
+                        <input type="submit"
+                               class="btn btn-outline"
+                               value="{% translate 'add web reference' %}" />
+                    </form>
+                </div>
+
 
                 <div class="flex">
                     <div class="flex-1"></div>

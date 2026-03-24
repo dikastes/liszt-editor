@@ -134,7 +134,7 @@ class ManifestationTitleForm(ModelForm):
 class ManifestationCommentForm(CommentForm):
     class Meta:
         model = Manifestation
-        fields = CommentForm.Meta.fields + ['taken_information', 'first_editor', 'editing_history']
+        fields = CommentForm.Meta.fields + ['taken_information', 'first_editor', 'editing_history', 'needs_review']
         widgets = dict(CommentForm.Meta.widgets, **{
                 'taken_information': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
@@ -144,6 +144,9 @@ class ManifestationCommentForm(CommentForm):
                     }),
                 'editing_history': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
+                    }),
+                'needs_review': CheckboxInput( attrs = {
+                        'class': 'toggle'
                     })
             })
 
@@ -176,6 +179,7 @@ class ManifestationCommentForm(CommentForm):
         first_save_field = self['first_save']
         last_save_field = self['last_save']
         editing_history_field = self['editing_history']
+        needs_review_field = self['needs_review']
 
         with form:
             with label(cls=SimpleFormMixin.form_control_classes):
@@ -190,8 +194,8 @@ class ManifestationCommentForm(CommentForm):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(taken_information_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(taken_information_field))
-            h2(_('editing history'))
-            h3(_('initial recording'))
+            h2(_('editing history'), cls='my-5')
+            h3(_('initial recording'), cls='my-5')
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(first_editor_field.label, cls=SimpleFormMixin.label_text_classes)
@@ -203,18 +207,23 @@ class ManifestationCommentForm(CommentForm):
                     with div(cls='flex'):
                         raw(str(first_save_field))
                     div(cls='flex-1')
-            h3(_('further recording'))
+            h3(_('further recording'), cls='my-5')
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(editing_history_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(editing_history_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
-                with div(cls='flex'):
+            with div(cls=SimpleFormMixin.palette_classes + ' items-end'):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
                     with div(cls='flex'):
-                        raw(str(last_save_field))
-                    div(cls='flex-1')
+                        with div(cls='flex'):
+                            raw(str(last_save_field))
+                        div(cls='flex-1')
+                div(cls='flex-1')
+                with label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0'):
+                    span(needs_review_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(needs_review_field))
 
         return mark_safe(str(form))
 
