@@ -323,7 +323,7 @@ msgstr "Signatur"
 
 #: apps/dmrism/models/item.py:253
 msgid "without signature"
-msgstr "o. S."
+msgstr ""
 
 #: apps/dmrism/models/item.py:257
 msgid "<< institution >>"

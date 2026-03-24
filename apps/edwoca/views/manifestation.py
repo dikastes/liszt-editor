@@ -589,9 +589,9 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        manuscript_search_form = FramedSearchForm(self.request.GET or None, prefix='manuscript')
-        collection_search_form = FramedSearchForm(self.request.GET or None, prefix='collection')
-        print_search_form = FramedSearchForm(self.request.GET or None, prefix='print')
+        manuscript_search_form = ManifestationSearchForm(self.request.GET or None, prefix='manuscript')
+        collection_search_form = ManifestationSearchForm(self.request.GET or None, prefix='collection')
+        print_search_form = ManifestationSearchForm(self.request.GET or None, prefix='print')
         context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
         context['manuscript_search_form'] = manuscript_search_form
         context['collection_search_form'] = collection_search_form
