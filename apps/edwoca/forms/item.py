@@ -175,7 +175,14 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
@@ -226,7 +233,14 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:

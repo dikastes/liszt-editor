@@ -251,7 +251,14 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes }))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
@@ -769,7 +776,14 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow', 'form': 'form'}))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:

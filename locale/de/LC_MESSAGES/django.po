@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-24 16:02+0100\n"
+"POT-Creation-Date: 2026-03-24 16:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: German\n"
@@ -25,7 +25,7 @@ msgstr "Bevorzugter Titel"
 msgid "Alternative"
 msgstr "Titelvariante"
 
-#: apps/dmad_on_django/models/base.py:24 apps/edwoca/forms/manifestation.py:558
+#: apps/dmad_on_django/models/base.py:24 apps/edwoca/forms/manifestation.py:565
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
@@ -36,7 +36,8 @@ msgstr "nach Vorlage"
 #: apps/dmad_on_django/models/base.py:29
 #: apps/dmad_on_django/models/period.py:37
 #: apps/dmrism/models/manifestation.py:651
-#: apps/dmrism/models/manifestation.py:670
+#: apps/dmrism/models/manifestation.py:670 apps/edwoca/forms/base.py:262
+#: apps/edwoca/forms/manifestation.py:255
 #: apps/edwoca/templates/edwoca/manifestation_print.html:142
 msgid "inferred"
 msgstr "ermittelt"
@@ -49,17 +50,17 @@ msgstr "ermittelt"
 msgid "assumed"
 msgstr "unsicher"
 
-#: apps/dmad_on_django/models/period.py:16 apps/edwoca/forms/base.py:343
+#: apps/dmad_on_django/models/period.py:16 apps/edwoca/forms/base.py:351
 #: apps/edwoca/forms/letter.py:69
 msgid "not before"
 msgstr "nicht vor"
 
-#: apps/dmad_on_django/models/period.py:21 apps/edwoca/forms/base.py:351
+#: apps/dmad_on_django/models/period.py:21 apps/edwoca/forms/base.py:359
 #: apps/edwoca/forms/letter.py:78
 msgid "not after"
 msgstr "nicht nach"
 
-#: apps/dmad_on_django/models/period.py:26 apps/edwoca/forms/base.py:333
+#: apps/dmad_on_django/models/period.py:26 apps/edwoca/forms/base.py:341
 #: apps/edwoca/forms/letter.py:86
 msgid "standardized date"
 msgstr "Datierung (standardisiert)"
@@ -313,7 +314,7 @@ msgstr "aktuell"
 msgid "Former"
 msgstr "vormalig"
 
-#: apps/dmrism/models/item.py:236 apps/edwoca/forms/manifestation.py:709
+#: apps/dmrism/models/item.py:236 apps/edwoca/forms/manifestation.py:716
 msgid "holding institution"
 msgstr "Bestandshaltende Institution"
 
@@ -455,13 +456,13 @@ msgid "incomplete"
 msgstr "unvollständig"
 
 #: apps/dmrism/models/manifestation.py:77
-#: apps/edwoca/forms/manifestation.py:690
+#: apps/edwoca/forms/manifestation.py:697
 msgid "working title"
 msgstr "Arbeitstitel"
 
 #: apps/dmrism/models/manifestation.py:83
-#: apps/edwoca/forms/manifestation.py:559
-#: apps/edwoca/forms/manifestation.py:696
+#: apps/edwoca/forms/manifestation.py:566
+#: apps/edwoca/forms/manifestation.py:703
 msgid "source title"
 msgstr "Quellentitel"
 
@@ -470,8 +471,8 @@ msgid "manifestation form"
 msgstr "Quellenform"
 
 #: apps/dmrism/models/manifestation.py:130
-#: apps/edwoca/forms/manifestation.py:561
-#: apps/edwoca/forms/manifestation.py:702
+#: apps/edwoca/forms/manifestation.py:568
+#: apps/edwoca/forms/manifestation.py:709
 msgid "source type"
 msgstr "Quellentyp"
 
@@ -535,7 +536,7 @@ msgid "private print comment"
 msgstr "interner Kommentar zu den Druckspezifika"
 
 #: apps/dmrism/models/manifestation.py:261
-#: apps/edwoca/forms/manifestation.py:560
+#: apps/edwoca/forms/manifestation.py:567
 msgid "plate number"
 msgstr "Plattennummer"
 
@@ -701,27 +702,31 @@ msgstr "<< neuer Titel >>"
 msgid "has alternative"
 msgstr "hat Alternative"
 
-#: apps/edwoca/forms/base.py:319
+#: apps/edwoca/forms/base.py:262 apps/edwoca/forms/manifestation.py:255
+msgid "based on source"
+msgstr "nach Vorlage"
+
+#: apps/edwoca/forms/base.py:327
 msgid "date inferred assumed"
 msgstr "Datierung unsicher ermittelt"
 
-#: apps/edwoca/forms/base.py:321
+#: apps/edwoca/forms/base.py:329
 msgid "date assumed"
 msgstr "Datierung unsicher"
 
-#: apps/edwoca/forms/base.py:324
+#: apps/edwoca/forms/base.py:332
 msgid "date inferred"
 msgstr "Datierung ermittelt"
 
-#: apps/edwoca/forms/base.py:326
+#: apps/edwoca/forms/base.py:334
 msgid "date as documented"
 msgstr "Datierung nach Vorlage"
 
-#: apps/edwoca/forms/base.py:339
+#: apps/edwoca/forms/base.py:347
 msgid "calculate"
 msgstr "berechnen"
 
-#: apps/edwoca/forms/base.py:370
+#: apps/edwoca/forms/base.py:386
 msgid "clear"
 msgstr "leeren"
 
@@ -733,49 +738,49 @@ msgstr "Ersterfassung"
 msgid "further recording"
 msgstr "weitere Bearbeitung"
 
-#: apps/edwoca/forms/manifestation.py:477
+#: apps/edwoca/forms/manifestation.py:484
 msgid "function"
 msgstr "Quellenfunktion"
 
-#: apps/edwoca/forms/manifestation.py:508
+#: apps/edwoca/forms/manifestation.py:515
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: apps/edwoca/forms/manifestation.py:565
+#: apps/edwoca/forms/manifestation.py:572
 #: apps/edwoca/templates/edwoca/create_manifestation.html:16
 #: apps/edwoca/templates/edwoca/manifestation_print.html:18
 #: apps/edwoca/templates/edwoca/manifestation_print.html:28
 msgid "publisher"
 msgstr "Verlag"
 
-#: apps/edwoca/forms/manifestation.py:565
+#: apps/edwoca/forms/manifestation.py:572
 msgid "choose publisher"
 msgstr "Verlag auswählen"
 
-#: apps/edwoca/forms/manifestation.py:710
+#: apps/edwoca/forms/manifestation.py:717
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: apps/edwoca/forms/manifestation.py:714
+#: apps/edwoca/forms/manifestation.py:721
 msgid "Signature"
 msgstr "Signatur"
 
-#: apps/edwoca/forms/manifestation.py:921
+#: apps/edwoca/forms/manifestation.py:928
 #: apps/edwoca/templates/edwoca/manifestation_print.html:135
 msgid "place as documented"
 msgstr "Ort nach Vorlage"
 
-#: apps/edwoca/forms/manifestation.py:924
+#: apps/edwoca/forms/manifestation.py:931
 #: apps/edwoca/templates/edwoca/manifestation_print.html:127
 msgid "place inferred assumed"
 msgstr "Ort unsicher ermittelt"
 
-#: apps/edwoca/forms/manifestation.py:926
+#: apps/edwoca/forms/manifestation.py:933
 #: apps/edwoca/templates/edwoca/manifestation_print.html:129
 msgid "place assumed"
 msgstr "Ort unsicher"
 
-#: apps/edwoca/forms/manifestation.py:929
+#: apps/edwoca/forms/manifestation.py:936
 #: apps/edwoca/templates/edwoca/manifestation_print.html:133
 msgid "place inferred"
 msgstr "Ort ermittelt"
