@@ -58,6 +58,11 @@ class SignatureForm(GenericAsDaisyMixin, ModelForm):
                 'id': HiddenInput()
             }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        lib_field = self.fields['library']
+        lib_field.label = f'{lib_field.label}*'
+
     def as_daisy(self):
         form_wrapper = div(cls='mb-10')
 

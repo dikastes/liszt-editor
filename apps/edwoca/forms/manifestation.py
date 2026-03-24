@@ -40,6 +40,10 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
                     }),
             }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        wt_field = self.fields['working_title']
+        wt_field.label = f'{wt_field.label}*'
 
 class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
@@ -72,7 +76,7 @@ class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
         form_control = div(cls=SimpleFormMixin.form_control_classes)
         with form_control:
             with div(cls=SimpleFormMixin.label_classes):
-                span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                span(source_title_field.label + '*', cls=SimpleFormMixin.label_text_classes)
             raw(str(source_title_field))
 
         return mark_safe(str(form_control))
@@ -151,7 +155,7 @@ class ManifestationCommentForm(CommentForm):
             })
 
     first_save = forms.DateTimeField(
-            label=_('first save'),
+            label=_('first save') + '*',
             required = False,
             disabled = True,
             widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black' })
@@ -168,6 +172,8 @@ class ManifestationCommentForm(CommentForm):
         if self.instance and self.instance.pk:
             self.fields['first_save'].initial = self.instance.first_save
             self.fields['last_save'].initial = self.instance.last_save
+        fe_field = self.fields['first_editor']
+        fe_field.label = f'{fe_field.label}*'
 
     def as_daisy(self):
         form = div()
@@ -426,6 +432,9 @@ class ManifestationClassificationForm(ModelForm):
                     (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
                 ]
 
+        st_field = self.fields['source_type']
+        st_field.label = f'{st_field.label}*'
+
     def as_daisy(self):
         form = div(cls='mb-10')
 
@@ -578,7 +587,7 @@ class ManifestationCreateForm(forms.Form):
             source_title_field = self['source_title']
             source_title_container = label(cls='form-control w-full')
             source_title_label = div(cls='label')
-            source_title_label.add(span(source_title_field.label, cls='label-text'))
+            source_title_label.add(span(source_title_field.label + '*', cls='label-text'))
             source_title_container.add(source_title_label)
             source_title_container.add(raw(str(source_title_field)))
             if source_title_field.errors:
@@ -588,7 +597,7 @@ class ManifestationCreateForm(forms.Form):
             temporary_title_field = self['temporary_title']
             temporary_title_container = label(cls='form-control w-full')
             temporary_title_label = div(cls='label')
-            temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
+            temporary_title_label.add(span(temporary_title_field.label + '*', cls='label-text'))
             temporary_title_container.add(temporary_title_label)
             temporary_title_container.add(raw(str(temporary_title_field)))
             if temporary_title_field.errors:
@@ -678,26 +687,26 @@ class SingletonCreateForm(forms.ModelForm):
             ]
 
     working_title = forms.CharField(
-            label = _('working title'),
+            label = _('working title') + '*',
             max_length = 255,
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
         )
     source_title = forms.CharField(
-            label = _('source title'),
+            label = _('source title') + '*',
             max_length = 255,
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
         )
     source_type = forms.ChoiceField(
-            label = _('source type'),
+            label = _('source type') + '*',
             choices = Manifestation.SourceType.choices,
             widget = Select(attrs={'class': SimpleFormMixin.select_classes}),
             required = False
         )
     library = forms.ModelChoiceField(
             queryset = Library.objects.all(),
-            label = _('holding institution'),
+            label = _('holding institution') + '*',
             empty_label = _('choose library'),
             widget = Select(attrs={'class': SimpleFormMixin.select_classes})
         )
