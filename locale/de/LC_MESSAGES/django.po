@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-24 08:38+0100\n"
+"POT-Creation-Date: 2026-03-24 13:04+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: German\n"
@@ -64,7 +64,7 @@ msgstr "nicht nach"
 msgid "standardized date"
 msgstr "Datierung (standardisiert)"
 
-#: apps/dmad_on_django/models/period.py:33 apps/dmrism/models/item.py:246
+#: apps/dmad_on_django/models/period.py:33 apps/dmrism/models/item.py:248
 #: apps/edwoca/models/base.py:942
 msgid "status"
 msgstr "Status"
@@ -165,6 +165,10 @@ msgstr "Herbst"
 msgid "winter"
 msgstr "Winter"
 
+#: apps/dmad_on_django/models/place.py:128
+msgid "<< error >>"
+msgstr "<< Fehler >>"
+
 #: apps/dmrism/models/base.py:14
 msgid "public comment"
 msgstr "öffentlicher Kommentar"
@@ -228,7 +232,7 @@ msgstr "bezogen"
 #: apps/dmrism/models/base.py:102 apps/edwoca/models/base.py:1082
 #: apps/edwoca/templates/edwoca/manifestation_history.html:85
 #: apps/edwoca/templates/edwoca/manifestation_manuscript.html:55
-#: apps/edwoca/templates/edwoca/manifestation_provenance.html:440
+#: apps/edwoca/templates/edwoca/manifestation_provenance.html:475
 #: apps/edwoca/templates/edwoca/manifestation_title.html:408
 #: apps/edwoca/templates/edwoca/manifestation_update.html:113
 #: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:70
@@ -301,52 +305,60 @@ msgstr "Name"
 msgid "siglum"
 msgstr "Sigle"
 
-#: apps/dmrism/models/item.py:225
+#: apps/dmrism/models/item.py:227
 msgid "Current"
 msgstr "aktuell"
 
-#: apps/dmrism/models/item.py:226
+#: apps/dmrism/models/item.py:228
 msgid "Former"
 msgstr "vormalig"
 
-#: apps/dmrism/models/item.py:234 apps/edwoca/forms/manifestation.py:700
+#: apps/dmrism/models/item.py:236 apps/edwoca/forms/manifestation.py:700
 msgid "holding institution"
 msgstr "Bestandshaltende Institution"
 
-#: apps/dmrism/models/item.py:240
+#: apps/dmrism/models/item.py:242
 msgid "signature"
 msgstr "Signatur"
 
-#: apps/dmrism/models/item.py:324 apps/dmrism/models/item.py:356
+#: apps/dmrism/models/item.py:253
+msgid "without signature"
+msgstr "o. S."
+
+#: apps/dmrism/models/item.py:257
+msgid "<< institution >>"
+msgstr ""
+
+#: apps/dmrism/models/item.py:329 apps/dmrism/models/item.py:361
 msgid "<< new provenance station >>"
 msgstr "<< neue Provenienz >>"
 
-#: apps/dmrism/models/item.py:382
+#: apps/dmrism/models/item.py:387
 msgid "Digitized"
 msgstr "Digitalisat"
 
-#: apps/dmrism/models/item.py:383
+#: apps/dmrism/models/item.py:388
 msgid "IIIF Manifest"
 msgstr "IIIF-Manifest"
 
-#: apps/dmrism/models/item.py:384
+#: apps/dmrism/models/item.py:389
 msgid "Private"
 msgstr "Privat"
 
-#: apps/dmrism/models/item.py:385
+#: apps/dmrism/models/item.py:390
 msgid "Working copy"
 msgstr "Arbeitsdigitalisat"
 
-#: apps/dmrism/models/item.py:394 apps/dmrism/models/item.py:440
+#: apps/dmrism/models/item.py:399 apps/dmrism/models/item.py:445
 #: venv/lib/python3.10/site-packages/django/db/models/fields/__init__.py:2642
 msgid "URL"
 msgstr "URL"
 
-#: apps/dmrism/models/item.py:401
+#: apps/dmrism/models/item.py:406
 msgid "link type"
 msgstr "Linktyp"
 
-#: apps/dmrism/models/item.py:445
+#: apps/dmrism/models/item.py:450
 msgid "web reference comment"
 msgstr "Kommentar"
 
@@ -661,7 +673,7 @@ msgstr "Titelposition"
 
 #: apps/dmrism/models/manifestation.py:711
 msgid "<< new title >>"
-msgstr ""
+msgstr "<< neuer Titel >>"
 
 #: apps/dmrism/models/manifestation.py:728 apps/edwoca/models/expression.py:96
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:280
@@ -728,22 +740,22 @@ msgstr "Bibliothek auswählen"
 msgid "Signature"
 msgstr "Signatur"
 
-#: apps/edwoca/forms/manifestation.py:911
+#: apps/edwoca/forms/manifestation.py:912
 #: apps/edwoca/templates/edwoca/manifestation_print.html:135
 msgid "place as documented"
 msgstr "Ort nach Vorlage"
 
-#: apps/edwoca/forms/manifestation.py:914
+#: apps/edwoca/forms/manifestation.py:915
 #: apps/edwoca/templates/edwoca/manifestation_print.html:127
 msgid "place inferred assumed"
 msgstr "Ort unsicher ermittelt"
 
-#: apps/edwoca/forms/manifestation.py:916
+#: apps/edwoca/forms/manifestation.py:917
 #: apps/edwoca/templates/edwoca/manifestation_print.html:129
 msgid "place assumed"
 msgstr "Ort unsicher"
 
-#: apps/edwoca/forms/manifestation.py:919
+#: apps/edwoca/forms/manifestation.py:920
 #: apps/edwoca/templates/edwoca/manifestation_print.html:133
 msgid "place inferred"
 msgstr "Ort ermittelt"
@@ -1101,7 +1113,7 @@ msgstr "keine verknüpften Briefe"
 
 #: apps/edwoca/templates/edwoca/bib_update.html:107
 #: apps/edwoca/views/manifestation.py:1015
-#: apps/edwoca/views/manifestation.py:1347
+#: apps/edwoca/views/manifestation.py:1357
 msgid "search letters"
 msgstr "Briefe durchsuchen"
 
@@ -1356,24 +1368,27 @@ msgid "provenance proof (letter)"
 msgstr "Provenienzbeleg (Brief)"
 
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:185
+#: apps/edwoca/templates/edwoca/manifestation_provenance.html:413
 msgid "provenance proof (web)"
 msgstr "Provenienzbeleg (Web)"
 
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:200
+#: apps/edwoca/templates/edwoca/manifestation_provenance.html:428
 msgid "remove web reference"
 msgstr "Nachweis entfernen"
 
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:214
+#: apps/edwoca/templates/edwoca/manifestation_provenance.html:442
 msgid "add web reference"
 msgstr "Webnachweis hinzufügen"
 
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:225
-#: apps/edwoca/templates/edwoca/manifestation_provenance.html:419
+#: apps/edwoca/templates/edwoca/manifestation_provenance.html:454
 msgid "remove provenance station"
 msgstr "Provenienz entfernen"
 
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:233
-#: apps/edwoca/templates/edwoca/manifestation_provenance.html:427
+#: apps/edwoca/templates/edwoca/manifestation_provenance.html:462
 msgid "no provenance entries"
 msgstr "keine Provenienzeinträge"
 
@@ -1385,7 +1400,7 @@ msgstr "Provenienz anlegen"
 msgid "provenance corporations"
 msgstr "Vorbesitzende Körperschaft"
 
-#: apps/edwoca/templates/edwoca/manifestation_provenance.html:435
+#: apps/edwoca/templates/edwoca/manifestation_provenance.html:470
 msgid "add corporation provenance station"
 msgstr "Provenienz anlegen"
 
@@ -1548,7 +1563,7 @@ msgstr "keine Widmungsträger"
 #: apps/edwoca/views/manifestation.py:474
 #: apps/edwoca/views/manifestation.py:492
 #: apps/edwoca/views/manifestation.py:1021
-#: apps/edwoca/views/manifestation.py:1335
+#: apps/edwoca/views/manifestation.py:1345
 msgid "search persons"
 msgstr "Personen durchsuchen"
 
@@ -1570,7 +1585,7 @@ msgid "corporation dedications"
 msgstr "Körperschaftswidmungen"
 
 #: apps/edwoca/templates/edwoca/manifestation_title.html:304
-#: apps/edwoca/views/manifestation.py:1026
+#: apps/edwoca/views/manifestation.py:1027
 msgid "search corporations"
 msgstr "Körperschaften durchsuchen"
 
@@ -1773,7 +1788,7 @@ msgid "search place"
 msgstr "Orte durchsuchen"
 
 #: apps/edwoca/views/manifestation.py:1011
-#: apps/edwoca/views/manifestation.py:1326
+#: apps/edwoca/views/manifestation.py:1336
 msgid "search zotero"
 msgstr "Zotero durchsuchen"
 

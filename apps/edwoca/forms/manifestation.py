@@ -704,7 +704,8 @@ class SingletonCreateForm(forms.ModelForm):
     signature = forms.CharField(
             label = _('Signature'),
             max_length = 255,
-            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
+            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes}),
+            required = False
         )
 
     def __init__(self, *args, **kwargs):

@@ -214,7 +214,9 @@ class Library(models.Model):
         return reverse('edwoca:library_update', kwargs = {'pk' : self.id})
 
     def __str__(self):
-        return f"{self.siglum} {self.name}"
+        if self.siglum:
+            return f"{self.siglum} {self.name}"
+        return self.name
 
 
 class BaseSignature(models.Model):
@@ -247,10 +249,13 @@ class BaseSignature(models.Model):
         )
 
     def __str__(self):
+        if not self.signature:
+            return _('without signature')
         if self.library:
-            return f"{self.library.siglum} {self.signature}"
+            return f'{self.library.siglum} {self.signature}'
         else:
-            return f"<<Institution>> {self.signature}"
+            institution = _('<< institution >>')
+            return f'{institution} {self.signature}'
 
 
 class ItemSignature(BaseSignature):

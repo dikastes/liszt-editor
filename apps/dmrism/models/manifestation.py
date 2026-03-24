@@ -124,7 +124,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     source_type = models.CharField(
             max_length = 5,
             choices = SourceType.choices,
-            default = None,
+            default = SourceType.AUTOGRAPH,
             null = True,
             blank = True,
             verbose_name = _('source type')
