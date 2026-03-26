@@ -22,6 +22,11 @@ class TitleTypes(models.TextChoices):
 
 
 class Manifestation(RenderRawJSONMixin, WemiBaseClass):
+    class PartLabel(models.TextChoices):
+        CONSTITUTING = 'c', _('constituting')
+        BOUND_TOGETHER = 'b', _('bound together')
+        SEPARATED = 's', _('separated')
+
     class ManifestationForm(models.TextChoices):
         EXCERPTS = 'EX', _('Excerpts')
         SKETCHES = 'SK', _('Sketches'),
@@ -320,6 +325,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             'Manifestation',
             related_name = 'collection_parts',
             on_delete = models.SET_NULL,
+            null = True
+        )
+    part_label = models.CharField(
+            max_length = 1,
+            choices = PartLabel,
+            default = None,
+            verbose_name = _('part label'),
             null = True
         )
     component_of = models.ForeignKey(
@@ -723,9 +735,9 @@ class ManifestationBib(BaseBib):
 
 class RelatedManifestation(RelatedEntity):
     class Label(models.TextChoices):
-        #IS_PART_OF = 'P', _('is part of')
-        #IS_COMPONENT_OF = 'C', _('is component of')
-        HAS_ALTERNATIVE = 'A', _('has alternative')
+        STITCH_TEMPLATE = 'SD', _('is stitch template (as documented)')
+        STITCH_TEMPLATE_INFERRED = 'SI', _('is stitch template (inferred)')
+        RELATED = 'R', _('is related to')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',
@@ -738,7 +750,7 @@ class RelatedManifestation(RelatedEntity):
             related_name="target_manifestation_of"
         )
     label = models.CharField(
-            max_length=1,
+            max_length=2,
             choices=Label,
             verbose_name = _('label'),
             null = True

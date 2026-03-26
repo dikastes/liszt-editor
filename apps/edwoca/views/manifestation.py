@@ -579,7 +579,7 @@ class RelatedManifestationRemoveView(DeleteView):
     model = RelatedManifestation
 
     def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.object.source_manifestation.id})
+        return reverse_lazy('edwoca:manifestation_relations', kwargs={'pk': self.kwargs.get('referrer_pk')})
 
 
 class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
@@ -589,9 +589,9 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        manuscript_search_form = ManifestationSearchForm(self.request.GET or None, prefix='manuscript')
-        collection_search_form = ManifestationSearchForm(self.request.GET or None, prefix='collection')
-        print_search_form = ManifestationSearchForm(self.request.GET or None, prefix='print')
+        manuscript_search_form = ManifestationSearchForm(self.request.GET or None, prefix='manuscript', placeholder=_('search manuscripts'))
+        collection_search_form = ManifestationSearchForm(self.request.GET or None, prefix='collection', placeholder = _('search manifestations'))
+        print_search_form = ManifestationSearchForm(self.request.GET or None, prefix='print', placeholder=_('search prints'))
         context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
         context['manuscript_search_form'] = manuscript_search_form
         context['collection_search_form'] = collection_search_form
@@ -610,50 +610,68 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
 
         if collection_search_form.is_valid() and collection_search_form.cleaned_data.get('q'):
             context['collection_query'] = collection_search_form.cleaned_data.get('q')
-            context['found_collections'] = collection_search_form.search().models(Manifestation).filter(is_collection = True)
+            context['found_collections'] = collection_search_form.search().models(Manifestation)#.filter(is_collection = True)
 
         if print_search_form.is_valid() and print_search_form.cleaned_data.get('q'):
             context['print_query'] = print_search_form.cleaned_data.get('q')
             context['found_prints'] = print_search_form.search().models(Manifestation).filter(is_singleton = False)
 
-        # this needs to go to a post action
-        if 'manifestation-link-type' in self.request.GET:
-            manifestation_link = get_object_or_404(Manifestation, pk = self.request.GET['manifestation-link'])
-            link_type = getattr(RelatedManifestation.Label, self.request.GET['manifestation-link-type'].upper())
-            RelatedManifestation.objects.create(
-                    source_manifestation = self.object,
-                    target_manifestation = manifestation_link,
-                    label = link_type
-                )
-
-        if 'link-collection-part' in self.request.GET:
-            manifestation_link = get_object_or_404(Manifestation, pk = self.request.GET['link-collection-part'])
-            if manifestation_link.is_collection:
-                self.object.part_of = manifestation_link
-                self.object.save()
-
-        if 'link-collection-component' in self.request.GET:
-            manifestation_link = get_object_or_404(Manifestation, pk = self.request.GET['link-collection-component'])
-            if manifestation_link.is_collection:
-                self.object.component_of = manifestation_link
-                self.object.save()
-
         return context
 
     def post(self, request, *args, **kwargs):
-        response = super().post(request, *args, **kwargs)
-        relations_comment_form = ManifestationRelationsCommentForm(request.POST, instance=self.object)
-        context = self.get_context_data(**kwargs)
-        context['relations_comment_form'] = relations_comment_form
-        if relations_comment_form.is_valid():
-            relations_comment_form.save()
-            return redirect('edwoca:manifestation_relations', pk = self.object.id)
-        else:
-            context = self.get_context_data(**kwargs)
-            context['relations_comment_form'] = relations_comment_form
-            return self.render_to_response(context)
-        return response
+        self.object = self.get_object()
 
+        form = ManifestationRelationsCommentForm(request.POST, instance=self.object)
+        if not form.is_valid():
+            context = self.get_context_data(**kwargs)
+            context['relations_comment_form'] = form
+            return self.render_to_response(context)
+        else:
+            form.save()
+
+        if 'collection-link-type' in request.POST:
+            manifestation_link = get_object_or_404(
+                Manifestation,
+                pk=request.POST.get('collection-link')
+            )
+            link_type = request.POST.get('collection-link-type')
+
+            if link_type == 'component':
+                self.object.component_of = manifestation_link
+                self.object.part_of = None
+                self.object.part_label = None
+            else:
+                label = getattr(Manifestation.PartLabel, link_type.upper())
+                self.object.part_label = label
+                self.object.part_of = manifestation_link
+                self.object.component_of = None
+
+            self.object.save()
+
+        if 'manifestation-link-type' in request.POST:
+            manifestation_link = get_object_or_404(
+                Manifestation,
+                pk=request.POST.get('manifestation-link')
+            )
+            link_type = getattr(
+                RelatedManifestation.Label,
+                request.POST.get('manifestation-link-type').upper()
+            )
+
+            if self.object.is_singleton:
+                source = self.object
+                target = manifestation_link
+            else:
+                source = manifestation_link
+                target = self.object
+
+            RelatedManifestation.objects.create(
+                source_manifestation=source,
+                target_manifestation=target,
+                label=link_type
+            )
+
+        return redirect('edwoca:manifestation_relations', pk=self.object.id)
 
 def collection_remove(request, pk):
     manifestation = get_object_or_404(Manifestation, pk = pk)
@@ -2096,3 +2114,19 @@ def singleton_component_create(request, pk):
         form = SingletonCreateForm()
 
     return render(request, 'edwoca/create_singleton.html', {'form': form})
+
+
+def manifestation_set_collection(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk = pk)
+    manifestation.set_collection(is_collection = True)
+    manifestation.save()
+
+    return redirect('edwoca:manifestation_relations', pk = pk)
+
+
+def manifestation_unset_collection(request, pk):
+    manifestation = get_object_or_404(Manifestation, pk = pk)
+    manifestation.set_collection(is_collection = False)
+    manifestation.save()
+
+    return redirect('edwoca:manifestation_relations', pk = pk)
