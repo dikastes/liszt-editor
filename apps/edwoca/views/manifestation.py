@@ -1173,6 +1173,18 @@ class ManifestationProvenanceView(UpdateView):
 
         form = self.get_form()
 
+        self.person_formset = PersonProvenanceFormSet(
+            request.POST,
+            instance=item,
+            prefix='person'
+        )
+
+        self.corporation_formset = CorporationProvenanceFormSet(
+            request.POST,
+            instance=item,
+            prefix='corporation'
+        )
+
         if (
             form.is_valid()
             and self.person_formset.is_valid()
@@ -1217,6 +1229,9 @@ class ManifestationProvenanceView(UpdateView):
             for form in entry['web_reference_forms']:
                 form.save()
 
+        self._handle_period_buttons(self.person_formset)
+        self._handle_period_buttons(self.corporation_formset)
+
         return redirect('edwoca:manifestation_provenance', pk=self.object.pk)
 
     def _forms_invalid(self, form):
@@ -1225,8 +1240,31 @@ class ManifestationProvenanceView(UpdateView):
                 form=form,
                 enriched_person_formset=self.enriched_person,
                 enriched_corporation_formset=self.enriched_corporation,
-            )
-        )
+            ))
+
+    def _handle_period_buttons(self, formset):
+        for form in formset.forms:
+            instance = form.instance
+            prefix = form.prefix
+
+            if f'{prefix}-calculate-machine-readable-date' in self.request.POST:
+                period = self._ensure_period(instance)
+                period.parse_display()
+                period.save()
+
+            if f'{prefix}-clear-machine-readable-date' in self.request.POST:
+                period = self._ensure_period(instance)
+                period.not_before = None
+                period.not_after = None
+                period.assumed = False
+                period.inferred = False
+                period.save()
+
+    def _ensure_period(self, instance):
+        if instance.period is None:
+            instance.period = Period.objects.create()
+            instance.save(update_fields=['period'])
+        return instance.period
 
 def manifestation_provenance(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)

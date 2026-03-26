@@ -1,7 +1,7 @@
 import dominate.tags as tags
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateTimeField, SelectDateWidget, BooleanField, TypedChoiceField, RadioSelect
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateField, SelectDateWidget, BooleanField, TypedChoiceField, RadioSelect
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe
 from dominate.util import raw
@@ -254,10 +254,9 @@ class DateFormMixin:
                 'form': 'form'
             }
         }
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    not_before = DateField(widget = SelectDateWidget(**kwargs), required = False)
+    not_after = DateField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))
-    #inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
@@ -298,11 +297,8 @@ class DateFormMixin:
         period_instance.inferred = self.cleaned_data['inferred']
         period_instance.assumed = self.cleaned_data['assumed']
 
-        if commit:
-            period_instance.save()
-            instance.save()
-        else:
-            self._pending_save_period = period_instance
+        period_instance.save()
+        instance.save()
 
         return instance
 
@@ -321,18 +317,6 @@ class DateFormMixin:
         calculate_name = f'{self.prefix}-{calculate}-{postfix}' if self.prefix else f'{calculate}-{postfix}'
         clear_name = f'{self.prefix}-{clear}-{postfix}' if self.prefix else f'{clear}-{postfix}'
 
-        #documentation_label = ''
-        #if self.instance.period and self.instance.period.assumed:
-            #if self.instance.period.inferred:
-                #documentation_label = _('date inferred assumed')
-            #else:
-                #documentation_label = _('date assumed')
-        #else:
-            #if self.instance.period and self.instance.period.inferred:
-                #documentation_label = _('date inferred')
-            #else:
-                #documentation_label = _('date as documented')
-
         with date_div:
             # first row: standardized date
             with tags.div(cls='flex gap-5 items-end w-full'):
@@ -350,7 +334,7 @@ class DateFormMixin:
                 with tags.label(cls='form-control flex-0'):
                     tags.div(_('not before'), cls=SimpleFormMixin.label_text_classes)
                     with tags.div(cls='flex'):
-                        raw(str(not_after_field))
+                        raw(str(not_before_field))
                     if not_before_field.errors:
                         with div(cls='label'):
                             with span(cls='text-primary text-sm'):

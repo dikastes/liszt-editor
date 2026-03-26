@@ -53,7 +53,7 @@ class Period(models.Model):
         self.initialize_patterns()
 
         ASSUMED_TOKEN = '[?]'
-        display_value = self.display
+        display_value = self.display or ''
         INFERRED_TOKEN = ']'
 
         if ASSUMED_TOKEN in display_value:
