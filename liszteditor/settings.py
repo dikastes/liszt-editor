@@ -31,14 +31,16 @@ else:
 APP_VERSION = "0.0.1"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g562zyg%dply65c+z#rb4_eg=wr(=3u3m5=f(vp9a%lr=9%1eh'
+#SECRET_KEY = 'django-insecure-g562zyg%dply65c+z#rb4_eg=wr(=3u3m5=f(vp9a%lr=9%1eh'
+if 'SECRET_KEY' in os.environ:
+    SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
-if not DEBUG:
+if not DEBUG and 'DOMAIN_NAME' in os.environ:
     ALLOWED_HOSTS.append(os.environ['DOMAIN_NAME'])
 
 # Application definition
@@ -195,7 +197,7 @@ EDWOCA_FIXED_DATES = {
         }
     }
 
-EDITOR_MODE = 'dev'
+EDITOR_MODE = 'production'
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'
@@ -231,3 +233,9 @@ GLOBAL_NAVIGATION = {
 
 USE_TZ = True
 TIME_ZONE = 'Europe/Berlin'
+
+# production stuff
+
+SECURE_HSTS_SECONDS = 600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+SECURE_SSL_REDIRECT = True
