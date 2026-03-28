@@ -217,10 +217,10 @@ GLOBAL_NAVIGATION = {
                 'label': 'DMAd',
                 'href': reverse_lazy('dmad_on_django:index')
             },
-        'bib': {
-                'label': 'Bib',
-                'href': reverse_lazy('bib:index')
-            },
+        #'bib': {
+                #'label': 'Bib',
+                #'href': reverse_lazy('bib:index')
+            #},
         'musiconn': {
                 'label': 'musiconn',
                 'href': None
