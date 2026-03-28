@@ -179,7 +179,14 @@ RISM_API_KEY = os.environ['RISM_API_KEY']
 EDWOCA_FIXED_PERSONS = {
         'Liszt': '118573527',
         'zS': None,
-        'Dr': None
+        'Dr': None,
+        'Fischer': None,
+        'L. Htmn.': None,
+        'Pietro Cavallini': None,
+        'C. S.': None,
+        'Carl Schmiedicke': None,
+        'Lutz': None,
+        'Victor Mattasovich': None
     }
 
 EDWOCA_EMPTY_LIBRARIES = [ 'Privatbesitz', 'unbekannt' ]
