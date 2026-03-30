@@ -7,6 +7,15 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
 
+{% if not object.is_collection and not object.component_of and not object.part_of %}
+    <div class="flex">
+        <div class="flex-1"></div>
+        <form action="{% url 'edwoca:manifestation_set_collection' object.id %}" class="flex-0">
+            <input type="submit" class="btn btn-outline btn-primary" value="{% translate 'set collection status' %}" />
+        </form>
+    </div>
+{% endif %}
+
 <h2 class="mb-5">
     {% translate 'parent references' %}
 </h2>
@@ -147,15 +156,6 @@
     <p class="note">
         🚧 under construction 🚧
     </p>
-{% endif %}
-
-{% if not object.is_collection and not object.component_of and not object.part_of %}
-    <div class="flex">
-        <div class="flex-1"></div>
-        <form action="{% url 'edwoca:manifestation_set_collection' object.id %}" class="flex-0">
-            <input type="submit" class="btn btn-outline btn-primary" value="{% translate 'set collection status' %}" />
-        </form>
-    </div>
 {% endif %}
 
 {% if object.is_collection or object.part_of %}

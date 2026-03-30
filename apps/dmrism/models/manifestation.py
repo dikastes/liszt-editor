@@ -408,12 +408,18 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
         return review_string + source_typed_title
 
-    def __str__(self):
+    def standardized_search_entry(self):
         if self.items.count():
             prefix = self.items.first().get_current_signature()
             return self.render_title(prefix)
-
         return '<Fehler: keine Items>'
+
+    def __str__(self):
+        #for other in Manifestation.objects.exclude(pk=self.pk):
+            #if other.standardized_search_entry() == self.standardized_search_entry():
+                #return f'{self.pk} {self.standardized_search_entry()}'
+
+        return f'{self.pk} {self.standardized_search_entry()}'
 
     def save(self, *args, **kwargs):
         if not self.period:
@@ -571,7 +577,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             target_manifestation.set_collection(True)
             target_manifestation.save()
             self.part_of = target_manifestation
-            self.part_label = PartLabel.CONSTITUTING
+            self.part_label = Manifestation.PartLabel.CONSTITUTING
             #RelatedManifestation.objects.create(
                     #source_manifestation = self,
                     #target_manifestation = target_manifestation,
@@ -701,6 +707,7 @@ class ManifestationTitle(models.Model):
             choices = TitleTypes,
             default = None,
             null = True,
+            blank = True,
             verbose_name = _('title type')
         )
     manifestation = models.ForeignKey(

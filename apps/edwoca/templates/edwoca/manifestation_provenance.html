@@ -46,9 +46,11 @@
                         </a>
                     </div>
                 {% empty %}
+                {% comment %}
                     <p class="note my-5">
                         {% translate 'no owners' %}
                     </p>
+                {% endcomment %}
                 {% endfor %}
                 <form method="get" class="flex mt-5 items-end">
                     <label class="flex-1">

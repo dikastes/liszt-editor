@@ -241,7 +241,6 @@ class BaseSignature(models.Model):
         )
     signature = models.CharField(
             max_length=20,
-            null = True,
             blank = True,
             verbose_name = _('signature')
         )
@@ -253,13 +252,15 @@ class BaseSignature(models.Model):
         )
 
     def __str__(self):
-        if not self.signature:
-            return _('without signature')
+        without_signature = _('without signature')
+
         if self.library:
-            return f'{self.library.siglum} {self.signature}'
+            if self.library.siglum:
+                return f'{self.library.siglum} {self.signature or without_signature}'
+            return f'[{self.library.name}] {self.signature or without_signature}'
         else:
             institution = _('<< institution >>')
-            return f'{institution} {self.signature}'
+            return f'{institution} {self.signature or without_signature}'
 
 
 class ItemSignature(BaseSignature):

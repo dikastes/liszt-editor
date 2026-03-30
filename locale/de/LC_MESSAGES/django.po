@@ -1440,11 +1440,11 @@ msgstr "Vorbesitzende Person"
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:267
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:283
 msgid "owner"
-msgstr "Vorbesitzer"
+msgstr "Vorbesitzer*in"
 
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:50
 msgid "no owners"
-msgstr "keine Vorbesitzer"
+msgstr "keine Vorbesitzer*in"
 
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:80
 #: apps/edwoca/templates/edwoca/manifestation_provenance.html:308
@@ -1959,7 +1959,7 @@ msgstr "Drucke durchsuchen"
 #: apps/edwoca/views/manifestation.py:1029
 #: apps/edwoca/views/manifestation.py:1392
 msgid "search zotero"
-msgstr "Zotero durchsuchen"
+msgstr "Literatur durchsuchen"
 
 #: venv/lib/python3.10/site-packages/dal/views.py:205
 msgid "Error"

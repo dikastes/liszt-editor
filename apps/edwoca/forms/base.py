@@ -294,7 +294,7 @@ class DateFormMixin:
         period_instance.not_before = self.cleaned_data['not_before']
         period_instance.not_after = self.cleaned_data['not_after']
         period_instance.display = self.cleaned_data['display']
-        period_instance.inferred = self.cleaned_data['inferred']
+        period_instance.inferred = self.cleaned_data['inferred'] or False
         period_instance.assumed = self.cleaned_data['assumed']
 
         period_instance.save()
