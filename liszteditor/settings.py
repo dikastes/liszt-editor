@@ -39,9 +39,11 @@ if 'SECRET_KEY' in os.environ:
 DEBUG = False
 
 ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = []
 
 if not DEBUG and 'DOMAIN_NAME' in os.environ:
     ALLOWED_HOSTS.append(os.environ['DOMAIN_NAME'])
+    CSRF_TRUSTED_ORIGINS.append('https://' + os.environ['DOMAIN_NAME'])
 
 # Application definition
 
