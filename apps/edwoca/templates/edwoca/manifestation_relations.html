@@ -187,6 +187,7 @@
     </ul>
 
     <div class="my-5">
+        {% comment %}
         {% if object.is_collection %}
             <div class="flex gap-5 my-5">
                 <div class="flex-1"></div>
@@ -203,6 +204,18 @@
             <a class="flex-0 btn btn-outline" href="{% url 'edwoca:component_create' object.id %}">
                 {% translate 'create print component' %}
             </a>
+            <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_component_create' object.id %}">
+                {% translate 'create manuscript component' %}
+            </a>
+        </div>
+        {% endcomment %}
+        <div class="flex gap-5 my-5">
+            <div class="flex-1"></div>
+            {% if object.is_collection %}
+                <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_part_create' object.id %}">
+                    {% translate 'create manuscript part' %}
+                </a>
+            {% endif %}
             <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_component_create' object.id %}">
                 {% translate 'create manuscript component' %}
             </a>
@@ -230,9 +243,11 @@
 
     <div class="flex gap-5">
         <div class="flex-1"></div>
+        {% comment %}
         <a class="flex-0 btn btn-outline" href="{% url 'edwoca:component_create' object.id %}">
             {% translate 'create print component' %}
         </a>
+        {% endcomment %}
         <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_component_create' object.id %}">
             {% translate 'create manuscript component' %}
         </a>

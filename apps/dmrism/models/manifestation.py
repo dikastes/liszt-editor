@@ -393,9 +393,11 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
 
         if self.is_collection:
             collection = _('coll')
-            return f'{review_string}({collection}) {prefix} {self.source_title}'
+            title = self.source_title or _('empty')
+            return f'{review_string}({collection}) {prefix} {title}'
 
-        source_typed_title = f'{prefix} {self.working_title} ({self.get_source_type_display()})'
+        title = self.working_title or _('empty')
+        source_typed_title = f'{prefix} {title} ({self.get_source_type_display()})'
 
         if self.part_of:
             part = _('pt')
@@ -569,6 +571,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             target_manifestation.set_collection(True)
             target_manifestation.save()
             self.part_of = target_manifestation
+            self.part_label = PartLabel.CONSTITUTING
             #RelatedManifestation.objects.create(
                     #source_manifestation = self,
                     #target_manifestation = target_manifestation,

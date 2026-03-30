@@ -115,7 +115,9 @@
 
 <h2 class="mb-5"> {% translate 'dedications' %} </h2>
 
+{% comment %}
 {{ form.title_comment_as_daisy }}
+{% endcomment %}
 
 <h3 class="my-5"> {% translate 'person dedications' %} </h3>
 {% for person_dedication_form in person_dedication_forms %}
