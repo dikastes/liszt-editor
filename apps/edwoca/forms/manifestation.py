@@ -707,7 +707,7 @@ class SingletonCreateForm(forms.ModelForm):
         )
     source_type = forms.ChoiceField(
             label = _('source type') + '*',
-            choices = Manifestation.SourceType.choices,
+            choices = Manifestation.SourceType.choices[:-1],
             widget = Select(attrs={'class': SimpleFormMixin.select_classes}),
             required = False
         )
