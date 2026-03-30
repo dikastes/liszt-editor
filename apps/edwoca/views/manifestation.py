@@ -22,7 +22,7 @@ from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from django.apps import apps
 from liszt_util.forms import SearchForm
-from dmad_on_django.models import Place, Corporation, Status, Person
+from dmad_on_django.models import Place, Corporation, Status, Person, Period
 from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting
 from dmrism.models.manifestation import Manifestation as DmrismManifestation, Publication, ManifestationPersonDedication, ManifestationCorporationDedication
 from dmrism.models.manifestation import ManifestationBib, Publication
@@ -1545,9 +1545,9 @@ def manifestation_dedication_htmx_search(request):
     dedication_model_id = request.GET.get('dedication_model_id')
 
 
-    search_from = SearchForm(request.GET)
+    search_form = SearchForm(request.GET)
 
-    if search_from.is_valid():
+    if search_form.is_valid():
         model_name = request.GET.get('model')
 
         try:
@@ -1555,7 +1555,7 @@ def manifestation_dedication_htmx_search(request):
         except LookupError:
             raise Http404
 
-        results = search_from.search().model(model)[:10]
+        results = search_form.search().model(model)[:10]
 
         return render(request, 'edwoca/partials/manifestation/dedication_search_results.html', {
             'results': results,

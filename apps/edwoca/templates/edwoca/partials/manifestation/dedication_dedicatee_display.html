@@ -1,0 +1,28 @@
+{% load i18n %}
+{% for result in results %}
+    <li class="border-b last:border-0 hover:bg-base-200">
+        {% if search_type == 'writer' %}
+            <a class="block p-2" href="{% url 'edwoca:manifestation_title_add_handwriting_writer' manifestation_id dedication_model_id result.pk %}">
+                {{ result.object }}
+            </a>
+        {% elif search_type == 'person_dedicatee' %}
+            <a class="block p-2" href="{% url 'edwoca:manifestation_person_dedication_add_dedicatee' manifestation_id dedication_model_id result.pk %}">
+                {{ result.object }}
+            </a>
+        {% elif search_type == 'person_place' %}
+            <a class="block p-2" href="{% url 'edwoca:manifestation_person_dedication_add_place' manifestation_id dedication_model_id result.pk %}">
+                {{ result.object }}
+            </a>
+        {% elif search_type == 'corp_dedicatee' %}
+            <a class="block p-2" href="{% url 'edwoca:manifestation_corporation_dedication_add_dedicatee' manifestation_id dedication_model_id result.pk %}">
+                {{ result.object }}
+            </a>
+        {% elif search_type == 'corp_place' %}
+            <a class="block p-2" href="{% url 'edwoca:manifestation_corporation_dedication_add_place' manifestation_id dedication_model_id result.pk %}">
+                {{ result.object }}
+            </a>
+        {% endif %}
+    </li>
+{% empty %}
+    <li class="p-3 text-sm text-gray-500 italic">{% translate 'no search results' %}</li>
+{% endfor %}

@@ -1,22 +1,28 @@
 {% load i18n %}
-
-<ul class="border border-black p-3 overflow-auto h-32 bg-white mt-2">
-{% for res in results %}
-    <li class="p-1 hover:bg-gray-100 flex justify-between items-center">
-        <span>{{ res.object }}</span>
-        <button class="btn btn-xs btn-outline"
-                hx-post="{% url 'name_deines_update_views' %}"
-                hx-target="#dedicatee-display-{{ dedication_model_id }}"
-                hx-vals='{
-                    "dedicatee_model_id": "{{ res.pk }}",
-                    "dedicatee_model": "{{ dedicatee_model }}",
-                    "dedication_model_id": "{{ dedication_model_id }}",
-                    "dedication_model": "{{ dedication_model_name }}"
-                }'>
-            {% translate 'select' %}
-        </button>
-    </li>
-{% empty %}
-    <li>{{ no_result_msg }}</li>
-{% endfor %}
-</ul>
+<div class="search-container mb-4">
+    <label class="label">
+        <span class="label-text">{% translate label %}</span>
+    </label>
+    <div class="relative flex items-center">
+        <input
+            type="text"
+            name="q"
+            class="input input-bordered border-black bg-white flex-1"
+            placeholder="{% translate placeholder %}"
+            hx-get="{% url 'edwoca:manifestation_dedication_htmx_search' %}"
+            hx-trigger="keyup changed delay:300ms"
+            hx-target="#results-{{ target_id }}"
+            hx-indicator="#indicator-{{ target_id }}"
+            hx-vals='{
+                "model": "{{ model_name }}",
+                "dedication_model_id": "{{ dedication_id }}",
+                "dedication_model": "{{ dedication_model }}",
+                "dedicatee_model": "{{ dedicatee_model }}",
+                "manifestation_id": "{{ object.id }}"
+            }'
+        >
+        <span id="indicator-{{ target_id }}" class="htmx-indicator loading loading-spinner loading-sm absolute right-3"></span>
+    </div>
+    <ul id="results-{{ target_id }}" class="border border-t-0 border-black p-0 max-h-48 bg-white overflow-auto empty:hidden shadow-lg">
+    </ul>
+</div>
