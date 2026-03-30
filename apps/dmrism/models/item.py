@@ -172,7 +172,7 @@ class Item(Sortable, WemiBaseClass):
             max_index = Item.objects.filter(
                 manifestation=self.manifestation
             ).aggregate(models.Max('order_index'))['order_index__max']
-            
+
             # Wenn bereits Items existieren, nimm max + 1, sonst bleib bei 0
             if max_index is not None:
                 self.order_index = max_index + 1
@@ -215,8 +215,12 @@ class Library(models.Model):
 
     def __str__(self):
         if self.siglum:
-            return f"{self.siglum} {self.name}"
-        return self.name
+            if self.name:
+                return f"{self.siglum} {self.name}"
+            return self.siglum
+        if self.name:
+            return self.name
+        return ''
 
 
 class BaseSignature(models.Model):
