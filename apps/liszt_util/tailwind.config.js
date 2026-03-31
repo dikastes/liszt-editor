@@ -7,6 +7,7 @@ module.exports = {
     "../../**/templates/**/*.js",
   ],
   safelist: [
+    'md:flex-row',
     'items-center',
     'form-control',
     'label',
