@@ -1539,11 +1539,17 @@ class ManifestationDigitalCopyDeleteView(DeleteView):
         manifestation = self.object.item.manifestation
         return reverse('edwoca:manifestation_digital_copy',kwargs={'pk': manifestation.id})
 
+
 def manifestation_dedication_htmx_search(request):
+    dedication_app = request.GET.get('dedication_app', 'dmrism')
+    dedicatee_app = request.GET.get('dedicatee_app', 'dmad')
     dedication_model_name = request.GET.get('dedication_model')
     dedicatee_model_name = request.GET.get('dedicatee_model')
     dedication_model_id = request.GET.get('dedication_model_id')
 
+    manifestation_id = request.GET.get('manifestation_id')
+    search_type = request.GET.get('search_type')
+    field_name = request.GET.get('field_name')  # NEU: Feldname auslesen
 
     search_form = SearchForm(request.GET)
 
@@ -1555,37 +1561,63 @@ def manifestation_dedication_htmx_search(request):
         except LookupError:
             raise Http404
 
-        results = search_form.search().model(model)[:10]
+        results = search_form.search().models(model)[:10]
 
-        return render(request, 'edwoca/partials/manifestation/dedication_search_results.html', {
+        return render(request, 'edwoca/partials/manifestation/dedication_dedicatee_display.html', {
             'results': results,
-            'dedication_model_name' : dedication_model_name,
-            'dedicatee_model_name' : dedicatee_model_name,
-            'dedication_model_id' : dedication_model_id,
-            'no_result_msg': _('no results') if not results else None
+            'dedication_app': dedication_app,
+            'dedicatee_app': dedicatee_app,
+            'dedication_model_name': dedication_model_name,
+            'dedicatee_model_name': dedicatee_model_name,
+            'dedication_model_id': dedication_model_id,
+            'manifestation_id': manifestation_id,
+            'search_type': search_type,
+            'field_name': field_name,  # NEU: Ans Template übergeben
+            'no_result_msg': _('no search results') if not results else None
         })
-
 
     raise Http404
 
 
 def manifestation_dedication_htmx_update(request):
+    # Alle Daten holen
+    dedication_app = request.POST.get('dedication_app')
     dedication_model_name = request.POST.get('dedication_model')
+    dedicatee_app = request.POST.get('dedicatee_app', 'dmad')
     dedicatee_model_name = request.POST.get('dedicatee_model')
     dedication_model_id = request.POST.get('dedication_model_id')
     dedicatee_model_id = request.POST.get('dedicatee_model_id')
+    field_name = request.POST.get('field_name')
+    label_htmx = request.POST.get('label', 'Selected')
+
+    # Debug-Printing: Schau in dein Terminal, wenn es knallt!
+    print(f"DEBUG: App={dedication_app}, Model={dedication_model_name}, Field={field_name}")
 
     try:
-        dedicatee_model = apps.get_model('dmad', dedicatee_model_name)
-        dedication_model = apps.get_model('dmrism', dedication_model_name)
-    except LookupError:
-        raise Http404
+        # .lower() stellt sicher, dass Django die Models findet
+        dedicatee_model = apps.get_model(dedicatee_app, dedicatee_model_name)
+        dedication_model = apps.get_model(dedication_app, dedication_model_name)
+
+        if not dedication_model or not dedicatee_model:
+            print("ERROR: One of the models returned None")
+            raise Http404("Model existiert nicht")
+
+    except Exception as e:
+        print(f"ERROR in get_model: {e}")
+        raise Http404(f"Model-Konfiguration fehlerhaft: {e}")
 
     dedicatee = get_object_or_404(dedicatee_model, pk=dedicatee_model_id)
-    dedication_model.objects.filter(pk=dedication_model_id).update(dedicatee=dedicatee)
 
-    return render(request, 'edwoca/partials/manifestation/dedication_dedicatee_display.html',{
+    # Hier nutzen wir filter().update(), das ist am sichersten für HTMX
+    updated_count = dedication_model.objects.filter(pk=dedication_model_id).update(**{field_name: dedicatee})
+
+    if updated_count == 0:
+        print(f"ERROR: No instance found for ID {dedication_model_id}")
+        raise Http404("Instanz nicht gefunden")
+
+    return render(request, 'edwoca/partials/manifestation/dedication_selected_partial.html', {
         'dedicatee': dedicatee,
+        'label': label_htmx,
     })
 
 def person_dedication_add(request, pk):

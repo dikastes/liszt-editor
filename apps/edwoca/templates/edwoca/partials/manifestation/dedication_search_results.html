@@ -14,11 +14,15 @@
             hx-target="#results-{{ target_id }}"
             hx-indicator="#indicator-{{ target_id }}"
             hx-vals='{
+                "dedication_app": "{{ dedication_app }}",
+                "dedicatee_app": "{{ dedicatee_app|default:"dmad" }}",
                 "model": "{{ model_name }}",
                 "dedication_model_id": "{{ dedication_id }}",
                 "dedication_model": "{{ dedication_model }}",
                 "dedicatee_model": "{{ dedicatee_model }}",
-                "manifestation_id": "{{ object.id }}"
+                "manifestation_id": "{{ object.id }}",
+                "search_type": "{{ search_type }}",
+                "field_name": "{{ field_name }}"
             }'
         >
         <span id="indicator-{{ target_id }}" class="htmx-indicator loading loading-spinner loading-sm absolute right-3"></span>

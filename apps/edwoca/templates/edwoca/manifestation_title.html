@@ -48,7 +48,9 @@
                             </div>
                         {% else %}
                             {# HTMX Suche für WRITER #}
-                            {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='writer' model_name='person' dedication_model='handwriting' dedicatee_model='person' target_id=handwriting_form.instance.id dedication_id=handwriting_form.instance.id placeholder='search persons' %}
+                            <div id="search-container-{{ handwriting_form.instance.id }}-writer">
+                                {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='writer' search_type='writer' field_name='writer' dedication_app='dmrism' dedication_model='manifestationtitlehandwriting' dedicatee_app='dmad' dedicatee_model='person' model_name='person' target_id=handwriting_form.instance.id dedication_id=handwriting_form.instance.id placeholder='search persons' %}
+                            </div>
                         {% endif %}
 
                         <div class="flex gap-5 items-end rounded-lg">
@@ -123,7 +125,9 @@
                 </div>
             {% else %}
                 {# HTMX Suche für PERSON DEDICATEE #}
-                {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='dedicatee' model_name='person' dedication_model='person_dedication' dedicatee_model='person' target_id=person_dedication_form.instance.id|stringformat:"s"|add:"-pers" dedication_id=person_dedication_form.instance.id placeholder='search persons' %}
+                <div id="search-container-{{ person_dedication_form.instance.id }}-dedicatee">
+                    {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='dedicatee' search_type='person_dedicatee' field_name='dedicatee' dedication_app='dmrism' dedication_model='manifestationpersondedication' dedicatee_app='dmad' dedicatee_model='person' model_name='person' target_id=person_dedication_form.instance.id|stringformat:"s"|add:"-pers" dedication_id=person_dedication_form.instance.id placeholder='search persons' %}
+                </div>
             {% endif %}
 
             {# PERSON PLACE SECTION #}
@@ -143,7 +147,9 @@
                 </div>
             {% else %}
                 {# HTMX Suche für PERSON PLACE #}
-                {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='place' model_name='place' dedication_model='person_dedication' dedicatee_model='place' target_id=person_dedication_form.instance.id|stringformat:"s"|add:"-place" dedication_id=person_dedication_form.instance.id placeholder='search places' %}
+                <div id="search-container-{{ person_dedication_form.instance.id }}-place">
+                    {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='place' search_type='person_place' field_name='place' dedication_app='dmrism' dedication_model='manifestationpersondedication' dedicatee_app='dmad' dedicatee_model='place' model_name='place' target_id=person_dedication_form.instance.id|stringformat:"s"|add:"-place" dedication_id=person_dedication_form.instance.id placeholder='search places' %}
+                </div>
             {% endif %}
 
             {{ person_dedication_form.date_as_daisy }}
@@ -192,7 +198,9 @@
                 </div>
             {% else %}
                 {# HTMX Suche für CORP DEDICATEE #}
-                {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='dedicatee' model_name='corporation' dedication_model='corporation_dedication' dedicatee_model='corporation' target_id=corporation_dedication_form.instance.id|stringformat:"s"|add:"-corp" dedication_id=corporation_dedication_form.instance.id placeholder='search corporations' %}
+                <div id="search-container-{{ corporation_dedication_form.instance.id }}-dedicatee">
+                    {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='dedicatee' search_type='corp_dedicatee' field_name='dedicatee' dedication_app='dmrism' dedication_model='manifestationcorporationdedication' dedicatee_app='dmad' dedicatee_model='corporation' model_name='corporation' target_id=corporation_dedication_form.instance.id|stringformat:"s"|add:"-corp" dedication_id=corporation_dedication_form.instance.id placeholder='search corporations' %}
+                </div>
             {% endif %}
 
             {# CORP PLACE SECTION #}
@@ -212,7 +220,9 @@
                 </div>
             {% else %}
                 {# HTMX Suche für CORP PLACE #}
-                {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='place' model_name='place' dedication_model='corporation_dedication' dedicatee_model='place' target_id=corporation_dedication_form.instance.id|stringformat:"s"|add:"-corpplace" dedication_id=corporation_dedication_form.instance.id placeholder='search places' %}
+                <div id="search-container-{{ corporation_dedication_form.instance.id }}-place">
+                    {% include 'edwoca/partials/manifestation/dedication_search_results.html' with label='place' search_type='corp_place' field_name='place' dedication_app='dmrism' dedication_model='manifestationcorporationdedication' dedicatee_app='dmad' dedicatee_model='place' model_name='place' target_id=corporation_dedication_form.instance.id|stringformat:"s"|add:"-corpplace" dedication_id=corporation_dedication_form.instance.id placeholder='search places' %}
+                </div>
             {% endif %}
 
             {{ corporation_dedication_form.date_as_daisy }}
