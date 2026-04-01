@@ -1549,7 +1549,7 @@ def manifestation_dedication_htmx_search(request):
 
     manifestation_id = request.GET.get('manifestation_id')
     search_type = request.GET.get('search_type')
-    field_name = request.GET.get('field_name')  # NEU: Feldname auslesen
+    field_name = request.GET.get('field_name')
 
     search_form = SearchForm(request.GET)
 
@@ -1572,7 +1572,7 @@ def manifestation_dedication_htmx_search(request):
             'dedication_model_id': dedication_model_id,
             'manifestation_id': manifestation_id,
             'search_type': search_type,
-            'field_name': field_name,  # NEU: Ans Template übergeben
+            'field_name': field_name,
             'no_result_msg': _('no search results') if not results else None
         })
 
