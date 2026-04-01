@@ -1195,6 +1195,11 @@ class ManifestationProvenanceView(UpdateView):
 
         return self._forms_invalid(form)
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['instance'] = self.object.get_single_item()
+        return kwargs
+
     def _all_nested_valid(self):
         person_bib = [e['bib_formset'] for e in self.enriched_person]
         corp_bib = [e['bib_formset'] for e in self.enriched_corporation]
@@ -1209,10 +1214,10 @@ class ManifestationProvenanceView(UpdateView):
         )
 
     def _forms_valid(self, form):
-        self.object = form.save()
+        single_item = form.save()
 
-        self.person_formset.instance = self.object.get_single_item()
-        self.corporation_formset.instance = self.object.get_single_item()
+        self.person_formset.instance = single_item
+        self.corporation_formset.instance = single_item
 
         self.person_formset.save()
         self.corporation_formset.save()
@@ -1266,6 +1271,8 @@ class ManifestationProvenanceView(UpdateView):
             instance.save(update_fields=['period'])
         return instance.period
 
+
+"""
 def manifestation_provenance(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     item = manifestation.items.all()[0]
@@ -1327,6 +1334,7 @@ def manifestation_provenance(request, pk):
             provenance_comment_form.save()
 
         context['provenance_comment_form'] = provenance_comment_form
+        breakpoint()
         if pps_form.is_valid()\
             and all(f.is_valid() for f in pps_bib_forms)\
             and cps_form.is_valid()\
@@ -1414,7 +1422,7 @@ def manifestation_provenance(request, pk):
     context['letter_search_form'] = letter_search_form
 
     return render(request, 'edwoca/manifestation_provenance.html', context)
-
+"""
 
 def person_provenance_add(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
