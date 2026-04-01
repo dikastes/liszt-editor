@@ -1557,7 +1557,7 @@ def manifestation_dedication_htmx_search(request):
         model_name = request.GET.get('model')
 
         try:
-            model = apps.get_model('dmad', model_name)
+            model = apps.get_model(dedicatee_app, model_name)
         except LookupError:
             raise Http404
 
