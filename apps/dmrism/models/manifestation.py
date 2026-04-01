@@ -1,4 +1,5 @@
 import re
+from haystack.query import SearchQuerySet
 from .base import *
 from ..rism_tools import get_rism_data
 from .item import ItemDigitalCopy, BaseDigitalCopy, BaseSignature
@@ -382,11 +383,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         return '<Fehler: keine Items>'
 
     def __str__(self):
-        #for other in Manifestation.objects.exclude(pk=self.pk):
-            #if other.standardized_search_entry() == self.standardized_search_entry():
-                #return f'{self.pk} {self.standardized_search_entry()}'
+        if self.get_current_signature_normalized():
+            candidates = SearchQuerySet().models(Manifestation).filter(content=self.get_current_signature_normalized())
+            for other in candidates:
+                if other.standardized_search_entry() == self.standardized_search_entry():
+                    return f'{self.pk} {self.standardized_search_entry()}'
 
-        return f'{self.pk} {self.standardized_search_entry()}'
+        return self.standardized_search_entry()
 
     def save(self, *args, **kwargs):
         if not self.period:
@@ -615,7 +618,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             return ''
 
         signature = single_item.signatures.filter(status = BaseSignature.Status.CURRENT).first()
-        return re.sub(r'[^A-Za-z0-9]', '', signature.signature).lower()
+        return re.sub(r'[^A-Za-z0-9]', '', signature.signature or '').lower()
 
 
 class Publication(models.Model):
