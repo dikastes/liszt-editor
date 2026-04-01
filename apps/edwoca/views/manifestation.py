@@ -1590,11 +1590,7 @@ def manifestation_dedication_htmx_update(request):
     field_name = request.POST.get('field_name')
     label_htmx = request.POST.get('label', 'Selected')
 
-    # Debug-Printing: Schau in dein Terminal, wenn es knallt!
-    print(f"DEBUG: App={dedication_app}, Model={dedication_model_name}, Field={field_name}")
-
     try:
-        # .lower() stellt sicher, dass Django die Models findet
         dedicatee_model = apps.get_model(dedicatee_app, dedicatee_model_name)
         dedication_model = apps.get_model(dedication_app, dedication_model_name)
 
@@ -1608,7 +1604,6 @@ def manifestation_dedication_htmx_update(request):
 
     dedicatee = get_object_or_404(dedicatee_model, pk=dedicatee_model_id)
 
-    # Hier nutzen wir filter().update(), das ist am sichersten für HTMX
     updated_count = dedication_model.objects.filter(pk=dedication_model_id).update(**{field_name: dedicatee})
 
     if updated_count == 0:
