@@ -106,37 +106,39 @@
     {% if found_collections %}
         <ul class="border border-black p-2 h-32 overflow-auto">
             {% for found_collection in found_collections %}
-                <li>
-                    {{ found_collection.object }}
-                    <div class="flex mb-2 mx-2 gap-2">
-                        {% if found_collection.object.is_collection %}
+                {% if not found_collection.object.id == object.id %}
+                    <li>
+                        {{ found_collection.object }}
+                        <div class="flex mb-2 mx-2 gap-2">
+                            {% if found_collection.object.is_collection %}
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="collection-link-type" value="constituting" />
+                                    <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (constituting) of' %}" />
+                                </form>
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="collection-link-type" value="bound_together" />
+                                    <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (bound together) of' %}" />
+                                </form>
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="collection-link-type" value="separated" />
+                                    <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (separated) of' %}" />
+                                </form>
+                            {% endif %}
                             <form method="post" class="flex-0">
                                 {% csrf_token %}
-                                <input type="hidden" name="collection-link-type" value="constituting" />
+                                <input type="hidden" name="collection-link-type" value="component" />
                                 <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
-                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (constituting) of' %}" />
+                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is component of' %}" />
                             </form>
-                            <form method="post" class="flex-0">
-                                {% csrf_token %}
-                                <input type="hidden" name="collection-link-type" value="bound_together" />
-                                <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
-                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (bound together) of' %}" />
-                            </form>
-                            <form method="post" class="flex-0">
-                                {% csrf_token %}
-                                <input type="hidden" name="collection-link-type" value="separated" />
-                                <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
-                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (separated) of' %}" />
-                            </form>
-                        {% endif %}
-                        <form method="post" class="flex-0">
-                            {% csrf_token %}
-                            <input type="hidden" name="collection-link-type" value="component" />
-                            <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
-                            <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is component of' %}" />
-                        </form>
-                    </div>
-                </li>
+                        </div>
+                    </li>
+                {% endif %}
             {% empty %}
                 <li>
                     <em>
@@ -345,31 +347,33 @@
     {% if manuscript_query %}
         <ul class="border border-black p-2 h-32 overflow-auto">
             {% for found_manuscript in found_manuscripts %}
-                <li>
-                    {{ found_manuscript.object }}
-                    <div class="flex mb-2 mx-2 gap-2">
-                        <form method="post" class="flex-0">
-                            {% csrf_token %}
-                            <input type="hidden" name="manifestation-link-type" value="related" />
-                            <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
-                            <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is related to' %}" />
-                        </form>
-                        {% if not object.is_singleton %}
+                {% if not found_manuscript.object.id == object.id %}
+                    <li>
+                        {{ found_manuscript.object }}
+                        <div class="flex mb-2 mx-2 gap-2">
                             <form method="post" class="flex-0">
                                 {% csrf_token %}
-                                <input type="hidden" name="manifestation-link-type" value="stitch_template" />
+                                <input type="hidden" name="manifestation-link-type" value="related" />
                                 <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
-                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'has as stitch template (as documented)' %}" />
+                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is related to' %}" />
                             </form>
-                            <form method="post" class="flex-0">
-                                {% csrf_token %}
-                                <input type="hidden" name="manifestation-link-type" value="stitch_template_inferred" />
-                                <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
-                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'has as stitch template (inferred)' %}" />
-                            </form>
-                        {% endif %}
-                    </div>
-                </li>
+                            {% if not object.is_singleton %}
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="manifestation-link-type" value="stitch_template" />
+                                    <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'has as stitch template (as documented)' %}" />
+                                </form>
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="manifestation-link-type" value="stitch_template_inferred" />
+                                    <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'has as stitch template (inferred)' %}" />
+                                </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endif %}
             {% empty %}
                 <li>
                     <em>
@@ -438,31 +442,33 @@
     {% if print_query %}
         <ul class="border border-black p-2 h-32 overflow-auto">
             {% for found_print in found_prints %}
-                <li>
-                    {{ found_print.object }}
-                    <div class="flex mb-2 mx-2 gap-2">
-                        <form method="post" class="flex-0">
-                            {% csrf_token %}
-                            <input type="hidden" name="manifestation-link-type" value="related" />
-                            <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
-                            <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is related to' %}" />
-                        </form>
-                        {% if object.is_singleton %}
+                {% if not found_print.object.id == object.id %}
+                    <li>
+                        {{ found_print.object }}
+                        <div class="flex mb-2 mx-2 gap-2">
                             <form method="post" class="flex-0">
                                 {% csrf_token %}
-                                <input type="hidden" name="manifestation-link-type" value="stitch_template" />
+                                <input type="hidden" name="manifestation-link-type" value="related" />
                                 <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
-                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is stitch template (as documented)' %}" />
+                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is related to' %}" />
                             </form>
-                            <form method="post" class="flex-0">
-                                {% csrf_token %}
-                                <input type="hidden" name="manifestation-link-type" value="stitch_template_inferred" />
-                                <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
-                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is stitch template (inferred)' %}" />
-                            </form>
-                        {% endif %}
-                    </div>
-                </li>
+                            {% if object.is_singleton %}
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="manifestation-link-type" value="stitch_template" />
+                                    <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is stitch template (as documented)' %}" />
+                                </form>
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="manifestation-link-type" value="stitch_template_inferred" />
+                                    <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is stitch template (inferred)' %}" />
+                                </form>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endif %}
             {% empty %}
                 <li>
                     <em>
