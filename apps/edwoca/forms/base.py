@@ -330,7 +330,8 @@ class DateFormMixin:
                                 display_field.errors
                 tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=calculate_name)
             # second row: not before & not after
-            with tags.div(cls=SimpleFormMixin.palette_classes):
+            #with tags.div(cls=SimpleFormMixin.palette_classes):
+            with tags.div(cls='flex flex-col md:flex-row'):
                 with tags.label(cls='form-control flex-0'):
                     tags.div(_('not before'), cls=SimpleFormMixin.label_text_classes)
                     with tags.div(cls='flex'):
@@ -347,7 +348,7 @@ class DateFormMixin:
                         with div(cls='label'):
                             with span(cls='text-primary text-sm'):
                                 not_after_field.errors
-                tags.div(cls='flex-1')
+                #tags.div(cls='flex-1')
             # third row: controls
             with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
                 #tags.div(documentation_label, cls='flex-0 mr-10')

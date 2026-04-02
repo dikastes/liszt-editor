@@ -22,6 +22,9 @@ class TitleTypes(models.TextChoices):
 
 
 class Manifestation(RenderRawJSONMixin, WemiBaseClass):
+    class Meta:
+        ordering = ['-needs_review']
+
     class PartLabel(models.TextChoices):
         CONSTITUTING = 'c', _('constituting')
         BOUND_TOGETHER = 'b', _('bound together')
@@ -78,13 +81,11 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     working_title = models.TextField(
             max_length = 200,
             blank = True,
-            null = True,
             verbose_name = _('working title')
         )
     source_title = models.TextField(
             max_length = 200,
             blank = True,
-            null = True,
             verbose_name = _('source title')
         )
     rism_id_unaligned = models.BooleanField(default=False)
@@ -92,28 +93,19 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     temporary_target = models.ForeignKey(
             'Manifestation',
             on_delete = models.CASCADE,
-            null = True,
             related_name = 'temporary_copy'
         )
     # move to edwoca?
     period = models.OneToOneField(
             'dmad.Period',
             on_delete = models.SET_NULL,
+            null = True,
             blank = True,
-            null = True
         )
     places = models.ManyToManyField(
             'dmad.Place',
             through = 'ManifestationPlace'
         )
-    #place_inferred = models.BooleanField(
-            #default=False,
-            #verbose_name = _("inferred")
-            #)
-    #place_assumed = models.BooleanField(
-            #default=False,
-            #verbose_name = _("assumed")
-            #)
     related_manifestations = models.ManyToManyField(
             'Manifestation',
             through = 'RelatedManifestation'
@@ -122,7 +114,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length=10,
             choices = ManifestationForm.choices,
             default = None,
-            null = True,
             blank = True,
             verbose_name = _('manifestation form')
         )
@@ -130,7 +121,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 5,
             choices = SourceType.choices,
             default = SourceType.AUTOGRAPH,
-            null = True,
             blank = True,
             verbose_name = _('source type')
         )
@@ -138,9 +128,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 10,
             choices = PrintType,
             default = None,
-            null = True,
-            blank = True,
-            verbose_name = _('print type')
+            verbose_name = _('edition')
         )
     edition = models.CharField(
             max_length = 10,
@@ -156,12 +144,10 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         )
     extent = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('extent')
         )
     history = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('history')
         )
     bib = models.ManyToManyField(
@@ -172,18 +158,15 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 15,
             choices = Language,
             default = None,
-            null = True,
             verbose_name = _('language')
         )
     watermark = models.TextField(
             max_length = 100,
             blank = True,
-            null = True,
             verbose_name = _('watermark')
         )
     watermark_url = models.URLField(
             blank=True,
-            null=True,
             verbose_name = _('watermark url')
         )
     is_singleton = models.BooleanField(default=False)
@@ -191,69 +174,57 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     missing_item = models.BooleanField(default=False)
     # move to edwoca?
     numerus_currens = models.IntegerField(
-            null = True,
             unique = True
         )
     rism_id = models.CharField(
             max_length=20,
-            null = True,
             blank = True,
             verbose_name = _('RISM id')
         )
     raw_data = models.TextField(
             blank = True,
-            null = True
         )
     date_diplomatic = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('diplomatic date')
         )
     print_extent = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('print extent')
         )
     private_head_comment = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('private head comment')
         )
     private_relations_comment = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('private relations comment')
         )
     private_title_comment = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('private title comment')
         )
     private_history_comment = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('private history comment')
         )
     private_dedication_comment = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('private dedication comment')
         )
     private_print_comment = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('private print comment')
         )
     taken_information = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('taken information')
         )
     stitcher = models.ForeignKey(
             'dmad.Corporation',
             related_name = 'stitched_manifestations',
+            on_delete = models.SET_NULL,
             null = True,
-            on_delete = models.SET_NULL
         )
     specific_figure = models.BooleanField(
             default = False,
@@ -261,7 +232,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         )
     plate_number = models.CharField(
             max_length=20,
-            null = True,
             blank = True,
             verbose_name = _('plate number')
         )
@@ -331,8 +301,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 1,
             choices = PartLabel,
             default = None,
-            verbose_name = _('part label'),
-            null = True
+            verbose_name = _('part label')
         )
     component_of = models.ForeignKey(
             'Manifestation',
@@ -351,12 +320,10 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     first_editor = models.CharField(
             max_length = 50,
             blank = True,
-            null = True,
             verbose_name = _('first editor')
         )
     editing_history = models.TextField(
             blank = True,
-            null = True,
             verbose_name = _('editing history')
         )
     needs_review = models.BooleanField(
@@ -415,11 +382,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         return '<Fehler: keine Items>'
 
     def __str__(self):
-        #for other in Manifestation.objects.exclude(pk=self.pk):
-            #if other.standardized_search_entry() == self.standardized_search_entry():
-                #return f'{self.pk} {self.standardized_search_entry()}'
-
-        return f'{self.pk} {self.standardized_search_entry()}'
+        return self.standardized_search_entry()
 
     def save(self, *args, **kwargs):
         if not self.period:
@@ -648,7 +611,9 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             return ''
 
         signature = single_item.signatures.filter(status = BaseSignature.Status.CURRENT).first()
-        return re.sub(r'[^A-Za-z0-9]', '', signature.signature).lower()
+        if signature:
+            return re.sub(r'[^A-Za-z0-9]', '', signature.signature or '').lower()
+        return ''
 
 
 class Publication(models.Model):
