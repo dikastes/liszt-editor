@@ -135,7 +135,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             piano_reduction = self.piano_reduction,
             particell = self.particell,
             score = self.score,
-            parts = self.parts,
+            part = self.part,
             print_extent = self.print_extent,
             private_head_comment = self.private_head_comment,
             private_relations_comment = self.private_relations_comment,
@@ -171,10 +171,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         )
                 pps_copy = PersonProvenanceStation.objects.create(
                         item = single_item_copy,
-                        owner = pps.owner,
                         period = period
                     )
+                pps_copy.owner.set(pps.owner.all())
                 pps_copy.bib.set(pps.bib.all())
+                pps_copy.save()
 
             for cps in self.get_single_item().corporation_provenance_stations.all():
                 period = None
@@ -191,6 +192,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         period = period
                     )
                 cps_copy.bib.set(cps.bib.all())
+                cps_copy.save()
 
             for modification in self.get_single_item().modifications.all():
                 if modification.period:
@@ -260,13 +262,14 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     assumed = person_dedication.period.assumed,
                     inferred = person_dedication.period.inferred
                     )
-            ManifestationPersonDedication.objects.create(
+            mpd_copy = ManifestationPersonDedication.objects.create(
                     manifestation = copy,
                     period = period,
                     diplomatic_dedication = person_dedication.diplomatic_dedication,
-                    place = person_dedication.place,
-                    dedicatee = person_dedication.dedicatee
+                    place = person_dedication.place
                 )
+            mpd_copy.dedicatee.set(person_dedication.dedicatee.all())
+            mpd_copy.save()
 
         for corporation_dedication in self.manifestation_corporation_dedications.all():
             period = Period.objects.create(
@@ -283,6 +286,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     place = corporation_dedication.place,
                     dedicatee = corporation_dedication.dedicatee
                 )
+
+        copy.save()
 
         return copy
 
