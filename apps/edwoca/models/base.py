@@ -8,6 +8,7 @@ from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, Bas
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
+from haystack.query import SearchQuerySet, SQ
 from re import compile, split
 
 
@@ -57,25 +58,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             self.part_of_id = value.pk
         else:
             self.part_of_id = None
-
-    def __str__(self):
-        if self.is_singleton:
-            return super().__str__()
-
-        if self.missing_item:
-            return f"{catalog_number} unbekannt {numerus_currens}"
-
-        publisher_addition = self.period
-        if self.plate_number:
-            publisher_addition = self.plate_number
-
-        publisher_string = _('<< publisher >>')
-        if self.publications.first() and self.publications.first().publisher:
-            publisher_string = self.publications.first().publisher.get_designator()
-
-        prefix = f"{publisher_string} {publisher_addition}"
-
-        return self.render_title(prefix)
 
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
@@ -842,6 +824,37 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     item = single_item,
                     url = raw_data[DIGITAL_COPY_KEY]
                 )
+
+    def render_title(self, prefix):
+        if self.is_singleton:
+            return super().render_title(prefix)
+
+        #if self.missing_item:
+            #return f"{catalog_number} unbekannt {numerus_currens}"
+
+        publisher_addition = self.period
+        if self.plate_number:
+            publisher_addition = self.plate_number
+
+        publisher_string = _('<< publisher >>')
+        if self.publications.first() and self.publications.first().publisher:
+            publisher_string = self.publications.first().publisher.get_designator()
+
+        prefix = f"{publisher_string} {publisher_addition}"
+
+        return self.render_title(prefix)
+
+    def __str__(self):
+        if self.get_current_signature_normalized():
+            candidates = SearchQuerySet().models(Manifestation).filter(SQ(signature_normalized=self.get_current_signature_normalized()))
+            for other in candidates:
+                if other.pk != str(self.pk) and other.object.standardized_search_entry() == self.standardized_search_entry():
+                    return f'{self.pk} {self.standardized_search_entry()}'
+
+        return self.standardized_search_entry()
+
+
+
 
 
 class ManifestationTitle(DmRismManifestationTitle):
