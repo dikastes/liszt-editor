@@ -319,7 +319,7 @@ class DateFormMixin:
 
         with date_div:
             # first row: standardized date
-            with tags.div(cls='flex gap-5 items-end w-full'):
+            with tags.div(cls='flex gap-5 items-end w-full mb-5'):
                 with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
                     with tags.div(cls=SimpleFormMixin.label_classes):
                         tags.label(_('standardized date'), cls=SimpleFormMixin.label_text_classes)
@@ -330,8 +330,7 @@ class DateFormMixin:
                                 display_field.errors
                 tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=calculate_name)
             # second row: not before & not after
-            #with tags.div(cls=SimpleFormMixin.palette_classes):
-            with tags.div(cls='flex flex-col md:flex-row'):
+            with tags.div(cls='flex flex-col xl:flex-row gap-5'):
                 with tags.label(cls='form-control flex-0'):
                     tags.div(_('not before'), cls=SimpleFormMixin.label_text_classes)
                     with tags.div(cls='flex'):
@@ -348,10 +347,8 @@ class DateFormMixin:
                         with div(cls='label'):
                             with span(cls='text-primary text-sm'):
                                 not_after_field.errors
-                #tags.div(cls='flex-1')
             # third row: controls
             with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
-                #tags.div(documentation_label, cls='flex-0 mr-10')
                 with tags.label(cls=SimpleFormMixin.toggle_label_classes):
                     tags.span(_(assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
                     raw(str(assumed_field))

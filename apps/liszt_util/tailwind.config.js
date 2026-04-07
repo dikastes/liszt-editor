@@ -8,6 +8,7 @@ module.exports = {
   ],
   safelist: [
     'md:flex-row',
+    'flex-row',
     'items-center',
     'form-control',
     'label',
