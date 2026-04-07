@@ -20,7 +20,7 @@ iso639==0.1.4
 jsonpath-ng==1.7.0
 packaging==25.0
 ply==3.11
--e git+https://github.com/Nathmel123/pylobid@f51f243a24ec422221842b6480245a5114005a97#egg=pylobid
+-e git+https://github.com/Nathmel123/pylobid@380e53db20f1d725177da56779e747bf4a6b4923#egg=pylobid
 pymarc==5.3.1
 pyparsing==3.2.3
 python-dotenv==1.1.1

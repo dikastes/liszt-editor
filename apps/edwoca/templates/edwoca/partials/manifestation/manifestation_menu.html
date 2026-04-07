@@ -6,6 +6,9 @@
             <a
             href="{% url 'edwoca:manifestation_detail' object.id %}"
             {% if 'detail' in request.path %}class="active"{% endif %}
+            {% comment %}
+            class="text-sm xl:text-base"
+            {% endcomment %}
             >
             {% translate 'detail' %}
             </a>

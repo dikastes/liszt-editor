@@ -7,6 +7,11 @@ module.exports = {
     "./apps/**/templates/**/*.js",
   ],
   safelist: [
+    'xl:text-2xl',
+    'text-lg',
+    'text-sm',
+    'xl:text-base',
+    'xl:flex-row',
     'disabled:!bg-white',
     'disabled:!border-black',
     'disabled:!text-black',

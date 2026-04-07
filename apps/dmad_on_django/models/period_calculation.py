@@ -81,6 +81,19 @@ PERIOD_CODES = {
                 'month': 12,
                 'year': 3
             }
+        },
+        # the beginning of a century is from the first to the nineteenth year
+        'century': {
+            'lower': {
+                'day': 1,
+                'month': 1,
+                'year': 0
+            },
+            'upper': {
+                'day': 31,
+                'month': 12,
+                'year': 19
+            }
         }
     },
     'mid': {
@@ -117,6 +130,19 @@ PERIOD_CODES = {
                 'day': 31,
                 'month': 12,
                 'year': 6
+            }
+        },
+        # the mid of a century is from the fourtieth to the fiftynineth year
+        'century': {
+            'lower': {
+                'day': 1,
+                'month': 1,
+                'year': 40
+            },
+            'upper': {
+                'day': 31,
+                'month': 12,
+                'year': 59
             }
         }
     },
@@ -155,6 +181,19 @@ PERIOD_CODES = {
                 'month': 12,
                 'year': 9
             }
+        },
+        # the end of a century is from the eightieth to the ninetynineth year
+        'century': {
+            'lower': {
+                'day': 1,
+                'month': 1,
+                'year': 80
+            },
+            'upper': {
+                'day': 31,
+                'month': 12,
+                'year': 99
+            }
         }
     },
     'first half': {
@@ -192,6 +231,19 @@ PERIOD_CODES = {
                 'month': 12,
                 'year': 4
             }
+        },
+        # the first half of a century
+        'century': {
+            'lower': {
+                'day': 1,
+                'month': 1,
+                'year': 0
+            },
+            'upper': {
+                'day': 31,
+                'month': 12,
+                'year': 49
+            }
         }
     },
     'second half': {
@@ -228,6 +280,19 @@ PERIOD_CODES = {
                 'day': 31,
                 'month': 12,
                 'year': 9
+            }
+        },
+        # the second half of a century
+        'century': {
+            'lower': {
+                'day': 1,
+                'month': 1,
+                'year': 50
+            },
+            'upper': {
+                'day': 31,
+                'month': 12,
+                'year': 99
             }
         }
     },
@@ -281,8 +346,8 @@ PERIOD_CODES = {
                 'year': 0
             },
             'upper': {
-                'day': 31,
-                'month': 1,
+                'day': 29,
+                'month': 2,
                 'year': 1
             }
         }
