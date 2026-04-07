@@ -1482,11 +1482,15 @@ def manifestation_manuscript_update(request, pk):
 
     if request.method == 'POST':
         form = ItemManuscriptForm(request.POST, instance=item)
-        if form.is_valid():
+        manifestation_form = ManifestationManuscriptForm(request.POST, instance=manifestation)
+        if form.is_valid() and manifestation_form.is_valid():
             form.save()
+            manifestation_form.save()
         else:
             return render(request, 'edwoca/manifestation_manuscript.html', context)
+
         context['form'] = form
+        context['manifestation_form'] = form
 
         handwriting_forms = []
         for handwriting in item.handwritings.all():
@@ -1591,6 +1595,7 @@ def manifestation_manuscript_update(request, pk):
                         }
 
         form = ItemManuscriptForm(instance=item)
+        manifestation_form = ManifestationManuscriptForm(instance=manifestation)
         handwriting_forms = []
         for handwriting in item.handwritings.all():
             prefix = f'handwriting_{handwriting.id}'
@@ -1616,7 +1621,7 @@ def manifestation_manuscript_update(request, pk):
         context['modifications'] = modifications
 
     context['form'] = form
-    #context['search_form'] = search_form
+    context['manifestation_form'] = manifestation_form
 
     if request.GET.get('handwriting_id'):
         context['handwriting_id'] = int(request.GET.get('handwriting_id'))

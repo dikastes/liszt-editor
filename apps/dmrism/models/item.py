@@ -58,6 +58,18 @@ class Item(Sortable, WemiBaseClass):
             null = True,
             verbose_name = _('taken information')
         )
+    is_lyrics = models.BooleanField(
+            default = False,
+            verbose_name = _('is lyrics')
+        )
+    is_program = models.BooleanField(
+            default = False,
+            verbose_name = _('is program')
+        )
+    is_explanation = models.BooleanField(
+            default = False,
+            verbose_name = _('is explanation')
+        )
 
     _group_field_name = 'manifestation'
 

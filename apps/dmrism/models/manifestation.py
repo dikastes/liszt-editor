@@ -92,8 +92,9 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     temporary = models.BooleanField(default=False)
     temporary_target = models.ForeignKey(
             'Manifestation',
-            on_delete = models.CASCADE,
-            related_name = 'temporary_copy'
+            on_delete = models.SET_NULL,
+            related_name = 'temporary_copy',
+            null = True
         )
     # move to edwoca?
     period = models.OneToOneField(
@@ -115,6 +116,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             choices = ManifestationForm.choices,
             default = None,
             blank = True,
+            null = True,
             verbose_name = _('manifestation form')
         )
     source_type = models.CharField(
@@ -128,6 +130,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 10,
             choices = PrintType,
             default = None,
+            null = True,
             verbose_name = _('edition')
         )
     edition = models.CharField(
@@ -158,6 +161,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 15,
             choices = Language,
             default = None,
+            null = True,
             verbose_name = _('language')
         )
     watermark = models.TextField(
@@ -174,6 +178,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     missing_item = models.BooleanField(default=False)
     # move to edwoca?
     numerus_currens = models.IntegerField(
+            null = True,
             unique = True
         )
     rism_id = models.CharField(
@@ -301,6 +306,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 1,
             choices = PartLabel,
             default = None,
+            null = True,
             verbose_name = _('part label')
         )
     component_of = models.ForeignKey(
@@ -329,6 +335,18 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     needs_review = models.BooleanField(
             default = False,
             verbose_name = _('needs review')
+        )
+    is_lyrics = models.BooleanField(
+            default = False,
+            verbose_name = _('is lyrics')
+        )
+    is_program = models.BooleanField(
+            default = False,
+            verbose_name = _('is program')
+        )
+    is_explanation = models.BooleanField(
+            default = False,
+            verbose_name = _('is explanation')
         )
 
     def get_absolute_url(self):

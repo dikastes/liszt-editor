@@ -956,3 +956,44 @@ class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
                     raw(str(place_assumed_field))
 
         return mark_safe(str(palette))
+
+
+class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Item
+        fields = ['is_lyrics', 'is_program', 'is_explanation']
+        widgets = {
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        lyrics_field = self['is_lyrics']
+        program_field = self['is_program']
+        explanation_field = self['is_explanation']
+
+        form = div()
+
+        with form:
+            h3(_('text type'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(lyrics_field))
+                span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(program_field))
+                span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(explanation_field))
+                span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))
