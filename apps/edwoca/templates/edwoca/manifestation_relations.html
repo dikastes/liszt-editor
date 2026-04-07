@@ -29,6 +29,7 @@
 {% if not object.is_collection %}
     {% if object.part_of %}
         <p>
+        {{ object.part_label }}
             {% if object.part_label == 'c' %}
                 {% translate 'this object is part of (constituting)' %}
             {% endif %}
@@ -188,40 +189,35 @@
         {% endfor %}
     </ul>
 
-    <div class="my-5">
-        {% comment %}
-        {% if object.is_collection %}
-            <div class="flex gap-5 my-5">
-                <div class="flex-1"></div>
-                <a class="flex-0 btn btn-outline" href="{% url 'edwoca:part_create' object.id %}">
-                    {% translate 'create print part' %}
-                </a>
-                <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_part_create' object.id %}">
-                    {% translate 'create manuscript part' %}
-                </a>
-            </div>
-        {% endif %}
-        <div class="flex gap-5 my-5">
-            <div class="flex-1"></div>
-            <a class="flex-0 btn btn-outline" href="{% url 'edwoca:component_create' object.id %}">
-                {% translate 'create print component' %}
-            </a>
-            <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_component_create' object.id %}">
-                {% translate 'create manuscript component' %}
-            </a>
-        </div>
-        {% endcomment %}
-        <div class="flex gap-5 my-5">
-            <div class="flex-1"></div>
-            {% if object.is_collection %}
-                <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_part_create' object.id %}">
-                    {% translate 'create manuscript part' %}
-                </a>
-            {% endif %}
-            <a class="flex-0 btn btn-outline" href="{% url 'edwoca:singleton_component_create' object.id %}">
-                {% translate 'create manuscript component' %}
-            </a>
-        </div>
+    <div class="flex">
+        <div class="flex-1"></div>
+        <details class="dropdown dropdown-end my-5 flex-0">
+            <summary class="btn btn-outline">
+                {% translate 'create' %}
+            </summary>
+            <ul class="menu dropdown-content bg-white shadow">
+                <li>
+                    <a href="{% url 'edwoca:singleton_part_create' object.id 'constituting' %}">
+                        {% translate 'create manuscript part (constituting)' %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'edwoca:singleton_part_create' object.id 'bound_together' %}">
+                        {% translate 'create manuscript part (bound together)' %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'edwoca:singleton_part_create' object.id 'separated' %}">
+                        {% translate 'create manuscript part (separated)' %}
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url 'edwoca:singleton_component_create' object.id %}">
+                        {% translate 'create manuscript component' %}
+                    </a>
+                </li>
+            </ul>
+        </details>
     </div>
 {% endif %}
 

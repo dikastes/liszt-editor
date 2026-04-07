@@ -2098,7 +2098,7 @@ def component_create(request, pk, publisher_pk = None):
     return render(request, 'edwoca/create_manifestation.html', context)
 
 
-def singleton_part_create(request, pk):
+def singleton_part_create(request, pk, part_label):
     existing_manifestation = get_object_or_404(Manifestation, pk = pk)
 
     if request.method == 'POST':
@@ -2108,7 +2108,8 @@ def singleton_part_create(request, pk):
                 is_singleton=True,
                 source_type = form.cleaned_data.get('source_type'),
                 working_title = form.cleaned_data.get('working_title'),
-                part_of = existing_manifestation
+                part_of = existing_manifestation,
+                part_label = getattr(EdwocaManifestation.PartLabel, part_label.upper())
             )
 
             item = Item.objects.create(manifestation=manifestation)
