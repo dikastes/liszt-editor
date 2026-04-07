@@ -940,8 +940,15 @@ def manifestation_print_update(request, pk):
                 publication_form.save()
 
         form = ManifestationPrintForm(request.POST, instance=manifestation)
-        if form.is_valid():
+        text_type_form = ManifestationTextTypeForm(request.POST, instance=manifestation)
+
+        if form.is_valid() and text_type_form.is_valid():
             form.save()
+            text_type_form.save()
+        else:
+            context['form'] = form
+            context['text_type_form'] = text_type_form
+            return render(request, 'edwoca/manifestation_print.html', context)
 
         if 'calculate-machine-readable-date' in request.POST:
             manifestation.period.parse_display()
@@ -956,6 +963,7 @@ def manifestation_print_update(request, pk):
         return redirect('edwoca:manifestation_print', pk=pk)
 
     context['form'] = ManifestationPrintForm(instance = manifestation)
+    context['text_type_form'] = ManifestationTextTypeForm(instance=manifestation)
 
     publication_forms = []
     for publication in manifestation.publications.all():
@@ -1507,7 +1515,7 @@ def manifestation_manuscript_update(request, pk):
 
     if request.method == 'POST':
         form = ItemManuscriptForm(request.POST, instance=item)
-        manifestation_form = ManifestationManuscriptForm(request.POST, instance=manifestation)
+        manifestation_form = ManifestationTextTypeForm(request.POST, instance=manifestation)
         if form.is_valid() and manifestation_form.is_valid():
             form.save()
             manifestation_form.save()
@@ -1620,7 +1628,7 @@ def manifestation_manuscript_update(request, pk):
                         }
 
         form = ItemManuscriptForm(instance=item)
-        manifestation_form = ManifestationManuscriptForm(instance=manifestation)
+        manifestation_form = ManifestationTextTypeForm(instance=manifestation)
         handwriting_forms = []
         for handwriting in item.handwritings.all():
             prefix = f'handwriting_{handwriting.id}'

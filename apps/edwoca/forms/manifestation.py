@@ -958,9 +958,9 @@ class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
         return mark_safe(str(palette))
 
 
-class ManifestationManuscriptForm(ModelForm, SimpleFormMixin):
+class ManifestationTextTypeForm(ModelForm, SimpleFormMixin):
     class Meta:
-        model = Item
+        model = Manifestation
         fields = ['is_lyrics', 'is_program', 'is_explanation']
         widgets = {
                 'is_lyrics': CheckboxInput( attrs = {
