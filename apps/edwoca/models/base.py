@@ -847,7 +847,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         prefix = f"{publisher_string} {publisher_addition}"
 
-        return self.render_title(prefix)
+        return super().render_title(prefix)
 
     def __str__(self):
         if self.get_current_signature_normalized():
