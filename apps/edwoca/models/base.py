@@ -77,6 +77,13 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 replace(')', '').\
                 strip()
 
+    def get_numeric_signature_part(self):
+        numeric_pattern = compile('[0-9]{3,}')
+        match = numeric_pattern.search(self.get_current_signature_normalized())
+        if match:
+            return match.group()
+        return None
+
     def get_copy(self):
         period = None
         if self.period:

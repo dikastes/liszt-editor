@@ -25,6 +25,7 @@ class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
             indexed=True,
             stored=True
         )
+    signature_numbers = indexes.IntegerField(model_attr = 'get_numeric_signature_part', null = True)
     is_singleton = indexes.BooleanField(model_attr = 'is_singleton')
     is_collection = indexes.BooleanField(model_attr = 'is_collection')
 
