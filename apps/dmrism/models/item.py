@@ -254,7 +254,8 @@ class BaseSignature(models.Model):
     signature = models.CharField(
             max_length=20,
             blank = True,
-            verbose_name = _('signature')
+            verbose_name = _('signature'),
+            default = ''
         )
     status = models.CharField(
             max_length=1,
