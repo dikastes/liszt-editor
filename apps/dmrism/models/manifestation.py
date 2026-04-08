@@ -348,6 +348,10 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = _('is explanation')
         )
+    is_text = models.BooleanField(
+            default = False,
+            verbose_name = _('is text')
+        )
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -369,7 +373,6 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             if self.source_title and not self.working_title:
                 self.working_title = self.source_title
             self.is_collection = False
-
 
     def render_title(self, prefix):
         review_string = ''
