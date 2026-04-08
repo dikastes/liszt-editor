@@ -207,6 +207,9 @@ class Item(Sortable, WemiBaseClass):
 
 
 class Library(models.Model):
+    class Meta:
+        ordering = ['siglum', 'name']
+
     name = models.CharField(
             unique=True,
             max_length=100,
