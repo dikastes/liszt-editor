@@ -920,7 +920,15 @@ class ManifestationSearchForm(FramedSearchForm):
 
 
 class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    #inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
@@ -946,27 +954,24 @@ class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
         place_assumed_field = self['assumed']
         place_inferred_field = self['inferred']
 
-        place_documentation_label = _('place as documented')
-        if self.instance.assumed:
-            if self.instance.inferred:
-                place_documentation_label = _('place inferred assumed')
-            else:
-                place_documentation_label = _('place assumed')
-        else:
-            if self.instance.inferred:
-                place_documentation_label = _('place inferred')
-
         with palette:
             div(cls='flex-1')
-            div(place_documentation_label, cls='flex-0 mr-10')
-            with div(cls=SimpleFormMixin.palette_form_control_classes):
-                with label(cls=SimpleFormMixin.toggle_label_classes):
-                    span(_(place_inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
-                    raw(str(place_inferred_field))
-            with div(cls=SimpleFormMixin.palette_form_control_classes):
-                with label(cls=SimpleFormMixin.toggle_label_classes):
+            with div(cls='form-control flex-0'):
+                with label(cls='cursor-pointer label flex gap-5'):
                     span(_(place_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
                     raw(str(place_assumed_field))
+            for sw in place_inferred_field.subwidgets:
+                with tags.div(cls=SimpleFormMixin.form_control_classes):
+                    with tags.label(cls='label cursor-pointer gap-5'):
+                        tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
+                        tags.input_(
+                                type='radio',
+                                name=sw.data.get('name'),
+                                value=str(sw.data.get('value')),
+                                cls='radio',
+                                checked = sw.data.get('selected', False),
+                                form='form'
+                            )
 
         return mark_safe(str(palette))
 
