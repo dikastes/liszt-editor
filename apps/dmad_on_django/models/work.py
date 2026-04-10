@@ -1,12 +1,11 @@
 from django.db import models
 from django.urls import reverse
-
+from django.utils.translation import gettext_lazy as _
 from .base import DisplayableModel, Status, max_trials, GNDSubjectCategory
 from dmad_on_django.models import Person
 from .subjectterm import SubjectTerm
 from .geographicareacodes import WorkGeographicAreaCode
 from liszt_util.tools import get_model_link
-
 from pylobid.pylobid import PyLobidWork, GNDAPIError
 from json import dumps, loads
 import requests
@@ -64,7 +63,10 @@ class Work(DisplayableModel):
     )
 
     broader_terms = models.ManyToManyField('self', blank=True, symmetrical=False)
-    
+
+    def get_search_placeholder():
+        return _('search works')
+
     def fetch_raw(self):
         trials = max_trials
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
@@ -77,7 +79,7 @@ class Work(DisplayableModel):
                 continue
 
             break
-            
+
         self.raw_data = dumps(pl_work.ent_dict)
 
     @staticmethod
@@ -109,28 +111,27 @@ class Work(DisplayableModel):
 
         for name in pl_work.alt_names:
             WorkName.create_from_string(name, Status.ALTERNATIVE, self).save()
-        
+
         self.geographic_area_codes.all().delete()
         WorkGeographicAreaCode.create_geographic_area_codes(self)
 
         if pl_work.broader_terms:
             for term in pl_work.broader_terms:
                 self.broader_terms.add(self.fetch_or_get(term['id']))
-        
+
         if pl_work.form_of_work:
             self.form_of_work = SubjectTerm.fetch_or_get(pl_work.form_of_work[0]['id'])
-        
+
         GNDSubjectCategory.create_or_link(self)
 
         if pl_work.opus:
             self.opus = pl_work.opus
-        
+
         if pl_work.work_catalouge_number:
             self.work_catalouge_number = pl_work.work_catalouge_number
 
         self.save()
 
-        
 
     @staticmethod
     def search(search_string):
@@ -153,7 +154,7 @@ class Work(DisplayableModel):
 
     def __str__(self):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
-    
+
     def get_table(self):
         table = []
 
@@ -166,7 +167,6 @@ class Work(DisplayableModel):
         if self.work_catalouge_number:
             table.append(("Werkverzeichnisnummer", self.work_catalouge_number))
 
-        
         match self.form_of_work:
             case work_form if work_form: 
                 table.append(("Gattung", get_model_link(work_form)))
@@ -190,11 +190,10 @@ class Work(DisplayableModel):
 
         return table
 
-    
+
     def get_overview_title(self):
-        
         return "Angaben" 
-    
+
 
 
 

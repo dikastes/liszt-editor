@@ -1,6 +1,7 @@
 from django.db import models
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
 import requests
 
@@ -64,6 +65,9 @@ class Corporation(DisplayableModel):
         blank=True,
         related_name='corporations'
     )
+
+    def get_search_placeholder():
+        return _('search corporations')
 
     def get_absolute_url(self):
         return reverse('dmad_on_django:corporation_update', kwargs={'pk': self.id})

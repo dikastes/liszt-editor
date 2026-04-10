@@ -1,17 +1,19 @@
+{% load i18n %}
+
 <form
     method="get"
     action="{{ action_url }}"
-    class="flex-1 flex gap-5 m-0"
+    class="flex-1 flex m-0 bg-white"
+    id="search-form"
     {% if hx_get %}
         hx-get="{{ hx_get }}"
-        hx-target="#search-results"
-        hx-trigger="input"
+        hx-target="#search-results-container"
+        hx-trigger="input delay:500ms"
         hx-push-url="true"
     {% endif %}
 >
-    <label class="input input-bordered flex items-center gap-2 flex-1">
-        Suche
+    <label class="form-control flex items-center gap-2 flex-1">
         {{ form.q }}
     </label>
-    <input class="btn" type="submit" value="Suchen" />
+    <input class="btn btn-outline border-l-0" type="submit" value="{% translate 'search' %}" />
 </form>
