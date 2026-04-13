@@ -61,26 +61,7 @@ VENV_DIR="$SCRIPT_DIR/venv"
 blue "Using Python: $PYTHON_BIN"
 blue "Script directory: $SCRIPT_DIR"
 
-# === INSTALL Pylobid ===
-if [[ ! -d "$SCRIPT_DIR/pylobid" ]]; then
-  yellow "Installing pylobid..."
-  run git clone https://github.com/Nathmel123/pylobid "$SCRIPT_DIR/pylobid"
-else
-  yellow "pylobid already cloned. Pulling latest changes..."
-  (cd "$SCRIPT_DIR/pylobid" && run git pull)
-fi
-
-# === CREATE VENV ===
-if [[ ! -d "$VENV_DIR" ]]; then
-  yellow "Creating virtual environment..."
-  run "$PYTHON_BIN" -m venv "$VENV_DIR"
-else
-  yellow "Virtual environment already exists."
-fi
-
-# === UPGRADE PIP ===
-run "$VENV_DIR/bin/pip" install --upgrade pip
-
+uv venv
 
 # === INSTALL NPM & BUILD TAILWIND IN APPS ===
 for APP in edwoca bib dmad_on_django liszt_util; do
@@ -95,15 +76,14 @@ done
 
 # === INSTALL PYTHON DEPENDENCIES ===
 yellow "Installing python dependencies..."
-if [[ -f "$SCRIPT_DIR/python_requirements.txt" ]]; then
-  run "$VENV_DIR/bin/pip" install -r "$SCRIPT_DIR/python_requirements.txt"
-fi
-run "$VENV_DIR/bin/pip" install -e "$SCRIPT_DIR/pylobid"
+
+uv sync --locked
 
 # === DJANGO MIGRATIONS ===
 yellow "Running Django migrations..."
-run "$VENV_DIR/bin/python" "$SCRIPT_DIR/manage.py" makemigrations
-run "$VENV_DIR/bin/python" "$SCRIPT_DIR/manage.py" migrate
+
+run uv run manage.py makemigrations
+run uv run manage.py migrate
 
 green "✔ Setup complete!"
-yellow "To use this environment: source $VENV_DIR/bin/activate"
+yellow "Run the project with uv run manage.py runserver"

@@ -9,7 +9,7 @@ from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCate
 from .place import Place
 from .geographicareacodes import PersonGeographicAreaCode
 from .subjectterm import SubjectTerm
-from pylobid.pylobid import PyLobidPerson, GNDAPIError
+from slub_pylobid.pylobid import PyLobidPerson, GNDAPIError
 
 
 class PersonName(models.Model):

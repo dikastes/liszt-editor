@@ -11,7 +11,7 @@ from .place import Place
 from .geographicareacodes import CorporationGeographicAreaCode
 from .subjectterm import SubjectTerm
 from .period import Period
-from pylobid.pylobid import PyLobidOrg, GNDAPIError
+from slub_pylobid.pylobid import PyLobidOrg, GNDAPIError
 
 class CorporationName(models.Model):
     name = models.CharField(max_length=50)

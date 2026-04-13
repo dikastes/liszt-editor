@@ -9,7 +9,7 @@ from haystack.generic_views import SearchView
 from json import dumps
 from dmad_on_django.forms import formWidgets, DmadCreateForm, DmadUpdateForm
 from liszt_util.tools import camel_to_snake_case, snake_to_camel_case
-from pylobid.pylobid import GNDNotFoundError
+from slub_pylobid.pylobid import GNDNotFoundError
 
 def search_gnd(request, search_string, entity_type):
     response = getattr(dmad_models, snake_to_camel_case(entity_type)).search(search_string)

@@ -5,7 +5,7 @@ from .geographicareacodes import PlaceGeographicAreaCode
 from django.utils.translation import gettext_lazy as _
 
 from .base import Status, Language, max_trials, DisplayableModel
-from pylobid.pylobid import PyLobidPlace, GNDAPIError
+from slub_pylobid.pylobid import PyLobidPlace, GNDAPIError
 import requests
 
 class PlaceName(models.Model):

@@ -7,7 +7,7 @@ from .subjectterm import SubjectTerm
 from .geographicareacodes import WorkGeographicAreaCode
 from liszt_util.tools import get_model_link
 
-from pylobid.pylobid import PyLobidWork, GNDAPIError
+from slub_pylobid.pylobid import PyLobidWork, GNDAPIError
 from json import dumps, loads
 import requests
 
