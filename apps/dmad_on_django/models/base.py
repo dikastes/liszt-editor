@@ -90,6 +90,11 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
     )
     gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
 
+    def is_stub(self):
+        if self.gnd_id and self.gnd_id != '':
+            return False
+        return True
+
     def concise(self):
         if (name := self.names.filter(status=Status.PRIMARY).first()):
             if hasattr(name, 'name'):
@@ -116,6 +121,9 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
 
     def get_table(self):
         raise NotImplementedError("Please override get_table")
+
+    def get_search_placeholder():
+        raise NotImplementedError("Please override get_search_placeholder")
 
     class Meta:
         abstract = True

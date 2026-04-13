@@ -58,6 +58,18 @@ class Item(Sortable, WemiBaseClass):
             null = True,
             verbose_name = _('taken information')
         )
+    is_lyrics = models.BooleanField(
+            default = False,
+            verbose_name = _('is lyrics')
+        )
+    is_program = models.BooleanField(
+            default = False,
+            verbose_name = _('is program')
+        )
+    is_explanation = models.BooleanField(
+            default = False,
+            verbose_name = _('is explanation')
+        )
 
     _group_field_name = 'manifestation'
 
@@ -195,6 +207,9 @@ class Item(Sortable, WemiBaseClass):
 
 
 class Library(models.Model):
+    class Meta:
+        ordering = ['siglum', 'name']
+
     name = models.CharField(
             unique=True,
             max_length=100,
@@ -242,7 +257,8 @@ class BaseSignature(models.Model):
     signature = models.CharField(
             max_length=20,
             blank = True,
-            verbose_name = _('signature')
+            verbose_name = _('signature'),
+            default = ''
         )
     status = models.CharField(
             max_length=1,

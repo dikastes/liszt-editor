@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from dmad_on_django.models import Period
 from dmrism.models.item import *
-from dominate.tags import div, label, span, form, input_
+from dominate.tags import div, label, span, form, input_, h3
 from dominate.util import raw
 from django import forms
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, SelectDateWidget, CharField, BooleanField
@@ -384,6 +384,47 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
 
         return mark_safe(str(form))
 
+        with form:
+            # upper palette with source type and manifestaion form
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(source_type_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(manifestation_form_field))
+            # lower palette with toggles
+            h1(_('function'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(album_page_field))
+                span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(performance_material_field))
+                span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
+            if self.instance.is_singleton:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(correction_sheet_field))
+                    span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(stitch_template_field))
+                    span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(dedication_item_field))
+                    span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
+            else:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(authorized_edition_field))
+                    span(authorized_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(first_edition_field))
+                    span(first_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(proof_field))
+                    span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(further_edition_field))
+                    span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
     def comment_as_daisy(self):
         private_manuscript_comment_field = self['private_manuscript_comment']
         form = div()
@@ -496,3 +537,44 @@ CorporationProvenanceBibFormSet = inlineformset_factory(
     extra=0,
     can_delete=False
 )
+
+
+class ItemTextTypeForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Item
+        fields = ['is_lyrics', 'is_program', 'is_explanation']
+        widgets = {
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        lyrics_field = self['is_lyrics']
+        program_field = self['is_program']
+        explanation_field = self['is_explanation']
+
+        form = div()
+
+        with form:
+            h3(_('text type'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(lyrics_field))
+                span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(program_field))
+                span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(explanation_field))
+                span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))

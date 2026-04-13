@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
 from json import loads, dumps
 from slub_pylobid.pylobid import PyLobidClient, GNDAPIError
@@ -42,6 +43,9 @@ class SubjectTerm(DisplayableModel):
         )
         for s in self.parent_subjects.all()
     ]
+
+    def get_search_placeholder():
+        return _('search subject terms')
 
     @staticmethod
     def fetch_or_get(gnd_id):

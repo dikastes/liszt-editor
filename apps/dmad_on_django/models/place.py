@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
 from .geographicareacodes import PlaceGeographicAreaCode
 from django.utils.translation import gettext_lazy as _
@@ -63,6 +64,9 @@ class Place(DisplayableModel):
     )
 
     description = models.TextField(null=True)
+
+    def get_search_placeholder():
+        return _('search places')
 
     def update_from_raw(self):
         pl_place = PyLobidPlace()
