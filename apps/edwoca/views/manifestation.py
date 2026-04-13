@@ -242,11 +242,11 @@ def manifestation_update(request, pk):
     if request.method == 'POST':
         manifestation_form = ManifestationForm(request.POST, instance=manifestation)
 
+        signature_forms = []
         if manifestation.is_singleton:
             item = manifestation.get_single_item()
             signature_forms_valid = True
 
-            signature_forms = []
             for signature in manifestation.get_single_item().signatures.all():
                 signature_form = SignatureForm(
                         request.POST,
@@ -255,18 +255,18 @@ def manifestation_update(request, pk):
                     )
                 signature_forms.append(signature_form)
 
-            if manifestation_form.is_valid() and all(s.is_valid() for s in signature_forms):
-                manifestation_form.save()
-                for signature in manifestation.get_single_item().signatures.all():
-                    signature.status = ItemSignature.Status.FORMER
-                    signature.save()
-                for signature_form in signature_forms:
-                    signature_form.save()
-            else:
-                context['manifestation_form'] = manifestation_form
-                context['signature_forms'] = signature_forms
+        if manifestation_form.is_valid() and all(s.is_valid() for s in signature_forms):
+            manifestation_form.save()
+            for signature in manifestation.get_single_item().signatures.all():
+                signature.status = ItemSignature.Status.FORMER
+                signature.save()
+            for signature_form in signature_forms:
+                signature_form.save()
+        else:
+            context['manifestation_form'] = manifestation_form
+            context['signature_forms'] = signature_forms
 
-                return render(request, 'edwoca/manifestation_update.html', context)
+            return render(request, 'edwoca/manifestation_update.html', context)
 
         if 'add_signature' in request.POST:
             status = ItemSignature.Status.CURRENT
@@ -276,8 +276,10 @@ def manifestation_update(request, pk):
                     item = item,
                     status = status
                 )
-            context['signature_forms'] += [ SignatureForm(instance = signature, prefix = f"signature-{signature.id}") ]
-            context['library_search_form'] = SearchForm()
+            signature_forms += [ SignatureForm(instance = signature, prefix = f"signature-{signature.id}") ]
+
+        context['signature_forms'] = signature_forms
+        context['library_search_form'] = SearchForm()
 
         return redirect('edwoca:manifestation_update', pk = pk)
     else:
