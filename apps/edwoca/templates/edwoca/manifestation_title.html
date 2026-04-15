@@ -79,28 +79,24 @@
                             <div class="flex-1">
                                 {{ handwriting_form.as_daisy }}
                             </div>
-                            <form action="{% url 'edwoca:manifestation_title_handwriting_delete' handwriting_form.instance.id %}" method="post" class="flex-0 m-0">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-outline text-primary" value="{% translate 'remove writer' %}"/>
-                            </form>
+                            <button class="flex-0 btn btn-outline text-primary" name="remove-manifestation-title-handwriting" value="{{ handwriting_form.instance.id }}" form="form">
+                                {% translate 'remove writer' %}
+                            </button>
                         </div>
                     </div>
                 {% endfor %}
                 <div class="flex">
                     <div class="flex-1"></div>
-                    <form method="post" class="flex-0">
-                        {% csrf_token %}
-                        <input type="hidden" name="add_title_handwriting_to_title_id" value="{{ title_form.instance.id }}">
-                        <input type="submit" name="add_title_handwriting" value="{% translate 'create handwriting' %}" class="btn btn-outline mt-3">
-                    </form>
+                    <button class="btn btn-outline my-5" name="add-manifestation-title-handwriting" form="form" value="{{ title_form.instance.id }}">
+                        {% translate 'create handwriting' %}
+                    </button>
                 </div>
             </div>
             <div class="flex">
                 <div class="flex-1"></div>
-                <form action="{% url 'edwoca:manifestation_title_delete' title_form.instance.id %}" method="post" class="flex-0">
-                    {% csrf_token %}
-                    <input class="btn btn-primary btn-outline" type="submit" value="{% translate 'remove title' %}" />
-                </form>
+                <button class="btn btn-primary btn-outline" name="remove-title" type="submit" form="form" value="{{ title_form.instance.id }}">
+                    {% translate 'remove title' %}
+                </button>
             </div>
         </div>
     </div>
@@ -110,14 +106,12 @@
 </div>
 <div class="flex items-center">
     <div class="flex-1"></div>
-    <a href="{% url 'edwoca:manifestation_title_add' object.id%}" class="btn btn-outline flex-0"> {% translate 'create title' %}</a>
+    <button form="form" type="submit" class="btn btn-outline flex-0" name="create-title">
+        {% translate 'create title' %}
+    </button>
 </div>
 
 <h2 class="mb-5"> {% translate 'dedications' %} </h2>
-
-{% comment %}
-{{ form.title_comment_as_daisy }}
-{% endcomment %}
 
 <h3 class="my-5"> {% translate 'person dedications' %} </h3>
 {% for person_dedication_form in person_dedication_forms %}
@@ -244,10 +238,9 @@
             {{ person_dedication_form.date_as_daisy }}
             <div class="flex">
                 <div class="flex-1"></div>
-                <form action="{% url 'edwoca:manifestation_person_dedication_delete' person_dedication_form.instance.id %}" method="post" class="flex-0">
-                    {% csrf_token %}
-                    <input class="btn btn-primary btn-outline" type="submit" value="{% translate 'remove dedication' %}" />
-                </form>
+                <button class="btn btn-primary btn-outline" type="submit" name="remove-person-dedication" value="{{ person_dedication_form.instance.id }}" form="form">
+                    {% translate 'remove dedication' %}
+                </button>
             </div>
         </div>
     </div>
@@ -257,7 +250,9 @@
 
 <div class="flex items-center">
     <div class="flex-1"></div>
-    <a href="{% url 'edwoca:person_dedication_add' object.id %}" class="btn-outline btn flex-0"> {% translate 'create person dedication' %} </a>
+    <button class="btn-outline btn flex-0" name="create-person-dedication" type="submit" form="form">
+        {% translate 'create person dedication' %}
+    </button>
 </div>
 
 <h3 class="my-5"> {% translate 'corporation dedications' %} </h3>
@@ -286,12 +281,6 @@
                         </div>
                     </label>
                 </div>
-            {% empty %}
-            {% comment %}
-                <p class="note my-5">
-                    {% translate 'no dedicatees' %}
-                </p>
-            {% endcomment %}
             {% endfor %}
             <div class="my-5">
                 <div class="items-center">
@@ -386,10 +375,9 @@
             {{ corporation_dedication_form.date_as_daisy }}
             <div class="flex">
                 <div class="flex-1"></div>
-                <form action="{% url 'edwoca:manifestation_corporation_dedication_delete' corporation_dedication_form.instance.id %}" method="post" class="flex-0">
-                    {% csrf_token %}
-                    <input class="btn btn-primary btn-outline" type="submit" value="{% translate 'remove dedication' %}" />
-                </form>
+                <button class="btn btn-primary btn-outline" type="submit" name="remove-corporation-dedication" value="{{ corporation_dedication_form.instance.id }}" form="form">
+                    {% translate 'remove dedication' %}
+                </button>
             </div>
         </div>
     </div>
@@ -399,7 +387,9 @@
 
 <div class="flex items-center">
     <div class="flex-1"></div>
-    <a href="{% url 'edwoca:corporation_dedication_add' object.id %}" class="btn-outline btn flex-0"> {% translate 'create corporation dedication' %} </a>
+    <button class="btn-outline btn flex-0" name="create-corporation-dedication" type="submit" form="form">
+        {% translate 'create corporation dedication' %}
+    </button>
 </div>
 
 <label>

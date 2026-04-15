@@ -26,7 +26,9 @@
             </div>
         {% endfor %}
         <div class="flex justify-end">
-            <input type="submit" name="add_handwriting" form="form" value="{% translate 'create writer' %}" class="btn btn-outline mt-3">
+            <button class="btn btn-outline mt-3" name="add-manifestation-handwriting" form="form">
+                {% translate 'create writer' %}
+            </button>
         </div>
     </div>
 
@@ -45,7 +47,12 @@
             <div class="flex">
                 <div class="flex-1"></div>
                 <div class="flex-0">
+                    <button class="btn btn-outline mt-3" form="form" name="add-modification">
+                        {% translate 'create modification' %}
+                    </button>
+                    {% comment %}
                     <input type="submit" name="add_modification" value="{% translate 'create modification' %}" class="btn btn-outline mt-3" form="form">
+                    {% endcomment %}
                 </div>
             </div>
         </div>
