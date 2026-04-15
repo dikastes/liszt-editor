@@ -21,7 +21,7 @@ class TitleTypes(models.TextChoices):
     ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
 
 
-class Manifestation(RenderRawJSONMixin, WemiBaseClass):
+class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass):
     class Meta:
         ordering = ['-needs_review']
 
@@ -372,6 +372,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = _('is text')
         )
+    _group_field_names = ['part_of', 'component_of']
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})

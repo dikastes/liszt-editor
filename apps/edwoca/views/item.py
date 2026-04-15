@@ -102,16 +102,18 @@ def item_swap_view(request, pk, direction):
     success = swap_order(item, direction)
     if not success:
         messages.error(request, "Element steht am Anfang oder Ende der Liste")
-        
+
     manifestation = item.manifestation
 
     context = {'object': manifestation}
-    
+
     return render(
         request,
         'edwoca/partials/manifestation/item_list.html',
         context
     )
+
+
 @require_POST
 def item_move_view(request, item_pk):
     item = get_object_or_404(Item, pk=item_pk)
@@ -124,7 +126,7 @@ def item_move_view(request, item_pk):
 
     # Verschieben ausführen
     old_manifestation = item.move_to_manifestation(target_manifestation)
-    
+
     # Erfolgsmeldung für den Verschiebevorgang
     messages.success(request, f'Exemplar wurde erfolgreich nach "{target_manifestation}" verschoben.')
 

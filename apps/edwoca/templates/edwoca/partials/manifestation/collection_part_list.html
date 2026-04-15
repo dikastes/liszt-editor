@@ -1,0 +1,65 @@
+{% load i18n %}
+
+{% for collection_part in object.collection_parts.all %}
+    <li class="list-disc flex gap-3">
+        <div class="flex flex-0 gap-1">
+            {% url 'edwoca:collection_part_swap_order' pk=collection_part.id direction='up' as swap_up_url %}
+            <form hx-post="{{ swap_up_url }}"
+                  hx-target="#item-list-container"
+                  hx-swap="innerHTML"
+                  class="flex-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move up' %}">
+                    ↑
+                    {% translate 'up' %}
+                </button>
+            </form>
+
+            {% url 'edwoca:collection_part_swap_order' pk=collection_part.id direction='down' as swap_down_url %}
+            <form hx-post="{{ swap_down_url }}"
+                  hx-target="#collection-parts"
+                  hx-swap="innerHTML"
+                  class="flex-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move down' %}">
+                    ↓
+                    {% translate 'down' %}
+                </button>
+            </form>
+            <a href="{% url 'edwoca:manifestation_relations' collection_part.id %}">
+                {{ collection_part }}
+            </a>
+        </div>
+    </li>
+{% endfor %}
+{% for collection_component in object.collection_components.all %}
+    <li class="list-disc">
+        <div class="flex flex-0 gap-1">
+            {% url 'edwoca:collection_part_swap_order' pk=collection_component.id direction='up' as swap_up_url %}
+            <form hx-post="{{ swap_up_url }}"
+                  hx-target="#item-list-container"
+                  hx-swap="innerHTML"
+                  class="flex-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move up' %}">
+                    ↑
+                    {% translate 'up' %}
+                </button>
+            </form>
+
+            {% url 'edwoca:collection_part_swap_order' pk=collection_component.id direction='down' as swap_down_url %}
+            <form hx-post="{{ swap_down_url }}"
+                  hx-target="#collection-parts"
+                  hx-swap="innerHTML"
+                  class="flex-0">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move down' %}">
+                    ↓
+                    {% translate 'down' %}
+                </button>
+            </form>
+        <a href="{% url 'edwoca:manifestation_relations' collection_component.id %}">
+            {{ collection_component }}
+        </a>
+    </li>
+{% endfor %}

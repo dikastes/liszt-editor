@@ -1,17 +1,17 @@
 from django.db import models
 from django.db.models import Max
+from django.utils.translation import gettext_lazy as _
 from abc import ABC, abstractproperty
 
-# Create your models here.
-class Sortable(models.Model):
+class Sortable(ABC, models.Model):
     order_index = models.IntegerField(
-        default=0,
-        db_index=True,
-        verbose_name="Sortier-Index"
+        default = 0,
+        db_index = True,
+        verbose_name = _('sorting index')
     )
-    
+
     @abstractproperty
-    def _group_field_name(self):
+    def _group_field_names(self):
         pass
 
     def save(self,*args, **kwargs):
@@ -22,4 +22,4 @@ class Sortable(models.Model):
     class Meta:
         abstract = True
         ordering = ['order_index']
-        verbose_name = "Sortierbares Model"
+        verbose_name = _('sortable model')

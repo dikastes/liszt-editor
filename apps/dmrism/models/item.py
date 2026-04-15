@@ -6,11 +6,21 @@ from django.db import transaction
 from django.db.models import Q, UniqueConstraint, F
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from liszt_util.models import Sortable
 
 
 class Item(Sortable, WemiBaseClass):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['manifestation'],
+                condition=models.Q(is_template=True),
+                name='unique_template_item_per_manifestation'
+            )
+        ]
+        ordering = ['manifestation', 'order_index']
+        unique_together = ('manifestation', 'order_index')
+
     rism_id = models.CharField(
             max_length=20,
             null = True,
@@ -71,7 +81,7 @@ class Item(Sortable, WemiBaseClass):
             verbose_name = _('is explanation')
         )
 
-    _group_field_name = 'manifestation'
+    _group_field_names = ['manifestation']
 
     def get_copy(self, manifestation):
         copy = Item.objects.create(
@@ -106,8 +116,6 @@ class Item(Sortable, WemiBaseClass):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings)
 
     def __str__(self):
-        #title = self.get_pref_title() or '<ohne Titel>'
-        #return f'{self.rism_id}: {title}'
         if self.manifestation.is_singleton:
             return self.manifestation.__str__()
         return self.get_current_signature()
@@ -137,7 +145,7 @@ class Item(Sortable, WemiBaseClass):
     def move_to_manifestation(self, target_manifestation):
         if self.manifestation == target_manifestation:
             return self.manifestation
-        
+
         if target_manifestation.is_singleton and target_manifestation.items.exists():
             raise ValidationError("Ziel-Manifestation ist ein Singleton und hat bereits ein Item.")
 
@@ -165,7 +173,7 @@ class Item(Sortable, WemiBaseClass):
 
             # Sicherheitshalber das item nochmal aus der DB laden
             self.refresh_from_db()
-            
+
         return old_manifestation
 
     def save(self, *args, **kwargs):
@@ -181,9 +189,10 @@ class Item(Sortable, WemiBaseClass):
         # Wir prüfen auf pk is None (neues Objekt) 
         # UND (Index ist None ODER Index ist der Default 0)
         if self.pk is None and (self.order_index is None or self.order_index == 0):
-            max_index = Item.objects.filter(
-                manifestation=self.manifestation
-            ).aggregate(models.Max('order_index'))['order_index__max']
+            max_index = Item.objects\
+                    .filter(manifestation=self.manifestation)\
+                    .aggregate(models.Max('order_index'))\
+                    ['order_index__max']
 
             # Wenn bereits Items existieren, nimm max + 1, sonst bleib bei 0
             if max_index is not None:
@@ -193,17 +202,6 @@ class Item(Sortable, WemiBaseClass):
 
         # 3. Vererbungskette aufrufen (Sortable -> Models -> DB)
         super().save(*args, **kwargs)
-
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['manifestation'],
-                condition=models.Q(is_template=True),
-                name='unique_template_item_per_manifestation'
-            )
-        ]
-        ordering = ['manifestation', 'order_index']
-        unique_together = ('manifestation', 'order_index')
 
 
 class Library(models.Model):

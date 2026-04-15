@@ -293,15 +293,17 @@ def manifestation_update(request, pk):
             context['found_expressions'] = expression_search_form.search().models(Expression)
 
         manifestation_form = ManifestationForm(instance=manifestation)
-        signature_forms = []
-        for signature in manifestation.get_single_item().signatures.all():
-            signature_form = SignatureForm(
-                    instance = signature,
-                    prefix = f"signature-{signature.id}"
-                )
-            signature_forms.append(signature_form)
 
-        context['signature_forms'] = signature_forms
+        signature_forms = []
+        if manifestation.is_singleton:
+            for signature in manifestation.get_single_item().signatures.all():
+                signature_form = SignatureForm(
+                        instance = signature,
+                        prefix = f"signature-{signature.id}"
+                    )
+                signature_forms.append(signature_form)
+            context['signature_forms'] = signature_forms
+
         context['library_search_form'] = SearchForm()
         context['manifestation_form'] = manifestation_form
 
@@ -2217,3 +2219,22 @@ def manifestation_unset_collection(request, pk):
     manifestation.save()
 
     return redirect('edwoca:manifestation_relations', pk = pk)
+
+
+@require_POST
+def collection_part_swap_view(request, pk, direction):
+
+    manifestation = get_object_or_404(EdwocaManifestation, pk=pk)
+    success = swap_order(manifestation, direction)
+    if not success:
+        messages.error(request, "Element steht am Anfang oder Ende der Liste")
+
+    context = {'object': manifestation}
+
+    return render(
+        request,
+        'edwoca/partials/manifestation/collection_part_list.html',
+        context
+    )
+
+

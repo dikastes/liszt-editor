@@ -172,21 +172,8 @@
         {% translate 'collection parts and components' %}
     </h3>
 
-    <ul class="list-disc m-5">
-        {% for collection_part in object.collection_parts.all %}
-            <li class="list-disc">
-                <a href="{% url 'edwoca:manifestation_relations' collection_part.id %}">
-                    {{ collection_part }}
-                </a>
-            </li>
-        {% endfor %}
-        {% for collection_component in object.collection_components.all %}
-            <li class="list-disc">
-                <a href="{% url 'edwoca:manifestation_relations' collection_component.id %}">
-                    {{ collection_component }}
-                </a>
-            </li>
-        {% endfor %}
+    <ul class="list-disc m-5" id="collection-parts">
+        {% include 'edwoca/partials/manifestation/collection_part_list.html' %}
     </ul>
 
     <div class="flex">
@@ -487,16 +474,22 @@
 </form>
 
 {% if not object.is_singleton %}
-    <h2 class="my-5"> Exemplare </h2>
+    <h2 class="my-5"> 
+        {% translate 'items' %}
+    </h2>
     {% if object.missing_item %}
-        <p> Alle Exemplare dieses Drucks sind verschollen </p>
+        <p>
+            {% translate 'all items of this print are lost' %}
+        </p>
     {% else %}
         <div id="item-list-container">
             {% include 'edwoca/partials/manifestation/item_list.html' %}
         </div>
         <div class="flex mt-4">
             <div class="flex-1"></div>
-            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn flex-0"> neues Exemplar </a>
+            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn flex-0">
+                {% translate 'create item' %}
+            </a>
         </div>
     {% endif %}
 {% endif %}
