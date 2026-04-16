@@ -228,8 +228,7 @@ class Period(models.Model):
 
             return date(year, month, day)
 
-        date_parts = date_string.split('.')
-        #day = self._parse_date_part(date_parts, bound, 'day')
+        date_parts = [s.strip() for s in date_string.split('.')]
         if len(date_parts) == 3:
             day = self._parse_date_part(date_parts[0], bound, 'day')
             month = self._parse_date_part(date_parts[1], bound, 'month')
