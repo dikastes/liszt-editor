@@ -28,7 +28,7 @@ else:
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # App version
-APP_VERSION = "0.0.1"
+APP_VERSION = "0.0.2"
 
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = 'django-insecure-g562zyg%dply65c+z#rb4_eg=wr(=3u3m5=f(vp9a%lr=9%1eh'
