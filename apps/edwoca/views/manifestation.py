@@ -639,7 +639,10 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
 
         if collection_search_form.is_valid() and collection_search_form.cleaned_data.get('q'):
             context['collection_query'] = collection_search_form.cleaned_data.get('q')
-            context['found_collections'] = collection_search_form.search().models(Manifestation)#.filter(is_collection = True)
+            found_collections = collection_search_form.search().models(Manifestation)#.filter(is_collection = True)
+            if self.object.is_collection:
+                found_collections = found_collections.filter(is_collection = True)
+            context['found_collections'] = found_collections
 
         if print_search_form.is_valid() and print_search_form.cleaned_data.get('q'):
             context['print_query'] = print_search_form.cleaned_data.get('q')
