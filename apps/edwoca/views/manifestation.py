@@ -15,10 +15,12 @@ from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_POST
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
 from liszt_util.forms import SearchForm
+from liszt_util.tools import swap_order
 from dmad_on_django.models import Place, Corporation, Status, Person
 from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting, CorporationProvenanceStationBib, PersonProvenanceStationBib
 from dmrism.models.manifestation import Manifestation as DmrismManifestation, Publication, ManifestationPersonDedication, ManifestationCorporationDedication
@@ -2225,14 +2227,24 @@ def manifestation_unset_collection(request, pk):
 
 
 @require_POST
-def collection_part_swap_view(request, pk, direction):
+def collection_part_swap_view(request, pk, parent_pk, direction):
+    def initialize_order_indices(qs):
+        for i, child in enumerate(qs.all()):
+            if child.order_index == 0:
+                child.order_index = i
+                child.save()
 
     manifestation = get_object_or_404(EdwocaManifestation, pk=pk)
-    success = swap_order(manifestation, direction)
-    if not success:
-        messages.error(request, "Element steht am Anfang oder Ende der Liste")
+    parent_manifestation = get_object_or_404(EdwocaManifestation, pk=parent_pk)
 
-    context = {'object': manifestation}
+    if parent_manifestation.collection_parts.count():
+        initialize_order_indices(parent_manifestation.collection_parts)
+    if parent_manifestation.collection_components.count():
+        initialize_order_indices(parent_manifestation.collection_components)
+
+    success = swap_order(manifestation, direction)
+
+    context = {'object': parent_manifestation}
 
     return render(
         request,

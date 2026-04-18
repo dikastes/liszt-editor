@@ -12,6 +12,7 @@ from dmad_on_django.models.base import DocumentationStatus
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
+from liszt_util.models import Sortable
 
 
 class TitleTypes(models.TextChoices):
@@ -23,7 +24,7 @@ class TitleTypes(models.TextChoices):
 
 class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass):
     class Meta:
-        ordering = ['-needs_review']
+        ordering = ['-needs_review', 'order_index']
 
     class PartLabel(models.TextChoices):
         CONSTITUTING = 'c', _('constituting')

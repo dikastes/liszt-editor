@@ -51,9 +51,9 @@ def swap_order(obj, direction) -> bool:
 
     group_found = False
     for name in group_field_names:
-        group_value = getattr(obj, group_field_names)
+        group_value = getattr(obj, name)
         if group_value:
-            group_filter = {group_field_name: group_value}
+            group_filter = {name: group_value}
             group_found = True
             break
 
@@ -63,15 +63,21 @@ def swap_order(obj, direction) -> bool:
     if direction == 'up':
         # Objekt mit dem nächstkleineren Index
         # ... (neighbour-Suche) ...
-        neighbour = ModelClass.objects\
-            .filter(order_index__lt=current_index, **group_filter)\
+        neighbour = (
+            ModelClass
+            .objects
+            .filter(order_index__lt=current_index, **group_filter)
             .order_by('-order_index').first()
+        )
 
     elif direction == 'down':
 
-        neighbour = ModelClass.objects
-            .filter(order_index__gt=current_index, **group_filter)\
+        neighbour = (
+            ModelClass
+            .objects
+            .filter(order_index__gt=current_index, **group_filter)
             .order_by('order_index').first()
+        )
     else:
         return False
 

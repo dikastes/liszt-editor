@@ -1,65 +1,70 @@
 {% load i18n %}
 
 {% for collection_part in object.collection_parts.all %}
-    <li class="list-disc flex gap-3">
-        <div class="flex flex-0 gap-1">
-            {% url 'edwoca:collection_part_swap_order' pk=collection_part.id direction='up' as swap_up_url %}
-            <form hx-post="{{ swap_up_url }}"
-                  hx-target="#item-list-container"
-                  hx-swap="innerHTML"
-                  class="flex-0">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move up' %}">
-                    ↑
-                    {% translate 'up' %}
-                </button>
-            </form>
-
-            {% url 'edwoca:collection_part_swap_order' pk=collection_part.id direction='down' as swap_down_url %}
-            <form hx-post="{{ swap_down_url }}"
-                  hx-target="#collection-parts"
-                  hx-swap="innerHTML"
-                  class="flex-0">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move down' %}">
-                    ↓
-                    {% translate 'down' %}
-                </button>
-            </form>
-            <a href="{% url 'edwoca:manifestation_relations' collection_part.id %}">
+    {% url 'edwoca:collection_part_swap_order' pk=collection_part.id parent_pk=object.id direction='up' as swap_up_url %}
+    {% url 'edwoca:collection_part_swap_order' pk=collection_part.id parent_pk=object.id direction='down' as swap_down_url %}
+    <li class="items-center hover:bg-base-100 px-2">
+        <div class="flex gap-2 items-center py-2">
+            <a class="flex-1" href="{% url 'edwoca:manifestation_relations' collection_part.id %}">
                 {{ collection_part }}
             </a>
+            {% if not forloop.first %}
+                <form hx-post="{{ swap_up_url }}"
+                      hx-target="#collection-parts"
+                      hx-swap="innerHTML"
+                      class="flex-0 m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm p-1 px-2" title="{% translate 'move up' %}">
+                        ↑
+                    </button>
+                </form>
+            {% endif %}
+
+            {% if not forloop.last %}
+                <form hx-post="{{ swap_down_url }}"
+                      hx-target="#collection-parts"
+                      hx-swap="innerHTML"
+                      class="flex-0 m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm p-1 px-2" title="{% translate 'move down' %}">
+                        ↓
+                    </button>
+                </form>
+            {% endif %}
         </div>
     </li>
 {% endfor %}
 {% for collection_component in object.collection_components.all %}
-    <li class="list-disc">
-        <div class="flex flex-0 gap-1">
-            {% url 'edwoca:collection_part_swap_order' pk=collection_component.id direction='up' as swap_up_url %}
-            <form hx-post="{{ swap_up_url }}"
-                  hx-target="#item-list-container"
-                  hx-swap="innerHTML"
-                  class="flex-0">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move up' %}">
-                    ↑
-                    {% translate 'up' %}
-                </button>
-            </form>
+    {% url 'edwoca:collection_part_swap_order' pk=collection_component.id parent_pk=object.id direction='up' as swap_up_url %}
+    {% url 'edwoca:collection_part_swap_order' pk=collection_component.id parent_pk=object.id direction='down' as swap_down_url %}
+    <li class="items-center hover:bg-base-100 px-2">
+        <div class="flex gap-2 items-center py-2">
+            <a class="flex-1" href="{% url 'edwoca:manifestation_relations' collection_component.id %}">
+                {{ collection_component }}
+            </a>
+            {% if not forloop.first %}
+                <form hx-post="{{ swap_up_url }}"
+                      hx-target="#collection-parts"
+                      hx-swap="innerHTML"
+                      class="flex-0 m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm p-1 px-2" title="{% translate 'move up' %}">
+                        ↑
+                    </button>
+                </form>
+            {% endif %}
 
-            {% url 'edwoca:collection_part_swap_order' pk=collection_component.id direction='down' as swap_down_url %}
-            <form hx-post="{{ swap_down_url }}"
-                  hx-target="#collection-parts"
-                  hx-swap="innerHTML"
-                  class="flex-0">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move down' %}">
-                    ↓
-                    {% translate 'down' %}
-                </button>
-            </form>
-        <a href="{% url 'edwoca:manifestation_relations' collection_component.id %}">
-            {{ collection_component }}
-        </a>
+            {% if not forloop.last %}
+                <form hx-post="{{ swap_down_url }}"
+                      hx-target="#collection-parts"
+                      hx-swap="innerHTML"
+                      class="flex-0 m-0">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-outline btn-sm p-1 px-2" title="{% translate 'move down' %}">
+                        ↓
+                    </button>
+                </form>
+            {% endif %}
+        </div>
     </li>
 {% endfor %}
