@@ -1,0 +1,33 @@
+{% load i18n %}
+<div class="search-container mb-4">
+    <label class="label">
+        <span class="label-text">{% translate label %}</span>
+    </label>
+    <div class="relative flex items-center">
+        <input
+            type="text"
+            name="q"
+            class="input input-bordered border-black bg-white flex-1"
+            placeholder="{% translate placeholder %}"
+            hx-get="{% url 'edwoca:htmx_search' %}"
+            hx-trigger="keyup changed delay:300ms"
+            hx-target="#results-{{ target_id }}"
+            hx-indicator="#indicator-{{ target_id }}"
+            hx-swap="outerHTML"
+            hx-vals='{
+                "dedication_app": "{{ dedication_app }}",
+                "dedicatee_app": "{{ dedicatee_app|default:"dmad" }}",
+                "model": "{{ model_name }}",
+                "dedication_model_id": "{{ dedication_id }}",
+                "dedication_model": "{{ dedication_model }}",
+                "dedicatee_model": "{{ dedicatee_model }}",
+                "manifestation_id": "{{ object.id }}",
+                "search_type": "{{ search_type }}",
+                "field_name": "{{ field_name }}"
+            }'
+        >
+        <span id="indicator-{{ target_id }}" class="htmx-indicator loading loading-spinner loading-sm absolute right-3"></span>
+    </div>
+    <ul id="results-{{ target_id }}" class="p-0 max-h-48 bg-white overflow-auto empty:hidden shadow-lg">
+    </ul>
+</div>

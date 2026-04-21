@@ -45,6 +45,7 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
         wt_field = self.fields['working_title']
         wt_field.label = f'{wt_field.label}*'
 
+
 class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
 
