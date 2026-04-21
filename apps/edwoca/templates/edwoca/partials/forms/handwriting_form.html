@@ -57,8 +57,7 @@
 
 <div class="flex justify-end mt-3">
     {{ form.model }}
-    <form action="{% url 'edwoca:'|add:class|add:'_delete' form.instance.id %}" method="post" class="flex-0 m-0">
-        {% csrf_token %}
-        <input type="submit" class="btn btn-outline text-primary" value="{% translate 'remove' %}"/>
-    </form>
+    <button class="flex-0 btn btn-outline text-primary" name="{{ class }}-delete" value="{{ form.instance.id }}" form="form">
+        {% translate 'remove' %}
+    </button>
 </div>

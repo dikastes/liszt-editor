@@ -15,15 +15,20 @@
     {% translate 'provenance persons' %}
 </h2>
 
+{% include 'edwoca/partials/formset_management.html' with formset=person_formset form_id='form' %}
+
 <div class="my-5">
-    {% for pps_form in person_provenance_forms %}
+    {% for entry in enriched_person_formset %}
         <div class="collapse collapse-arrow bg-base-100 my-5">
             <input type="checkbox" />
+
             <div class="collapse-title truncate">
-                {{ pps_form.instance }}
+                {{ entry.form.instance }}
             </div>
+
             <div class="collapse-content mt-5">
-                {% if pps_form.instance.owner %}
+
+                {% for owner in entry.form.instance.owner.all %}
                     <div class="flex items-end mt-5 gap-5">
                         <label class="flex-1 gap-2">
                             <div class="label">
@@ -31,142 +36,198 @@
                                     {% translate 'owner' %}
                                 </span>
                             </div>
-                            <div type="text" class="w-full bg-white input-bordered border-black border pseudo-input flex items-center">
-                                {{ pps_form.instance.owner }}
+                            <div class="w-full bg-white border border-black pseudo-input flex items-center">
+                                {{ owner }}
                             </div>
                         </label>
-                        <a class="btn btn-outline btn-primary" href="{% url 'edwoca:person_provenance_remove_owner' item.id pps_form.instance.id %}">{% translate 'remove' %}</a>
+                        <a class="btn btn-outline btn-primary"
+                           href="{% url 'edwoca:person_provenance_remove_owner' item.id entry.form.instance.id owner.id %}">
+                            {% translate 'remove' %}
+                        </a>
                     </div>
-                {% else %}
-                    <form method="get" class="flex-1 flex mt-5 items-end">
-                        <label class="items-center gap-2 flex-1">
-                            <div class="label">
-                                <span class="label-text">
-                                    {% translate 'owner' %}
-                                </span>
-                            </div>
-                            {{ owner_search_form.q }}
-                        </label>
-                        <input type="submit" class="flex-0 btn btn-outline border-l-0" value="{% translate 'search' %}"/>
-                    </form>
-                    {% if found_persons %}
-                        <ul class="border bg-white border-black p-2 h-32 overflow-auto">
-                        {% for person in found_persons %}
-                            <li>
-                                <a href="{% url 'edwoca:person_provenance_add_owner' item.id pps_form.instance.id person.pk %}">{{ person.object }}</a>
-                            </li>
-                        {% empty %}
-                            <li>
-                                {% translate 'no search results' %}
-                            </li>
-                        {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% endif %}
-
-                {{ pps_form.as_daisy }}
-
-                <h3 class="my-5">
-                    {% translate 'provenance proof (bibliography)' %}
-                </h3>
-                <ul>
-                {% for bib in pps_form.instance.bib.all %}
-                    <li class="my-5">
-                        <div class="flex gap-5 items-center">
-                            <label class="pseudo-input bg-white border border-black input-bordered flex-1 flex items-center gap-2">
-                                <div type="text" class="grow">
-                                    {{ bib }}
-                                </div>
-                            </label>
-                            <form method="post" action="{% url 'edwoca:person_provenance_remove_bib' item.id pps_form.instance.id bib.zot_key %}" class="flex-0 mb-0">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove' %}">
-                            </form>
-                        </div>
-                    </li>
+                {% empty %}
+                {% comment %}
+                    <p class="note my-5">
+                        {% translate 'no owners' %}
+                    </p>
+                {% endcomment %}
                 {% endfor %}
-                </ul>
-
-                <form method="get" class="flex-1 flex mt-5 items-end">
+                <form method="get" class="flex mt-5 items-end">
                     <label class="flex-1">
                         <div class="label">
-                            <span class="label-text">
-                                {% translate 'bibliography' %}
-                            </span>
+                            <span class="label-text">{% translate 'owner' %}</span>
                         </div>
-                        {{ bib_search_form.q }}
+                        {{ entry.owner_search_form.q }}
                     </label>
                     <input type="submit" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
                 </form>
 
-                {% if found_bibs %}
-                    <ul class="p-2 bg-white border border-black h-32 overflow-auto">
-                    {% for bib in found_bibs %}
-                        <li>
-                            <a href="{% url 'edwoca:person_provenance_add_bib' item.id pps_form.instance.id bib.pk %}">{{ bib.object }}</a>
-                        </li>
-                    {% empty %}
-                        <li>
-                            {% translate 'no search results' %}
+                {% if entry.owner_results %}
+                    <ul class="border bg-white border-black p-2 h-32 overflow-auto">
+                        {% for person in entry.owner_results %}
+                            <li>
+                                <a href="{% url 'edwoca:person_provenance_add_owner' item.id entry.form.instance.id person.pk %}">
+                                    {{ person.object }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>{% translate 'no search results' %}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {{ entry.form.as_daisy }}
+
+                <h3 class="my-5">
+                    {% translate 'provenance proof (bibliography)' %}
+                </h3>
+
+                {% include 'edwoca/partials/formset_management.html' with formset=entry.bib_formset form_id='form' %}
+
+                <ul>
+                    {% for bib_form in entry.bib_formset %}
+                        <li class="my-5">
+                            <div class="p-5 border-black border">
+                                <div class="label">
+                                    <span class="label-text">{% translate 'title' %}</span>
+                                </div>
+
+                                <div class="pseudo-input bg-white border border-black flex items-center">
+                                    {{ bib_form.instance.bib }}
+                                </div>
+
+                                {{ bib_form.as_daisy }}
+
+                                <div class="flex">
+                                    <div class="flex-1"></div>
+                                    <form method="post"
+                                          action="{% url 'edwoca:person_provenance_remove_bib' bib_form.instance.id %}">
+                                        {% csrf_token %}
+                                        <input type="submit"
+                                               class="btn btn-outline btn-primary"
+                                               value="{% translate 'remove reference' %}">
+                                    </form>
+                                </div>
+                            </div>
                         </li>
                     {% endfor %}
+                </ul>
+
+                <form method="get" class="flex mt-5 items-end">
+                    <label class="flex-1">
+                        <div class="label">
+                            <span class="label-text">{% translate 'bibliography' %}</span>
+                        </div>
+                        {{ entry.bib_search_form.q }}
+                    </label>
+                    <input type="submit" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
+                </form>
+
+                {% if entry.bib_results %}
+                    <ul class="p-2 bg-white border border-black h-32 overflow-auto">
+                        {% for bib in entry.bib_results %}
+                            <li>
+                                <a href="{% url 'edwoca:person_provenance_add_bib' item.id entry.form.instance.id bib.pk %}">
+                                    {{ bib.object }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>{% translate 'no search results' %}</li>
+                        {% endfor %}
                     </ul>
                 {% endif %}
 
                 <h3 class="my-5">
                     {% translate 'provenance proof (letter)' %}
                 </h3>
+
                 <ul>
-                {% for letter in pps_form.instance.letters.all %}
-                    <li class="my-5">
-                        <div class="flex gap-5 items-center mt-5">
-                            <label class="pseudo-input bg-white border border-black input-bordered flex-1 flex items-center gap-2">
-                                <div type="text" class="grow">
+                    {% for letter in entry.form.instance.letters.all %}
+                        <li class="my-5">
+                            <div class="flex gap-5 items-center">
+                                <label class="pseudo-input bg-white border border-black flex-1 flex items-center">
                                     {{ letter }}
-                                </div>
-                            </label>
-                            <form method="post" action="{% url 'edwoca:person_provenance_remove_letter' item.id pps_form.instance.id letter.id %}" class="flex-0 mb-0">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove' %}">
-                            </form>
-                        </div>
-                    </li>
-                {% endfor %}
+                                </label>
+                                <form method="post"
+                                      action="{% url 'edwoca:person_provenance_remove_letter' item.id entry.form.instance.id letter.id %}"
+                                      class="mb-0">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove' %}">
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
                 </ul>
 
-                <form method="get" class="flex-1 flex items-end mt-5">
+                <form method="get" class="flex items-end mt-5">
                     <label class="flex-1">
                         <div class="label">
-                            <span class="label-text">
-                                {% translate 'letter' %}
-                            </span>
+                            <span class="label-text">{% translate 'letter' %}</span>
                         </div>
-                        {{ letter_search_form.q }}
+                        {{ entry.letter_search_form.q }}
                     </label>
                     <input type="submit" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
                 </form>
 
-                {% if found_letters %}
-                    <ul class="p-2 bg-white border border-black overflow-auto h-32">
-                    {% for letter in found_letters %}
-                        <li>
-                            <a href="{% url 'edwoca:person_provenance_add_letter' item.id pps_form.instance.id letter.pk %}">{{ letter.object }}</a>
-                        </li>
-                    {% empty %}
-                        <li>
-                            {% translate 'no search results' %}
-                        </li>
-                    {% endfor %}
+                {% if entry.letter_results %}
+                    <ul class="p-2 bg-white border border-black h-32 overflow-auto">
+                        {% for letter in entry.letter_results %}
+                            <li>
+                                <a href="{% url 'edwoca:person_provenance_add_letter' item.id entry.form.instance.id letter.pk %}">
+                                    {{ letter.object }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>{% translate 'no search results' %}</li>
+                        {% endfor %}
                     </ul>
                 {% endif %}
 
-                <div class="flex">
+                <h3 class="my-5">
+                    {% translate 'provenance proof (web)' %}
+                </h3>
+
+                <ul>
+                    {% for web_reference_form in entry.web_reference_forms %}
+                        <li class="my-5 border border-black p-5 my-5">
+                                {{ web_reference_form.as_daisy }}
+                            <div class="flex mt-5">
+                                <div class="flex-1"></div>
+                                <form method="post"
+                                      action="{% url 'edwoca:person_provenance_remove_webref' web_reference_form.instance.id %}"
+                                      class="flex-0 mb-0">
+                                    {% csrf_token %}
+                                    <input type="submit"
+                                           class="btn btn-primary btn-outline"
+                                           value="{% translate 'remove web reference' %}" />
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <div class="flex my-5">
                     <div class="flex-1"></div>
-                    <form action="{% url 'edwoca:person_provenance_delete' pps_form.instance.id %}" method="post" class="flex-0">
+                    <form method="post"
+                          action="{% url 'edwoca:person_provenance_add_webref' item.id entry.form.instance.id %}">
                         {% csrf_token %}
-                        <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove provenance station' %}" />
+                        <input type="submit"
+                               class="btn btn-outline"
+                               value="{% translate 'add web reference' %}" />
                     </form>
                 </div>
+
+                <div class="flex">
+                    <div class="flex-1"></div>
+                    <form method="post"
+                          action="{% url 'edwoca:person_provenance_delete' entry.form.instance.id %}">
+                        {% csrf_token %}
+                        <input type="submit"
+                               class="btn btn-primary btn-outline"
+                               value="{% translate 'remove provenance station' %}" />
+                    </form>
+                </div>
+
             </div>
         </div>
     {% empty %}
@@ -187,15 +248,20 @@
     {% translate 'provenance corporations' %}
 </h2>
 
+{% include 'edwoca/partials/formset_management.html' with formset=corporation_formset form_id='form' %}
+
 <div class="my-5">
-    {% for cps_form in corporation_provenance_forms %}
+    {% for entry in enriched_corporation_formset %}
         <div class="collapse collapse-arrow bg-base-100 my-5">
             <input type="checkbox" />
+
             <div class="collapse-title truncate">
-                {{ cps_form.instance }}
+                {{ entry.form.instance }}
             </div>
+
             <div class="collapse-content mt-5">
-                {% if cps_form.instance.owner %}
+
+                {% if entry.form.instance.owner %}
                     <div class="flex items-end mt-5 gap-5">
                         <label class="flex-1 gap-2">
                             <div class="label">
@@ -203,276 +269,194 @@
                                     {% translate 'owner' %}
                                 </span>
                             </div>
-                            <div type="text" class="w-full bg-white input-bordered border-black border pseudo-input flex items-center">
-                                {{ cps_form.instance.owner }}
+                            <div class="w-full bg-white border border-black pseudo-input flex items-center">
+                                {{ entry.form.instance.owner }}
                             </div>
                         </label>
-                        <a class="btn btn-outline btn-primary" href="{% url 'edwoca:corporation_provenance_remove_owner' item.id cps_form.instance.id %}">{% translate 'remove' %}</a>
+                        <a class="btn btn-outline btn-primary"
+                           href="{% url 'edwoca:corporation_provenance_remove_owner' item.id entry.form.instance.id %}">
+                            {% translate 'remove' %}
+                        </a>
                     </div>
                 {% else %}
-                    <form method="get" class="flex-1 flex mt-5 items-end">
-                        <label class="items-center gap-2 flex-1">
+                    <form method="get" class="flex mt-5 items-end">
+                        <label class="flex-1">
                             <div class="label">
-                                <span class="label-text">
-                                    {% translate 'owner' %}
-                                </span>
+                                <span class="label-text">{% translate 'owner' %}</span>
                             </div>
-                            {{ owner_search_form.q }}
+                            {{ entry.owner_search_form.q }}
                         </label>
-                        <input type="submit" class="flex-0 btn btn-outline border-l-0" value="{% translate 'search' %}"/>
+                        <input type="submit" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
                     </form>
-                    {% if found_corporations %}
+
+                    {% if entry.owner_results %}
                         <ul class="border bg-white border-black p-2 h-32 overflow-auto">
-                        {% for corporation in found_corporations %}
-                            <li>
-                                <a href="{% url 'edwoca:corporation_provenance_add_owner' item.id cps_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
-                            </li>
-                        {% empty %}
-                            <li>
-                                {% translate 'no search results' %}
-                            </li>
-                        {% endfor %}
+                            {% for corporation in entry.owner_results %}
+                                <li>
+                                    <a href="{% url 'edwoca:corporation_provenance_add_owner' item.id entry.form.instance.id corporation.pk %}">
+                                        {{ corporation.object }}
+                                    </a>
+                                </li>
+                            {% empty %}
+                                <li>{% translate 'no search results' %}</li>
+                            {% endfor %}
                         </ul>
                     {% endif %}
                 {% endif %}
 
-                {{ cps_form.as_daisy }}
+                {{ entry.form.as_daisy }}
 
                 <h3 class="my-5">
                     {% translate 'provenance proof (bibliography)' %}
                 </h3>
+
+                {% include 'edwoca/partials/formset_management.html' with formset=entry.bib_formset form_id='form' %}
+
                 <ul>
-                {% for bib in cps_form.instance.bib.all %}
-                    <li class="my-5">
-                        <div class="flex gap-5 items-center">
-                            <label class="pseudo-input bg-white border border-black input-bordered flex-1 flex items-center gap-2">
-                                <div type="text" class="grow">
-                                    {{ bib }}
+                    {% for bib_form in entry.bib_formset %}
+                        <li class="my-5">
+                            <div class="p-5 border-black border">
+                                <div class="label">
+                                    <span class="label-text">{% translate 'title' %}</span>
                                 </div>
-                            </label>
-                            <form method="post" action="{% url 'edwoca:corporation_provenance_remove_bib' item.id cps_form.instance.id bib.zot_key %}" class="flex-0 mb-0">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove' %}">
-                            </form>
-                        </div>
-                    </li>
-                {% endfor %}
+
+                                <div class="pseudo-input bg-white border border-black flex items-center">
+                                    {{ bib_form.instance.bib }}
+                                </div>
+
+                                {{ bib_form.as_daisy }}
+
+                                <div class="flex">
+                                    <div class="flex-1"></div>
+                                    <form method="post"
+                                          action="{% url 'edwoca:corporation_provenance_remove_bib' bib_form.instance.id %}">
+                                        {% csrf_token %}
+                                        <input type="submit"
+                                               class="btn btn-outline btn-primary"
+                                               value="{% translate 'remove reference' %}">
+                                    </form>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
                 </ul>
 
-                <form method="get" class="flex-1 flex mt-5 items-end">
+                <form method="get" class="flex mt-5 items-end">
                     <label class="flex-1">
                         <div class="label">
-                            <span class="label-text">
-                                {% translate 'bibliography' %}
-                            </span>
+                            <span class="label-text">{% translate 'bibliography' %}</span>
                         </div>
-                        {{ bib_search_form.q }}
+                        {{ entry.bib_search_form.q }}
                     </label>
                     <input type="submit" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
                 </form>
 
-                {% if found_bibs %}
+                {% if entry.bib_results %}
                     <ul class="p-2 bg-white border border-black h-32 overflow-auto">
-                    {% for bib in found_bibs %}
-                        <li>
-                            <a href="{% url 'edwoca:corporation_provenance_add_bib' item.id cps_form.instance.id bib.pk %}">{{ bib.object }}</a>
-                        </li>
-                    {% empty %}
-                        <li>
-                            {% translate 'no search results' %}
-                        </li>
-                    {% endfor %}
+                        {% for bib in entry.bib_results %}
+                            <li>
+                                <a href="{% url 'edwoca:corporation_provenance_add_bib' item.id entry.form.instance.id bib.pk %}">
+                                    {{ bib.object }}
+                                </a>
+                            </li>
+                        {% empty %}
+                            <li>{% translate 'no search results' %}</li>
+                        {% endfor %}
                     </ul>
                 {% endif %}
 
                 <h3 class="my-5">
                     {% translate 'provenance proof (letter)' %}
                 </h3>
+
                 <ul>
-                {% for letter in cps_form.instance.letters.all %}
-                    <li class="my-5">
-                        <div class="flex gap-5 items-center mt-5">
-                            <label class="pseudo-input bg-white border border-black input-bordered flex-1 flex items-center gap-2">
-                                <div type="text" class="grow">
+                    {% for letter in entry.form.instance.letters.all %}
+                        <li class="my-5">
+                            <div class="flex gap-5 items-center">
+                                <label class="pseudo-input bg-white border border-black flex-1 flex items-center">
                                     {{ letter }}
-                                </div>
-                            </label>
-                            <form method="post" action="{% url 'edwoca:corporation_provenance_remove_letter' item.id cps_form.instance.id letter.id %}" class="flex-0 mb-0">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove' %}">
-                            </form>
-                        </div>
-                    </li>
-                {% endfor %}
+                                </label>
+                                <form method="post"
+                                      action="{% url 'edwoca:corporation_provenance_remove_letter' item.id entry.form.instance.id letter.id %}"
+                                      class="mb-0">
+                                    {% csrf_token %}
+                                    <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove' %}">
+                                </form>
+                            </div>
+                        </li>
+                    {% endfor %}
                 </ul>
 
-                <form method="get" class="flex-1 flex items-end mt-5">
+                <form method="get" class="flex items-end mt-5">
                     <label class="flex-1">
                         <div class="label">
-                            <span class="label-text">
-                                {% translate 'letter' %}
-                            </span>
+                            <span class="label-text">{% translate 'letter' %}</span>
                         </div>
-                        {{ letter_search_form.q }}
+                        {{ entry.letter_search_form.q }}
                     </label>
                     <input type="submit" class="btn btn-outline border-l-0" value="{% translate 'search' %}"/>
                 </form>
 
-                {% if found_letters %}
-                    <ul class="p-2 bg-white border border-black overflow-auto h-32">
-                    {% for letter in found_letters %}
-                        <li>
-                            <a href="{% url 'edwoca:corporation_provenance_add_letter' item.id cps_form.instance.id letter.pk %}">{{ letter.object }}</a>
-                        </li>
-                    {% empty %}
-                        <li>
-                            {% translate 'no search results' %}
-                        </li>
-                    {% endfor %}
-                    </ul>
-                {% endif %}
-
-                <div class="flex">
-                    <div class="flex-1"></div>
-                    <form action="{% url 'edwoca:corporation_provenance_delete' cps_form.instance.id %}" method="post" class="flex-0">
-                        {% csrf_token %}
-                        <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove provenance station' %}" />
-                    </form>
-                </div>
-            </div>
-        </div>
-        <div class="collapse collapse-arrow bg-base-100 my-5">
-            <input type="checkbox" />
-            <div class="collapse-title truncate">
-                {{ cps_form.instance }}
-            </div>
-            <div class="collapse-content mt-5">
-                {% if cps_form.instance.owner %}
-                    <div class="flex items-center mt-5">
-                        <label class="input input-bordered border-black border-r-0 bg-white flex-1 flex items-center gap-2">
-                            {% translate 'owner' %}
-                            <input type="text" class="grow" disabled value="{{ cps_form.instance.owner }}" />
-                        </label>
-                        <a class="btn btn-outline" href="{% url 'edwoca:corporation_provenance_remove_owner' item.id cps_form.instance.id %}">{% translate 'remove' %}</a>
-                    </div>
-                {% else %}
-                    <form method="get" class="flex-1 flex mt-5">
-                        <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2 flex-1">
-                            {% translate 'owner' %}
-                            {{ owner_search_form.q }}
-                        </label>
-                        <input type="submit" class="btn btn-outline" value="{% translate 'search' %}"/>
-                    </form>
-                    {% if found_corporations %}
-                        <ul class="border bg-white border-black p-2 h-32 overflow-auto">
-                        {% for corporation in found_corporations %}
+                {% if entry.letter_results %}
+                    <ul class="p-2 bg-white border border-black h-32 overflow-auto">
+                        {% for letter in entry.letter_results %}
                             <li>
-                                <a href="{% url 'edwoca:corporation_provenance_add_owner' item.id cps_form.instance.id corporation.pk %}">{{ corporation.object }}</a>
+                                <a href="{% url 'edwoca:corporation_provenance_add_letter' item.id entry.form.instance.id letter.pk %}">
+                                    {{ letter.object }}
+                                </a>
                             </li>
                         {% empty %}
-                            <li>
-                                {% translate 'no search results' %}
-                            </li>
+                            <li>{% translate 'no search results' %}</li>
                         {% endfor %}
-                        </ul>
-                    {% endif %}
-                {% endif %}
-
-                <h3>
-                    {% translate 'date provenance' %}
-                </h3>
-
-                {{ cps_form.as_daisy }}
-
-                <h3>
-                    {% translate 'provenance proof (bibliography)' %}
-                </h3>
-                <ul>
-                {% for bib in cps_form.instance.bib.all %}
-                    <li>
-                        <div class="flex gap-5 items-center">
-                            <label class="input input-bordered flex-1 flex items-center gap-2">
-                                {% translate 'bibliography' %}
-                                <input type="text" class="grow" disabled value="{{ bib }}" />
-                            </label>
-                            <form method="post" action="{% url 'edwoca:corporation_provenance_remove_bib' item.id cps_form.instance.id bib.zot_key %}" class="flex-0">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
-                            </form>
-                        </div>
-                    </li>
-                {% endfor %}
-                </ul>
-
-                <form method="get" class="flex-1 flex mt-5 bg-white">
-                    <label class="input input-bordered border-black bg-white border-r-0 flex items-center gap-2 flex-1">
-                        {% translate 'bibliography' %}
-                        {{ bib_search_form.q }}
-                    </label>
-                    <input type="submit" class="btn btn-outline" value="{% translate 'search' %}"/>
-                </form>
-                {% if found_bibs %}
-                    <ul class="p-2 border border-black h-32 overflow-auto">
-                    {% for bib in found_bibs %}
-                        <li>
-                            <a href="{% url 'edwoca:corporation_provenance_add_bib' item.id cps_form.instance.id bib.pk %}">{{ bib.object }}</a>
-                        </li>
-                    {% empty %}
-                        <li>
-                            {% translate 'no search results' %}
-                        </li>
-                    {% endfor %}
                     </ul>
                 {% endif %}
 
-                <h3>
-                    {% translate 'provenance proof (letter)' %}
+                <h3 class="my-5">
+                    {% translate 'provenance proof (web)' %}
                 </h3>
-                <ul>
-                {% for letter in cps_form.instance.letters.all %}
-                    <li>
-                        <div class="flex gap-5 items-center mt-5">
-                            <label class="input input-bordered flex-1 flex items-center gap-2">
-                                {% translate 'letter' %}
-                                <input type="text" class="grow" disabled value="{{ letter }}" />
-                            </label>
-                            <form method="post" action="{% url 'edwoca:corporation_provenance_remove_letter' item.id cps_form.instance.id letter.id %}" class="flex-0">
-                                {% csrf_token %}
-                                <input type="submit" class="btn btn-small" value="{% translate 'remove' %}">
-                            </form>
-                        </div>
-                    </li>
-                {% endfor %}
-                </ul>
 
-                <form method="get" class="flex-1 flex bg-white mt-5">
-                    <label class="input input-bordered flex border-r-0 border-black bg-white items-center gap-2 flex-1">
-                        {% translate 'letter' %}
-                        {{ letter_search_form.q }}
-                    </label>
-                    <input type="submit" class="btn btn-outline" value="{% translate 'search' %}"/>
-                </form>
-                {% if found_letters %}
-                    <ul class="p-2 border border-black overflow-auto h-32">
-                    {% for letter in found_letters %}
-                        <li>
-                            <a href="{% url 'edwoca:corporation_provenance_add_letter' item.id cps_form.instance.id letter.pk %}">{{ letter.object }}</a>
-                        </li>
-                    {% empty %}
-                        <li>
-                            {% translate 'no search results' %}
+                <ul>
+                    {% for web_reference_form in entry.web_reference_forms %}
+                        <li class="my-5 border border-black p-5 my-5">
+                                {{ web_reference_form.as_daisy }}
+                            <div class="flex mt-5">
+                                <div class="flex-1"></div>
+                                <form method="post"
+                                      action="{% url 'edwoca:corporation_provenance_remove_webref' web_reference_form.instance.id %}"
+                                      class="flex-0 mb-0">
+                                    {% csrf_token %}
+                                    <input type="submit"
+                                           class="btn btn-primary btn-outline"
+                                           value="{% translate 'remove web reference' %}" />
+                                </form>
+                            </div>
                         </li>
                     {% endfor %}
-                    </ul>
-                {% endif %}
+                </ul>
+
+                <div class="flex my-5">
+                    <div class="flex-1"></div>
+                    <form method="post"
+                          action="{% url 'edwoca:corporation_provenance_add_webref' item.id entry.form.instance.id %}">
+                        {% csrf_token %}
+                        <input type="submit"
+                               class="btn btn-outline"
+                               value="{% translate 'add web reference' %}" />
+                    </form>
+                </div>
+
 
                 <div class="flex">
                     <div class="flex-1"></div>
-                    <form action="{% url 'edwoca:corporation_provenance_delete' cps_form.instance.id %}" method="post" class="flex-0">
+                    <form method="post"
+                          action="{% url 'edwoca:corporation_provenance_delete' entry.form.instance.id %}">
                         {% csrf_token %}
-                        <input type="submit" class="btn btn-primary btn-outline" value="{% translate 'remove provenance station' %}" />
+                        <input type="submit"
+                               class="btn btn-primary btn-outline"
+                               value="{% translate 'remove provenance station' %}" />
                     </form>
                 </div>
+
             </div>
         </div>
     {% empty %}
@@ -492,7 +476,7 @@
 <h2>
     {% translate 'comment' %}
 </h2>
-    {{ provenance_comment_form.as_daisy }}
+    {{ form.as_daisy }}
 
 {% include 'edwoca/partials/manifestation/preview-divs/provenance_epilog.html' %}
 

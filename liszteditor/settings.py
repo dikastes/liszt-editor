@@ -28,18 +28,22 @@ else:
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # App version
-APP_VERSION = "0.0.1"
+APP_VERSION = "0.0.2"
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-g562zyg%dply65c+z#rb4_eg=wr(=3u3m5=f(vp9a%lr=9%1eh'
+#SECRET_KEY = 'django-insecure-g562zyg%dply65c+z#rb4_eg=wr(=3u3m5=f(vp9a%lr=9%1eh'
+if 'SECRET_KEY' in os.environ:
+    SECRET_KEY = os.environ['SECRET_KEY']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
+CSRF_TRUSTED_ORIGINS = []
 
-if not DEBUG:
+if not DEBUG and 'DOMAIN_NAME' in os.environ:
     ALLOWED_HOSTS.append(os.environ['DOMAIN_NAME'])
+    CSRF_TRUSTED_ORIGINS.append('https://' + os.environ['DOMAIN_NAME'])
 
 # Application definition
 
@@ -105,7 +109,7 @@ WSGI_APPLICATION = 'liszteditor.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'data/db.sqlite3',
     }
 }
 
@@ -177,7 +181,14 @@ RISM_API_KEY = os.environ['RISM_API_KEY']
 EDWOCA_FIXED_PERSONS = {
         'Liszt': '118573527',
         'zS': None,
-        'Dr': None
+        'Dr': None,
+        'Fischer': None,
+        'L. Htmn.': None,
+        'Pietro Cavallini': None,
+        'C. S.': None,
+        'Carl Schmiedicke': None,
+        'Lutz': None,
+        'Victor Mattasovich': None
     }
 
 EDWOCA_EMPTY_LIBRARIES = [ 'Privatbesitz', 'unbekannt' ]
@@ -195,7 +206,7 @@ EDWOCA_FIXED_DATES = {
         }
     }
 
-EDITOR_MODE = 'dev'
+EDITOR_MODE = 'production'
 
 # HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SIGNAL_PROCESSOR = 'bib.signals.CustomRealtimeSignalProcessor'
@@ -215,10 +226,10 @@ GLOBAL_NAVIGATION = {
                 'label': 'DMAd',
                 'href': reverse_lazy('dmad_on_django:index')
             },
-        'bib': {
-                'label': 'Bib',
-                'href': reverse_lazy('bib:index')
-            },
+        #'bib': {
+                #'label': 'Bib',
+                #'href': reverse_lazy('bib:index')
+            #},
         'musiconn': {
                 'label': 'musiconn',
                 'href': None

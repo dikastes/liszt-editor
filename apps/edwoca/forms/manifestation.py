@@ -11,7 +11,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period, Corporation
 from dmad_on_django.models.base import DocumentationStatus
-from dmrism.models.item import Item, PersonProvenanceStation, CorporationProvenanceStation, Library
+from dmrism.models.item import Item, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting, ManifestationPlace
 from dominate.tags import div, label, span, _input, h1, h2, h3
 from dominate.util import raw
@@ -39,6 +39,11 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
                         'form': 'form'
                     }),
             }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        wt_field = self.fields['working_title']
+        wt_field.label = f'{wt_field.label}*'
 
 
 class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
@@ -72,7 +77,7 @@ class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
         form_control = div(cls=SimpleFormMixin.form_control_classes)
         with form_control:
             with div(cls=SimpleFormMixin.label_classes):
-                span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                span(source_title_field.label + '*', cls=SimpleFormMixin.label_text_classes)
             raw(str(source_title_field))
 
         return mark_safe(str(form_control))
@@ -134,7 +139,7 @@ class ManifestationTitleForm(ModelForm):
 class ManifestationCommentForm(CommentForm):
     class Meta:
         model = Manifestation
-        fields = CommentForm.Meta.fields + ['taken_information', 'first_editor', 'editing_history']
+        fields = CommentForm.Meta.fields + ['taken_information', 'first_editor', 'editing_history', 'needs_review']
         widgets = dict(CommentForm.Meta.widgets, **{
                 'taken_information': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
@@ -144,11 +149,14 @@ class ManifestationCommentForm(CommentForm):
                     }),
                 'editing_history': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
+                    }),
+                'needs_review': CheckboxInput( attrs = {
+                        'class': 'toggle'
                     })
             })
 
     first_save = forms.DateTimeField(
-            label=_('first save'),
+            label=_('first save') + '*',
             required = False,
             disabled = True,
             widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black' })
@@ -165,6 +173,8 @@ class ManifestationCommentForm(CommentForm):
         if self.instance and self.instance.pk:
             self.fields['first_save'].initial = self.instance.first_save
             self.fields['last_save'].initial = self.instance.last_save
+        fe_field = self.fields['first_editor']
+        fe_field.label = f'{fe_field.label}*'
 
     def as_daisy(self):
         form = div()
@@ -176,6 +186,7 @@ class ManifestationCommentForm(CommentForm):
         first_save_field = self['first_save']
         last_save_field = self['last_save']
         editing_history_field = self['editing_history']
+        needs_review_field = self['needs_review']
 
         with form:
             with label(cls=SimpleFormMixin.form_control_classes):
@@ -190,8 +201,8 @@ class ManifestationCommentForm(CommentForm):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(taken_information_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(taken_information_field))
-            h2(_('editing history'))
-            h3(_('initial recording'))
+            h2(_('editing history'), cls='my-5')
+            h3(_('initial recording'), cls='my-5')
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(first_editor_field.label, cls=SimpleFormMixin.label_text_classes)
@@ -203,27 +214,32 @@ class ManifestationCommentForm(CommentForm):
                     with div(cls='flex'):
                         raw(str(first_save_field))
                     div(cls='flex-1')
-            h3(_('further recording'))
+            h3(_('further recording'), cls='my-5')
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(editing_history_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(editing_history_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
-                with div(cls='flex'):
+            with div(cls=SimpleFormMixin.palette_classes + ' items-end'):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
                     with div(cls='flex'):
-                        raw(str(last_save_field))
-                    div(cls='flex-1')
+                        with div(cls='flex'):
+                            raw(str(last_save_field))
+                        div(cls='flex-1')
+                div(cls='flex-1')
+                with label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0'):
+                    span(needs_review_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(needs_review_field))
 
         return mark_safe(str(form))
 
 
 class ManifestationBibForm(BaseBibForm):
-    class Meta(BaseBibForm.Meta):
+    class Meta:
         model = ManifestationBib
-        fields = BaseBibForm.Meta.fields + [ 'manifestation' ]
-        widgets = dict(BaseBibForm.Meta.widgets, **{ 'manifestation': HiddenInput() })
+        fields = BaseBibForm.Meta.fields
+        widgets = BaseBibForm.Meta.widgets
 
 
 class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
@@ -236,7 +252,14 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes }))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
@@ -256,13 +279,15 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
         ]
         widgets = {
                 'history': Textarea( attrs = {
+
                         'class': SimpleFormMixin.text_area_classes
                     }),
                 'date_diplomatic': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     }),
                 'private_history_comment': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
                     }),
                 #'place_inferred': CheckboxInput( attrs = {
                         #'class': SimpleFormMixin.toggle_classes,
@@ -348,7 +373,8 @@ class ManifestationClassificationForm(ModelForm):
                 'choir_score',
                 'piano_reduction',
                 'particell',
-                'score'
+                'score',
+                'is_text'
             ]
         widgets = {
                 'manifestation_form': Select( attrs = {
@@ -399,6 +425,9 @@ class ManifestationClassificationForm(ModelForm):
                 'score': CheckboxInput( attrs = {
                         'class': 'toggle'
                     }),
+                'is_text': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
             }
 
     def __init__(self, *args, **kwargs):
@@ -416,6 +445,9 @@ class ManifestationClassificationForm(ModelForm):
                     (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
                 ]
 
+        st_field = self.fields['source_type']
+        st_field.label = f'{st_field.label}*'
+
     def as_daisy(self):
         form = div(cls='mb-10')
 
@@ -430,19 +462,22 @@ class ManifestationClassificationForm(ModelForm):
         authorized_edition_field = self['authorized_edition']
         first_edition_field = self['first_edition']
         proof_field = self['proof']
-        part_field = self['part']
         further_edition_field = self['further_edition']
 
         # manuscript source functions
         correction_sheet_field = self['correction_sheet']
         stitch_template_field = self['stitch_template']
         dedication_item_field = self['dedication_item']
+        part_field = self['part']
 
         # editions types
         choir_score_field = self['choir_score']
         piano_reduction_field = self['piano_reduction']
         particell_field = self['particell']
         score_field = self['score']
+        text_field = self['is_text']
+
+        instance = self.instance
 
         with form:
             # upper palette with source type and manifestaion form
@@ -462,7 +497,7 @@ class ManifestationClassificationForm(ModelForm):
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(performance_material_field))
                 span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
-            if self.instance.is_singleton:
+            if instance.is_singleton:
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
                     raw(str(correction_sheet_field))
                     span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
@@ -487,21 +522,26 @@ class ManifestationClassificationForm(ModelForm):
                     span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
 
             h1(_('edition type') + '*', cls='text-lg my-5')
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(choir_score_field))
-                span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(piano_reduction_field))
-                span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(particell_field))
-                span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(score_field))
-                span(score_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(part_field))
-                span(part_field.label, cls=SimpleFormMixin.label_text_classes)
+            if not instance.is_text:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(choir_score_field))
+                    span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(piano_reduction_field))
+                    span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(particell_field))
+                    span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(score_field))
+                    span(score_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(part_field))
+                    span(part_field.label, cls=SimpleFormMixin.label_text_classes)
+            if not (instance.choir_score or instance.piano_reduction or instance.particell or instance.score or instance.part):
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(text_field))
+                    span(text_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
 
@@ -568,7 +608,7 @@ class ManifestationCreateForm(forms.Form):
             source_title_field = self['source_title']
             source_title_container = label(cls='form-control w-full')
             source_title_label = div(cls='label')
-            source_title_label.add(span(source_title_field.label, cls='label-text'))
+            source_title_label.add(span(source_title_field.label + '*', cls='label-text'))
             source_title_container.add(source_title_label)
             source_title_container.add(raw(str(source_title_field)))
             if source_title_field.errors:
@@ -578,7 +618,7 @@ class ManifestationCreateForm(forms.Form):
             temporary_title_field = self['temporary_title']
             temporary_title_container = label(cls='form-control w-full')
             temporary_title_label = div(cls='label')
-            temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
+            temporary_title_label.add(span(temporary_title_field.label + '*', cls='label-text'))
             temporary_title_container.add(temporary_title_label)
             temporary_title_container.add(raw(str(temporary_title_field)))
             if temporary_title_field.errors:
@@ -668,33 +708,34 @@ class SingletonCreateForm(forms.ModelForm):
             ]
 
     working_title = forms.CharField(
-            label = _('working title'),
+            label = _('working title') + '*',
             max_length = 255,
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
         )
     source_title = forms.CharField(
-            label = _('source title'),
+            label = _('source title') + '*',
             max_length = 255,
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
         )
     source_type = forms.ChoiceField(
-            label = _('source type'),
-            choices = Manifestation.SourceType.choices,
+            label = _('source type') + '*',
+            choices = Manifestation.SourceType.choices[:-1],
             widget = Select(attrs={'class': SimpleFormMixin.select_classes}),
             required = False
         )
     library = forms.ModelChoiceField(
             queryset = Library.objects.all(),
-            label = _('holding institution'),
+            label = _('holding institution') + '*',
             empty_label = _('choose library'),
             widget = Select(attrs={'class': SimpleFormMixin.select_classes})
         )
     signature = forms.CharField(
             label = _('Signature'),
             max_length = 255,
-            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
+            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes}),
+            required = False
         )
 
     def __init__(self, *args, **kwargs):
@@ -749,7 +790,14 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow', 'form': 'form'}))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
@@ -859,9 +907,10 @@ class ManifestationSearchForm(FramedSearchForm):
         if not query:
             return self.searchqueryset
 
-        #sqs = self.searchqueryset.auto_query(query)
-
         query_norm = re.sub(r'[^A-Za-z0-9]', '', query).lower()
+
+        if query.isnumeric() and (int_q := int(query)) > 99:
+            return self.searchqueryset.filter(signature_numbers = int_q)
 
         sqs = self.searchqueryset.filter(
                 SQ(content = query) |
@@ -872,7 +921,15 @@ class ManifestationSearchForm(FramedSearchForm):
 
 
 class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    #inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
@@ -898,26 +955,64 @@ class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
         place_assumed_field = self['assumed']
         place_inferred_field = self['inferred']
 
-        place_documentation_label = _('place as documented')
-        if self.instance.assumed:
-            if self.instance.inferred:
-                place_documentation_label = _('place inferred assumed')
-            else:
-                place_documentation_label = _('place assumed')
-        else:
-            if self.instance.inferred:
-                place_documentation_label = _('place inferred')
-
         with palette:
             div(cls='flex-1')
-            div(place_documentation_label, cls='flex-0 mr-10')
-            with div(cls=SimpleFormMixin.palette_form_control_classes):
-                with label(cls=SimpleFormMixin.toggle_label_classes):
-                    span(_(place_inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
-                    raw(str(place_inferred_field))
-            with div(cls=SimpleFormMixin.palette_form_control_classes):
-                with label(cls=SimpleFormMixin.toggle_label_classes):
+            with div(cls='form-control flex-0'):
+                with label(cls='cursor-pointer label flex gap-5'):
                     span(_(place_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
                     raw(str(place_assumed_field))
+            for sw in place_inferred_field.subwidgets:
+                with tags.div(cls=SimpleFormMixin.form_control_classes):
+                    with tags.label(cls='label cursor-pointer gap-5'):
+                        tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
+                        tags.input_(
+                                type='radio',
+                                name=sw.data.get('name'),
+                                value=str(sw.data.get('value')),
+                                cls='radio',
+                                checked = sw.data.get('selected', False),
+                                form='form'
+                            )
 
         return mark_safe(str(palette))
+
+
+class ManifestationTextTypeForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Manifestation
+        fields = ['is_lyrics', 'is_program', 'is_explanation']
+        widgets = {
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        lyrics_field = self['is_lyrics']
+        program_field = self['is_program']
+        explanation_field = self['is_explanation']
+
+        form = div()
+
+        with form:
+            h3(_('text type'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(lyrics_field))
+                span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(program_field))
+                span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(explanation_field))
+                span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))

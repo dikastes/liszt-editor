@@ -89,3 +89,13 @@ div.modal-box {
     --rounded-selector: 0;
     --rounded-btn: 0;
 }
+
+.update-menu a, .navigation a {
+    @apply text-xs;
+}
+
+@screen xl {
+    .update-menu a, .navigation a {
+        @apply text-base;
+    }
+}

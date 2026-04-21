@@ -1,7 +1,7 @@
 {% load i18n %}
 
-<div class="flex flex-col h-full items-stretch">
-    <div class="flex-1">
+<div class="navigation flex flex-col h-full items-stretch overflow-auto pr-10">
+    <div class="flex-1 mb-10">
     {% if entity_type == 'work' %}
         -- Navigation --
     {% endif %}
@@ -16,7 +16,7 @@
     {% endif %}
     </div>
     {% if entity_type == 'manifestation' %}
-        <div class="flex-0 text-sm text-gray-500 mb-10">
+        <div class="flex-0 text-xs xl:text-sm text-gray-500 mb-10">
             <p>
                 {% translate 'created' %}
             </p>
@@ -34,7 +34,7 @@
                 </p>
             {% endif %}
         </div>
-        <div class="flex-0 text-sm text-gray-500 mb-10">
+        <div class="flex-0 text-xs xl:text-sm text-gray-500 mb-10">
             <p>
                 {% translate 'last update' %}
             </p>
@@ -44,6 +44,6 @@
         </div>
     {% endif %}
     <div class="flex-0">
-        <label for="submit-form" class="w-full btn text-primary btn-outline"> {% translate 'save' %} </label>
+        <label for="submit-form" class="w-full btn btn-sm xl:btn-base text-primary btn-outline"> {% translate 'save' %} </label>
     </div>
 </div>

@@ -8,6 +8,7 @@ from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, Bas
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
+from haystack.query import SearchQuerySet, SQ
 from re import compile, split
 
 
@@ -58,25 +59,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         else:
             self.part_of_id = None
 
-    def __str__(self):
-        if self.is_singleton:
-            return super().__str__()
-
-        if self.missing_item:
-            return f"{catalog_number} unbekannt {numerus_currens}"
-
-        publisher_addition = self.period
-        if self.plate_number:
-            publisher_addition = self.plate_number
-
-        publisher_string = _('<< publisher >>')
-        if self.publications.first() and self.publications.first().publisher:
-            publisher_string = self.publications.first().publisher.get_designator()
-
-        prefix = f"{publisher_string} {publisher_addition}"
-
-        return self.render_title(prefix)
-
     def extract_gnd_id(string):
         ID_PATTERN = '[0-9]\w{4,}-?\w? *]'
         id_pattern = compile(ID_PATTERN)
@@ -94,6 +76,13 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 replace('(', '').\
                 replace(')', '').\
                 strip()
+
+    def get_numeric_signature_part(self):
+        numeric_pattern = compile('[0-9]{3,}')
+        match = numeric_pattern.search(self.get_current_signature_normalized())
+        if match:
+            return match.group()
+        return None
 
     def get_copy(self):
         period = None
@@ -135,7 +124,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             piano_reduction = self.piano_reduction,
             particell = self.particell,
             score = self.score,
-            parts = self.parts,
+            part = self.part,
             print_extent = self.print_extent,
             private_head_comment = self.private_head_comment,
             private_relations_comment = self.private_relations_comment,
@@ -171,10 +160,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         )
                 pps_copy = PersonProvenanceStation.objects.create(
                         item = single_item_copy,
-                        owner = pps.owner,
                         period = period
                     )
+                pps_copy.owner.set(pps.owner.all())
                 pps_copy.bib.set(pps.bib.all())
+                pps_copy.save()
 
             for cps in self.get_single_item().corporation_provenance_stations.all():
                 period = None
@@ -191,6 +181,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         period = period
                     )
                 cps_copy.bib.set(cps.bib.all())
+                cps_copy.save()
 
             for modification in self.get_single_item().modifications.all():
                 if modification.period:
@@ -260,13 +251,14 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     assumed = person_dedication.period.assumed,
                     inferred = person_dedication.period.inferred
                     )
-            ManifestationPersonDedication.objects.create(
+            mpd_copy = ManifestationPersonDedication.objects.create(
                     manifestation = copy,
                     period = period,
                     diplomatic_dedication = person_dedication.diplomatic_dedication,
-                    place = person_dedication.place,
-                    dedicatee = person_dedication.dedicatee
+                    place = person_dedication.place
                 )
+            mpd_copy.dedicatee.set(person_dedication.dedicatee.all())
+            mpd_copy.save()
 
         for corporation_dedication in self.manifestation_corporation_dedications.all():
             period = Period.objects.create(
@@ -283,6 +275,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     place = corporation_dedication.place,
                     dedicatee = corporation_dedication.dedicatee
                 )
+
+        copy.save()
 
         return copy
 
@@ -842,6 +836,37 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     item = single_item,
                     url = raw_data[DIGITAL_COPY_KEY]
                 )
+
+    def render_title(self, prefix):
+        if self.is_singleton:
+            return super().render_title(prefix)
+
+        #if self.missing_item:
+            #return f"{catalog_number} unbekannt {numerus_currens}"
+
+        publisher_addition = self.period
+        if self.plate_number:
+            publisher_addition = self.plate_number
+
+        publisher_string = _('<< publisher >>')
+        if self.publications.first() and self.publications.first().publisher:
+            publisher_string = self.publications.first().publisher.get_designator()
+
+        prefix = f"{publisher_string} {publisher_addition}"
+
+        return super().render_title(prefix)
+
+    def __str__(self):
+        if self.get_current_signature_normalized():
+            candidates = SearchQuerySet().models(Manifestation).filter(SQ(signature_normalized=self.get_current_signature_normalized()))
+            for other in candidates:
+                if other.pk != str(self.pk) and other.object.standardized_search_entry() == self.standardized_search_entry():
+                    return f'{self.pk} {self.standardized_search_entry()}'
+
+        return self.standardized_search_entry()
+
+
+
 
 
 class ManifestationTitle(DmRismManifestationTitle):

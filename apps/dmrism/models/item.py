@@ -1,15 +1,26 @@
 from .base import *
+from dmrism.models.base import BaseBib
 from django.core.exceptions import ValidationError, FieldError
 from django.db import models
 from django.db import transaction
 from django.db.models import Q, UniqueConstraint, F
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-
 from liszt_util.models import Sortable
 
 
 class Item(Sortable, WemiBaseClass):
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=['manifestation'],
+                condition=models.Q(is_template=True),
+                name='unique_template_item_per_manifestation'
+            )
+        ]
+        ordering = ['manifestation', 'order_index']
+        unique_together = ('manifestation', 'order_index')
+
     rism_id = models.CharField(
             max_length=20,
             null = True,
@@ -57,8 +68,20 @@ class Item(Sortable, WemiBaseClass):
             null = True,
             verbose_name = _('taken information')
         )
+    is_lyrics = models.BooleanField(
+            default = False,
+            verbose_name = _('is lyrics')
+        )
+    is_program = models.BooleanField(
+            default = False,
+            verbose_name = _('is program')
+        )
+    is_explanation = models.BooleanField(
+            default = False,
+            verbose_name = _('is explanation')
+        )
 
-    _group_field_name = 'manifestation'
+    _group_field_names = ['manifestation']
 
     def get_copy(self, manifestation):
         copy = Item.objects.create(
@@ -93,8 +116,6 @@ class Item(Sortable, WemiBaseClass):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings)
 
     def __str__(self):
-        #title = self.get_pref_title() or '<ohne Titel>'
-        #return f'{self.rism_id}: {title}'
         if self.manifestation.is_singleton:
             return self.manifestation.__str__()
         return self.get_current_signature()
@@ -124,7 +145,7 @@ class Item(Sortable, WemiBaseClass):
     def move_to_manifestation(self, target_manifestation):
         if self.manifestation == target_manifestation:
             return self.manifestation
-        
+
         if target_manifestation.is_singleton and target_manifestation.items.exists():
             raise ValidationError("Ziel-Manifestation ist ein Singleton und hat bereits ein Item.")
 
@@ -152,7 +173,7 @@ class Item(Sortable, WemiBaseClass):
 
             # Sicherheitshalber das item nochmal aus der DB laden
             self.refresh_from_db()
-            
+
         return old_manifestation
 
     def save(self, *args, **kwargs):
@@ -168,10 +189,11 @@ class Item(Sortable, WemiBaseClass):
         # Wir prüfen auf pk is None (neues Objekt) 
         # UND (Index ist None ODER Index ist der Default 0)
         if self.pk is None and (self.order_index is None or self.order_index == 0):
-            max_index = Item.objects.filter(
-                manifestation=self.manifestation
-            ).aggregate(models.Max('order_index'))['order_index__max']
-            
+            max_index = Item.objects\
+                    .filter(manifestation=self.manifestation)\
+                    .aggregate(models.Max('order_index'))\
+                    ['order_index__max']
+
             # Wenn bereits Items existieren, nimm max + 1, sonst bleib bei 0
             if max_index is not None:
                 self.order_index = max_index + 1
@@ -181,19 +203,11 @@ class Item(Sortable, WemiBaseClass):
         # 3. Vererbungskette aufrufen (Sortable -> Models -> DB)
         super().save(*args, **kwargs)
 
-    class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=['manifestation'],
-                condition=models.Q(is_template=True),
-                name='unique_template_item_per_manifestation'
-            )
-        ]
-        ordering = ['manifestation', 'order_index']
-        unique_together = ('manifestation', 'order_index')
-
 
 class Library(models.Model):
+    class Meta:
+        ordering = ['siglum', 'name']
+
     name = models.CharField(
             unique=True,
             max_length=100,
@@ -213,7 +227,13 @@ class Library(models.Model):
         return reverse('edwoca:library_update', kwargs = {'pk' : self.id})
 
     def __str__(self):
-        return f"{self.siglum} {self.name}"
+        if self.siglum:
+            if self.name:
+                return f"{self.siglum} {self.name}"
+            return self.siglum
+        if self.name:
+            return self.name
+        return ''
 
 
 class BaseSignature(models.Model):
@@ -234,9 +254,9 @@ class BaseSignature(models.Model):
         )
     signature = models.CharField(
             max_length=20,
-            null = True,
             blank = True,
-            verbose_name = _('signature')
+            verbose_name = _('signature'),
+            default = ''
         )
     status = models.CharField(
             max_length=1,
@@ -246,10 +266,15 @@ class BaseSignature(models.Model):
         )
 
     def __str__(self):
+        without_signature = _('without signature')
+
         if self.library:
-            return f"{self.library.siglum} {self.signature}"
+            if self.library.siglum:
+                return f'{self.library.siglum} {self.signature or without_signature}'
+            return f'[{self.library.name}] {self.signature or without_signature}'
         else:
-            return f"<<Institution>> {self.signature}"
+            institution = _('<< institution >>')
+            return f'{institution} {self.signature or without_signature}'
 
 
 class ItemSignature(BaseSignature):
@@ -291,29 +316,30 @@ class ItemContributor(BaseContributor):
     )
 
 
-class ProvenanceStationRenderMixin:
-    def __str__(self):
-        if not self.owner:
-            return str(_('<< new provenance station >>'))
-        period_string = self.period or 'ohne Zeitraum'
-        return f'{str(self.owner)} ({str(period_string)})'
+class BaseProvenanceStation(models.Model):
+    class Meta:
+        abstract = True
 
+    class PeriodStatus(models.TextChoices):
+        ACQUISITION = 'acq', _('acquisition')
+        DISPOSITION = 'dis', _('disposition')
+        OWNERSHIP_PERIOD = 'per', _('ownership period')
+        OWNERSHIP_DATE = 'dat', _('ownership date')
 
-class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
+class PersonProvenanceStation(models.Model):
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE,
             related_name = 'person_provenance_stations'
         )
-    owner = models.ForeignKey(
+    owner = models.ManyToManyField(
             'dmad.Person',
-            on_delete = models.CASCADE,
-            related_name = 'provenance_stations',
-            null = True
+            related_name = 'provenance_stations'
         )
     bib = models.ManyToManyField(
             'bib.ZotItem',
-            related_name = 'person_provenance_stations'
+            related_name = 'person_provenance_stations',
+            through = 'PersonProvenanceStationBib'
         )
     period = models.ForeignKey(
             'dmad.Period',
@@ -322,9 +348,25 @@ class PersonProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             null = True,
             related_name = 'person_provenance_stations'
         )
+    period_status = models.CharField(
+            max_length = 3,
+            choices = BaseProvenanceStation.PeriodStatus,
+            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP_PERIOD,
+            verbose_name = _('period status')
+        )
+
+    def __str__(self):
+        if len(self.owner.all()) > 1:
+            owner_string = str(self.owner.first()) + ' et al.'
+        elif len(self.owner.all()) == 1:
+            owner_string = str(self.owner.first())
+        else:
+            return str(_('<< new provenance station >>'))
+        period_string = self.period or 'ohne Zeitraum'
+        return f'{str(owner_string)} ({str(period_string)})'
 
 
-class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
+class CorporationProvenanceStation(models.Model):
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE,
@@ -338,7 +380,8 @@ class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
         )
     bib = models.ManyToManyField(
             'bib.ZotItem',
-            related_name = 'corporation_provenance_stations'
+            related_name = 'corporation_provenance_stations',
+            through = 'CorporationProvenanceStationBib'
         )
     period = models.ForeignKey(
             'dmad.Period',
@@ -347,6 +390,34 @@ class CorporationProvenanceStation(ProvenanceStationRenderMixin, models.Model):
             null = True,
             related_name = 'corporation_provenance_stations'
             )
+    period_status = models.CharField(
+            max_length = 3,
+            choices = BaseProvenanceStation.PeriodStatus,
+            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP_PERIOD,
+            verbose_name = _('period status')
+        )
+
+    def __str__(self):
+        if not self.owner:
+            return str(_('<< new provenance station >>'))
+        period_string = self.period or 'ohne Zeitraum'
+        return f'{str(self.owner)} ({str(period_string)})'
+
+
+class PersonProvenanceStationBib(BaseBib):
+    person_provenance_station = models.ForeignKey(
+            'PersonProvenanceStation',
+            on_delete = models.CASCADE,
+            related_name = 'bib_set'
+        )
+
+
+class CorporationProvenanceStationBib(BaseBib):
+    corporation_provenance_station = models.ForeignKey(
+            'CorporationProvenanceStation',
+            on_delete = models.CASCADE,
+            related_name = 'bib_set'
+        )
 
 
 class BaseDigitalCopy(models.Model):
@@ -404,4 +475,34 @@ class ItemCorporationDedication(BaseCorporationDedication):
     item = models.ForeignKey(
             'Item',
             on_delete = models.CASCADE
+        )
+
+
+class BaseProvenanceStationWebReference(models.Model):
+    class Meta:
+        abstract = True
+
+    url = models.URLField(
+            verbose_name = _('URL')
+        )
+    comment = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('web reference comment')
+        )
+
+
+class PersonProvenanceStationWebReference(BaseProvenanceStationWebReference):
+    person_provenance_station = models.ForeignKey(
+            'PersonProvenanceStation',
+            on_delete = models.CASCADE,
+            related_name = 'web_references'
+        )
+
+
+class CorporationProvenanceStationWebReference(BaseProvenanceStationWebReference):
+    corporation_provenance_station = models.ForeignKey(
+            'CorporationProvenanceStation',
+            on_delete = models.CASCADE,
+            related_name = 'web_references'
         )

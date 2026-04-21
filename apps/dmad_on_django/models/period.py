@@ -53,7 +53,7 @@ class Period(models.Model):
         self.initialize_patterns()
 
         ASSUMED_TOKEN = '[?]'
-        display_value = self.display
+        display_value = self.display or ''
         INFERRED_TOKEN = ']'
 
         if ASSUMED_TOKEN in display_value:
@@ -84,33 +84,60 @@ class Period(models.Model):
                     dates[1] = dates[0][:2] + dates[1]
         elif '-' in display_value:
             dates = [ date.strip() for date in display_value.split('-') ]
+            if len(dates[1]) == 2:
+                dates[1] = dates[0][:2] + dates[1]
         elif str(_('and')) in display_value:
             dates = [ date.strip() for date in display_value.split(str(_('and'))) ]
         else:
             dates = [ display_value ]
 
-        self.not_before = self._parse_date(dates[0], 'lower')
-        if len(dates) == 2:
+        before_string = _('before')
+        after_string = _('after')
+
+        if str(before_string) in dates[0]:
+            self.not_before = self.earliest
+            self.not_after = self._parse_date(dates[0].replace(str(before_string), ''), 'upper')
+        elif str(after_string) in dates[0]:
+            self.not_before = self._parse_date(dates[0].replace(str(after_string), ''), 'lower')
+            self.not_after = self.latest
+        elif len(dates) == 2:
+            self.not_before = self._parse_date(dates[0], 'lower')
             self.not_after = self._parse_date(dates[1], 'upper')
         else:
+            self.not_before = self._parse_date(dates[0], 'lower')
             self.not_after = self._parse_date(dates[0], 'upper')
 
     def initialize_patterns(self):
         prefix_pipe_string = '|'.join(str(_(prefix)) for prefix in PERIOD_CODES)
         month_pipe_string = '|'.join(str(_(month)) for month in MONTHS)
+        decade_suffix = _('ies')
+        century_suffix = _('century')
 
         self.month_pattern = re.compile(rf'^({prefix_pipe_string})\s+({month_pipe_string})\s+(\d{{4}})$', re.IGNORECASE)
         self.year_pattern = re.compile(rf'^({prefix_pipe_string})\s+(\d{{4}})(/\d{{2}})?$', re.IGNORECASE)
-        decade_suffix = _('ies')
         self.decade_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{3}}0){decade_suffix}$', re.IGNORECASE)
+        self.century_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{2}}).?\s*{century_suffix}.?$', re.IGNORECASE)
+
+        self.earliest = date(
+                settings.EDWOCA_FIXED_DATES['birth']['year'],
+                settings.EDWOCA_FIXED_DATES['birth']['month'],
+                settings.EDWOCA_FIXED_DATES['birth']['day'],
+            )
+        self.latest = date(
+                settings.EDWOCA_FIXED_DATES['death']['year'],
+                settings.EDWOCA_FIXED_DATES['death']['month'],
+                settings.EDWOCA_FIXED_DATES['death']['day'],
+            )
+
+        self.without_date_strings = [ _('without date'), _('without year') ]
 
     def _parse_date(self, date_string, bound):
 
-        match = re.search(r"[\d?]{4}", date_string)
-        if match:
-            year = int(match.group())
-        else:
-            raise ValueError(f'No year found in {date_string}')
+        for without_date_string in self.without_date_strings:
+            if str(without_date_string) in date_string:
+                if bound == 'upper':
+                    return self.latest
+                return self.earliest
 
         month_match = self.month_pattern.match(date_string)
 
@@ -140,6 +167,8 @@ class Period(models.Model):
                 day = PERIOD_CODES[prefix]['year']['upper']['day']
                 month = PERIOD_CODES[prefix]['year']['upper']['month']
                 year = year + PERIOD_CODES[prefix]['year']['upper']['year']
+                if day > monthrange(year, month)[1]:
+                    day = monthrange(year, month)[1]
             return date(year, month, day)
 
         decade_match = self.decade_pattern.match(date_string)
@@ -167,8 +196,39 @@ class Period(models.Model):
                     year = year + 9
             return date(year, month, day)
 
-        date_parts = date_string.split('.')
-        #day = self._parse_date_part(date_parts, bound, 'day')
+        century_match = self.century_pattern.match(date_string)
+
+        if century_match:
+            year -= 100
+            if century_match.group(1):
+                prefix = resolve_period(century_match.group(1))
+                if bound=='lower':
+                    day = PERIOD_CODES[prefix]['century']['lower']['day']
+                    month = PERIOD_CODES[prefix]['century']['lower']['month']
+                    year = year + PERIOD_CODES[prefix]['century']['lower']['year']
+                else:
+                    day = PERIOD_CODES[prefix]['century']['upper']['day']
+                    month = PERIOD_CODES[prefix]['century']['upper']['month']
+                    year = year + PERIOD_CODES[prefix]['century']['upper']['year']
+            else:
+                if bound=='lower':
+                    day = 1
+                    month = 1
+                    year = year
+                else:
+                    day = 31
+                    month = 12
+                    year = year + 9
+
+            exact_date = date(year, month, day)
+            if exact_date < self.earliest:
+                return self.earliest
+            if exact_date > self.latest:
+                return self.latest
+
+            return date(year, month, day)
+
+        date_parts = [s.strip() for s in date_string.split('.')]
         if len(date_parts) == 3:
             day = self._parse_date_part(date_parts[0], bound, 'day')
             month = self._parse_date_part(date_parts[1], bound, 'month')

@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
 import requests
 
@@ -91,9 +92,11 @@ class Person(DisplayableModel):
 
     professions = models.ManyToManyField(SubjectTerm)
 
+    def get_search_placeholder():
+        return _('search persons')
+
     def get_absolute_url(self):
         return reverse('dmad_on_django:person_update', kwargs={'pk': self.id})
-
 
     def get_description(self):
         birth_date = self.birth_date.strftime('%d.%m.%Y') if self.birth_date else 'o.D.'

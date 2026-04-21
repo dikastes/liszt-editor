@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from dmad_on_django.models import Period
 from dmrism.models.item import *
-from dominate.tags import div, label, span, form, input_
+from dominate.tags import div, label, span, form, input_, h3
 from dominate.util import raw
 from django import forms
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, SelectDateWidget, CharField, BooleanField
@@ -57,6 +57,11 @@ class SignatureForm(GenericAsDaisyMixin, ModelForm):
                     }),
                 'id': HiddenInput()
             }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        lib_field = self.fields['library']
+        lib_field.label = f'{lib_field.label}*'
 
     def as_daisy(self):
         form_wrapper = div(cls='mb-10')
@@ -170,7 +175,14 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
@@ -180,12 +192,30 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
             'not_after',
             'display',
             'inferred',
-            'assumed'
+            'assumed',
+            'period_status'
         ]
+        widgets = {
+                'period_status': Select( attrs = {
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
+                    })
+            }
 
     def as_daisy(self):
         form = div(cls='mb-10')
         date_div = self.get_date_div()
+        period_status_field = self['period_status']
+
+        for hidden in self.hidden_fields():
+            hidden.field.widget.attrs['form'] = 'form'
+            form.add(raw(str(hidden)))
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(period_status_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(period_status_field))
 
         form.add(date_div)
 
@@ -203,7 +233,14 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:
@@ -213,12 +250,30 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
             'not_after',
             'display',
             'inferred',
-            'assumed'
+            'assumed',
+            'period_status'
         ]
+        widgets = {
+                'period_status': Select( attrs = {
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
+                    })
+            }
 
     def as_daisy(self):
         form = div(cls='mb-10')
         date_div = self.get_date_div()
+        period_status_field = self['period_status']
+
+        for hidden in self.hidden_fields():
+            hidden.field.widget.attrs['form'] = 'form'
+            form.add(raw(str(hidden)))
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(period_status_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(period_status_field))
 
         form.add(date_div)
 
@@ -329,6 +384,47 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
 
         return mark_safe(str(form))
 
+        with form:
+            # upper palette with source type and manifestaion form
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(source_type_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(manifestation_form_field))
+            # lower palette with toggles
+            h1(_('function'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(album_page_field))
+                span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(performance_material_field))
+                span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
+            if self.instance.is_singleton:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(correction_sheet_field))
+                    span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(stitch_template_field))
+                    span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(dedication_item_field))
+                    span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
+            else:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(authorized_edition_field))
+                    span(authorized_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(first_edition_field))
+                    span(first_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(proof_field))
+                    span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(further_edition_field))
+                    span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
     def comment_as_daisy(self):
         private_manuscript_comment_field = self['private_manuscript_comment']
         form = div()
@@ -353,3 +449,132 @@ ItemHandwritingFormSet = inlineformset_factory(
         extra = 0,
         can_delete = True
     )
+
+
+class BaseProvenanceStationWebReferenceForm(ModelForm):
+    class Meta:
+        fields = [ 'url', 'comment' ]
+        widgets = {
+                'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}),
+                'comment': Textarea(attrs={'class': SimpleFormMixin.text_area_classes, 'form': 'form'})
+            }
+
+    def as_daisy(self):
+        form = div()
+
+        url_field = self['url']
+        comment_field = self['comment']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(url_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(url_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(comment_field))
+
+        return mark_safe(str(form))
+
+
+class PersonProvenanceStationWebReferenceForm(BaseProvenanceStationWebReferenceForm):
+    class Meta:
+        model = PersonProvenanceStationWebReference
+        fields = BaseProvenanceStationWebReferenceForm.Meta.fields
+        widgets = BaseProvenanceStationWebReferenceForm.Meta.widgets
+
+
+class CorporationProvenanceStationWebReferenceForm(BaseProvenanceStationWebReferenceForm):
+    class Meta:
+        model = CorporationProvenanceStationWebReference
+        fields = BaseProvenanceStationWebReferenceForm.Meta.fields
+        widgets = BaseProvenanceStationWebReferenceForm.Meta.widgets
+
+
+class PersonProvenanceStationBibForm(BaseBibForm):
+    class Meta:
+        model = PersonProvenanceStationBib
+        fields = BaseBibForm.Meta.fields
+        widgets = BaseBibForm.Meta.widgets
+
+
+class CorporationProvenanceStationBibForm(BaseBibForm):
+    class Meta:
+        model = CorporationProvenanceStationBib
+        fields = BaseBibForm.Meta.fields
+        widgets = BaseBibForm.Meta.widgets
+
+
+PersonProvenanceFormSet = inlineformset_factory(
+    parent_model=Item,
+    model=PersonProvenanceStation,
+    form=PersonProvenanceStationForm,
+    extra=0,
+    can_delete=False
+)
+
+PersonProvenanceBibFormSet = inlineformset_factory(
+    parent_model=PersonProvenanceStation,
+    model=PersonProvenanceStationBib,
+    form=PersonProvenanceStationBibForm,
+    extra=0,
+    can_delete=False
+)
+
+CorporationProvenanceFormSet = inlineformset_factory(
+    parent_model=Item,
+    model=CorporationProvenanceStation,
+    form=CorporationProvenanceStationForm,
+    extra=0,
+    can_delete=False
+)
+
+CorporationProvenanceBibFormSet = inlineformset_factory(
+    parent_model=CorporationProvenanceStation,
+    model=CorporationProvenanceStationBib,
+    form=CorporationProvenanceStationBibForm,
+    extra=0,
+    can_delete=False
+)
+
+
+class ItemTextTypeForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Item
+        fields = ['is_lyrics', 'is_program', 'is_explanation']
+        widgets = {
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        lyrics_field = self['is_lyrics']
+        program_field = self['is_program']
+        explanation_field = self['is_explanation']
+
+        form = div()
+
+        with form:
+            h3(_('text type'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(lyrics_field))
+                span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(program_field))
+                span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(explanation_field))
+                span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))

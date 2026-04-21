@@ -55,11 +55,14 @@
         </a>
     </li>
     <li>
+        {% comment %}
         <a href="{% url 'edwoca:composite_search' %}"
             class="flex {% if list_entity_type == 'composite' %}active{% endif %}"
             >
+        {% endcomment %}
+        <a href="#">
             <span class="flex-1">
-                {% translate 'composites' %}
+                🚧 {% translate 'composites' %} 🚧
             </span>
             <span class="flex-0 ml-5"> {{ composite_count }} </span>
         </a>

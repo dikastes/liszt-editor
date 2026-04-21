@@ -1,0 +1,12 @@
+{% comment %}
+Usage:
+{% include "partials/formset_management.html" with formset=entry.bib_formset form_id="form" %}
+{% endcomment %}
+
+{% for hidden in formset.management_form %}
+    <input type="hidden"
+           name="{{ formset.prefix }}-{{ hidden.name }}"
+           id="id_{{ formset.prefix }}-{{ hidden.name }}"
+           value="{{ hidden.value|default_if_none:'' }}"
+           {% if form_id %}form="{{ form_id }}"{% endif %}>
+{% endfor %}

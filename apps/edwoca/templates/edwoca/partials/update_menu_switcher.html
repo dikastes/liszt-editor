@@ -1,13 +1,15 @@
-{% if entity_type == 'expression' %}
-    {% include 'edwoca/partials/expression/expression_menu.html' %}
-{% elif entity_type == 'work' %}
-    {% include 'edwoca/partials/work/work_menu.html' %}
-{% elif entity_type == 'manifestation' %}
-    {% include 'edwoca/partials/manifestation/manifestation_menu.html' %}
-{% elif entity_type == 'item' %}
-    {% include 'edwoca/partials/item/item_menu.html' %}
-{% elif entity_type == 'library' %}
-    {% include 'edwoca/partials/library/library_menu.html' %}
-{% elif entity_type == 'letter' %}
-    {% include 'edwoca/partials/letter/letter_menu.html' %}
-{% endif %}
+<div class="update-menu">
+    {% if entity_type == 'expression' %}
+        {% include 'edwoca/partials/expression/expression_menu.html' %}
+    {% elif entity_type == 'work' %}
+        {% include 'edwoca/partials/work/work_menu.html' %}
+    {% elif entity_type == 'manifestation' %}
+        {% include 'edwoca/partials/manifestation/manifestation_menu.html' %}
+    {% elif entity_type == 'item' %}
+        {% include 'edwoca/partials/item/item_menu.html' %}
+    {% elif entity_type == 'library' %}
+        {% include 'edwoca/partials/library/library_menu.html' %}
+    {% elif entity_type == 'letter' %}
+        {% include 'edwoca/partials/letter/letter_menu.html' %}
+    {% endif %}
+</div>

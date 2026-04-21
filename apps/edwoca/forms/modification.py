@@ -2,6 +2,7 @@ from .base import *
 from django import forms
 from django.conf import settings
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField
+from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period
 from ..models.base import ItemModification
 from ..models.base import ModificationHandwriting
@@ -19,8 +20,16 @@ class ItemModificationForm(DateFormMixin, ModelForm):
     }
     not_before = DateTimeField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = DateTimeField(widget=SelectDateWidget(**kwargs), required=False)
-    display = CharField(required=False, widget=TextInput(attrs={'class': 'grow flex-1', 'form': 'form'}))
-    inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    #display = CharField(required=False, widget=TextInput(attrs={'class': 'grow flex-1', 'form': 'form'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     class Meta:

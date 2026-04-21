@@ -1,11 +1,18 @@
+{% load i18n %}
+
 <p class="m-0">
 	<em> Kopf: </em>
 	{% for item in object.items.all %}
 		{{ item }}
 	{% empty %}
-		<span class="badge badge-primary">!</span> keine Exemplare
+		<span class="badge badge-primary">!</span>
+		{% translate 'no items' %}
 	{% endfor %}
 	{{ object.rism_id|default:'' }}
+	{% if not object.is_collection and not object.working_title %}
+		<span class="badge badge-primary">!</span>
+		{% translate 'no working title' %}
+	{% endif %}
 </p>
 {% if object.private_head_comment %}
 	<p class="m-0 truncate">

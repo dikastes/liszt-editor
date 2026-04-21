@@ -1,4 +1,6 @@
+{% load i18n %}
 {% load static message_utils %}
+
 <div id="messages-container">
     {% for message in messages %}
         {% get_message_colors message.tags as colors %}
@@ -12,7 +14,6 @@
 </div>
 {% for item in object.items.all %}
     <div class="flex gap-3 items-center mb-2">
-        
         <div class="flex flex-0 gap-1"> 
             {% url 'edwoca:item_swap_order' pk=item.id direction='up' as swap_up_url %}
             <form hx-post="{{ swap_up_url }}" 
@@ -20,45 +21,53 @@
                   hx-swap="innerHTML" 
                   class="flex-0">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="Nach oben verschieben">
-                    ↑ Auf
+                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move up' %}">
+                    ↑
+                    {% translate 'up' %}
                 </button>
             </form>
-            
+
             {% url 'edwoca:item_swap_order' pk=item.id direction='down' as swap_down_url %}
             <form hx-post="{{ swap_down_url }}" 
                   hx-target="#item-list-container" 
                   hx-swap="innerHTML" 
                   class="flex-0">
                 {% csrf_token %}
-                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="Nach unten verschieben">
-                    ↓ Ab
+                <button type="submit" class="btn btn-xs text-gray-500 hover:bg-gray-200 p-1" title="{% translate 'move down' %}">
+                    ↓
+                    {% translate 'down' %}
                 </button>
             </form>
         </div>
-        
+
         <p class="flex-1 m-0">
             <a href="{% url 'edwoca:item_update' item.id %}" class="font-semibold">
                 {{ item }}
                 {% if item.is_template %}
-                    <span class="badge badge-primary badge-sm ml-2">Vorlage</span>
+                    <span class="badge badge-primary badge-sm ml-2">
+                        {% translate 'template' %}
+                    </span>
                 {% endif %}
             </a>
         </p>
-        
+
         {% if not item.is_template %}
-            <a href="{% url 'edwoca:item_set_template' item.id %}" class="btn btn-sm flex-0 ml-2"> Vorlage </a>
+            <a href="{% url 'edwoca:item_set_template' item.id %}" class="btn btn-sm flex-0 ml-2">
+                {% translate 'template' %}
+            </a>
         {% endif %}
         <form action="{% url 'edwoca:manifestation_item_delete' item.id %}" method="post" class="flex-0 ml-2">
             {% csrf_token %}
             <input type="submit" class="btn btn-sm btn-error" value="löschen"/>
         </form>
         <button class="btn btn-sm btn-outline ml-2"
-        hx-get="{% url 'edwoca:item_move_modal' item.id %}"
-        hx-target="#modal-container">
-        Verschieben
+            hx-get="{% url 'edwoca:item_move_modal' item.id %}"
+            hx-target="#modal-container">
+            {% translate 'move' %}
         </button>
     </div>
 {% empty %}
-    <p> keine Exemplare </p>
+    <p>
+        {% translate 'no items' %}
+    </p>
 {% endfor %}

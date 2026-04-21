@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="{% static 'liszt_util/tailwind.dist.css' %}" crossorigin="anonymous" />
         <link rel="stylesheet" href="{% static 'liszt_util/sumoselect.css' %}" crossorigin="anonymous" />
         <link rel="icon" href="{% static 'favicon.ico' %}" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"
     </head>
 
     {% block modals %}
@@ -21,7 +22,7 @@
             <div class="flex-none min-h-inherit">
                 {% render_main_navbar_link %}
             </div>
-            <div class="flex-1 text-lg py-5">
+            <div class="flex-1 text-lg xl:py-5">
             </div>
             <div class="flex-none gap-2 min-h-inherit">
                 {% block navbar_extras %}
@@ -32,15 +33,15 @@
         {% block navbar_title %}
         {% endblock %}
         <div class="flex gap-10 flex-1 my-5 overflow-hidden">
-            <div class="flex-0 px-10">
+            <div class="flex-0 pl-10 xl:px-10">
                 {% block menu %}
                 {% endblock %}
             </div>
-            <div class="flex-1 min-w-0 overflow-auto max-w-5xl mx-auto px-20">
+            <div class="flex-1 min-w-0 overflow-auto max-w-5xl mx-auto px-5 xl:px-20">
                 {% block content %}
                 {% endblock %}
             </div>
-            <div class="flex-0 px-10">
+            <div class="flex-0 pr-10 xl:px-10">
                 {% block nav %}
                 {% endblock %}
             </div>
