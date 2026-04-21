@@ -1,0 +1,35 @@
+{% extends 'liszt_util/base.html' %}
+
+{% load i18n %}
+{% load static %}
+
+{% block content %}
+
+<div class="bg-white p-5 w-full overflow-auto">
+    <div class="prose">
+        {% include 'dmad_on_django/partials/search_results.html' %}
+    </div>
+</div>
+
+{% endblock %}
+
+{% block nav %}
+<div class="flex-none prose" id="sidebar">
+    {% if rework_count > 0 or stub_count > 0 %}
+    {% include 'dmad_on_django/partials/facets.html' %}
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{%block menu%}
+    {%include 'dmad_on_django/partials/navbar.html'%}
+{%endblock%}
+
+
+{% block navbar_extras %}
+    <div class="flex gap-10 items-center items-stretch">
+        {% include 'dmad_on_django/partials/search_form.html' with action_url=search_url hx_get=search_url %}
+        {% include 'dmad_on_django/partials/create_button.html' %}
+    </div>
+{% endblock %}

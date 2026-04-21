@@ -87,16 +87,18 @@ def item_swap_view(request, pk, direction):
     success = swap_order(item, direction)
     if not success:
         messages.error(request, "Element steht am Anfang oder Ende der Liste")
-        
+
     manifestation = item.manifestation
 
     context = {'object': manifestation}
-    
+
     return render(
         request,
         'edwoca/partials/manifestation/item_list.html',
         context
     )
+
+
 @require_POST
 def item_move_view(request, item_pk):
     item = get_object_or_404(Item, pk=item_pk)
@@ -109,7 +111,7 @@ def item_move_view(request, item_pk):
 
     # Verschieben ausführen
     old_manifestation = item.move_to_manifestation(target_manifestation)
-    
+
     # Erfolgsmeldung für den Verschiebevorgang
     messages.success(request, f'Exemplar wurde erfolgreich nach "{target_manifestation}" verschoben.')
 
@@ -528,8 +530,15 @@ def item_manuscript_update(request, pk):
     if request.method == 'POST':
         if 'save_changes' in request.POST:
             form = ItemManuscriptForm(request.POST, instance=item)
-            if form.is_valid():
+            text_type_form = ItemTextTypeForm(request.POST, instance=item)
+
+            if form.is_valid() and text_type_form.is_valid():
                 form.save()
+                text_type_form.save()
+            else:
+                context['form'] = form
+                context['text_type_form'] = text_type_form
+                return render(request, 'edwoca:item_manuscript.html', context)
 
             for modification in item.modifications.all():
                 prefix = f'modification_{modification.id}'
@@ -556,16 +565,17 @@ def item_manuscript_update(request, pk):
 
     else:
         form = ItemManuscriptForm(instance=item)
+        text_type_form = ItemTextTypeForm(instance=item)
         modifications = []
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
             modification_form = ItemModificationForm(instance=modification, prefix=prefix)
-            
+
             handwriting_forms = []
             for handwriting in modification.handwritings.all():
                 prefix = f'modification_handwriting_{handwriting.id}'
                 handwriting_forms.append(ModificationHandwritingForm(instance=handwriting, prefix=prefix))
-            
+
             modifications.append({
                 'form': modification_form,
                 'handwriting_forms': handwriting_forms
@@ -574,6 +584,7 @@ def item_manuscript_update(request, pk):
         context['modifications'] = modifications
 
     context['form'] = form
+    context['text_type_form'] = text_type_form
     search_form = SearchForm(request.GET or None)
     context['search_form'] = search_form
 

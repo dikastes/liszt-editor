@@ -1,15 +1,19 @@
 from django import forms
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.utils.translation import gettext_lazy as _
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.http import JsonResponse, HttpResponseRedirect
+from liszt_util.forms import FramedSearchForm
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm, Corporation
 from haystack.generic_views import SearchView
+from haystack.query import SearchQuerySet
 from json import dumps
 from dmad_on_django.forms import formWidgets, DmadCreateForm, DmadUpdateForm
 from liszt_util.tools import camel_to_snake_case, snake_to_camel_case
 from pylobid.pylobid import GNDNotFoundError
+
 
 def search_gnd(request, search_string, entity_type):
     response = getattr(dmad_models, snake_to_camel_case(entity_type)).search(search_string)
@@ -187,25 +191,124 @@ class PullView(UpdateView):
         return super().post(self, request, **kwargs)
 
 
-class DmadSearchView(NavbarContextMixin, SearchView):
-    def form_invalid(self, form):
+class ListContextMixin(NavbarContextMixin):
+    def get_model_name(self):
+        return camel_to_snake_case(self.get_model().__name__)
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+
+        context.update({
+            'active': camel_to_snake_case(self.model.__name__),
+            'type': self.kwargs.get('type'),
+            'search_url': reverse_lazy(f'dmad_on_django:{self.get_model_name()}_search')
+        })
+        if hasattr(self, 'sqs'):
+            context.update({
+                'rework_count': self.sqs.filter(rework_in_gnd=True).count(),
+                'stub_count': self.sqs.filter(is_stub=True).count(),
+            })
+        else:
+            context.update({
+                'rework_count': self.model.objects.filter(rework_in_gnd=True).count(),
+                'stub_count': self.model.objects.filter(gnd_id__isnull=True).count(),
+            })
+
+
+        return context
+
+
+class DmadListView(ListContextMixin, ListView):
+    template_name = 'dmad_on_django/list.html'
+    paginate_by = 10
+
+    def get_model(self):
+        return self.model
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        placeholder = self.model.get_search_placeholder()
+        context['form'] = FramedSearchForm(placeholder=placeholder)
+
+        return context
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        type_ = self.kwargs.get('type')
+        if type_ == 'rework':
+            qs = qs.filter(rework_in_gnd = True)
+        if type_ == 'stub':
+            qs = qs.filter(gnd_id__isnull = True)
+
+        return qs
+
+    def get(self, *args, **kwargs):
+        response = super().get(*args, **kwargs)
+
         if self.request.htmx:
             context = self.get_context_data()
-            context[self.form_name] = form
-            context['object_list'] = self.get_queryset()
-            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
-        return super().form_invalid(form)
+            return render(
+                    self.request,
+                    'dmad_on_django/partials/list_htmx.html',
+                    context
+                )
+        return response
+
+
+class DmadSearchView(ListContextMixin, NavbarContextMixin, SearchView):
+    template_name = 'dmad_on_django/list.html'
+    form_class = FramedSearchForm
+    paginate_by = 10
+    filter_type = None
+
+    def get(self, requet, *args, **kwargs):
+        query = self.request.GET.get('q', '')
+
+        self.filter_type = self.kwargs.get('type', None)
+
+        if not query or query == '':
+            if self.filter_type:
+                return redirect(
+                        f'dmad_on_django:{camel_to_snake_case(self.model.__name__)}_list',
+                        type=self.filter_type
+                    )
+            return redirect(
+                    f'dmad_on_django:{camel_to_snake_case(self.model.__name__)}_list'
+                )
+
+        return super().get(self.request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        context['object_list'] = [r.object for r in context['object_list']]
+
+        return context
 
     def form_valid(self, form):
+        self.sqs = form.search().models(self.model)
+
+        if self.filter_type == 'rework':
+            self.sqs = self.sqs.filter(rework_in_gnd = True)
+        if self.filter_type == 'stub':
+            self.sqs = self.sqs.filter(is_stub = True)
+
+        context = self.get_context_data(**{
+                self.form_name: form,
+                'query': form.cleaned_data.get(self.search_field),
+                'object_list': self.sqs
+            })
+
         if self.request.htmx:
-            self.queryset = form.search().models(self.model)
-            context = self.get_context_data(**{
-                    self.form_name: form,
-                    'query': form.cleaned_data.get(self.search_field),
-                    'object_list': self.queryset
-                })
-            return render(self.request, 'dmad_on_django/partials/search_results.html', context)
-        return super().form_valid(form)
+            return render(
+                    self.request,
+                    'dmad_on_django/partials/list_htmx.html',
+                    context
+                )
+
+        return self.render_to_response(context)
 
     def get_model(self):
         return self.model
