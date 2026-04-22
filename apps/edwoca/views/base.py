@@ -1,6 +1,8 @@
 from django.forms import inlineformset_factory
+from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, FormView, CreateView, DeleteView
 from django.db.models import Case, When
@@ -14,18 +16,18 @@ from ..models import Work, Expression, Manifestation, Item, Letter, LetterMentio
 from dmrism.models import Library
 from edwoca import forms as edwoca_forms
 from edwoca import models as edwoca_models
-
+from django.apps import apps
 
 def index(request):
     return redirect('edwoca:work_search')
 
 
 def htmx_search(request):
-    dedication_app = request.GET.get('dedication_app', 'dmrism')
-    dedicatee_app = request.GET.get('dedicatee_app', 'dmad')
-    dedication_model_name = request.GET.get('dedication_model')
-    dedicatee_model_name = request.GET.get('dedicatee_model')
-    dedication_model_id = request.GET.get('dedication_model_id')
+    app = request.GET.get('app', 'dmrism')
+    target_app = request.GET.get('target_app', 'dmad')
+    target_model_name = request.GET.get('target_model')
+    model_id = request.GET.get('model_id')
+    model_name = request.GET.get('model_name')
 
     manifestation_id = request.GET.get('manifestation_id')
     search_type = request.GET.get('search_type')
@@ -33,24 +35,24 @@ def htmx_search(request):
 
     search_form = SearchForm(request.GET)
 
+    #breakpoint()
     if search_form.is_valid():
-        model_name = request.GET.get('model')
 
         try:
-            model = apps.get_model(dedicatee_app, model_name)
+            model = apps.get_model(target_app, target_model_name)
         except LookupError:
             raise Http404
 
         results = search_form.search().models(model)[:10]
 
-        return render(request, 'edwoca/partials/manifestation/dedication_dedicatee_display.html', {
+        return render(request, 'edwoca/partials/htmx/display_results.html', {
             'results': results,
-            'dedication_app': dedication_app,
-            'dedicatee_app': dedicatee_app,
-            'dedication_model_name': dedication_model_name,
-            'dedicatee_model_name': dedicatee_model_name,
-            'dedication_model_id': dedication_model_id,
-            'manifestation_id': manifestation_id,
+            'app': app,
+            'target_app': target_app,
+            'model_name': model_name,
+            'target_model_name': target_model_name,
+            'model_id': model_id,
+            'target_id': manifestation_id,
             'search_type': search_type,
             'field_name': field_name,
             'no_result_msg': _('no search results') if not results else None
@@ -61,20 +63,20 @@ def htmx_search(request):
 
 def manifestation_dedication_htmx_update(request):
     # Alle Daten holen
-    dedication_app = request.POST.get('dedication_app')
-    dedication_model_name = request.POST.get('dedication_model')
-    dedicatee_app = request.POST.get('dedicatee_app', 'dmad')
-    dedicatee_model_name = request.POST.get('dedicatee_model')
-    dedication_model_id = request.POST.get('dedication_model_id')
-    dedicatee_model_id = request.POST.get('dedicatee_model_id')
+    app = request.POST.get('app')
+    model_name = request.POST.get('model_name')
+    target_app = request.POST.get('target_app', 'dmad')
+    target_model_name = request.POST.get('target_model')
+    model_id = request.POST.get('model_id')
+    target_model_id = request.POST.get('target_model_id')
     field_name = request.POST.get('field_name')
     label_htmx = request.POST.get('label', 'Selected')
 
     try:
-        dedicatee_model = apps.get_model(dedicatee_app, dedicatee_model_name)
-        dedication_model = apps.get_model(dedication_app, dedication_model_name)
+        target_model = apps.get_model(target_app, target_model_name)
+        model = apps.get_model(app, model_name)
 
-        if not dedication_model or not dedicatee_model:
+        if not model or not target_model:
             print("ERROR: One of the models returned None")
             raise Http404("Model existiert nicht")
 
@@ -82,16 +84,16 @@ def manifestation_dedication_htmx_update(request):
         print(f"ERROR in get_model: {e}")
         raise Http404(f"Model-Konfiguration fehlerhaft: {e}")
 
-    dedicatee = get_object_or_404(dedicatee_model, pk=dedicatee_model_id)
+    target = get_object_or_404(target_model, pk=target_model_id)
 
-    updated_count = dedication_model.objects.filter(pk=dedication_model_id).update(**{field_name: dedicatee})
+    updated_count = model.objects.filter(pk=model_id).update(**{field_name: target})
 
     if updated_count == 0:
-        print(f"ERROR: No instance found for ID {dedication_model_id}")
+        print(f"ERROR: No instance found for ID {model_id}")
         raise Http404("Instanz nicht gefunden")
 
-    return render(request, 'edwoca/partials/manifestation/dedication_selected_partial.html', {
-        'dedicatee': dedicatee,
+    return render(request, 'edwoca/partials/htmx/selected.html', {
+        'target': target,
         'label': label_htmx,
     })
 

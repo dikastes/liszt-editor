@@ -1,0 +1,14 @@
+{% load i18n %}
+<div class="flex items-center mb-5">
+    <label class="flex-1 items-center">
+        <div class="label">
+            <span class="label-text">{% translate label|default:'Selected' %}</span>
+        </div>
+        <div class="flex gap-5">
+            <input type="text" class="grow pseudo-input bg-white border border-black" disabled value="{{ target }}" />
+            <button class="btn btn-outline btn-primary" type="button" onclick="location.reload()">
+                {% translate 'Saved (Reload to edit)' %}
+            </button>
+        </div>
+    </label>
+</div>
