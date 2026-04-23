@@ -32,6 +32,7 @@ def htmx_search(request):
     manifestation_id = request.GET.get('manifestation_id')
     search_type = request.GET.get('search_type')
     field_name = request.GET.get('field_name')
+    multiplicity = request.GET.get('multiplicity')
 
     search_form = SearchForm(request.GET)
 
@@ -55,14 +56,14 @@ def htmx_search(request):
             'target_id': manifestation_id,
             'search_type': search_type,
             'field_name': field_name,
+            'multiplicity': multiplicity,
             'no_result_msg': _('no search results') if not results else None
         })
 
     raise Http404
 
 
-def manifestation_dedication_htmx_update(request):
-    # Alle Daten holen
+def htmx_update(request):
     app = request.POST.get('app')
     model_name = request.POST.get('model_name')
     target_app = request.POST.get('target_app', 'dmad')
@@ -71,30 +72,37 @@ def manifestation_dedication_htmx_update(request):
     target_model_id = request.POST.get('target_model_id')
     field_name = request.POST.get('field_name')
     label_htmx = request.POST.get('label', 'Selected')
+    multiplicity = request.POST.get('multiplicity', 'single') or 'single'
 
     try:
         target_model = apps.get_model(target_app, target_model_name)
         model = apps.get_model(app, model_name)
 
         if not model or not target_model:
-            print("ERROR: One of the models returned None")
-            raise Http404("Model existiert nicht")
+            raise Http404("Model does not exist")
 
     except Exception as e:
-        print(f"ERROR in get_model: {e}")
-        raise Http404(f"Model-Konfiguration fehlerhaft: {e}")
+        raise Http404(f"Defect model configuration: {e}")
 
+    entity = get_object_or_404(model, pk=model_id)
     target = get_object_or_404(target_model, pk=target_model_id)
 
-    updated_count = model.objects.filter(pk=model_id).update(**{field_name: target})
+    if multiplicity == 'single':
+        setattr(entity, field_name, target)
+        entity.save()
+    else:
+        qs = getattr(entity, field_name)
+        qs.add(target)
 
-    if updated_count == 0:
-        print(f"ERROR: No instance found for ID {model_id}")
-        raise Http404("Instanz nicht gefunden")
+    #updated_count = model.objects.filter(pk=model_id).update(**{field_name: target})
+
+    #if updated_count == 0:
+        #raise Http404("Instance not found")
 
     return render(request, 'edwoca/partials/htmx/selected.html', {
         'target': target,
         'label': label_htmx,
+        'multiplicity': multiplicity
     })
 
 

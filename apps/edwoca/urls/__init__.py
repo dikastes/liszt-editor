@@ -13,4 +13,6 @@ urlpatterns = [
     path('composites/', include('edwoca.urls.composite')),
     path('letters/', include('edwoca.urls.letter')),
     path('libraries/', include('edwoca.urls.library')),
+    path('htmx/search', views.htmx_search, name = 'htmx_search'),
+    path('htmx/update', views.htmx_update, name = 'htmx_update'),
 ]

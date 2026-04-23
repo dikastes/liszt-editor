@@ -4,21 +4,22 @@
     {% for result in results %}
         <li class="border-b last:border-0 hover:bg-base-200">
             <a class="block p-2 cursor-pointer"
-               hx-post="{% url 'edwoca:htmx_update' %}"
-               hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
-               hx-target="#search-container-{{ model_id }}-{{ field_name }}"
-               hx-swap="outerHTML"
-               hx-vals='{
-                   "app": "{{ app }}",
-                   "target_app": "{{ target_app|default:"dmad" }}",
-                   "model_name": "{{ model_name }}",
-                   "target_model": "{{ target_model_name }}",
-                   "model_id": "{{ model_id }}",
-                   "target_model_id": "{{ result.pk }}",
-                   "search_type": "{{ search_type }}",
-                   "field_name": "{{ field_name }}",
-                   "label": "{{ search_type }}"
-               }'>
+                hx-post="{% url 'edwoca:htmx_update' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-target="#search-container-{{ model_name }}-{{ model_id }}-{{ field_name }}"
+                hx-swap="outerHTML"
+                hx-vals='{
+                    "app": "{{ app }}",
+                    "target_app": "{{ target_app|default:"dmad" }}",
+                    "model_name": "{{ model_name }}",
+                    "target_model": "{{ target_model_name }}",
+                    "model_id": "{{ model_id }}",
+                    "target_model_id": "{{ result.pk }}",
+                    "search_type": "{{ search_type }}",
+                    "field_name": "{{ field_name }}",
+                    "label": "{{ search_type }}",
+                    "multiplicity": "{{ multiplicity }}"
+                }'>
                 {{ result.object }}
             </a>
         </li>
