@@ -36,7 +36,6 @@ def htmx_search(request):
 
     search_form = SearchForm(request.GET)
 
-    #breakpoint()
     if search_form.is_valid():
 
         try:

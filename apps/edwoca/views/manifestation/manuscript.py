@@ -33,9 +33,19 @@ def manifestation_manuscript_update(request, pk):
             return render(request, 'edwoca/manifestation_manuscript.html', context)
         context['form'] = form
 
-        if 'manifestation_handwriting-delete' in request.POST:
-            manifestation_handwriting = get_object_or_404(ItemHandwriting, pk = request.POST.get('manifestation_handwriting-delete'))
-            manifestation_handwriting.delete()
+        if 'remove-itemhandwriting-writer' in request.POST:
+            item_handwriting = get_object_or_404(ItemHandwriting, pk = request.POST.get('remove-itemhandwriting-writer'))
+            item_handwriting.writer = None
+            item_handwriting.save()
+
+        if 'remove-modificationhandwriting-writer' in request.POST:
+            modification_handwriting = get_object_or_404(ModificationHandwriting, pk = request.POST.get('remove-modificationhandwriting-writer'))
+            modification_handwriting.writer = None
+            modification_handwriting.save()
+
+        if 'itemhandwriting-delete' in request.POST:
+            item_handwriting = get_object_or_404(ItemHandwriting, pk = request.POST.get('manifestationhandwriting-delete'))
+            item_handwriting.delete()
 
         handwriting_forms = []
         for handwriting in item.handwritings.all():

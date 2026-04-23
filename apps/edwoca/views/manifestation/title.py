@@ -32,6 +32,11 @@ def manifestation_title_update(request, pk):
             title_handwriting = get_object_or_404(ManifestationTitleHandwriting, pk = request.POST.get('remove-manifestation-title-handwriting'))
             title_handwriting.delete()
 
+        if 'remove-manifestationtitlehandwriting-writer' in request.POST:
+            title_handwriting = get_object_or_404(ManifestationTitleHandwriting, pk = request.POST.get('remove-manifestationtitlehandwriting-writer'))
+            title_handwriting.writer = None
+            title_handwriting.save()
+
         if 'add-manifestation-title-handwriting' in request.POST:
             manifestation_title= get_object_or_404(ManifestationTitle, pk = request.POST.get('add-manifestation-title-handwriting'))
             ManifestationTitleHandwriting.objects.create(manifestation_title = manifestation_title)

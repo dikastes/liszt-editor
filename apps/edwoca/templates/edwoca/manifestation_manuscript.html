@@ -23,7 +23,7 @@
         <h3>{% translate 'writers / hands' %}</h3>
         {% for form in handwriting_forms %}
             <div class="bg-base-100 p-5 my-5">
-                {% include 'edwoca/partials/forms/handwriting_form.html' with class='manifestation_handwriting' %}
+                {% include 'edwoca/partials/forms/handwriting_form.html' with model='itemhandwriting' app='dmrism' %}
             </div>
         {% endfor %}
         <div class="flex justify-end">

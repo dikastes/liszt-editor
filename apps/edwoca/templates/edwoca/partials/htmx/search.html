@@ -12,23 +12,22 @@
             placeholder="{% translate placeholder %}"
             hx-get="{% url 'edwoca:htmx_search' %}"
             hx-trigger="input delay:300ms"
-            hx-target="#results-{{ target_id }}"
-            hx-indicator="#indicator-{{ target_id }}"
+            hx-target="#results-{{ model_name }}-{{ id }}-{{ field_name }}"
+            hx-indicator="#indicator-{{ model_name }}-{{ id }}-{{ field_name }}"
             hx-vals='{
                  "app": "{{ app }}",
                  "target_app": "{{ target_app|default:"dmad" }}",
                  "model_name": "{{ model_name }}",
                  "model_id": "{{ id }}",
                  "target_model": "{{ target_model }}",
-                 "target_id": "{{ object.id }}",
                  "search_type": "{{ search_type }}",
                  "field_name": "{{ field_name }}",
                  "multiplicity": "{{ multiplicity }}"
             }'
         >
-        <span id="indicator-{{ target_id }}" class="htmx-indicator loading loading-spinner loading-sm absolute right-3"></span>
+        <span id="indicator-{{ model_name }}-{{ id }}-{{ field_name }}" class="htmx-indicator loading loading-spinner loading-sm absolute right-3"></span>
     </div>
-    <div id="results-{{ target_id }}">
+    <div id="results-{{ model_name }}-{{ id }}-{{ field_name }}">
         <ul class="p-0 max-h-48 bg-white overflow-auto empty:hidden shadow-lg">
         </ul>
     </div>
