@@ -3,7 +3,9 @@
 {% load i18n %}
 
 {% block content %}
-<h2 class="my-5">Brief bearbeiten</h2>
+<h2 class="my-5">
+    {% translate 'date' %}
+</h2>
 
 <form id="form" method="post" class="mt-5">
     {% csrf_token %}
@@ -11,7 +13,9 @@
     <input type="submit" value="Speichern" class="hidden" id="submit-form">
 </form>
 
-<h3>Absender</h3>
+<h3 class="my-5">
+    {% translate 'sender' %}
+</h3>
 
 <div class="flex gap-5 my-5">
     {% if object.sender_person %}
