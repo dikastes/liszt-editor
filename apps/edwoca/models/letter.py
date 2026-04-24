@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from dmad_on_django.models.base import DocumentationStatusMixin
 from .base import *
 
 class LetterSignature(BaseSignature):
@@ -104,6 +105,11 @@ class Letter(models.Model):
             default = Category.LETTER,
             verbose_name = _('category')
         )
+    mentioned_works = models.TextField(
+            null = True,
+            blank = True,
+            verbose_name = _('comment')
+        )
     comment = models.TextField(
             null = True,
             blank = True,
@@ -113,8 +119,8 @@ class Letter(models.Model):
             'Work',
             related_name = 'letters'
         )
-    manifestation = models.ManyToManyField(
-            'Manifestation',
+    expression = models.ManyToManyField(
+            'Expression',
             related_name = 'letters'
         )
     person_provenance = models.ManyToManyField(
@@ -125,15 +131,15 @@ class Letter(models.Model):
             'dmrism.CorporationProvenanceStation',
             related_name = 'letters'
         )
-    diplomatic_date = models.CharField(
+    diplomatic_source_date = models.CharField(
             max_length = 100,
             blank = True,
             verbose_name = _('diplomatic date on source')
         )
-    source_period = models.CharField(
+    source_period = models.ForeignKey(
             'dmad.Period',
             null = True,
-            blank = True
+            on_delete = models.SET_NULL
         )
 
     def get_first_mentioning(self):
@@ -190,30 +196,10 @@ class LetterMentioning(models.Model):
         return f'{self.bib.zot_short_title}, {self.pages}'
 
 
-class BaseLetterPlace(models.Model):
-    class Meta:
-        abstract = True
-
-    letter = models.ForeignKey(
-            'Letter',
-            on_delete = models.CASCADE,
-            related_name = '%(class)s'
-        )
-
-
-class SenderPlace(BaseLetterPlace):
-    place = models.ForeignKey(
-            'dmad.Place',
-            on_delete = models.CASCADE,
-            related_name = '+'
-        )
-
-
-class ReceiverPlace(BaseLetterPlace):
-    place = models.ForeignKey(
-            'dmad.Place',
-            on_delete = models.CASCADE,
-            related_name = '+'
+class DocumentedEntityName(DocumentationStatusMixin):
+    name = models.CharField(
+            max_length = 100,
+            blank = True
         )
 
 
@@ -226,7 +212,34 @@ class BaseLetterContributor(models.Model):
             on_delete = models.CASCADE,
             related_name = '%(class)s'
         )
-    # status
+    edition_name = models.OneToOneField(
+            'DocumentedEntityName',
+            null = True,
+            on_delete = models.SET_NULL,
+            related_name = '+'
+        )
+    source_name = models.OneToOneField(
+            'DocumentedEntityName',
+            null = True,
+            on_delete = models.SET_NULL,
+            related_name = '+'
+        )
+
+
+class SenderPlace(BaseLetterContributor):
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.CASCADE,
+            related_name = '+'
+        )
+
+
+class ReceiverPlace(BaseLetterContributor):
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.CASCADE,
+            related_name = '+'
+        )
 
 
 class EditionSenderPerson(BaseLetterContributor):

@@ -10,7 +10,7 @@ from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period, Corporation
-from dmad_on_django.models.base import DocumentationStatus
+from dmad_on_django.models.base import DocumentationStatusMixin
 from dmrism.models.item import Item, Library
 from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting, ManifestationPlace
 from dominate.tags import div, label, span, _input, h1, h2, h3

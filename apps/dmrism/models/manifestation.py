@@ -8,7 +8,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
-from dmad_on_django.models.base import DocumentationStatus
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
