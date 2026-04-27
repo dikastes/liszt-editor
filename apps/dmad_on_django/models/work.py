@@ -7,6 +7,8 @@ from .subjectterm import SubjectTerm
 from .geographicareacodes import WorkGeographicAreaCode
 from liszt_util.tools import get_model_link
 
+from django.utils.translation import gettext_lazy as _
+
 from slub_pylobid.pylobid import PyLobidWork, GNDAPIError
 from json import dumps, loads
 import requests
@@ -190,6 +192,8 @@ class Work(DisplayableModel):
 
         return table
 
+    def get_search_placeholder():
+        return _('Werke suchen')
     
     def get_overview_title(self):
         
