@@ -9,9 +9,12 @@
 
 <form id="form" method="post" class="mt-5">
     {% csrf_token %}
-    {{ form.as_daisy }}
     <input type="submit" value="Speichern" class="hidden" id="submit-form">
 </form>
+
+{{ edition_period_form.as_daisy }}
+{{ form.diplomatic_date_as_daisy }}
+{{ source_period_form.as_daisy }}
 
 <h3 class="my-5">
     {% translate 'sender' %}
@@ -84,7 +87,9 @@
     {% endif %}
 </div>
 
-<h3>Empfänger</h3>
+<h3>
+    {% translate 'receiver' %}
+</h3>
 
 <div class="flex gap-5 my-5">
     {% if object.receiver_person %}
@@ -153,7 +158,9 @@
     {% endif %}
 </div>
 
-<h3>Orte</h3>
+<h3>
+    {% translate 'places' %}
+</h3>
 
 <div class="flex gap-5 my-5">
     {% if object.sender_place %}
@@ -222,7 +229,9 @@
     {% endif %}
 </div>
 
-<h3>Editionen</h3>
+<h3>
+    {% translate 'editions' %}
+</h3>
 
 <div class="my-5">
     {% for letter_mentioning_form in letter_mentioning_forms %}
@@ -268,4 +277,7 @@
         </ul>
     {% endif %}
 </div>
+
+{{ form.comment_as_daisy }}
+
 {% endblock %}

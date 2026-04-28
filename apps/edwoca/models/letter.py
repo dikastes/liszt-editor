@@ -151,29 +151,38 @@ class Letter(models.Model):
         return reverse('edwoca:letter_update', kwargs={'pk': self.id})
 
     def __str__(self):
-        if self.sender_person:
-            if self.sender_corporation:
-                sender = self.sender_person.get_default_name() + ' u. a.'
+        unknown = _('unknown')
+        to = _('writing to')
+        etal = ' ' + _('et al.')
+        if self.source_sender_person.count():
+            if self.source_sender_corporation or self.source_sender_person.count() > 1:
+                sender = self.source_sender_person.first().get_default_name() + etal
             else:
-                sender = self.sender_person.get_default_name()
+                sender = self.source_sender_person.first().get_default_name()
         else:
-            if self.sender_corporation:
-                sender = self.sender_corporation.get_default_name()
+            if self.source_sender_corporation.count():
+                if self.source_sender_corporation.count() > 1:
+                    sender = self.source_sender_corporation.first().get_default_name() + etal
+                else:
+                    sender = self.source_sender_corporation.first().get_default_name()
             else:
-                sender = 'unbekannt'
+                sender = unknown
 
-        if self.receiver_person:
-            if self.receiver_corporation:
-                receiver = self.receiver_person.get_default_name() + ' u. a.'
+        if self.source_receiver_person.count():
+            if self.receiver_corporation or self.source_receiver_person.count() > 1:
+                receiver = self.source_receiver_person.first().get_default_name() + etal
             else:
-                receiver = self.receiver_person.get_default_name()
+                receiver = self.source_receiver_person.first().get_default_name()
         else:
-            if self.receiver_corporation:
-                receiver = self.receiver_corporation.get_default_name()
+            if self.source_receiver_corporation.count():
+                if self.source_receiver_corporation.count() > 1:
+                    receiver = self.source_receiver_corporation.first().get_default_name() + etal
+                else:
+                    receiver = self.source_receiver_corporation.first().get_default_name()
             else:
-                receiver = 'unbekannt'
+                receiver = unknown
 
-        return f'{sender} an {receiver}, {self.period} ({self.get_first_mentioning()})'
+        return f'{sender} {to} {receiver}, {self.source_period} ({self.get_first_mentioning()})'
 
 
 class LetterMentioning(models.Model):

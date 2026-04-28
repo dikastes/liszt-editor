@@ -268,12 +268,13 @@ class DateFormMixin:
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     def __init__(self, *args, **kwargs):
+        period_property = kwargs.pop('period_property', 'period')
         super().__init__(*args, **kwargs)
 
         if self.is_bound:
             return
 
-        period = getattr(self.instance, 'period', None)
+        period = getattr(self.instance, period_property, None)
         if period:
             self.initial.update({
                 'not_before': period.not_before,
