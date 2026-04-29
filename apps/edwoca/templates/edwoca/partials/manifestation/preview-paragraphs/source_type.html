@@ -1,17 +1,22 @@
+{% load i18n %}
+
 <p>
     <span class="mr-5">
-        <em> Quellenart: </em>
+        <em>
+            {% translate 'source type' %}:
+        </em>
     </span>
-    {% if object.edition_type %}
+    {% if object.get_edition_type %}
         <span class="mr-5">
-            {{ object.get_edition_type_display }}
+            {{ object.get_edition_type }}
         </span>
     {% else %}
-        <span class="badge badge-primary">!</span> keine Ausgabeform
+        <span class="badge badge-primary">!</span>
+        {% translate 'no edition type' %}
     {% endif %}
-    {% if object.source_type %}
+    {% if object.get_source_type %}
     <span class="mr-5">
-        {{ object.get_source_type_display }}
+        {{ object.get_source_type }}
     </span>
     {% endif %}
     {% if object.manifestation_form %}
