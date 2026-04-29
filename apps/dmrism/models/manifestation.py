@@ -352,6 +352,39 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
                 self.working_title = self.source_title
             self.is_collection = False
 
+    def get_edition_type(self):
+        potential_edition_types = [
+                'choir_score',
+                'piano_reduction',
+                'particell',
+                'score',
+                'part'
+            ]
+
+        return self._render_types(potential_edition_types)
+
+    def get_source_type(self):
+        potential_edition_types = [
+                'album_page',
+                'performance_material',
+                'authorized_edition',
+                'first_edition',
+                'proof',
+                'part',
+                'further_edition',
+                'correction_sheet',
+                'stitch_template',
+                'dedication_item'
+            ]
+
+        return self._render_types(potential_edition_types)
+
+    def _render_types(self, types):
+        truthy_types = [ str(getattr(Manifestation, t).field.verbose_name) for t in types if getattr(self, t) ]
+
+        if truthy_types:
+            return ', '.join(truthy_types)
+        return False
 
     def render_title(self, prefix):
         review_string = ''
