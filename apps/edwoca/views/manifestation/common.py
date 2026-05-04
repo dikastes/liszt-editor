@@ -1,25 +1,29 @@
 import re
+
+from django.http import Http404
 from haystack.query import SQ
-from ..forms.manifestation import *
+from ...forms.manifestation import *
 from calendar import monthrange
-from ..forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm
-from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
-from ..forms.publication import PublicationForm
-from ..forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
-from ..models import Manifestation as EdwocaManifestation, Letter, Expression, Work, ItemModification, ModificationHandwriting
-from .base import *
-from ..models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
-from .base import *
+from ...forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm
+from ...forms.modification import ItemModificationForm, ModificationHandwritingForm
+from ...forms.publication import PublicationForm
+from ...forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
+from ...models import Manifestation as EdwocaManifestation, Letter, Expression, Work, ItemModification, ModificationHandwriting
+from ..base import *
+from ...models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from bib.models import ZotItem
 from django.forms import inlineformset_factory
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.decorators.http import require_POST
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
+from django.apps import apps
 from liszt_util.forms import SearchForm
-from dmad_on_django.models import Place, Corporation, Status, Person
+from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting
+from liszt_util.tools import swap_order
 from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting, CorporationProvenanceStationBib, PersonProvenanceStationBib
 from dmrism.models.manifestation import Manifestation as DmrismManifestation, Publication, ManifestationPersonDedication, ManifestationCorporationDedication
 from dmrism.models.manifestation import ManifestationBib, Publication
@@ -293,15 +297,17 @@ def manifestation_update(request, pk):
             context['found_expressions'] = expression_search_form.search().models(Expression)
 
         manifestation_form = ManifestationForm(instance=manifestation)
-        signature_forms = []
-        for signature in manifestation.get_single_item().signatures.all():
-            signature_form = SignatureForm(
-                    instance = signature,
-                    prefix = f"signature-{signature.id}"
-                )
-            signature_forms.append(signature_form)
 
-        context['signature_forms'] = signature_forms
+        signature_forms = []
+        if manifestation.is_singleton:
+            for signature in manifestation.get_single_item().signatures.all():
+                signature_form = SignatureForm(
+                        instance = signature,
+                        prefix = f"signature-{signature.id}"
+                    )
+                signature_forms.append(signature_form)
+            context['signature_forms'] = signature_forms
+
         context['library_search_form'] = SearchForm()
         context['manifestation_form'] = manifestation_form
 
@@ -347,228 +353,6 @@ def manifestation_unset_missing(request, pk):
     manifestation.save()
     return redirect('edwoca:manifestation_update', pk = pk)
 
-def manifestation_title_create(request, pk):
-    manifestation = get_object_or_404(Manifestation, pk=pk)
-    ManifestationTitle.objects.create(manifestation=manifestation)
-    return redirect('edwoca:manifestation_title', pk = pk)
-
-def manifestation_title_update(request, pk):
-    manifestation = get_object_or_404(Manifestation, pk=pk)
-    context = {
-        'object': manifestation,
-        'entity_type': 'manifestation'
-    }
-
-    if request.method == 'POST':
-        # collect any invalid forms and create a global render method in case one is invalid
-        form = ManifestationTitleDedicationForm(request.POST, instance=manifestation)
-        if form.is_valid():
-            form.save()
-        context['form'] = form
-
-        print_form = ManifestationPrintForm(request.POST, instance=manifestation)
-        if print_form.is_valid():
-            print_form.save()
-        # Handle existing title forms
-        title_forms = []
-        for title_obj in manifestation.titles.all():
-            prefix = f'title_{title_obj.id}'
-            title_form = ManifestationTitleForm(request.POST, instance=title_obj, prefix=prefix)
-            if title_form.is_valid():
-                title_form.save()
-
-            # Handle existing ManifestationTitleHandwriting forms for this title
-            for handwriting_obj in title_obj.handwritings.all():
-                handwriting_prefix = f'title_handwriting_{handwriting_obj.id}'
-                data = request.POST.copy()
-                if f'{handwriting_prefix}-medium' not in data:
-                    data[f'{handwriting_prefix}-medium'] = handwriting_obj.medium
-                handwriting_form = ManifestationTitleHandwritingForm(data, instance=handwriting_obj, prefix=handwriting_prefix)
-                if handwriting_form.is_valid():
-                    handwriting_form.save()
-            title_forms.append(title_form)
-        context['title_forms'] = title_forms
-
-        # Handle new title form
-        #new_title_form = ManifestationTitleForm(request.POST, prefix='new_title')
-        #if new_title_form.is_valid() and new_title_form.has_changed():
-            #new_title = new_title_form.save(commit=False)
-            #new_title.manifestation = manifestation
-            #new_title.save()
-
-        # Handle adding new ManifestationTitleHandwriting
-        if 'add_title_handwriting' in request.POST:
-            title_id_to_add_handwriting = request.POST.get('add_title_handwriting_to_title_id')
-            if title_id_to_add_handwriting:
-                title_obj = get_object_or_404(ManifestationTitle, pk=title_id_to_add_handwriting)
-                ManifestationTitleHandwriting.objects.create(manifestation_title=title_obj)
-
-        # Handle existing PersonDedication forms
-        person_dedication_forms = []
-        for person_dedication in manifestation.manifestation_person_dedications.all():
-            prefix = f'person_dedication_{person_dedication.id}'
-            form = ManifestationPersonDedicationForm(request.POST, instance=person_dedication, prefix=prefix)
-            if form.is_valid():
-                form.save()
-            if f'{prefix}-calculate-machine-readable-date' in request.POST:
-                period = person_dedication.period
-                period.parse_display()
-                period.save()
-                form = ManifestationPersonDedicationForm(instance=person_dedication, prefix=prefix)
-            if f'{prefix}-clear-machine-readable-date' in request.POST:
-                period = person_dedication.period
-                period.not_before = None
-                period.not_after = None
-                period.inferred = False
-                period.assumed = False
-                period.save()
-                form = ManifestationPersonDedicationForm(instance=person_dedication, prefix=prefix)
-            person_dedication_forms.append(form)
-        context['person_dedication_forms'] = person_dedication_forms
-
-        # Handle existing CorporationDedication forms
-        corporation_dedication_forms = []
-        for corporation_dedication in manifestation.manifestation_corporation_dedications.all():
-            prefix = f'corporation_dedication_{corporation_dedication.id}'
-            form = ManifestationCorporationDedicationForm(request.POST, instance=corporation_dedication, prefix=prefix)
-            if form.is_valid():
-                form.save()
-            if f'{prefix}-calculate-machine-readable-date' in request.POST:
-                period = corporation_dedication.period
-                period.parse_display()
-                period.save()
-                form = ManifestationCorporationDedicationForm(instance=corporation_dedication, prefix=prefix)
-            if f'{prefix}-clear-machine-readable-date' in request.POST:
-                period = corporation_dedication.period
-                period.not_before = None
-                period.not_after = None
-                period.inferred = False
-                period.assumed = False
-                period.save()
-                form = ManifestationCorporationDedicationForm(instance=corporation_dedication, prefix=prefix)
-            corporation_dedication_forms.append(form)
-        context['corporation_dedication_forms'] = corporation_dedication_forms
-
-        return redirect('edwoca:manifestation_title', pk = manifestation.id)
-
-    else:
-        # Initialize forms for existing titles
-        form = ManifestationTitleDedicationForm(instance=manifestation)
-        context['form'] = form
-
-        title_forms = []
-        for title_obj in manifestation.titles.all():
-            prefix = f'title_{title_obj.id}'
-            title_form = ManifestationTitleForm(instance=title_obj, prefix=prefix) # Get the form instance
-
-            # Initialize forms for existing ManifestationTitleHandwriting for this title
-            handwriting_forms = []
-            for handwriting_obj in title_obj.handwritings.all():
-                handwriting_prefix = f'title_handwriting_{handwriting_obj.id}'
-                handwriting_forms.append(ManifestationTitleHandwritingForm(instance=handwriting_obj, prefix=handwriting_prefix))
-            title_form.handwriting_forms = handwriting_forms # Attach to the form instance
-
-            title_forms.append(title_form) # Append the form instance to the list
-
-        context['title_forms'] = title_forms
-
-        # Initialize forms for existing PersonDedication
-        person_dedication_forms = []
-        for person_dedication in manifestation.manifestation_person_dedications.all():
-            prefix = f'person_dedication_{person_dedication.id}'
-            person_dedication_forms.append(ManifestationPersonDedicationForm(instance=person_dedication, prefix=prefix))
-        context['person_dedication_forms'] = person_dedication_forms
-
-        # Initialize forms for existing CorporationDedication
-        corporation_dedication_forms = []
-        for corporation_dedication in manifestation.manifestation_corporation_dedications.all():
-            prefix = f'corporation_dedication_{corporation_dedication.id}'
-            corporation_dedication_forms.append(ManifestationCorporationDedicationForm(instance=corporation_dedication, prefix=prefix))
-        context['corporation_dedication_forms'] = corporation_dedication_forms
-
-    context['print_form'] = ManifestationPrintForm(instance=manifestation)
-
-    q_dedicatee = request.GET.get('dedicatee-q')
-    q_place = request.GET.get('place-q')
-
-    if q_dedicatee:
-        dedicatee_search_form = FramedSearchForm(request.GET, prefix='dedicatee', placeholder=_('search persons'))
-        if dedicatee_search_form.is_valid():
-            context['query_dedicatee'] = dedicatee_search_form.cleaned_data.get('q')
-            context['found_persons'] = dedicatee_search_form.search().models(Person)
-            context['found_corporations'] = dedicatee_search_form.search().models(Corporation)
-    else:
-        dedicatee_search_form = FramedSearchForm(prefix='dedicatee', placeholder=_('search persons'))
-
-    if q_place:
-        place_search_form = FramedSearchForm(request.GET, prefix='place', placeholder=_('search place'))
-        if place_search_form.is_valid():
-            context['query_place'] = place_search_form.cleaned_data.get('q')
-            context['found_places'] = place_search_form.search().models(Place)
-    else:
-        place_search_form = FramedSearchForm(prefix='place', placeholder=_('search place'))
-
-    context['dedicatee_search_form'] = dedicatee_search_form
-    context['place_search_form'] = place_search_form
-
-    if request.GET.get('person_dedication_id'):
-        context['person_dedication_id'] = int(request.GET.get('person_dedication_id'))
-    if request.GET.get('corporation_dedication_id'):
-        context['corporation_dedication_id'] = int(request.GET.get('corporation_dedication_id'))
-
-    search_form = FramedSearchForm(request.GET or None, placeholder=_('search persons'))
-    context['search_form'] = search_form
-
-    if search_form.is_valid() and search_form.cleaned_data.get('q'):
-        context['query'] = search_form.cleaned_data.get('q')
-        context[f"found_persons"] = search_form.search().models(Person)
-
-    return render(request, 'edwoca/manifestation_title.html', context)
-
-
-def manifestation_writer_add(request, pk, title_id, writer_id):
-    title = get_object_or_404(ManifestationTitle, pk=title_id)
-    writer = get_object_or_404(Person, pk=writer_id)
-    title.writer = writer
-    title.save()
-    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_id}')
-
-
-def manifestation_writer_remove(request, pk, title_id):
-    title = get_object_or_404(ManifestationTitle, pk=title_id)
-    title.writer = None
-    title.save()
-    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}) + f'#title-modal-{title_id}')
-
-
-def manifestation_title_add_handwriting_writer(request, pk, title_handwriting_pk, person_pk):
-    title_handwriting = get_object_or_404(ManifestationTitleHandwriting, pk=title_handwriting_pk)
-    person = get_object_or_404(Person, pk=person_pk)
-    title_handwriting.writer = person
-    title_handwriting.save()
-    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}))
-
-
-def manifestation_title_remove_handwriting_writer(request, pk, title_handwriting_pk):
-    title_handwriting = get_object_or_404(ManifestationTitleHandwriting, pk=title_handwriting_pk)
-    title_handwriting.writer = None
-    title_handwriting.save()
-    return redirect(reverse('edwoca:manifestation_title', kwargs={'pk': pk}))
-
-
-def manifestation_add_dedicatee(request, pk, person_id):
-    manifestation = get_object_or_404(Manifestation, pk=pk)
-    person = get_object_or_404(Person, pk=person_id)
-    manifestation.dedicatees.add(person)
-    return redirect('edwoca:manifestation_title', pk=pk)
-
-
-def manifestation_remove_dedicatee(request, pk, dedicatee_id):
-    dedicatee = get_object_or_404(Person, pk=dedicatee_id)
-    manifestation = get_object_or_404(Manifestation, pk=pk)
-    manifestation.dedicatees.remove(dedicatee)
-    return redirect('edwoca:manifestation_title', pk=pk)
-
 
 class ManifestationDeleteView(EntityMixin, DeleteView):
     model = EdwocaManifestation
@@ -576,25 +360,11 @@ class ManifestationDeleteView(EntityMixin, DeleteView):
     template_name = 'edwoca/delete.html'
 
 
-class ManifestationTitleDeleteView(DeleteView):
-    model = ManifestationTitle
-
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_title', kwargs = {'pk': self.object.manifestation.id})
-
-
 class ManifestationHandwritingDeleteView(DeleteView):
     model = ItemHandwriting
 
     def get_success_url(self):
         return reverse_lazy('edwoca:manifestation_manuscript', kwargs={'pk': self.object.item.manifestation.id})
-
-
-class ManifestationTitleHandwritingDeleteView(DeleteView):
-    model = ManifestationTitleHandwriting
-
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_title', kwargs={'pk': self.object.manifestation_title.manifestation.id})
 
 
 class RelatedManifestationAddView(RelatedEntityAddView):
@@ -637,7 +407,10 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
 
         if collection_search_form.is_valid() and collection_search_form.cleaned_data.get('q'):
             context['collection_query'] = collection_search_form.cleaned_data.get('q')
-            context['found_collections'] = collection_search_form.search().models(Manifestation)#.filter(is_collection = True)
+            found_collections = collection_search_form.search().models(Manifestation)#.filter(is_collection = True)
+            if self.object.is_collection:
+                found_collections = found_collections.filter(is_collection = True)
+            context['found_collections'] = found_collections
 
         if print_search_form.is_valid() and print_search_form.cleaned_data.get('q'):
             context['print_query'] = print_search_form.cleaned_data.get('q')
@@ -1955,7 +1728,6 @@ class ManifestationDigitalCopyDeleteView(DeleteView):
         return reverse('edwoca:manifestation_digital_copy',kwargs={'pk': manifestation.id})
 
 
-
 def person_dedication_add(request, pk):
     manifestation = get_object_or_404(Manifestation, pk=pk)
     period = Period.objects.create()
@@ -1987,15 +1759,14 @@ def manifestation_corporation_dedication_delete(request, pk):
 def manifestation_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
     dedication = get_object_or_404(ManifestationPersonDedication, pk=dedication_id)
     person = get_object_or_404(Person, pk=person_id)
-    dedication.dedicatee.add(person)
+    dedication.dedicatee = person
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
 
-def manifestation_person_dedication_remove_dedicatee(request, pk, dedication_id, person_id):
+def manifestation_person_dedication_remove_dedicatee(request, pk, dedication_id):
     dedication = get_object_or_404(ManifestationPersonDedication, pk=dedication_id)
-    person = get_object_or_404(Person, pk=person_id)
-    dedication.dedicatee.remove(person)
+    dedication.dedicatee = None
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
@@ -2003,15 +1774,14 @@ def manifestation_person_dedication_remove_dedicatee(request, pk, dedication_id,
 def manifestation_corporation_dedication_add_dedicatee(request, pk, dedication_id, corporation_id):
     dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
     corporation = get_object_or_404(Corporation, pk=corporation_id)
-    dedication.dedicatee.add(corporation)
+    dedication.dedicatee = corporation
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
 
-def manifestation_corporation_dedication_remove_dedicatee(request, pk, dedication_id, corporation_id):
+def manifestation_corporation_dedication_remove_dedicatee(request, pk, dedication_id):
     dedication = get_object_or_404(ManifestationCorporationDedication, pk=dedication_id)
-    corporation = get_object_or_404(Corporation, pk=corporation_id)
-    dedication.dedicatee.remove(corporation)
+    dedication.dedicatee = None
     dedication.save()
     return redirect('edwoca:manifestation_title', pk=pk)
 
@@ -2217,3 +1987,32 @@ def manifestation_unset_collection(request, pk):
     manifestation.save()
 
     return redirect('edwoca:manifestation_relations', pk = pk)
+
+
+@require_POST
+def collection_part_swap_view(request, pk, parent_pk, direction):
+    def initialize_order_indices(qs):
+        for i, child in enumerate(qs.all()):
+            if child.order_index == 0:
+                child.order_index = i
+                child.save()
+
+    manifestation = get_object_or_404(EdwocaManifestation, pk=pk)
+    parent_manifestation = get_object_or_404(EdwocaManifestation, pk=parent_pk)
+
+    if parent_manifestation.collection_parts.count():
+        initialize_order_indices(parent_manifestation.collection_parts)
+    if parent_manifestation.collection_components.count():
+        initialize_order_indices(parent_manifestation.collection_components)
+
+    success = swap_order(manifestation, direction)
+
+    context = {'object': parent_manifestation}
+
+    return render(
+        request,
+        'edwoca/partials/manifestation/collection_part_list.html',
+        context
+    )
+
+

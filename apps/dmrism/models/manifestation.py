@@ -8,10 +8,10 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
-from dmad_on_django.models.base import DocumentationStatus
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
+from liszt_util.models import Sortable
 
 
 class TitleTypes(models.TextChoices):
@@ -21,9 +21,9 @@ class TitleTypes(models.TextChoices):
     ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
 
 
-class Manifestation(RenderRawJSONMixin, WemiBaseClass):
+class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass):
     class Meta:
-        ordering = ['-needs_review']
+        ordering = ['-needs_review', 'order_index']
 
     class PartLabel(models.TextChoices):
         CONSTITUTING = 'c', _('constituting')
@@ -372,6 +372,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             default = False,
             verbose_name = _('is text')
         )
+    _group_field_names = ['part_of', 'component_of']
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})

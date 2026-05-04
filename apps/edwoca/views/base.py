@@ -1,6 +1,8 @@
 from django.forms import inlineformset_factory
+from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import ListView
 from django.views.generic.edit import UpdateView, FormView, CreateView, DeleteView
 from django.db.models import Case, When
@@ -14,10 +16,93 @@ from ..models import Work, Expression, Manifestation, Item, Letter, LetterMentio
 from dmrism.models import Library
 from edwoca import forms as edwoca_forms
 from edwoca import models as edwoca_models
-
+from django.apps import apps
 
 def index(request):
     return redirect('edwoca:work_search')
+
+
+def htmx_search(request):
+    app = request.GET.get('app', 'dmrism')
+    target_app = request.GET.get('target_app', 'dmad')
+    target_model_name = request.GET.get('target_model')
+    model_id = request.GET.get('model_id')
+    model_name = request.GET.get('model_name')
+
+    manifestation_id = request.GET.get('manifestation_id')
+    search_type = request.GET.get('search_type')
+    field_name = request.GET.get('field_name')
+    multiplicity = request.GET.get('multiplicity')
+
+    search_form = SearchForm(request.GET)
+
+    if search_form.is_valid():
+
+        try:
+            model = apps.get_model(target_app, target_model_name)
+        except LookupError:
+            raise Http404
+
+        results = search_form.search().models(model)[:10]
+
+        return render(request, 'edwoca/partials/htmx/display_results.html', {
+            'results': results,
+            'app': app,
+            'target_app': target_app,
+            'model_name': model_name,
+            'target_model_name': target_model_name,
+            'model_id': model_id,
+            'target_id': manifestation_id,
+            'search_type': search_type,
+            'field_name': field_name,
+            'multiplicity': multiplicity,
+            'no_result_msg': _('no search results') if not results else None
+        })
+
+    raise Http404
+
+
+def htmx_update(request):
+    app = request.POST.get('app')
+    model_name = request.POST.get('model_name')
+    target_app = request.POST.get('target_app', 'dmad')
+    target_model_name = request.POST.get('target_model')
+    model_id = request.POST.get('model_id')
+    target_model_id = request.POST.get('target_model_id')
+    field_name = request.POST.get('field_name')
+    label_htmx = request.POST.get('label', 'Selected')
+    multiplicity = request.POST.get('multiplicity', 'single') or 'single'
+
+    try:
+        target_model = apps.get_model(target_app, target_model_name)
+        model = apps.get_model(app, model_name)
+
+        if not model or not target_model:
+            raise Http404("Model does not exist")
+
+    except Exception as e:
+        raise Http404(f"Defect model configuration: {e}")
+
+    entity = get_object_or_404(model, pk=model_id)
+    target = get_object_or_404(target_model, pk=target_model_id)
+
+    if multiplicity == 'single':
+        setattr(entity, field_name, target)
+        entity.save()
+    else:
+        qs = getattr(entity, field_name)
+        qs.add(target)
+
+    #updated_count = model.objects.filter(pk=model_id).update(**{field_name: target})
+
+    #if updated_count == 0:
+        #raise Http404("Instance not found")
+
+    return render(request, 'edwoca/partials/htmx/selected.html', {
+        'target': target,
+        'label': label_htmx,
+        'multiplicity': multiplicity
+    })
 
 
 class EdwocaListView(ListView):

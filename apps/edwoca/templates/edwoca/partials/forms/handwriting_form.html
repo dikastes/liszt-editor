@@ -14,11 +14,19 @@
                 <input type="text" class="pseudo-input border border-black bg-white grow w-full" disabled value="{{ form.instance.writer }}" />
             {% endif %}
         </label>
-        <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_remove_handwriting_writer' object.id form.instance.id %}">
+        <button type="submit" class="btn btn-outline btn-primary" value="{{ form.instance.id }}" name="remove-{{ model }}-writer" form="form">
             {% translate 'remove' %}
+        </button>
+        {% comment %}
+        <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_remove_handwriting_writer' object.id form.instance.id %}">
         </a>
+        {% endcomment %}
     </div>
 {% else %}
+    <div id="search-container-{{ model }}-{{ form.instance.id }}-writer">
+        {% include 'edwoca/partials/htmx/search.html' with label='writer' search_type='writer' field_name='writer' app=app model_name=model target_app='dmad' target_model='person' id=form.instance.id placeholder='search persons' %}
+    </div>
+    {% comment %}
     <form>
         <div class="mt-2 flex items-end">
             <label class="flex-1">
@@ -36,6 +44,7 @@
             <input type="submit" class="btn btn-outline" value="{% translate 'search' %}"/>
         </div>
     </form>
+    {% endcomment %}
     {% if search_form.is_valid and search_form.cleaned_data.q and handwriting_found_persons.handwriting_id == form.instance.id %}
         <ul class="border border-black h-32 overflow-auto p-2">
             {% for person in handwriting_found_persons.results %}
@@ -57,8 +66,7 @@
 
 <div class="flex justify-end mt-3">
     {{ form.model }}
-    <form action="{% url 'edwoca:'|add:class|add:'_delete' form.instance.id %}" method="post" class="flex-0 m-0">
-        {% csrf_token %}
-        <input type="submit" class="btn btn-outline text-primary" value="{% translate 'remove' %}"/>
-    </form>
+    <button class="flex-0 btn btn-outline text-primary" name="{{ model }}-delete" value="{{ form.instance.id }}" form="form">
+        {% translate 'remove' %}
+    </button>
 </div>

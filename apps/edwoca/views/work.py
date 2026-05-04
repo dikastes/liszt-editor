@@ -5,7 +5,7 @@ from ..forms.dedication import WorkPersonDedicationForm, WorkCorporationDedicati
 from dmad_on_django.models import Work as DmadWork, Person, Place, Corporation, SubjectTerm, Status
 from edwoca.forms import EdwocaSearchForm
 from bib.models import ZotItem
-from ..models.base import Letter
+from ..models.letter import Letter
 from django.forms.models import formset_factory
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy

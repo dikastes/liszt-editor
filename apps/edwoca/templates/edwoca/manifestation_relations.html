@@ -7,7 +7,7 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
 
-{% if not object.is_collection and not object.component_of and not object.part_of %}
+{% if not object.is_collection and not object.component_of %}
     <div class="flex">
         <div class="flex-1"></div>
         <form action="{% url 'edwoca:manifestation_set_collection' object.id %}" class="flex-0">
@@ -20,27 +20,40 @@
     {% translate 'parent references' %}
 </h2>
 
-{% if object.part_of or object.component_of and object.component_of.is_collection %}
+{% if object.part_of or object.is_collection or object.component_of and object.component_of.is_collection %}
     <h3 class="my-5">
         {% translate 'collection' %}
     </h3>
 {% endif %}
 
-{% if not object.is_collection %}
-    {% if object.part_of %}
+{% if object.part_of %}
+    <p>
+        {% if object.part_label == 'c' %}
+            {% translate 'this object is part of (constituting)' %}
+        {% endif %}
+        {% if object.part_label == 'b' %}
+            {% translate 'this object is part of (bound together)' %}
+        {% endif %}
+        {% if object.part_label == 's' %}
+            {% translate 'this object is part of (separated)' %}
+        {% endif %}
+        <a class="font-bold" href="{% url 'edwoca:manifestation_relations' object.part_of.id %}">
+            → {{ object.part_of }}.
+        </a>
+    </p>
+    <div class="flex my-5">
+        <div class="flex-1"></div>
+        <form class="flex-0" method="post" action="{% url 'edwoca:collection_remove' object.id %}">
+            {% csrf_token %}
+            <input type="submit" class="btn btn-primary btn-outline btn-sm" value="{% translate 'remove collection' %}" />
+        </form>
+    </div>
+{% else %}
+    {% if object.component_of and object.component_of.is_collection %}
         <p>
-        {{ object.part_label }}
-            {% if object.part_label == 'c' %}
-                {% translate 'this object is part of (constituting)' %}
-            {% endif %}
-            {% if object.part_label == 'b' %}
-                {% translate 'this object is part of (bound together)' %}
-            {% endif %}
-            {% if object.part_label == 's' %}
-                {% translate 'this object is part of (separated)' %}
-            {% endif %}
-            <a class="font-bold" href="{% url 'edwoca:manifestation_relations' object.part_of.id %}">
-                → {{ object.part_of }}.
+            {% translate 'this object is component of' %}
+            <a class="font-bold" href="{% url 'edwoca:manifestation_relations' object.component_of.id %}">
+                → {{ object.component_of }}.
             </a>
         </p>
         <div class="flex my-5">
@@ -51,22 +64,6 @@
             </form>
         </div>
     {% else %}
-        {% if object.component_of and object.component_of.is_collection %}
-            <p>
-                {% translate 'this object is component of' %}
-                <a class="font-bold" href="{% url 'edwoca:manifestation_relations' object.component_of.id %}">
-                    → {{ object.component_of }}.
-                </a>
-            </p>
-            <div class="flex my-5">
-                <div class="flex-1"></div>
-                <form class="flex-0" method="post" action="{% url 'edwoca:collection_remove' object.id %}">
-                    {% csrf_token %}
-                    <input type="submit" class="btn btn-primary btn-outline btn-sm" value="{% translate 'remove collection' %}" />
-                </form>
-            </div>
-        {% else %}
-        {% endif %}
     {% endif %}
 {% endif %}
 
@@ -90,7 +87,7 @@
     </div>
 {% endif %}
 
-{% if not object.is_collection and not object.component_of and not object.part_of %}
+{% if not object.component_of and not object.part_of %}
     <form action="{% url 'edwoca:manifestation_relations' object.id %}" class="w-full">
         <label class="form-control">
             <div class="label">
@@ -131,12 +128,14 @@
                                     <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (separated) of' %}" />
                                 </form>
                             {% endif %}
-                            <form method="post" class="flex-0">
-                                {% csrf_token %}
-                                <input type="hidden" name="collection-link-type" value="component" />
-                                <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
-                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is component of' %}" />
-                            </form>
+                            {% if not object.is_collection %}
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="collection-link-type" value="component" />
+                                    <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is component of' %}" />
+                                </form>
+                            {% endif %}
                         </div>
                     </li>
                 {% endif %}
@@ -172,21 +171,8 @@
         {% translate 'collection parts and components' %}
     </h3>
 
-    <ul class="list-disc m-5">
-        {% for collection_part in object.collection_parts.all %}
-            <li class="list-disc">
-                <a href="{% url 'edwoca:manifestation_relations' collection_part.id %}">
-                    {{ collection_part }}
-                </a>
-            </li>
-        {% endfor %}
-        {% for collection_component in object.collection_components.all %}
-            <li class="list-disc">
-                <a href="{% url 'edwoca:manifestation_relations' collection_component.id %}">
-                    {{ collection_component }}
-                </a>
-            </li>
-        {% endfor %}
+    <ul class="list-disc m-5" id="collection-parts">
+        {% include 'edwoca/partials/manifestation/collection_part_list.html' %}
     </ul>
 
     <div class="flex">
@@ -268,7 +254,7 @@
                     {% translate 'In order to remove the collection status, please delete all items of this object.' %}
                 </p>
             {% else %}
-                <div class="flex">
+                <div class="flex my-5">
                     <div class="flex-1"></div>
                     <form method="post" action="{% url 'edwoca:manifestation_unset_collection' object.id %}" class="flex-0">
                         {% csrf_token %}
@@ -487,16 +473,22 @@
 </form>
 
 {% if not object.is_singleton %}
-    <h2 class="my-5"> Exemplare </h2>
+    <h2 class="my-5"> 
+        {% translate 'items' %}
+    </h2>
     {% if object.missing_item %}
-        <p> Alle Exemplare dieses Drucks sind verschollen </p>
+        <p>
+            {% translate 'all items of this print are lost' %}
+        </p>
     {% else %}
         <div id="item-list-container">
             {% include 'edwoca/partials/manifestation/item_list.html' %}
         </div>
         <div class="flex mt-4">
             <div class="flex-1"></div>
-            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn flex-0"> neues Exemplar </a>
+            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn flex-0">
+                {% translate 'create item' %}
+            </a>
         </div>
     {% endif %}
 {% endif %}

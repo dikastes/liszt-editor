@@ -89,7 +89,7 @@ class ExpressionTitle(WemiTitle):
 
 class RelatedExpression(RelatedEntity):
     class Label(models.TextChoices):
-        IS_COMPONENT_OF = 'CP', _('is componnt of'),
+        IS_COMPONENT_OF = 'CP', _('is component of'),
         IS_PART_OF = 'PA', _('is part of'),
         IS_DERIVATIVE_OF = 'DE', _('is derivative of')
         IS_INCORPORATED_IN = 'IN', _('is incorporated in')
