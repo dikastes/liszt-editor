@@ -1720,11 +1720,6 @@ html {
   }
 }
 
-.link {
-  cursor: pointer;
-  text-decoration-line: underline;
-}
-
 .menu {
   display: flex;
   flex-direction: column;
@@ -2544,16 +2539,6 @@ details.collapse summary::-webkit-details-marker {
   isolation: isolate;
 }
 
-.link:focus {
-  outline: 2px solid transparent;
-  outline-offset: 2px;
-}
-
-.link:focus-visible {
-  outline: 2px solid currentColor;
-  outline-offset: 2px;
-}
-
 :where(.menu li:empty) {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-bc,oklch(var(--bc)/var(--tw-bg-opacity)));
@@ -3231,6 +3216,10 @@ details.collapse summary::-webkit-details-marker {
   margin-bottom: 1.25rem;
 }
 
+.mb-0 {
+  margin-bottom: 0px;
+}
+
 .mb-10 {
   margin-bottom: 2.5rem;
 }
@@ -3249,6 +3238,18 @@ details.collapse summary::-webkit-details-marker {
 
 .ml-5 {
   margin-left: 1.25rem;
+}
+
+.mr-0 {
+  margin-right: 0px;
+}
+
+.mr-10 {
+  margin-right: 2.5rem;
+}
+
+.mr-5 {
+  margin-right: 1.25rem;
 }
 
 .mt-0 {
@@ -3315,10 +3316,6 @@ details.collapse summary::-webkit-details-marker {
   width: 13rem;
 }
 
-.w-64 {
-  width: 16rem;
-}
-
 .w-full {
   width: 100%;
 }
@@ -3363,8 +3360,16 @@ details.collapse summary::-webkit-details-marker {
   align-content: center;
 }
 
+.items-end {
+  align-items: flex-end;
+}
+
 .items-center {
   align-items: center;
+}
+
+.items-stretch {
+  align-items: stretch;
 }
 
 .justify-end {
@@ -3454,10 +3459,6 @@ details.collapse summary::-webkit-details-marker {
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
 }
 
-.p-0 {
-  padding: 0px;
-}
-
 .p-2 {
   padding: 0.5rem;
 }
@@ -3470,14 +3471,8 @@ details.collapse summary::-webkit-details-marker {
   padding: 1.25rem;
 }
 
-.text-2xl {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
-
-.text-3xl {
-  font-size: 1.875rem;
-  line-height: 2.25rem;
+.pr-10 {
+  padding-right: 2.5rem;
 }
 
 .text-lg {
@@ -3495,8 +3490,18 @@ details.collapse summary::-webkit-details-marker {
   line-height: 1.75rem;
 }
 
+.text-xs {
+  font-size: 0.75rem;
+  line-height: 1rem;
+}
+
 .font-bold {
   font-weight: 700;
+}
+
+.text-gray-500 {
+  --tw-text-opacity: 1;
+  color: rgb(107 114 128 / var(--tw-text-opacity, 1));
 }
 
 .text-primary {
@@ -3536,4 +3541,25 @@ p.CaptionCont {
 
 p.CaptionCont label i {
   background-image: none;
+}
+
+@media (min-width: 1280px) {
+  .xl\:p-5 {
+    padding: 1.25rem;
+  }
+
+  .xl\:text-2xl {
+    font-size: 1.5rem;
+    line-height: 2rem;
+  }
+
+  .xl\:text-3xl {
+    font-size: 1.875rem;
+    line-height: 2.25rem;
+  }
+
+  .xl\:text-sm {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+  }
 }

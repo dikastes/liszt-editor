@@ -39,29 +39,16 @@ if [[ ! -f .env ]]; then
 fi
 
 # === CHECK PYTHON ===
-if command -v python3 > /dev/null; then
-    PYTHON_BIN=$(command -v python3)
-elif command -v python > /dev/null; then
-    PYTHON_BIN=$(command -v python)
-else
-    red "Python is not installed."
-    exit 1
-fi
-
-# === CHECK GIT ===
-if ! command -v git > /dev/null; then
-    red "Git must be installed."
-    exit 1
+if ! command -v uv > /dev/null; then
+	red "Please install uv"
 fi
 
 # === BASE DIR ===
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
-VENV_DIR="$SCRIPT_DIR/venv"
 
-blue "Using Python: $PYTHON_BIN"
 blue "Script directory: $SCRIPT_DIR"
 
-uv venv
+uv venv --clear
 
 # === INSTALL NPM & BUILD TAILWIND IN APPS ===
 for APP in edwoca bib dmad_on_django liszt_util; do
