@@ -1,6 +1,6 @@
 #!/bin/bash
 
-if ! command -v docker compose >> /dev/null; then
+if ! command -v docker compose > /dev/null; then
 	echo "please install docker"
 fi
 
