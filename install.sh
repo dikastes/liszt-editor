@@ -43,12 +43,22 @@ if ! command -v uv > /dev/null; then
 	red "Please install uv"
 fi
 
+# === CHECK NPM AND NPX === 
+if ! command -v npm > /dev/null; then
+	red "Please install npm"
+fi
+
+if ! command -v npx > /dev/null; then
+	red "Please install npx"
+fi
+
 # === BASE DIR ===
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
 
 blue "Script directory: $SCRIPT_DIR"
 
-uv venv --clear
+yellow "Creating venv using uv"
+run uv venv --clear
 
 # === INSTALL NPM & BUILD TAILWIND IN APPS ===
 for APP in edwoca bib dmad_on_django liszt_util; do
@@ -64,7 +74,7 @@ done
 # === INSTALL PYTHON DEPENDENCIES ===
 yellow "Installing python dependencies..."
 
-uv sync --locked
+run uv sync --locked
 
 # === DJANGO MIGRATIONS ===
 yellow "Running Django migrations..."
