@@ -8,6 +8,8 @@ dependencies = [
     "anyio==4.9.0",
     "asgiref==3.9.1",
     "bibtexparser==1.4.3",
+    "celery-types>=0.23.0",
+    "celery[redis]>=5.6.3",
     "certifi==2025.7.14",
     "charset-normalizer==3.4.2",
     "django==5.2.4",
