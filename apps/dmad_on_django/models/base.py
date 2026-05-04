@@ -105,6 +105,13 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
     )
     gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
 
+    @property
+    def name(self):
+        if hasattr(self, 'names'):
+            return self.names.filter(status=Status.PRIMARY).first()
+
+        raise Exception(f'Class {self.__class__.__name__} has no names property.')
+
     def is_stub(self):
         if self.gnd_id and self.gnd_id != '':
             return False
