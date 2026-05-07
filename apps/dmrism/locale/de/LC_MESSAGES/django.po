@@ -1,0 +1,522 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-06 15:22+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+#: models/base.py:14
+msgid "public comment"
+msgstr "öffentlicher Kommentar"
+
+#: models/base.py:20
+msgid "private comment"
+msgstr "interner Kommentar"
+
+#: models/base.py:33
+msgid "Composer"
+msgstr "Komponist"
+
+#: models/base.py:34
+msgid "Writer"
+msgstr "Schreiber"
+
+#: models/base.py:35
+msgid "Translator"
+msgstr "Übersetzer"
+
+#: models/base.py:36
+msgid "Poet"
+msgstr "Dichter"
+
+#: models/base.py:37
+msgid "Dedicatee"
+msgstr "Widmungsträger"
+
+#: models/base.py:48
+msgid "role"
+msgstr "Rolle"
+
+#: models/base.py:69
+msgid "page"
+msgstr "Seite"
+
+#: models/base.py:70
+msgid "column"
+msgstr "Spalte"
+
+#: models/base.py:71
+msgid "lot"
+msgstr "Los"
+
+#: models/base.py:81
+msgid "bib location"
+msgstr "Fundstelle"
+
+#: models/base.py:87
+msgid "bib location type"
+msgstr "Typ"
+
+#: models/base.py:96
+msgid "Parent"
+msgstr "teil von"
+
+#: models/base.py:97
+msgid "Related"
+msgstr "bezogen"
+
+#: models/base.py:102
+msgid "comment"
+msgstr "Kommentar"
+
+#: models/base.py:108 models/manifestation.py:772
+msgid "label"
+msgstr "Relation"
+
+#: models/base.py:179
+msgid "medium"
+msgstr "Schreibstoff"
+
+#: models/base.py:183
+msgid "dubious writer"
+msgstr "Schreiber unsicher"
+
+#: models/base.py:221
+msgid "dedication text"
+msgstr "Widmungstext (diplomatisch)"
+
+#: models/base.py:225
+msgid "<< new dedication >>"
+msgstr "<< neue Widmung >>"
+
+#: models/item.py:28 models/manifestation.py:193
+msgid "RISM id"
+msgstr "RISM ID Nr."
+
+#: models/item.py:38 models/manifestation.py:232
+msgid "private dedication comment"
+msgstr "interner Kommentar"
+
+#: models/item.py:43
+msgid "private provenance comment"
+msgstr "interner Kommentar"
+
+#: models/item.py:48
+msgid "public provenance comment"
+msgstr "öffentlicher Kommentar"
+
+#: models/item.py:54 models/manifestation.py:152
+msgid "extent"
+msgstr "Umfang"
+
+#: models/item.py:59
+msgid "measure"
+msgstr "Format"
+
+#: models/item.py:64
+msgid "private manuscript comment"
+msgstr "interner Kommentar"
+
+#: models/item.py:69 models/manifestation.py:242
+msgid "taken information"
+msgstr "übernommene Informationen"
+
+#: models/item.py:73 models/manifestation.py:361
+msgid "is lyrics"
+msgstr "Gesangstext"
+
+#: models/item.py:77 models/manifestation.py:365
+msgid "is program"
+msgstr "Programm"
+
+#: models/item.py:81 models/manifestation.py:369
+msgid "is explanation"
+msgstr "Erläuterung"
+
+#: models/item.py:216
+msgid "name"
+msgstr "Name"
+
+#: models/item.py:223
+msgid "siglum"
+msgstr "Sigle"
+
+#: models/item.py:244
+msgid "Current"
+msgstr "aktuell"
+
+#: models/item.py:245
+msgid "Former"
+msgstr "vormalig"
+
+#: models/item.py:253
+msgid "holding institution"
+msgstr "Bestandshaltende Institution"
+
+#: models/item.py:258
+msgid "signature"
+msgstr "Signatur"
+
+#: models/item.py:265
+msgid "status"
+msgstr "Status"
+
+#: models/item.py:269
+msgid "without signature"
+msgstr " "
+
+#: models/item.py:276
+msgid "<< institution >>"
+msgstr " "
+
+#: models/item.py:324
+msgid "acquisition"
+msgstr "Erwerb"
+
+#: models/item.py:325
+msgid "disposition"
+msgstr "Abgabe"
+
+#: models/item.py:326
+msgid "ownership period"
+msgstr "Besitzzeitraum"
+
+#: models/item.py:327
+msgid "ownership date"
+msgstr "Besitzzeitpunkt"
+
+#: models/item.py:355 models/item.py:397
+msgid "period status"
+msgstr "Datierungsereignis"
+
+#: models/item.py:364 models/item.py:402
+msgid "<< new provenance station >>"
+msgstr "<< neue Provenienz >>"
+
+#: models/item.py:428
+msgid "Digitized"
+msgstr "Digitalisat"
+
+#: models/item.py:429
+msgid "IIIF Manifest"
+msgstr "IIIF-Manifest"
+
+#: models/item.py:430
+msgid "Private"
+msgstr "Privat"
+
+#: models/item.py:431
+msgid "Working copy"
+msgstr "Arbeitsdigitalisat"
+
+#: models/item.py:440 models/item.py:486
+msgid "URL"
+msgstr "URL"
+
+#: models/item.py:447
+msgid "link type"
+msgstr "Linktyp"
+
+#: models/item.py:491
+msgid "web reference comment"
+msgstr "Kommentar"
+
+#: models/manifestation.py:18
+msgid "Head Title"
+msgstr "Kopftitel"
+
+#: models/manifestation.py:19
+msgid "Title Page"
+msgstr "Titelseite"
+
+#: models/manifestation.py:20
+msgid "Envelope"
+msgstr "Umschlagstitel"
+
+#: models/manifestation.py:21
+msgid "Envelope or Title Page"
+msgstr "Umschlagstitel oder Titelseite"
+
+#: models/manifestation.py:29
+msgid "constituting"
+msgstr "konstituierend"
+
+#: models/manifestation.py:30
+msgid "bound together"
+msgstr "zusammengebunden"
+
+#: models/manifestation.py:31
+msgid "separated"
+msgstr "separiert"
+
+#: models/manifestation.py:34
+msgid "Excerpts"
+msgstr "Ausschnitt"
+
+#: models/manifestation.py:35
+msgid "Sketches"
+msgstr "Entwurf"
+
+#: models/manifestation.py:36
+msgid "Fragments"
+msgstr "Fragment"
+
+#: models/manifestation.py:45
+msgid "Plate Print"
+msgstr "Plattendruck"
+
+#: models/manifestation.py:46
+msgid "Lithograph"
+msgstr "Lithograph"
+
+#: models/manifestation.py:54
+msgid "first issue"
+msgstr "Erstauflage"
+
+#: models/manifestation.py:55
+msgid "following issue"
+msgstr "Folgeauflage"
+
+#: models/manifestation.py:58
+msgid "transcript"
+msgstr "Abschrift"
+
+#: models/manifestation.py:59
+msgid "transcript with autograph entries"
+msgstr "Abschrift mit autographen Eintragungen"
+
+#: models/manifestation.py:60
+msgid "autograph"
+msgstr "Autograph"
+
+#: models/manifestation.py:61
+msgid "questionable autograph"
+msgstr "Fragliches Autograph"
+
+#: models/manifestation.py:62
+msgid "print with autograph entries"
+msgstr "Druck mit autographen Eintragungen"
+
+#: models/manifestation.py:78
+msgid "complete"
+msgstr "vollständig"
+
+#: models/manifestation.py:79
+msgid "incomplete"
+msgstr "unvollständig"
+
+#: models/manifestation.py:84
+msgid "working title"
+msgstr "Arbeitstitel"
+
+#: models/manifestation.py:90
+msgid "source title"
+msgstr "Quellentitel"
+
+#: models/manifestation.py:122
+msgid "manifestation form"
+msgstr "Quellenform"
+
+#: models/manifestation.py:129
+msgid "source type"
+msgstr "Quellentyp"
+
+#: models/manifestation.py:136 models/manifestation.py:142
+msgid "edition"
+msgstr "Auflage"
+
+#: models/manifestation.py:148
+msgid "state"
+msgstr "Status"
+
+#: models/manifestation.py:157
+msgid "history"
+msgstr "Geschichte"
+
+#: models/manifestation.py:169
+msgid "language"
+msgstr "Sprache"
+
+#: models/manifestation.py:174
+msgid "watermark"
+msgstr "Wasserzeichen"
+
+#: models/manifestation.py:179
+msgid "watermark url"
+msgstr "Wasserzeichen URL"
+
+#: models/manifestation.py:202
+msgid "diplomatic date"
+msgstr "Datierung (diplomatisch)"
+
+#: models/manifestation.py:207
+msgid "print extent"
+msgstr "Druckumfang"
+
+#: models/manifestation.py:212
+msgid "private head comment"
+msgstr "interner Kommentar (Werkbezüge)"
+
+#: models/manifestation.py:217
+msgid "private relations comment"
+msgstr "interner Kommentar"
+
+#: models/manifestation.py:222
+msgid "private title comment"
+msgstr "interner Kommentar zur Titelei"
+
+#: models/manifestation.py:227
+msgid "private history comment"
+msgstr "interner Kommentar"
+
+#: models/manifestation.py:237
+msgid "private print comment"
+msgstr "interner Kommentar zu den Druckspezifika"
+
+#: models/manifestation.py:258
+msgid "plate number"
+msgstr "Plattennummer"
+
+#: models/manifestation.py:263
+msgid "album page"
+msgstr "Albumblatt"
+
+#: models/manifestation.py:267
+msgid "performance material"
+msgstr "Aufführungsmaterial"
+
+#: models/manifestation.py:271
+msgid "authorized edition"
+msgstr "autorisierte Ausgabe"
+
+#: models/manifestation.py:275
+msgid "first edition"
+msgstr "Erstausgabe"
+
+#: models/manifestation.py:279
+msgid "proof"
+msgstr "Korrekturabzug"
+
+#: models/manifestation.py:283
+msgid "part"
+msgstr "Stimme"
+
+#: models/manifestation.py:287
+msgid "further edition"
+msgstr "weitere Ausgabe"
+
+#: models/manifestation.py:291
+msgid "correction sheet"
+msgstr "Korrekturblatt"
+
+#: models/manifestation.py:295
+msgid "stitch template"
+msgstr "Stichvorlage"
+
+#: models/manifestation.py:299
+msgid "dedication item"
+msgstr "Widmungsexemplar"
+
+#: models/manifestation.py:303
+msgid "choir score"
+msgstr "Chorpartitur"
+
+#: models/manifestation.py:307
+msgid "piano reduction"
+msgstr "Klavierauszug"
+
+#: models/manifestation.py:311
+msgid "particell"
+msgstr "Particell"
+
+#: models/manifestation.py:315
+msgid "score"
+msgstr "Partitur"
+
+#: models/manifestation.py:328
+msgid "part label"
+msgstr "Qualifikation des Sammlungsbezugs"
+
+#: models/manifestation.py:338
+msgid "first save"
+msgstr "Datum"
+
+#: models/manifestation.py:342
+msgid "last save"
+msgstr "letzte Bearbeitung"
+
+#: models/manifestation.py:347
+msgid "first editor"
+msgstr "Erstbearbeiter*in"
+
+#: models/manifestation.py:352
+msgid "editing history"
+msgstr "Bearbeitungshistorie"
+
+#: models/manifestation.py:357
+msgid "needs review"
+msgstr "zu überarbeiten"
+
+#: models/manifestation.py:373
+msgid "is text"
+msgstr "Text"
+
+#: models/manifestation.py:404
+msgid "coll"
+msgstr "SMLG"
+
+#: models/manifestation.py:405 models/manifestation.py:408
+msgid "empty"
+msgstr "[leer]"
+
+#: models/manifestation.py:412
+msgid "pt"
+msgstr "TEIL"
+
+#: models/manifestation.py:415
+msgid "cmp"
+msgstr "KOMP"
+
+#: models/manifestation.py:679 models/manifestation.py:698
+msgid "inferred"
+msgstr "ermittelt"
+
+#: models/manifestation.py:683 models/manifestation.py:702
+msgid "assumed"
+msgstr "unsicher"
+
+#: models/manifestation.py:710
+msgid "diplomatic title"
+msgstr "diplomatischer Titel"
+
+#: models/manifestation.py:718
+msgid "title type"
+msgstr "Titelposition"
+
+#: models/manifestation.py:740
+msgid "<< new title >>"
+msgstr "<< neuer Titel >>"
+
+#: models/manifestation.py:755
+msgid "is stitch template (as documented)"
+msgstr "ist Stichvorlage (nach Vorlage)"
+
+#: models/manifestation.py:756
+msgid "is stitch template (inferred)"
+msgstr "ist Stichvorlage (angenommen)"
+
+#: models/manifestation.py:757
+msgid "is related to"
+msgstr "hat Bezug zu"

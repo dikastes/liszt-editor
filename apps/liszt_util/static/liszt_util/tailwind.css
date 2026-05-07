@@ -49,6 +49,10 @@ p.note {
     @apply italic;
 }
 
+input:disabled {
+    border-color: black;
+}
+
 .textarea:focus-within, .select:focus-within, .input:focus-within {
     border-color: black;
     outline-style: solid;

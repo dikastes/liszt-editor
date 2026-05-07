@@ -12,11 +12,12 @@ from dominate.tags import div, label, span
 
 class SimpleFormMixin:
     text_area_classes = 'textarea textarea-bordered w-full bg-white border-black'
-    text_input_classes = 'input input-bordered w-full border-black bg-white'
+    text_input_classes = 'input input-bordered w-full border-black bg-white disabled:border-black'
     text_label_classes = 'input input-bordered w-full border-black bg-white flex gap-2 items-center'
     autocomplete_classes = 'autocomplete-select select select-bordered w-full border-black bg-white'
     select_classes = 'select select-bordered w-full border-black bg-white'
     toggle_classes = 'toggle'
+    radio_classes = 'radio'
     palette_classes = 'flex w-full gap-10 my-5'
     form_control_classes = 'form-control'
     palette_form_control_classes = 'form-control flex-1'
@@ -256,25 +257,26 @@ class DateFormMixin:
         }
     not_before = DateField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = { 'class': SimpleFormMixin.radio_classes, 'form': 'form'}
                 ),
             required = False
         )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     def __init__(self, *args, **kwargs):
-        period_property = kwargs.pop('period_property', 'period')
+        self.period_property = kwargs.pop('period_property', 'period')
         super().__init__(*args, **kwargs)
+
 
         if self.is_bound:
             return
 
-        period = getattr(self.instance, period_property, None)
+        period = getattr(self.instance, self.period_property, None)
         if period:
             self.initial.update({
                 'not_before': period.not_before,
@@ -288,10 +290,10 @@ class DateFormMixin:
         instance = super().save(commit=False)
 
         # Ensure period exists or create it
-        if not instance.period:
-            instance.period = Period.objects.create()
+        if not getattr(self.instance, self.period_property):
+            setattr(self.instance, self.period_property, Period.objects.create())
 
-        period_instance = instance.period
+        period_instance = getattr(self.instance, self.period_property)
         period_instance.not_before = self.cleaned_data['not_before']
         period_instance.not_after = self.cleaned_data['not_after']
         period_instance.display = self.cleaned_data['display']
@@ -303,7 +305,7 @@ class DateFormMixin:
 
         return instance
 
-    def get_date_div(self):
+    def get_date_div(self, disable_inferred = False):
         date_div = tags.div()
         not_before_field = self['not_before']
         not_after_field = self['not_after']
@@ -323,7 +325,8 @@ class DateFormMixin:
             with tags.div(cls='flex gap-5 items-end w-full mb-5'):
                 with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
                     with tags.div(cls=SimpleFormMixin.label_classes):
-                        tags.label(_('standardized date'), cls=SimpleFormMixin.label_text_classes)
+                        # display_field.label retrieves for some reason display instead of standardized date
+                        tags.label(display_field.label, cls=SimpleFormMixin.label_text_classes)
                     raw(str(display_field))
                     if display_field.errors:
                         with div(cls='label'):
@@ -364,7 +367,8 @@ class DateFormMixin:
                                     value=str(sw.data.get('value')),
                                     cls='radio',
                                     checked = sw.data.get('selected', False),
-                                    form='form'
+                                    form='form',
+                                    disabled = disable_inferred
                                 )
                 tags.div(cls='flex-1')
                 tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=clear_name)
