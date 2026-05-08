@@ -17,3 +17,10 @@ p.CaptionCont {
 p.CaptionCont label i {
     background-image: none;
 }
+
+@layer components {
+    .input:disabled,
+    .input[disabled] {
+        @apply border-black border-opacity-100 opacity-100;
+    }
+}

@@ -190,7 +190,6 @@ class BaseLetterContributorForm(ModelForm):
                     'form': 'form'
                 }),
             required = False,
-            disabled = True,
             label = _('assumed')
         )
 

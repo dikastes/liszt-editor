@@ -28,7 +28,6 @@ class LetterDeleteView(DeleteView):
 
 def letter_update(request, pk):
     letter = get_object_or_404(Letter, pk=pk)
-    LetterMentioningFormSet = inlineformset_factory(Letter, LetterMentioning, form=LetterMentioningForm, extra=0)
     context = {
         'object': letter,
         'entity_type': 'letter'
@@ -39,30 +38,26 @@ def letter_update(request, pk):
         edition_period_form = LetterEditionPeriodForm(request.POST, instance=letter, prefix='edition_period')
         source_period_form = LetterSourcePeriodForm(request.POST, instance=letter, prefix='source_period')
 
-        if 'remove-sender-person' in request.POST:
-            pk = request.POST.get('remove-sender-person')
-            sender_person = SenderPerson.objects.get(id = pk)
-            sender_person.delete()
-        if 'remove-receiver-person' in request.POST:
-            pk = request.POST.get('remove-receiver-person')
-            receiver_person = ReceiverPerson.objects.get(id = pk)
-            receiver_person.delete()
-        if 'remove-sender-corporation' in request.POST:
-            pk = request.POST.get('remove-sender-corporation')
-            sender_corporation = SenderCorporation.objects.get(id = pk)
-            sender_corporation.delete()
-        if 'remove-receiver-corporation' in request.POST:
-            pk = request.POST.get('remove-receiver-corporation')
-            receiver_corporation = ReceiverCorporation.objects.get(id = pk)
-            receiver_corporation.delete()
-        if 'remove-sender-place' in request.POST:
-            pk = request.POST.get('remove-sender-place')
-            sender_place = SenderPlace.objects.get(id = pk)
-            sender_place.delete()
-        if 'remove-receiver-place' in request.POST:
-            pk = request.POST.get('remove-receiver-place')
-            receiver_place = ReceiverPlace.objects.get(id = pk)
-            receiver_place.delete()
+        roles = ['sender', 'receiver']
+        models = ['person', 'place', 'corporation']
+
+        for role in roles:
+            for model in models:
+                # handle removing the contributor links in the lettercontributor entries
+                remove_submodel_string = f'{role}-{model}-remove-{model}'
+                if remove_submodel_string in request.POST:
+                    pk = request.POST.get(remove_submodel_string)
+                    contributor_model = apps.get_model('edwoca', role + model)
+                    entity = contributor_model.objects.get(id = pk)
+                    setattr(entity, model, None)
+                    entity.save()
+                # handle removing lettercontributor entries
+                remove_model_string = f'remove-{role}-{model}'
+                if remove_model_string in request.POST:
+                    pk = request.POST.get(remove_model_string)
+                    contributor_model = apps.get_model('edwoca', role + model)
+                    entity = contributor_model.objects.get(id = pk)
+                    entity.delete()
 
         sender_person_forms = []
         for sender_person in letter.senderperson_relations.all():
@@ -79,25 +74,25 @@ def letter_update(request, pk):
         sender_corporation_forms = []
         for sender_corporation in letter.sendercorporation_relations.all():
             prefix = f'sender_corporation_{sender_corporation.id}'
-            sender_corporation_form = SenderCorporationForm(request.POST, instance = sender_corporation)
+            sender_corporation_form = SenderCorporationForm(request.POST, instance = sender_corporation, prefix = prefix)
             sender_corporation_forms.append(sender_corporation_form)
 
         receiver_corporation_forms = []
         for receiver_corporation in letter.receivercorporation_relations.all():
             prefix = f'receiver_corporation_{receiver_corporation.id}'
-            receiver_corporation_form = ReceiverCorporationForm(request.POST, instance = receiver_corporation)
+            receiver_corporation_form = ReceiverCorporationForm(request.POST, instance = receiver_corporation, prefix = prefix)
             receiver_corporation_forms.append(receiver_corporation_form)
 
         sender_place_forms = []
         for sender_place in letter.senderplace_relations.all():
             prefix = f'sender_place_{sender_place.id}'
-            sender_place_form = SenderPlaceForm(request.POST, instance = sender_place)
+            sender_place_form = SenderPlaceForm(request.POST, instance = sender_place, prefix = prefix)
             sender_place_forms.append(sender_place_form)
 
         receiver_place_forms = []
         for receiver_place in letter.receiverplace_relations.all():
             prefix = f'receiver_place_{receiver_place.id}'
-            receiver_place_form = ReceiverPlaceForm(request.POST, instance = receiver_place)
+            receiver_place_form = ReceiverPlaceForm(request.POST, instance = receiver_place, prefix = prefix)
             receiver_place_forms.append(receiver_place_form)
 
         letter_mentioning_forms = []
@@ -186,25 +181,25 @@ def letter_update(request, pk):
         sender_corporation_forms = []
         for sender_corporation in letter.sendercorporation_relations.all():
             prefix = f'sender_corporation_{sender_corporation.id}'
-            sender_corporation_form = SenderCorporationForm(instance = sender_corporation)
+            sender_corporation_form = SenderCorporationForm(instance = sender_corporation, prefix = prefix)
             sender_corporation_forms.append(sender_corporation_form)
 
         receiver_corporation_forms = []
         for receiver_corporation in letter.receivercorporation_relations.all():
             prefix = f'receiver_corporation_{receiver_corporation.id}'
-            receiver_corporation_form = ReceiverCorporationForm(instance = receiver_corporation)
+            receiver_corporation_form = ReceiverCorporationForm(instance = receiver_corporation, prefix = prefix)
             receiver_corporation_forms.append(receiver_corporation_form)
 
         sender_place_forms = []
         for sender_place in letter.senderplace_relations.all():
             prefix = f'sender_place_{sender_place.id}'
-            sender_place_form = SenderPlaceForm(instance = sender_place)
+            sender_place_form = SenderPlaceForm(instance = sender_place, prefix = prefix)
             sender_place_forms.append(sender_place_form)
 
         receiver_place_forms = []
         for receiver_place in letter.receiverplace_relations.all():
             prefix = f'receiver_place_{receiver_place.id}'
-            receiver_place_form = ReceiverPlaceForm(instance = receiver_place)
+            receiver_place_form = ReceiverPlaceForm(instance = receiver_place, prefix = prefix)
             receiver_place_forms.append(receiver_place_form)
 
 
@@ -283,6 +278,7 @@ def letter_update(request, pk):
                 'receiver_corporation_forms': receiver_corporation_forms,
                 'sender_place_forms': sender_place_forms,
                 'receiver_place_forms': receiver_place_forms,
+                'letter_mentioning_forms': letter_mentioning_forms
             })
 
         return render(request, 'edwoca/letter_update.html', context)

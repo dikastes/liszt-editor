@@ -21,24 +21,8 @@
 </h3>
 
 {% for sender_person_form in sender_person_forms %}
-    <div class="border border-black my-5 p-5">
-        <div>
-            {% include 'edwoca/partials/htmx/search.html' with label='person' search_type='person' field_name='person' app='edwoca' model_name='sender_person' target_app='dmad' target_model='person' target_id='edition_sender_person' id='{{ sender_person_form.instance.id }}' placeholder='search persons' multiplicity='multiple' %}
-        </div>
-
-        {{ sender_person_form.as_daisy }}
-
-        <div class="flex">
-            <div class="flex-1"></div>
-            <div class="flex-0">
-                <form method="post" class="mb-0">
-                    <button class="btn btn-primary btn-outline" type="submit" name="remove-sender-person" value="{{ sender_person_form.instance.id }}" form="form">
-                        {% translate 'remove sender person' %}
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% translate 'remove sender person' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_person_form target='person' contributor=sender_person_form.instance.person model_name='senderperson' role='sender' remove_button_label=remove_button_label %}
 {% endfor %}
 
 <div class="flex">
@@ -53,24 +37,8 @@
 </div>
 
 {% for sender_corporation_form in sender_corporation_forms %}
-    <div class="border border-black my-5 p-5">
-        <div>
-            {% include 'edwoca/partials/htmx/search.html' with label='corporation' search_type='corporation' field_name='corporation' app='edwoca' model_name='sender_corporation' target_app='dmad' target_model='corporation' target_id='edition_sender_corporation' id='{{ sender_corporation_form.instance.id }}' placeholder='search corporations' multiplicity='multiple' %}
-        </div>
-
-        {{ sender_corporation_form.as_daisy }}
-
-        <div class="flex">
-            <div class="flex-1"></div>
-            <div class="flex-0">
-                <form method="post">
-                    <button class="btn btn-primary btn-outline" type="submit" name="remove-sender-corporation" value="{{ sender_corporation_form.instance.id }}" form="form">
-                        {% translate 'remove sender corporation' %}
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% translate 'remove sender corporation' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_corporation_form target='corporation' contributor=sender_corporation_form.instance.corporation model_name='sendercorporation' role='sender' remove_button_label=remove_button_label %}
 {% endfor %}
 
 <div class="flex">
@@ -89,24 +57,8 @@
 </h3>
 
 {% for receiver_person_form in receiver_person_forms %}
-    <div class="border border-black my-5 p-5">
-        <div>
-            {% include 'edwoca/partials/htmx/search.html' with label='person' search_type='person' field_name='person' app='edwoca' model_name='receiver_person' target_app='dmad' target_model='person' target_id='edition_receiver_person' id='{{ receiver_person_form.instance.id }}' placeholder='search persons' multiplicity='multiple' %}
-        </div>
-
-        {{ receiver_person_form.as_daisy }}
-
-        <div class="flex">
-            <div class="flex-1"></div>
-            <div class="flex-0">
-                <form method="post">
-                    <button class="btn btn-primary btn-outline" type="submit" name="remove-receiver-person" value="{{ receiver_person_form.instance.id }}" form="form">
-                        {% translate 'remove receiver person' %}
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% translate 'remove receiver person' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_person_form target='person' contributor=receiver_person_form.instance.person model_name='receiverperson' role='receiver' remove_button_label=remove_button_label %}
 {% endfor %}
 
 <div class="flex">
@@ -121,24 +73,8 @@
 </div>
 
 {% for receiver_corporation_form in receiver_corporation_forms %}
-    <div class="border border-black my-5 p-5">
-        <div>
-            {% include 'edwoca/partials/htmx/search.html' with label='corporation' search_type='corporation' field_name='corporation' app='edwoca' model_name='receiver_corporation' target_app='dmad' target_model='corporation' target_id='edition_receiver_corporation' id='{{ receiver_corporation_form.instance.id }}' placeholder='search corporations' multiplicity='multiple' %}
-        </div>
-
-        {{ receiver_corporation_form.as_daisy }}
-
-        <div class="flex">
-            <div class="flex-1"></div>
-            <div class="flex-0">
-                <form method="post">
-                    <button class="btn btn-primary btn-outline" type="submit" name="remove-receiver-corporation" value="{{ receiver_corporation_form.instance.id }}" form="form">
-                        {% translate 'remove receiver corporation' %}
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% translate 'remove receiver corporation' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_corporation_form target='corporation' contributor=receiver_corporation_form.instance.corporation model_name='receivercorporation' role='receiver' remove_button_label=remove_button_label %}
 {% endfor %}
 
 <div class="flex">
@@ -157,24 +93,8 @@
 </h3>
 
 {% for receiver_place_form in receiver_place_forms %}
-    <div class="border border-black my-5 p-5">
-        <div>
-            {% include 'edwoca/partials/htmx/search.html' with label='place' search_type='place' field_name='place' app='edwoca' model_name='receiver_place' target_app='dmad' target_model='place' target_id='edition_receiver_place' id='{{ receiver_place_form.instance.id }}' placeholder='search places' multiplicity='multiple' %}
-        </div>
-
-        {{ receiver_place_form.as_daisy }}
-
-        <div class="flex">
-            <div class="flex-1"></div>
-            <div class="flex-0">
-                <form method="post">
-                    <button class="btn btn-primary btn-outline" type="submit" name="remove-receiver-place" value="{{ receiver_place_form.instance.id }}" form="form">
-                        {% translate 'remove receiver place' %}
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% translate 'remove receiver place' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_place_form target='place' contributor=receiver_place_form.instance.place model_name='receiverplace' role='receiver' remove_button_label=remove_button_label %}
 {% endfor %}
 
 <div class="flex">
@@ -189,24 +109,8 @@
 </div>
 
 {% for sender_place_form in sender_place_forms %}
-    <div class="border border-black my-5 p-5">
-        <div>
-            {% include 'edwoca/partials/htmx/search.html' with label='place' search_type='place' field_name='place' app='edwoca' model_name='sender_place' target_app='dmad' target_model='place' target_id='edition_sender_place' id='{{ sender_place_form.instance.id }}' placeholder='search places' multiplicity='multiple' %}
-        </div>
-
-        {{ sender_place_form.as_daisy }}
-
-        <div class="flex">
-            <div class="flex-1"></div>
-            <div class="flex-0">
-                <form method="post">
-                    <button class="btn btn-primary btn-outline" type="submit" name="remove-sender-place" value="{{ sender_place_form.instance.id }}" form="form">
-                        {% translate 'remove sender place' %}
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
+    {% translate 'remove sender place' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_place_form target='place' contributor=sender_place_form.instance.place model_name='senderplace' role='sender' remove_button_label=remove_button_label %}
 {% endfor %}
 
 <div class="flex">
@@ -250,7 +154,7 @@
     <div class="items-center">
         <form method="get" class="flex">
             <label class="bg-white input input-bordered border-r-0 border-black flex items-center gap-2 flex-1">
-                Edition
+                {% translate 'edition' %}
                 <input type="text" name="edition-q" class="grow" {% if query_edition %}value="{{ query_edition }}"{% endif %}>
             </label>
             <input type="submit" class="btn btn-outline flex-0" value="{% translate 'search' %}"/>
@@ -263,7 +167,9 @@
                 <a href="{% url 'edwoca:letter_add_edition' object.id edition.pk %}">{{ edition.object }}</a>
             </li>
         {% empty %}
-            <li>Keine Suchergebnisse</li>
+            <li>
+                {% translate 'no search results' %}
+            </li>
         {% endfor %}
         </ul>
     {% endif %}

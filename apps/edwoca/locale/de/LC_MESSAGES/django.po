@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-07 09:22+0200\n"
+"POT-Creation-Date: 2026-05-08 16:22+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: forms/base.py:262 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:179 forms/item.py:237
-#: forms/letter.py:68 forms/letter.py:254 forms/manifestation.py:256
+#: forms/letter.py:68 forms/letter.py:167 forms/manifestation.py:256
 #: forms/manifestation.py:794 forms/manifestation.py:926
 #: forms/modification.py:26
 msgid "based on source"
@@ -27,7 +27,7 @@ msgstr "nach Vorlage"
 
 #: forms/base.py:262 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:179 forms/item.py:237
-#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:254
+#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:167
 #: forms/manifestation.py:256 forms/manifestation.py:794
 #: forms/manifestation.py:926 forms/modification.py:26
 #: templates/edwoca/manifestation_print.html:142
@@ -62,7 +62,7 @@ msgstr "Textart"
 msgid "date according to edition (standardized)"
 msgstr "Datierung nach Edition (standardisiert)"
 
-#: forms/letter.py:31 forms/letter.py:261
+#: forms/letter.py:31 forms/letter.py:182
 msgid "based on edition"
 msgstr "nach Edition"
 
@@ -70,15 +70,20 @@ msgstr "nach Edition"
 msgid "date according to source (standardized)"
 msgstr "Datierung nach Originalquelle (standardisiert)"
 
-#: forms/letter.py:246
+#: forms/letter.py:159
 msgid "source name"
 msgstr "Name (nach Originalquelle)"
 
-#: forms/letter.py:251
+#: forms/letter.py:164
 msgid "edtion name"
 msgstr "Name (nach Edition)"
 
-#: forms/letter.py:261
+#: forms/letter.py:179 forms/letter.py:193
+#: templates/edwoca/manifestation_print.html:150
+msgid "assumed"
+msgstr "unsicher"
+
+#: forms/letter.py:182
 msgid "attributed"
 msgstr "zugeschrieben"
 
@@ -389,15 +394,39 @@ msgstr "Postkarte"
 msgid "Copy"
 msgstr "Abschrift"
 
-#: models/letter.py:107
+#: models/letter.py:45
+msgid "receiver person"
+msgstr "Empfänger (Person)"
+
+#: models/letter.py:51
+msgid "sender person"
+msgstr "Absender (Person)"
+
+#: models/letter.py:57
+msgid "receiver corporation"
+msgstr "Empfänger (Korporation)"
+
+#: models/letter.py:63
+msgid "sender corporation"
+msgstr "Absender (Korporation)"
+
+#: models/letter.py:69
+msgid "receiver place"
+msgstr "Empfangsort"
+
+#: models/letter.py:75
+msgid "sender place"
+msgstr "Absendeort"
+
+#: models/letter.py:93
 msgid "category"
 msgstr "Kategorie"
 
-#: models/letter.py:112 models/letter.py:117
+#: models/letter.py:98 models/letter.py:103
 #: templates/edwoca/manifestation_history.html:85
 #: templates/edwoca/manifestation_manuscript.html:64
 #: templates/edwoca/manifestation_provenance.html:478
-#: templates/edwoca/manifestation_title.html:353
+#: templates/edwoca/manifestation_title.html:255
 #: templates/edwoca/manifestation_update.html:115
 #: templates/edwoca/partials/expression/expression_menu.html:70
 #: templates/edwoca/partials/item/item_menu.html:58
@@ -408,31 +437,31 @@ msgstr "Kategorie"
 msgid "comment"
 msgstr "Kommentar"
 
-#: models/letter.py:138
+#: models/letter.py:124
 msgid "diplomatic date on source"
 msgstr "Datierung diplomatisch (nach Originalquelle)"
 
-#: models/letter.py:148
+#: models/letter.py:134
 msgid "sender corporation name according to edition"
 msgstr "Name der Körperschaft (nach Edition)"
 
-#: models/letter.py:153
+#: models/letter.py:139
 msgid "sender corporation name according to source"
 msgstr "Name der Körperschaft (nach Originalquelle)"
 
-#: models/letter.py:165
+#: models/letter.py:151
 msgid "unknown"
 msgstr "unbekannt"
 
-#: models/letter.py:166
+#: models/letter.py:152
 msgid "writing to"
 msgstr "an"
 
-#: models/letter.py:167
+#: models/letter.py:153
 msgid "et al."
 msgstr "u. a."
 
-#: models/letter.py:212 templates/edwoca/letter_update.html:233
+#: models/letter.py:198 templates/edwoca/letter_update.html:137
 msgid "pages"
 msgstr "Seiten"
 
@@ -476,7 +505,7 @@ msgstr "Literatur durchsuchen"
 
 #: templates/edwoca/bib_update.html:54 templates/edwoca/bib_update.html:109
 #: templates/edwoca/create_manifestation.html:20
-#: templates/edwoca/letter_update.html:256
+#: templates/edwoca/letter_update.html:160
 #: templates/edwoca/manifestation_history.html:62
 #: templates/edwoca/manifestation_print.html:43
 #: templates/edwoca/manifestation_print.html:66
@@ -512,8 +541,8 @@ msgstr "suchen"
 #: templates/edwoca/manifestation_relations.html:145
 #: templates/edwoca/manifestation_relations.html:364
 #: templates/edwoca/manifestation_relations.html:459
-#: templates/edwoca/manifestation_title.html:179
-#: templates/edwoca/manifestation_title.html:295
+#: templates/edwoca/manifestation_title.html:113
+#: templates/edwoca/manifestation_title.html:199
 #: templates/edwoca/manifestation_update.html:106
 #: templates/edwoca/partials/forms/_modification_form.html:72
 #: templates/edwoca/partials/forms/_modification_form.html:115
@@ -526,7 +555,7 @@ msgstr "keine Suchergebnisse"
 msgid "letters"
 msgstr "Briefe"
 
-#: templates/edwoca/bib_update.html:91 templates/edwoca/letter_update.html:244
+#: templates/edwoca/bib_update.html:91 templates/edwoca/letter_update.html:148
 #: templates/edwoca/manifestation_digital_copy.html:40
 #: templates/edwoca/manifestation_history.html:43
 #: templates/edwoca/manifestation_print.html:22
@@ -535,15 +564,16 @@ msgstr "Briefe"
 #: templates/edwoca/manifestation_provenance.html:156
 #: templates/edwoca/manifestation_provenance.html:279
 #: templates/edwoca/manifestation_provenance.html:384
-#: templates/edwoca/manifestation_title.html:124
-#: templates/edwoca/manifestation_title.html:196
-#: templates/edwoca/manifestation_title.html:247
-#: templates/edwoca/manifestation_title.html:312
+#: templates/edwoca/manifestation_title.html:92
+#: templates/edwoca/manifestation_title.html:129
+#: templates/edwoca/manifestation_title.html:179
+#: templates/edwoca/manifestation_title.html:215
 #: templates/edwoca/manifestation_update.html:83
 #: templates/edwoca/partials/forms/_modification_form.html:47
 #: templates/edwoca/partials/forms/_modification_form.html:86
 #: templates/edwoca/partials/forms/handwriting_form.html:18
 #: templates/edwoca/partials/forms/handwriting_form.html:72
+#: templates/edwoca/partials/letter/contributor_form.html:12
 msgid "remove"
 msgstr "entfernen"
 
@@ -600,64 +630,64 @@ msgstr "Datierung"
 msgid "sender"
 msgstr "Absender"
 
-#: templates/edwoca/letter_update.html:36
+#: templates/edwoca/letter_update.html:24
 msgid "remove sender person"
-msgstr "Absender entfernen"
+msgstr "Absender (Person) entfernen"
+
+#: templates/edwoca/letter_update.html:33
+msgid "add sender person"
+msgstr "Absender (Person) hinzufügen"
+
+#: templates/edwoca/letter_update.html:40
+msgid "remove sender corporation"
+msgstr "Absender (Korporation) entfernen"
 
 #: templates/edwoca/letter_update.html:49
-msgid "add sender person"
-msgstr "Absender hinzufügen"
-
-#: templates/edwoca/letter_update.html:68
-msgid "remove sender corporation"
-msgstr "Absender entfernen"
-
-#: templates/edwoca/letter_update.html:81
 msgid "add sender corporation"
-msgstr "Absender hinzufügen"
+msgstr "Absender (Korporation) hinzufügen"
 
-#: templates/edwoca/letter_update.html:88
+#: templates/edwoca/letter_update.html:56
 msgid "receiver"
 msgstr "Empfänger"
 
-#: templates/edwoca/letter_update.html:104
+#: templates/edwoca/letter_update.html:60
 msgid "remove receiver person"
-msgstr "Empfänger entfernen"
+msgstr "Empfänger (Person) entfernen"
 
-#: templates/edwoca/letter_update.html:117
+#: templates/edwoca/letter_update.html:69
 msgid "add receiver person"
-msgstr "Empfänger hinzufügen"
+msgstr "Empfänger (Person) hinzufügen"
 
-#: templates/edwoca/letter_update.html:136
+#: templates/edwoca/letter_update.html:76
 msgid "remove receiver corporation"
-msgstr "Empfänger entfernen"
+msgstr "Empfänger (Korporation) entfernen"
 
-#: templates/edwoca/letter_update.html:149
+#: templates/edwoca/letter_update.html:85
 msgid "add receiver corporation"
-msgstr "Empfänger hinzufügen"
+msgstr "Empfänger (Korporation) hinzufügen"
 
-#: templates/edwoca/letter_update.html:156
+#: templates/edwoca/letter_update.html:92
 #: templates/edwoca/manifestation_history.html:20
 msgid "places"
 msgstr "Orte"
 
-#: templates/edwoca/letter_update.html:172
+#: templates/edwoca/letter_update.html:96
 msgid "remove receiver place"
-msgstr "Ort entfernen"
+msgstr "Empfangsort entfernen"
 
-#: templates/edwoca/letter_update.html:185
+#: templates/edwoca/letter_update.html:105
 msgid "add receiver place"
-msgstr "Ort hinzufügen"
+msgstr "Empfangsort hinzufügen"
 
-#: templates/edwoca/letter_update.html:204
+#: templates/edwoca/letter_update.html:112
 msgid "remove sender place"
-msgstr "Ort entfernen"
+msgstr "Absendeort entfernen"
 
-#: templates/edwoca/letter_update.html:217
+#: templates/edwoca/letter_update.html:121
 msgid "add sender place"
-msgstr "Ort hinzufügen"
+msgstr "Absendeort hinzufügen"
 
-#: templates/edwoca/letter_update.html:224
+#: templates/edwoca/letter_update.html:128
 msgid "editions"
 msgstr "Editionen"
 
@@ -769,8 +799,8 @@ msgstr "kein Ort verknüpft"
 
 #: templates/edwoca/manifestation_history.html:57
 #: templates/edwoca/manifestation_print.html:63
-#: templates/edwoca/manifestation_title.html:191
-#: templates/edwoca/manifestation_title.html:307
+#: templates/edwoca/manifestation_title.html:124
+#: templates/edwoca/manifestation_title.html:210
 msgid "place"
 msgstr "Ort"
 
@@ -832,10 +862,6 @@ msgstr "Ort ermittelt"
 #: templates/edwoca/manifestation_print.html:135
 msgid "place as documented"
 msgstr "Ort nach Vorlage"
-
-#: templates/edwoca/manifestation_print.html:150
-msgid "assumed"
-msgstr "unsicher"
 
 #: templates/edwoca/manifestation_print.html:160
 msgid "remove publication"
@@ -1104,58 +1130,58 @@ msgstr "Diplomatische Titel"
 msgid "writers/hands"
 msgstr "Schreiber"
 
-#: templates/edwoca/manifestation_title.html:79
+#: templates/edwoca/manifestation_title.html:47
 #: templates/edwoca/partials/forms/_modification_form.html:31
 msgid "create handwriting"
 msgstr "Schreiber hinzufügen"
 
-#: templates/edwoca/manifestation_title.html:87
+#: templates/edwoca/manifestation_title.html:55
 msgid "remove title"
 msgstr "Titel entfernen"
 
-#: templates/edwoca/manifestation_title.html:93
+#: templates/edwoca/manifestation_title.html:61
 msgid "no titles"
 msgstr "keine Titel"
 
-#: templates/edwoca/manifestation_title.html:100
+#: templates/edwoca/manifestation_title.html:68
 msgid "create title"
 msgstr "Titel anlegen"
 
-#: templates/edwoca/manifestation_title.html:104
+#: templates/edwoca/manifestation_title.html:72
 msgid "dedications"
 msgstr "Widmungen"
 
-#: templates/edwoca/manifestation_title.html:106
+#: templates/edwoca/manifestation_title.html:74
 msgid "person dedications"
 msgstr "Personenwidmungen"
 
-#: templates/edwoca/manifestation_title.html:119
-#: templates/edwoca/manifestation_title.html:242
+#: templates/edwoca/manifestation_title.html:87
+#: templates/edwoca/manifestation_title.html:174
 msgid "dedicatee"
 msgstr "Widmungsträger"
 
-#: templates/edwoca/manifestation_title.html:212
-#: templates/edwoca/manifestation_title.html:328
+#: templates/edwoca/manifestation_title.html:144
+#: templates/edwoca/manifestation_title.html:230
 msgid "remove dedication"
 msgstr "Widmung entfernen"
 
-#: templates/edwoca/manifestation_title.html:218
+#: templates/edwoca/manifestation_title.html:150
 msgid "no person dedications"
 msgstr "keine Personenwidmungen"
 
-#: templates/edwoca/manifestation_title.html:224
+#: templates/edwoca/manifestation_title.html:156
 msgid "create person dedication"
 msgstr "Personenwidmung anlegen"
 
-#: templates/edwoca/manifestation_title.html:228
+#: templates/edwoca/manifestation_title.html:160
 msgid "corporation dedications"
 msgstr "Körperschaftswidmungen"
 
-#: templates/edwoca/manifestation_title.html:334
+#: templates/edwoca/manifestation_title.html:236
 msgid "no corporation dedications"
 msgstr "keine Körperschaftswidmungen"
 
-#: templates/edwoca/manifestation_title.html:340
+#: templates/edwoca/manifestation_title.html:242
 msgid "create corporation dedication"
 msgstr "Körperschaftswidmung anlegen"
 
@@ -1517,6 +1543,11 @@ msgstr "Körperschaften durchsuchen"
 #: views/manifestation/title.py:198 views/manifestation/title.py:203
 msgid "search place"
 msgstr "Orte durchsuchen"
+
+#, fuzzy
+#~| msgid "remove"
+#~ msgid "remove "
+#~ msgstr "entfernen"
 
 #~ msgid "place according to edition"
 #~ msgstr "Ort (nach Edition)"

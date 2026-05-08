@@ -3949,6 +3949,15 @@ details.collapse summary::-webkit-details-marker {
   border-bottom-left-radius: 0px;
 }
 
+.input:disabled,
+    .input[disabled],
+    .select:disabled,
+    .select[disabled] {
+  border-color: rgb(0 0 0 / var(--tw-border-opacity, 1));
+  --tw-border-opacity: 1;
+  opacity: 1;
+}
+
 .collapse {
   visibility: collapse;
 }
@@ -4212,10 +4221,6 @@ details.collapse summary::-webkit-details-marker {
 
 .grow {
   flex-grow: 1;
-}
-
-.cursor-not-allowed {
-  cursor: not-allowed;
 }
 
 .cursor-pointer {

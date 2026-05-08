@@ -94,11 +94,6 @@ def htmx_update(request):
         qs = getattr(entity, field_name)
         qs.add(target)
 
-    #updated_count = model.objects.filter(pk=model_id).update(**{field_name: target})
-
-    #if updated_count == 0:
-        #raise Http404("Instance not found")
-
     return render(request, 'edwoca/partials/htmx/selected.html', {
         'target': target,
         'label': label_htmx,

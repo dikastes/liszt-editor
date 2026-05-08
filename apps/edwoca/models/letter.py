@@ -41,32 +41,38 @@ class Letter(models.Model):
     receiver_persons = models.ManyToManyField(
             'dmad.Person',
             through = 'ReceiverPerson',
-            related_name = 'edition_receiver_of'
+            related_name = 'edition_receiver_of',
+            verbose_name = _('receiver person')
         )
     sender_persons = models.ManyToManyField(
             'dmad.Person',
             through = 'SenderPerson',
-            related_name = 'edition_sender_of'
+            related_name = 'edition_sender_of',
+            verbose_name = _('sender person')
         )
     receiver_corporations = models.ManyToManyField(
             'dmad.Corporation',
             through = 'ReceiverCorporation',
-            related_name = 'edition_receiver_of'
+            related_name = 'edition_receiver_of',
+            verbose_name = _('receiver corporation')
         )
     sender_corporations = models.ManyToManyField(
             'dmad.Corporation',
             through = 'SenderCorporation',
-            related_name = 'edition_sender_of'
+            related_name = 'edition_sender_of',
+            verbose_name = _('sender corporation')
         )
     receiver_places = models.ManyToManyField(
             'dmad.Place',
             through = 'ReceiverPlace',
-            related_name = 'receiver_place_of'
+            related_name = 'receiver_place_of',
+            verbose_name = _('receiver place')
         )
     sender_places = models.ManyToManyField(
             'dmad.Place',
             through = 'SenderPlace',
-            related_name = 'sender_place_of'
+            related_name = 'sender_place_of',
+            verbose_name = _('sender place')
         )
     edition_period = models.OneToOneField(
             'dmad.Period',
@@ -265,7 +271,7 @@ class ReceiverPerson(BaseLetterContributor):
 
 
 class SenderCorporation(BaseLetterContributor):
-    edition_corporation = models.ForeignKey(
+    corporation = models.ForeignKey(
             'dmad.Corporation',
             on_delete = models.SET_NULL,
             null = True,
@@ -274,7 +280,7 @@ class SenderCorporation(BaseLetterContributor):
 
 
 class ReceiverCorporation(BaseLetterContributor):
-    edition_corporation = models.ForeignKey(
+    corporation = models.ForeignKey(
             'dmad.Corporation',
             on_delete = models.SET_NULL,
             null = True,
