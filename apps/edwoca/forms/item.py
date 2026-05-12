@@ -36,72 +36,11 @@ class ItemForm(ModelForm):
 
         return mark_safe(str(form))
 
-class SignatureForm(GenericAsDaisyMixin, ModelForm):
-    layout = Layouts.LABEL_OUTSIDE
-
+class SignatureForm(BaseSignatureForm):
     class Meta:
         model = ItemSignature
-        fields = ['library', 'signature', 'status', 'id']
-        widgets = {
-                'library': Select( attrs = {
-                        'class': SimpleFormMixin.autocomplete_classes,
-                        'form': 'form'
-                    }),
-                'signature': TextInput( attrs = {
-                        'class': SimpleFormMixin.text_input_classes,
-                        'form': 'form'
-                    }),
-                'status': Select( attrs = {
-                        'class': SimpleFormMixin.select_classes,
-                        'form': 'form'
-                    }),
-                'id': HiddenInput()
-            }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        lib_field = self.fields['library']
-        lib_field.label = f'{lib_field.label}*'
-
-    def as_daisy(self):
-        form_wrapper = div(cls='mb-10')
-
-        library_field = self['library']
-        signature_field = self['signature']
-        status_field = self['status']
-
-        library_container = label(cls='form-control w-full flex-1')
-        library_span = span(library_field.label, cls='label-text')
-        library_div = div(cls='label')
-        library_div.add(library_span)
-        library_container.add(library_div)
-        library_container.add(raw(str(library_field)))
-
-        signature_container = label(cls='form-control w-full flex-1')
-        signature_span = span(signature_field.label, cls='label-text')
-        signature_div = div(cls='label')
-        signature_div.add(signature_span)
-        signature_container.add(signature_div)
-        signature_container.add(raw(str(signature_field)))
-
-        status_container = label(cls='form-control w-full max-w-xs flex-0')
-        status_span = span(status_field.label, cls='label-text')
-        status_div = div(cls='label')
-        status_div.add(status_span)
-        status_container.add(status_div)
-        status_container.add(raw(str(status_field)))
-
-        upper_palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        lower_palette = div(cls='flex flex-rows w-full gap-10 my-5')
-
-        upper_palette.add(library_container)
-        upper_palette.add(status_container)
-        lower_palette.add(signature_container)
-
-        form_wrapper.add(upper_palette)
-        form_wrapper.add(lower_palette)
-
-        return mark_safe(str(form_wrapper))
+        fields = BaseSignatureForm.Meta.fields
+        widgets = BaseSignatureForm.Meta.widgets
 
 
 SignatureFormSet = inlineformset_factory(
@@ -303,33 +242,11 @@ class LibraryForm(ModelForm):
         return mark_safe(str(form))
 
 
-class ItemDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
-    layout = Layouts.LABEL_OUTSIDE
+class ItemDigitizedCopyForm(BaseDigitizedCopyForm):
     class Meta:
         model = ItemDigitalCopy
-        fields = ['url', 'link_type']
-        widgets = {
-                'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}),
-                'link_type': Select(attrs={'class': SimpleFormMixin.select_classes, 'form': 'form'})
-        }
-
-    def as_daisy(self):
-        form = div()
-
-        url_field = self['url']
-        link_type_field = self['link_type']
-
-        with form:
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(url_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(link_type_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(link_type_field))
-
-        return mark_safe(str(form))
+        fields = BaseDigitizedCopyForm.Meta.fields
+        widgets = BaseDigitizedCopyForm.Meta.widgets
 
 
 class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):

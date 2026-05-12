@@ -15,14 +15,15 @@
             hx-target="#results-{{ model_name }}-{{ id }}-{{ field_name }}"
             hx-indicator="#indicator-{{ model_name }}-{{ id }}-{{ field_name }}"
             hx-vals='{
-                 "app": "{{ app }}",
-                 "target_app": "{{ target_app|default:"dmad" }}",
-                 "model_name": "{{ model_name }}",
-                 "model_id": "{{ id }}",
-                 "target_model": "{{ target_model }}",
-                 "search_type": "{{ search_type }}",
-                 "field_name": "{{ field_name }}",
-                 "multiplicity": "{{ multiplicity }}"
+                "app": "{{ app }}",
+                "target_app": "{{ target_app|default:"dmad" }}",
+                "model_name": "{{ model_name }}",
+                "model_id": "{{ id }}",
+                "target_model": "{{ target_model }}",
+                "search_type": "{{ search_type }}",
+                "field_name": "{{ field_name }}",
+                "multiplicity": "{{ multiplicity }}",
+                "label": "{{ label }}"
             }'
         >
         <span id="indicator-{{ model_name }}-{{ id }}-{{ field_name }}" class="htmx-indicator loading loading-spinner loading-sm absolute right-3"></span>
