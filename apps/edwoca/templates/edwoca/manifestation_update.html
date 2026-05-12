@@ -39,9 +39,11 @@
             </div>
             <div class="flex">
                 <div class="flex-1"></div>
-                <form class="flex-0" method="post" action="{% url 'edwoca:item_signature_remove' form.instance.id %}">
+                <form class="flex-0" method="post">
                     {% csrf_token %}
-                    <input type="submit" value="{% translate 'remove signature' %}" class="btn btn-outline text-primary" />
+                    <button type="submit" name="remove-signature" value="{{ form.instance.pk }}" form="form" class="btn btn-outline text-primary">
+                        {% translate 'remove signature' %}
+                    </button>
                 </form>
             </div>
         {% endfor %}

@@ -1,0 +1,221 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-05-06 15:17+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: models/base.py:22
+msgid "Primary"
+msgstr "bevorzugt"
+
+#: models/base.py:23
+msgid "Alternative"
+msgstr "alternativ"
+
+#: models/base.py:24
+msgid "Temporary"
+msgstr "temporär"
+
+#: models/base.py:40
+msgid "inferred"
+msgstr "ermittelt"
+
+#: models/base.py:44
+msgid "assumed"
+msgstr "unsicher"
+
+#: models/corporation.py:70
+msgid "search corporations"
+msgstr "Körperschaftend durchsuchen"
+
+#: models/period.py:16
+msgid "not before"
+msgstr "nicht vor"
+
+#: models/period.py:21
+msgid "not after"
+msgstr "nicht nach"
+
+#: models/period.py:26
+msgid "standardized date"
+msgstr "Datierung (standardisiert)"
+
+#: models/period.py:81 models/period.py:82
+msgid "and"
+msgstr "und"
+
+#: models/period.py:86
+msgid "before"
+msgstr "vor"
+
+#: models/period.py:87
+msgid "after"
+msgstr "nach"
+
+#: models/period.py:105
+msgid "ies"
+msgstr "er"
+
+#: models/period.py:106
+msgid "century"
+msgstr "Jahrhundert"
+
+#: models/period.py:124
+msgid "without date"
+msgstr "o. D."
+
+#: models/period.py:124
+msgid "without year"
+msgstr "o. J."
+
+#: models/period_calculation.py:19
+msgid "january"
+msgstr "Januar"
+
+#: models/period_calculation.py:20
+msgid "february"
+msgstr "Februar"
+
+#: models/period_calculation.py:21
+msgid "march"
+msgstr "März"
+
+#: models/period_calculation.py:22
+msgid "april"
+msgstr "April"
+
+#: models/period_calculation.py:23
+msgid "may"
+msgstr "Mai"
+
+#: models/period_calculation.py:24
+msgid "june"
+msgstr "Juni"
+
+#: models/period_calculation.py:25
+msgid "july"
+msgstr "Juli"
+
+#: models/period_calculation.py:26
+msgid "august"
+msgstr "August"
+
+#: models/period_calculation.py:27
+msgid "september"
+msgstr "September"
+
+#: models/period_calculation.py:28
+msgid "october"
+msgstr "Oktober"
+
+#: models/period_calculation.py:29
+msgid "november"
+msgstr "November"
+
+#: models/period_calculation.py:30
+msgid "december"
+msgstr "Dezember"
+
+#: models/period_calculation.py:358
+msgid "beginning"
+msgstr "Anfang"
+
+#: models/period_calculation.py:359
+msgid "mid"
+msgstr "Mitte"
+
+#: models/period_calculation.py:360
+msgid "end"
+msgstr "Ende"
+
+#: models/period_calculation.py:361
+msgid "first half"
+msgstr "Erste Hälfte"
+
+#: models/period_calculation.py:362
+msgid "second half"
+msgstr "Zweite Hälfte"
+
+#: models/period_calculation.py:363
+msgid "spring"
+msgstr "Frühjahr"
+
+#: models/period_calculation.py:364
+msgid "summer"
+msgstr "Sommer"
+
+#: models/period_calculation.py:365
+msgid "fall"
+msgstr "Herbst"
+
+#: models/period_calculation.py:366
+msgid "winter"
+msgstr "Winter"
+
+#: models/person.py:96
+msgid "search persons"
+msgstr "Personen durchsuchen"
+
+#: models/place.py:69
+msgid "search places"
+msgstr "Orte durchsuchen"
+
+#: models/place.py:132
+msgid "<< error >>"
+msgstr "<< Fehler >>"
+
+#: models/subjectterm.py:48
+msgid "search subject terms"
+msgstr "Sachschlagworte durchsuchen"
+
+#: models/work.py:68
+msgid "search works"
+msgstr "Werke durchsuchen"
+
+#: templates/dmad_on_django/partials/create_button.html:4
+msgid "create"
+msgstr "anlegen"
+
+#: templates/dmad_on_django/partials/facets.html:7
+msgid "filters"
+msgstr "Filter"
+
+#: templates/dmad_on_django/partials/facets.html:21
+#: templates/dmad_on_django/partials/facets.html:33
+msgid "rework"
+msgstr "überarbeiten"
+
+#: templates/dmad_on_django/partials/facets.html:50
+#: templates/dmad_on_django/partials/facets.html:62
+msgid "stubs"
+msgstr "Rumpfdatensätze"
+
+#: templates/dmad_on_django/partials/search_form.html:18
+msgid "search"
+msgstr "suchen"
+
+#: templates/dmad_on_django/partials/search_results.html:13
+msgid "page"
+msgstr "Seite"
+
+#: templates/dmad_on_django/partials/search_results.html:13
+msgid "of"
+msgstr "von"
+
+#: templates/dmad_on_django/partials/search_results.html:32
+msgid "no search results"
+msgstr "keine Suchergebnisse"

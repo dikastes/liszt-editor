@@ -24,10 +24,25 @@ class Status(models.TextChoices):
     TEMPORARY = 'T', _('Temporary')
 
 
-class DocumentationStatus(models.TextChoices):
-    DOCUMENTED = 'D', _('documented')
-    INFERRED = 'I', _('inferred')
-    ASSUMED = 'A', _('assumed')
+#class DocumentationStatus(models.TextChoices):
+    #DOCUMENTED = 'D', _('documented')
+    #INFERRED = 'I', _('inferred')
+    #ASSUMED = 'A', _('assumed')
+
+
+class DocumentationStatusMixin(models.Model):
+    class Meta:
+        abstract = True
+
+
+    inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
+        )
 
 
 class GNDSubjectCategory(models.Model):
@@ -89,6 +104,13 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
         blank=True
     )
     gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
+
+    @property
+    def name(self):
+        if hasattr(self, 'names'):
+            return self.names.filter(status=Status.PRIMARY).first()
+
+        raise Exception(f'Class {self.__class__.__name__} has no names property.')
 
     def is_stub(self):
         if self.gnd_id and self.gnd_id != '':

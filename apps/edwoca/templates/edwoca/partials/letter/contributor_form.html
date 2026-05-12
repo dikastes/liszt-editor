@@ -1,0 +1,38 @@
+{% load i18n %}
+
+<div class="border border-black my-5 p-5">
+    {% if contributor %}
+        <div class="flex gap-5 my-5 items-end">
+            <label class="flex-1 form-control">
+                <div class="label">
+                    <span class="label-text">
+                        {% with label=role|add:' '|add:target %}
+                            {% translate label %}
+                        {% endwith %}
+                    </span>
+                </div>
+                <div class="pseudo-input border border-black flex items-center">
+                    {{ contributor }}
+                </div>
+            </label>
+            <button class="btn btn-primary btn-outline" name="sender-{{ target }}-remove-{{ target }}" value="{{ form.instance.id }}" form="form">
+                {% translate 'remove' %}
+            </button>
+        </div>
+    {% else %}
+        <div id="search-container-{{ model_name }}-{{ form.instance.id }}-{{ target }}">
+            {% include 'edwoca/partials/htmx/search.html' with label=role|add:' '|add:target search_type=target field_name=target app='edwoca' model_name=model_name target_app='dmad' target_model=target target_id=model_name id=form.instance.id placeholder='search '|add:target|add:'s' %}
+        </div>
+    {% endif %}
+
+    {{ form.as_daisy }}
+
+    <div class="flex">
+        <div class="flex-1"></div>
+        <div class="flex-0">
+            <button class="btn btn-primary btn-outline" type="submit" name="remove-{{ role }}-{{target }}" value="{{ form.instance.id }}" form="form">
+                {{ remove_button_label }}
+            </button>
+        </div>
+    </div>
+</div>

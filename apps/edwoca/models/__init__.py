@@ -1,5 +1,5 @@
 from .work import *
 from .expression import *
 from .base import Manifestation, Item
-#from .manifestation import *
+from .letter import *
 #from .item import *

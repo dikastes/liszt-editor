@@ -52,21 +52,6 @@ class ItemSearchView(EdwocaSearchView):
         return super().get_queryset().filter(manifestation_is_singleton = False)
 
 
-class ItemSignatureDeleteView(DeleteView):
-    model = ItemSignature
-
-    def post(self, request, *args, **kwargs):
-        response = super().post(self, request, *args, **kwargs)
-        self.object.item.manifestation.save()
-        return response
-
-    def get_success_url(self):
-        if self.object.item.manifestation.is_singleton:
-            return reverse_lazy('edwoca:manifestation_update', kwargs={'pk': self.object.item.manifestation.id})
-        else:
-            return reverse_lazy('edwoca:item_update', kwargs={'pk': self.object.item.id})
-
-
 def item_update(request, pk):
     item = get_object_or_404(EdwocaItem, pk=pk)
     item_form = ItemForm(request.POST or None, instance=item)
@@ -102,16 +87,18 @@ def item_swap_view(request, pk, direction):
     success = swap_order(item, direction)
     if not success:
         messages.error(request, "Element steht am Anfang oder Ende der Liste")
-        
+
     manifestation = item.manifestation
 
     context = {'object': manifestation}
-    
+
     return render(
         request,
         'edwoca/partials/manifestation/item_list.html',
         context
     )
+
+
 @require_POST
 def item_move_view(request, item_pk):
     item = get_object_or_404(Item, pk=item_pk)
@@ -124,7 +111,7 @@ def item_move_view(request, item_pk):
 
     # Verschieben ausführen
     old_manifestation = item.move_to_manifestation(target_manifestation)
-    
+
     # Erfolgsmeldung für den Verschiebevorgang
     messages.success(request, f'Exemplar wurde erfolgreich nach "{target_manifestation}" verschoben.')
 

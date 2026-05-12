@@ -20,7 +20,8 @@ class ItemModificationForm(DateFormMixin, ModelForm):
     }
     not_before = DateTimeField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = DateTimeField(widget=SelectDateWidget(**kwargs), required=False)
-    display = CharField(required=False, widget=TextInput(attrs={'class': 'grow flex-1', 'form': 'form'}))
+    #display = CharField(required=False, widget=TextInput(attrs={'class': 'grow flex-1', 'form': 'form'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
