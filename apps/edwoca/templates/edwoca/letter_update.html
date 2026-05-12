@@ -9,30 +9,28 @@
 
 <form id="form" method="post" class="mt-5">
     {% csrf_token %}
-    <input type="submit" value="Speichern" class="hidden" id="submit-form">
+    <input type="submit" class="hidden" id="submit-form">
 </form>
 
 {{ edition_period_form.as_daisy }}
 {{ form.diplomatic_date_as_daisy }}
 {{ source_period_form.as_daisy }}
 
-<h3 class="my-5">
+<h2 class="my-5">
     {% translate 'sender' %}
-</h3>
+</h2>
 
 {% for sender_person_form in sender_person_forms %}
     {% translate 'remove sender person' as remove_button_label %}
     {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_person_form target='person' contributor=sender_person_form.instance.person model_name='senderperson' role='sender' remove_button_label=remove_button_label %}
 {% endfor %}
 
-<div class="flex">
+<div class="flex my-5">
     <div class="flex-1"></div>
     <div class="flex-0">
-        <form method="post">
-            <button class="btn btn-outline" type="submit" name="add-sender-person" form="form">
-                {% translate 'add sender person' %}
-            </button>
-        </form>
+        <button class="btn btn-outline" type="submit" name="add-sender-person" form="form">
+            {% translate 'add sender person' %}
+        </button>
     </div>
 </div>
 
@@ -41,34 +39,30 @@
     {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_corporation_form target='corporation' contributor=sender_corporation_form.instance.corporation model_name='sendercorporation' role='sender' remove_button_label=remove_button_label %}
 {% endfor %}
 
-<div class="flex">
+<div class="flex my-5">
     <div class="flex-1"></div>
     <div class="flex-0">
-        <form method="post">
-            <button class="btn btn-outline" type="submit" name="add-sender-corporation" form="form">
-                {% translate 'add sender corporation' %}
-            </button>
-        </form>
+        <button class="btn btn-outline" type="submit" name="add-sender-corporation" form="form">
+            {% translate 'add sender corporation' %}
+        </button>
     </div>
 </div>
 
-<h3 class="my-5">
+<h2 class="my-5">
     {% translate 'receiver' %}
-</h3>
+</h2>
 
 {% for receiver_person_form in receiver_person_forms %}
     {% translate 'remove receiver person' as remove_button_label %}
     {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_person_form target='person' contributor=receiver_person_form.instance.person model_name='receiverperson' role='receiver' remove_button_label=remove_button_label %}
 {% endfor %}
 
-<div class="flex">
+<div class="flex my-5">
     <div class="flex-1"></div>
     <div class="flex-0">
-        <form method="post">
-            <button class="btn btn-outline" type="submit" name="add-receiver-person" form="form">
-                {% translate 'add receiver person' %}
-            </button>
-        </form>
+        <button class="btn btn-outline" type="submit" name="add-receiver-person" form="form">
+            {% translate 'add receiver person' %}
+        </button>
     </div>
 </div>
 
@@ -77,34 +71,30 @@
     {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_corporation_form target='corporation' contributor=receiver_corporation_form.instance.corporation model_name='receivercorporation' role='receiver' remove_button_label=remove_button_label %}
 {% endfor %}
 
-<div class="flex">
+<div class="flex my-5">
     <div class="flex-1"></div>
     <div class="flex-0">
-        <form method="post">
-            <button class="btn btn-outline" type="submit" name="add-receiver-corporation" form="form">
-                {% translate 'add receiver corporation' %}
-            </button>
-        </form>
+        <button class="btn btn-outline" type="submit" name="add-receiver-corporation" form="form">
+            {% translate 'add receiver corporation' %}
+        </button>
     </div>
 </div>
 
-<h3>
+<h2>
     {% translate 'places' %}
-</h3>
+</h2>
 
 {% for receiver_place_form in receiver_place_forms %}
     {% translate 'remove receiver place' as remove_button_label %}
     {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_place_form target='place' contributor=receiver_place_form.instance.place model_name='receiverplace' role='receiver' remove_button_label=remove_button_label %}
 {% endfor %}
 
-<div class="flex">
+<div class="flex my-5">
     <div class="flex-1"></div>
     <div class="flex-0">
-        <form method="post">
-            <button class="btn btn-outline" type="submit" name="add-receiver-place" form="form">
-                {% translate 'add receiver place' %}
-            </button>
-        </form>
+        <button class="btn btn-outline" type="submit" name="add-receiver-place" form="form">
+            {% translate 'add receiver place' %}
+        </button>
     </div>
 </div>
 
@@ -113,20 +103,18 @@
     {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_place_form target='place' contributor=sender_place_form.instance.place model_name='senderplace' role='sender' remove_button_label=remove_button_label %}
 {% endfor %}
 
-<div class="flex">
+<div class="flex my-5">
     <div class="flex-1"></div>
     <div class="flex-0">
-        <form method="post">
-            <button class="btn btn-outline" type="submit" name="add-sender-place" form="form">
-                {% translate 'add sender place' %}
-            </button>
-        </form>
+        <button class="btn btn-outline" type="submit" name="add-sender-place" form="form">
+            {% translate 'add sender place' %}
+        </button>
     </div>
 </div>
 
-<h3>
+<h2>
     {% translate 'editions' %}
-</h3>
+</h2>
 
 <div class="my-5">
     {% for letter_mentioning_form in letter_mentioning_forms %}
@@ -145,7 +133,7 @@
                     </div>
                 {% endif %}
             </label>
-            <a href="{% url 'edwoca:letter_remove_edition' object.id letter_mentioning_form.instance.bib.zot_key %}" class="btn btn-outline flex-0"> {% translate 'remove' %} </a>
+            <a href="{% url 'edwoca:letter_remove_edition' object.id letter_mentioning_form.instance.bib.zot_key %}" class="btn btn-outline btn-primary flex-0"> {% translate 'remove' %} </a>
         </div>
     {% endfor %}
 </div>
@@ -154,7 +142,7 @@
     <div class="items-center">
         <form method="get" class="flex">
             <label class="bg-white input input-bordered border-r-0 border-black flex items-center gap-2 flex-1">
-                {% translate 'edition' %}
+                {% translate 'letter edition' %}
                 <input type="text" name="edition-q" class="grow" {% if query_edition %}value="{{ query_edition }}"{% endif %}>
             </label>
             <input type="submit" class="btn btn-outline flex-0" value="{% translate 'search' %}"/>
@@ -175,6 +163,51 @@
     {% endif %}
 </div>
 
+<h2 class="my-5">
+    {% translate 'letter proof' %}
+</h2>
+
+{% for letter_signature_form in letter_signature_forms %}
+    <div class="my-5 px-5 border border-black">
+        {{ letter_signature_form.as_daisy }}
+        <div class="flex">
+            <div class="flex-1"></div>
+            <div class="flex-0">
+                <button class="btn btn-outline btn-primary mb-5" name="remove-signature" value="{{ letter_signature_form.instance.id }}">
+                    {% translate 'remove letter signature' %}
+                </button>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+<div class="flex">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" name="add-signature">
+            {% translate 'add letter signature' %}
+        </button>
+    </div>
+</div>
+
+{% for letter_digitized_copy_form in letter_digitized_copy_forms %}
+    {{ letter_digitized_copy_form.as_daisy }}
+{% endfor %}
+
+<h2 class="my-5">
+    {% translate 'work relations' %}
+</h2>
+
+<p class="note">
+    🚧 under construction 🚧
+</p>
+
+<h2 class="my-5">
+    {% translate 'comment' %}
+</h2>
+
 {{ form.comment_as_daisy }}
+
+{{ form.editing_history_as_daisy }}
 
 {% endblock %}

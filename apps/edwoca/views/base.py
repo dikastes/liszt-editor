@@ -34,6 +34,7 @@ def htmx_search(request):
     search_type = request.GET.get('search_type')
     field_name = request.GET.get('field_name')
     multiplicity = request.GET.get('multiplicity')
+    label = request.GET.get('label')
 
     search_form = SearchForm(request.GET)
 
@@ -57,6 +58,7 @@ def htmx_search(request):
             'search_type': search_type,
             'field_name': field_name,
             'multiplicity': multiplicity,
+            'label': label,
             'no_result_msg': _('no search results') if not results else None
         })
 

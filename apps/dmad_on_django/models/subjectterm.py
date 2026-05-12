@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCategory
 from json import loads, dumps
-from pylobid.pylobid import PyLobidClient, GNDAPIError
+from slub_pylobid.pylobid import PyLobidClient, GNDAPIError
 import requests
 
 class SubjectTermName(models.Model):

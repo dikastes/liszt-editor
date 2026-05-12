@@ -87,11 +87,14 @@ class LetterSourcePeriodForm(DateFormMixin, ModelForm):
         return mark_safe(str(form))
 
 
-class LetterForm(ModelForm, SimpleFormMixin):
+class LetterForm(BaseTrackedModelForm, ModelForm, SimpleFormMixin):
     class Meta:
         model = Letter
-        fields = ['comment', 'diplomatic_source_date']
-        widgets = {
+        fields = BaseTrackedModelForm.Meta.fields + [
+                'comment',
+                'diplomatic_source_date'
+            ]
+        widgets = dict(BaseTrackedModelForm.Meta.widgets, **{
             'diplomatic_source_date': TextInput(attrs={
                 'class': SimpleFormMixin.text_input_classes,
                 'form': 'form',
@@ -101,7 +104,20 @@ class LetterForm(ModelForm, SimpleFormMixin):
                 'class': SimpleFormMixin.text_area_classes + ' bg-white border-black',
                 'form': 'form'
             }),
-        }
+        })
+
+    first_save = DateTimeField(
+            label=_('first save') + '*',
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black' })
+        )
+    last_save = DateTimeField(
+            label=_('last save'),
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black'})
+        )
 
     def diplomatic_date_as_daisy(self):
         form = div()
@@ -130,6 +146,9 @@ class LetterForm(ModelForm, SimpleFormMixin):
         form.add(comment_container)
 
         return mark_safe(str(form))
+
+    def editing_history_as_daisy(self):
+        return mark_safe(str(self.get_editing_history_div()))
 
 
 class LetterMentioningForm(ModelForm):
@@ -335,3 +354,17 @@ class ReceiverPlaceForm(BaseLetterContributorForm):
         model = ReceiverPlace
         fields = BaseLetterContributorForm.Meta.fields
         widgets = BaseLetterContributorForm.Meta.widgets
+
+
+class LetterSignatureForm(BaseSignatureForm):
+    class Meta:
+        model = LetterSignature
+        fields = BaseSignatureForm.Meta.fields
+        widgets = BaseSignatureForm.Meta.widgets
+
+
+class LetterDigitizedCopyForm(BaseDigitizedCopyForm):
+    class Meta:
+        model = LetterDigitalCopy
+        fields = BaseDigitizedCopyForm.Meta.fields
+        widgets = BaseDigitizedCopyForm.Meta.widgets

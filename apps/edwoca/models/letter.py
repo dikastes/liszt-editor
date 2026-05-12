@@ -1,5 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models.base import DocumentationStatusMixin
+from dmrism.models import TrackedModel
 from .base import *
 
 
@@ -28,7 +29,7 @@ class LetterDigitalCopy(BaseDigitalCopy):
         )
 
 
-class Letter(models.Model):
+class Letter(TrackedModel):
     class Category(models.TextChoices):
         SKETCH = 'S', _('Sketch')
         LETTER = 'L', _('Letter')
@@ -102,6 +103,11 @@ class Letter(models.Model):
             blank = True,
             verbose_name = _('comment')
         )
+    work_mentionings = models.TextField(
+            null = True,
+            blank = True,
+            verbose_name = _('work mentionings')
+        )
     work = models.ManyToManyField(
             'Work',
             related_name = 'letters'
@@ -152,7 +158,7 @@ class Letter(models.Model):
         to = _('writing to')
         etal = ' ' + _('et al.')
         if self.sender_persons.count():
-            if self.sender_corporations or self.sender_persons.count() > 1:
+            if self.sender_corporations.count() or self.sender_persons.count() > 1:
                 sender = self.sender_persons.first().get_default_name() + etal
             else:
                 sender = self.sender_persons.first().get_default_name()

@@ -136,7 +136,7 @@ class ManifestationTitleForm(ModelForm):
         return mark_safe(str(form))
 
 
-class ManifestationCommentForm(CommentForm):
+class ManifestationCommentForm(BaseTrackedModelForm, CommentForm):
     class Meta:
         model = Manifestation
         fields = CommentForm.Meta.fields + ['taken_information', 'first_editor', 'editing_history', 'needs_review']
@@ -168,14 +168,6 @@ class ManifestationCommentForm(CommentForm):
             widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black'})
         )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.pk:
-            self.fields['first_save'].initial = self.instance.first_save
-            self.fields['last_save'].initial = self.instance.last_save
-        fe_field = self.fields['first_editor']
-        fe_field.label = f'{fe_field.label}*'
-
     def as_daisy(self):
         form = div()
 
@@ -201,36 +193,7 @@ class ManifestationCommentForm(CommentForm):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(taken_information_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(taken_information_field))
-            h2(_('editing history'), cls='my-5')
-            h3(_('initial recording'), cls='my-5')
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(first_editor_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(first_editor_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(first_save_field.label, cls=SimpleFormMixin.label_text_classes)
-                with div(cls='flex'):
-                    with div(cls='flex'):
-                        raw(str(first_save_field))
-                    div(cls='flex-1')
-            h3(_('further recording'), cls='my-5')
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(editing_history_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(editing_history_field))
-            with div(cls=SimpleFormMixin.palette_classes + ' items-end'):
-                with label(cls=SimpleFormMixin.palette_form_control_classes):
-                    with div(cls=SimpleFormMixin.label_classes):
-                        span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
-                    with div(cls='flex'):
-                        with div(cls='flex'):
-                            raw(str(last_save_field))
-                        div(cls='flex-1')
-                div(cls='flex-1')
-                with label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0'):
-                    span(needs_review_field.label, cls=SimpleFormMixin.label_text_classes)
-                    raw(str(needs_review_field))
+            self.get_editing_history_div()
 
         return mark_safe(str(form))
 

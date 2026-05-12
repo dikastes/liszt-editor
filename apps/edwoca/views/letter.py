@@ -37,9 +37,16 @@ def letter_update(request, pk):
         form = LetterForm(request.POST, instance=letter)
         edition_period_form = LetterEditionPeriodForm(request.POST, instance=letter, prefix='edition_period')
         source_period_form = LetterSourcePeriodForm(request.POST, instance=letter, prefix='source_period')
+        #letter_signature_form = LetterSignatureForm(request.POST, instance=letter, prefix='signature')
 
         roles = ['sender', 'receiver']
         models = ['person', 'place', 'corporation']
+
+        remove_signature_string = 'remove-signature'
+        if remove_signature_string in request.POST:
+            pk = request.POST.get(remove_signature_string)
+            signature = LetterSignature.objects.get(id = pk)
+            signature.delete()
 
         for role in roles:
             for model in models:
@@ -58,6 +65,12 @@ def letter_update(request, pk):
                     contributor_model = apps.get_model('edwoca', role + model)
                     entity = contributor_model.objects.get(id = pk)
                     entity.delete()
+
+        letter_signature_forms = []
+        for letter_signature in letter.signatures.all():
+            prefix = f'signature_{letter_signature.id}'
+            letter_signature_form = LetterSignatureForm(request.POST, instance = letter_signature, prefix = prefix)
+            letter_signature_forms.append(letter_signature_form)
 
         sender_person_forms = []
         for sender_person in letter.senderperson_relations.all():
@@ -105,6 +118,16 @@ def letter_update(request, pk):
                 )
             letter_mentioning_forms.append(letter_mentioning_form)
 
+        letter_digitized_copy_forms = []
+        for digital_copy in letter.digital_copies.all():
+            prefix = f'letter_digcopy_{digital_copy.id}'
+            letter_digitized_copy_form = LetterDigitizedCopyForm(
+                    request.POST,
+                    instance = digital_copy,
+                    prefix = prefix
+                )
+            letter_digitized_copy_forms.append(letter_digitized_copy_form)
+
         if 'add-sender-person' in request.POST:
             SenderPerson.objects.create(letter=letter)
         if 'add-receiver-person' in request.POST:
@@ -117,6 +140,14 @@ def letter_update(request, pk):
             SenderPlace.objects.create(letter=letter)
         if 'add-receiver-place' in request.POST:
             ReceiverPlace.objects.create(letter=letter)
+        if 'add-signature' in request.POST:
+            status = LetterSignature.Status.CURRENT
+            if letter.signatures.count():
+                status = LetterSignature.Status.FORMER
+            signature = LetterSignature.objects.create(
+                    letter = letter,
+                    status = status
+                )
 
         all_forms = (sender_person_forms +
             receiver_person_forms +
@@ -125,6 +156,8 @@ def letter_update(request, pk):
             sender_place_forms +
             receiver_place_forms +
             letter_mentioning_forms +
+            letter_digitized_copy_forms +
+            letter_signature_forms +
             [ form, edition_period_form, source_period_form ])
 
         if all(f.is_valid() for f in all_forms):
@@ -141,6 +174,7 @@ def letter_update(request, pk):
                     'receiver_corporation_forms': receiver_corporation_forms,
                     'sender_place_forms': receiver_place_forms,
                     'receiver_place_forms': receiver_place_forms,
+                    'letter_signature_forms': letter_signature_forms
                 }
             return render(request, 'edwoca/letter_update.html', context)
 
@@ -165,6 +199,12 @@ def letter_update(request, pk):
                     instance = letter_mentioning,
                     prefix = prefix
                 ))
+
+        letter_signature_forms = []
+        for letter_signature in letter.signatures.all():
+            prefix = f'signature_{letter_signature.id}'
+            letter_signature_form = LetterSignatureForm(instance = letter_signature, prefix = prefix)
+            letter_signature_forms.append(letter_signature_form)
 
         sender_person_forms = []
         for sender_person in letter.senderperson_relations.all():
@@ -202,6 +242,11 @@ def letter_update(request, pk):
             receiver_place_form = ReceiverPlaceForm(instance = receiver_place, prefix = prefix)
             receiver_place_forms.append(receiver_place_form)
 
+        letter_digitized_copy_forms = []
+        for digital_copy in letter.digital_copies.all():
+            prefix = f'letter_digcopy_{digital_copy.id}'
+            letter_digitized_copy_form = LetterDigitizedCopyForm(instance = letter_digitized_copy_form, prefix = prefix)
+            letter_digitized_copy_forms.append(letter_digitized_copy_form)
 
         # Search forms
         q_sender_person = request.GET.get('sender_person-q')
@@ -278,7 +323,9 @@ def letter_update(request, pk):
                 'receiver_corporation_forms': receiver_corporation_forms,
                 'sender_place_forms': sender_place_forms,
                 'receiver_place_forms': receiver_place_forms,
-                'letter_mentioning_forms': letter_mentioning_forms
+                'letter_mentioning_forms': letter_mentioning_forms,
+                'letter_signature_forms': letter_signature_forms,
+                'letter_digitized_copy_forms': letter_digitized_copy_forms
             })
 
         return render(request, 'edwoca/letter_update.html', context)
