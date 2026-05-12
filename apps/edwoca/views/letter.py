@@ -37,7 +37,6 @@ def letter_update(request, pk):
         form = LetterForm(request.POST, instance=letter)
         edition_period_form = LetterEditionPeriodForm(request.POST, instance=letter, prefix='edition_period')
         source_period_form = LetterSourcePeriodForm(request.POST, instance=letter, prefix='source_period')
-        #letter_signature_form = LetterSignatureForm(request.POST, instance=letter, prefix='signature')
 
         roles = ['sender', 'receiver']
         models = ['person', 'place', 'corporation']
@@ -47,6 +46,12 @@ def letter_update(request, pk):
             pk = request.POST.get(remove_signature_string)
             signature = LetterSignature.objects.get(id = pk)
             signature.delete()
+
+        remove_digcopy_string = 'remove-letter-digcopy'
+        if remove_digcopy_string in request.POST:
+            pk = request.POST.get(remove_digcopy_string)
+            digcopy = LetterDigitalCopy.objects.get(id = pk)
+            digcopy.delete()
 
         for role in roles:
             for model in models:
@@ -128,6 +133,8 @@ def letter_update(request, pk):
                 )
             letter_digitized_copy_forms.append(letter_digitized_copy_form)
 
+        if 'add-digcopy' in request.POST:
+            LetterDigitalCopy.objects.create(letter=letter)
         if 'add-sender-person' in request.POST:
             SenderPerson.objects.create(letter=letter)
         if 'add-receiver-person' in request.POST:
@@ -245,7 +252,7 @@ def letter_update(request, pk):
         letter_digitized_copy_forms = []
         for digital_copy in letter.digital_copies.all():
             prefix = f'letter_digcopy_{digital_copy.id}'
-            letter_digitized_copy_form = LetterDigitizedCopyForm(instance = letter_digitized_copy_form, prefix = prefix)
+            letter_digitized_copy_form = LetterDigitizedCopyForm(instance = digital_copy, prefix = prefix)
             letter_digitized_copy_forms.append(letter_digitized_copy_form)
 
         # Search forms

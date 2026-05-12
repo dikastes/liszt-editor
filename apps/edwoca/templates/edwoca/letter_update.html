@@ -173,7 +173,7 @@
         <div class="flex">
             <div class="flex-1"></div>
             <div class="flex-0">
-                <button class="btn btn-outline btn-primary mb-5" name="remove-signature" value="{{ letter_signature_form.instance.id }}">
+                <button class="btn btn-outline btn-primary mb-5" form="form" name="remove-signature" value="{{ letter_signature_form.instance.id }}">
                     {% translate 'remove letter signature' %}
                 </button>
             </div>
@@ -181,18 +181,49 @@
     </div>
 {% endfor %}
 
-<div class="flex">
+<div class="flex my-5">
     <div class="flex-1"></div>
     <div class="flex-0">
-        <button class="btn btn-outline" name="add-signature">
+        <button class="btn btn-outline" name="add-signature" form="form">
             {% translate 'add letter signature' %}
         </button>
     </div>
 </div>
 
 {% for letter_digitized_copy_form in letter_digitized_copy_forms %}
-    {{ letter_digitized_copy_form.as_daisy }}
+    <div class="flex gap-5 p-5 my-5 px-5 border border-black">
+        <div class="flex-1">
+            {{ letter_digitized_copy_form.as_daisy }}
+        </div>
+        <div class="flex-0 flex flex-col">
+            <div class="flex-1"></div>
+            <div class="flex-0">
+                <a class="btn btn-outline w-full " href="{{ letter_digitized_copy_form.instance.url }}" target="_blank">
+                    {% translate 'open' %}
+                </a>
+                <label class="flex-0 m-0">
+                    <div class="label">
+                        <span class="label-text">
+                            &nbsp;
+                        </span>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-outline w-full" name="remove-letter-digcopy" value="{{ letter_digitized_copy_form.instance.id }}" form="form">
+                        {% translate 'remove' %}
+                    </button>
+                </label>
+            </div>
+        </div>
+    </div>
 {% endfor %}
+
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" name="add-digcopy" form="form">
+            {% translate 'add letter digital copy' %}
+        </button>
+    </div>
+</div>
 
 <h2 class="my-5">
     {% translate 'work relations' %}

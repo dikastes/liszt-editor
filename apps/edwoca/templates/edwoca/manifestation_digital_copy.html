@@ -9,17 +9,17 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/digitized_copy_prolog.html' %}
 
-<h2> Digitalisate </h2>
+<h2>
+    {% translate 'digital copies' %}
+</h2>
 
-{% for form in forms %}
-{% endfor %}
 <form method="post" id="form" class="mt-5 flex flex-col gap-5 mb-10">
     {% csrf_token %}
     <input type="submit" name="save_changes" class="hidden" id="submit-form">
 </form>
 
 {% for form in forms %}
-    <div class="flex gap-5 bg-base-100 p-5 my-5">
+    <div class="flex gap-5 border border-black p-5 my-5">
         <div class="flex-1">
             {{ form.as_daisy }}
         </div>
