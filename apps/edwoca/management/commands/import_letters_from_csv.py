@@ -3,7 +3,7 @@ from liszt_util.tools import camel_to_snake_case
 from bib.models import ZotItem
 from django.core.management.base import BaseCommand, CommandError
 from dmad_on_django.models import Person, Corporation, Place, Period
-from pylobid.pylobid import GNDNotFoundError, GNDIdError
+from slub_pylobid.pylobid import GNDNotFoundError, GNDIdError
 from csv import DictReader
 import datetime
 

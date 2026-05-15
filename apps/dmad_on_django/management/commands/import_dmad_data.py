@@ -1,4 +1,4 @@
-from pylobid.pylobid import PyLobidClient, PyLobidPlace, PyLobidOrg, PyLobidPerson
+from slub_pylobid.pylobid import PyLobidClient, PyLobidPlace, PyLobidOrg, PyLobidPerson
 from django.core.management.base import BaseCommand, CommandError
 from csv import DictReader
 from ...models import Place, Corporation, Person
