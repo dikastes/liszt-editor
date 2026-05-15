@@ -1,4 +1,5 @@
-from ...models.base import Letter, LetterMentioning
+from ...models.letter import *
+from liszt_util.tools import camel_to_snake_case
 from bib.models import ZotItem
 from django.core.management.base import BaseCommand, CommandError
 from dmad_on_django.models import Person, Corporation, Place, Period
@@ -11,6 +12,12 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument(
+                '-f', '--start-from',
+                dest = 'start_from',
+                default = 0,
+                help='Start dataset.'
+            )
+        parser.add_argument(
                 'file_name',
                 nargs=1,
                 type=str,
@@ -18,42 +25,69 @@ class Command(BaseCommand):
             )
 
     def handle(self, *args, **options):
+        start_from = 0
+        if options['start_from'] != 0:
+            start_from = int(options['start_from']) - 1
         with open(options['file_name'][0]) as file:
             roman_literals = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI']
             reader = list(DictReader(file))
             total = len(reader)
-            for i, row in enumerate(reader):
+            for i, row in list(enumerate(reader))[start_from:]:
                 print(f'{str(i+1)} von {total}')
                 print(f'{row["Absender Person"]}{row["Absender Körperschaft"]} an {row["Adressat Person"]}{row["Adressat Körperschaft"]}')
 
-                sender_person = None
-                if (sender_person_id := row["GND Absender Person"]):
-                    sender_person = Person.fetch_or_get(sender_person_id)
-                sender_corporation = None
-                if (sender_corporation_id := row["GND Absender Körperschaft"]):
-                    sender_corporation = Corporation.fetch_or_get(sender_corporation_id)
-                sender_place = None
-                if (sender_place_id := row["Absendeort_GND"]):
-                    sender_place = Place.fetch_or_get(sender_place_id)
 
-                receiver_person = None
-                if (receiver_person_id := row["GND Adressat Person"]):
-                    receiver_person = Person.fetch_or_get(receiver_person_id)
-                receiver_corporation = None
-                if (receiver_corporation_id := row["GND Adressat Körperschaft"]):
-                    receiver_corporation = Corporation.fetch_or_get(receiver_corporation_id)
-                receiver_place = None
-                if (receiver_place_id := row["Empfangsort_GND"]):
-                    receiver_place = Place.fetch_or_get(receiver_place_id)
+                #try:
+                sender_persons_config = {
+                        'gnd_ids': 'GND Absender Person',
+                        'names': 'Absender Person',
+                        'edition_names': 'Absender Person Edition',
+                        'model': Person
+                    }
+                sender_persons = self.get_contributor_data(row, sender_persons_config)
 
-                display = row['Datierung (standardisiert)']
-                not_before = row['Datierung maschinenlesbar Teil 1']
-                if not_before:
-                    parsed_not_before = datetime.datetime.strptime(not_before, '%d.%m.%Y')
-                not_after = row['Datierung maschinenlesbar Teil 2']
-                if not_after:
-                    parsed_not_after = datetime.datetime.strptime(not_after, '%d.%m.%Y')
-                inferred = False if 'Vorlage' in row['Datierung Checkbox'] else True
+                receiver_persons_config = {
+                        'gnd_ids': 'GND Adressat Person',
+                        'names': 'Adressat Person',
+                        'edition_names': 'Adressat Person Edition',
+                        'model': Person
+                    }
+                receiver_persons = self.get_contributor_data(row, receiver_persons_config)
+
+                sender_corporations_config = {
+                        'gnd_ids': 'GND Absender Körperschaft',
+                        'names': 'Absender Körperschaft',
+                        'edition_names': 'Absender Körperschaft Edition',
+                        'model': Corporation
+                    }
+                sender_corporations = self.get_contributor_data(row, sender_corporations_config)
+
+                receiver_corporations_config = {
+                        'gnd_ids': 'GND Adressat Körperschaft',
+                        'names': 'Adressat Körperschaft',
+                        'edition_names': 'Adressat Körperschaft Edition',
+                        'model': Corporation
+                    }
+                receiver_corporations = self.get_contributor_data(row, receiver_corporations_config)
+
+                sender_places_config = {
+                        'gnd_ids': 'Absendeort_GND',
+                        'names': 'Absendeort',
+                        'edition_names': 'Absendeort Edition',
+                        'model': Place
+                    }
+                #breakpoint()
+                sender_places = self.get_contributor_data(row, sender_places_config)
+
+                receiver_places_config = {
+                        'gnd_ids': 'Empfangsort_GND',
+                        'names': 'Empfangsort',
+                        'edition_names': 'Empfangsort Edition',
+                        'model': Place
+                    }
+                receiver_places = self.get_contributor_data(row, receiver_places_config)
+                #except:
+                    #breakpoint()
 
                 work_comments = []
                 for number in roman_literals:
@@ -79,21 +113,50 @@ class Command(BaseCommand):
                         *work_comments
                         ])
 
-                period = Period.objects.create(
+                display = row['Datierung (standardisiert)']
+                not_before = row['Datierung maschinenlesbar Teil 1']
+                if not_before:
+                    try:
+                        parsed_not_before = datetime.datetime.strptime(not_before, '%d.%m.%Y')
+                    except:
+                        parsed_not_before = datetime.datetime.strptime(not_before, '%Y-%m-%d')
+                not_after = row['Datierung maschinenlesbar Teil 2']
+                if not_after:
+                    try:
+                        parsed_not_after = datetime.datetime.strptime(not_after, '%d.%m.%Y')
+                    except:
+                        parsed_not_after = datetime.datetime.strptime(not_after, '%Y-%m-%d')
+                inferred = False if 'Edition' in row['Datierung Checkbox'] else True
+                assumed = True if 'unsicher' in row['Datierung Checkbox'] else False
+
+                edition_period = Period.objects.create(
                         not_before = parsed_not_before,
                         not_after = parsed_not_after,
-                        display = display
+                        display = display,
+                        inferred = inferred,
+                        assumed = assumed
                     )
+
                 letter = Letter.objects.create(
-                        receiver_person = receiver_person,
-                        receiver_corporation = receiver_corporation,
-                        receiver_place = receiver_place,
-                        sender_person = sender_person,
-                        sender_corporation = sender_corporation,
-                        sender_place = sender_place,
-                        period = period,
+                        edition_period = edition_period,
                         comment = comment
                     )
+
+                # contributors
+                for sender_person in sender_persons:
+                    self.create_contributor(sender_person, letter, SenderPerson, 'person')
+                for receiver_person in receiver_persons:
+                    self.create_contributor(receiver_person, letter, ReceiverPerson, 'person')
+
+                for sender_corporation in sender_corporations:
+                    self.create_contributor(sender_corporation, letter, SenderCorporation, 'corporation')
+                for receiver_corporation in receiver_corporations:
+                    self.create_contributor(receiver_corporation, letter, ReceiverCorporation, 'corporation')
+
+                for sender_place in sender_places:
+                    self.create_contributor(sender_place, letter, SenderPlace, 'place')
+                for receiver_place in receiver_places:
+                    self.create_contributor(receiver_place, letter, ReceiverPlace, 'place')
 
                 for mentioning in row['Sigle / Kurztitel'].split(' / '):
                     proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
@@ -107,3 +170,60 @@ class Command(BaseCommand):
                             letter = letter
                         )
 
+                for mentioning in row['Weitere Editionen'].split(' / '):
+                    if mentioning:
+                        proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
+                        proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
+                        if not proof:
+                            print(f"{proof_title} not found")
+                            continue
+                        LetterMentioning.objects.create(
+                                bib = proof,
+                                pages = proof_page[0] if len(proof_page) else '',
+                                letter = letter
+                            )
+
+    def create_contributor(self, data, letter, model, target_property):
+        den = DocumentedEntityName.objects.create(
+                name = data['target_name'],
+                inferred = data['target_inferred'],
+                assumed = data['target_assumed']
+            )
+        model.objects.create(
+                edition_name = den,
+                letter = letter,
+                **{ target_property: data['target'] }
+            )
+
+    def get_contributor_data(self, data, config):
+        contributors = []
+        if (ids := data[config['gnd_ids']]):
+            for i, id in enumerate(ids.split('|')):
+                name = data[config['names']].split('|')[i].strip()
+                edition_name = data[config['edition_names']].split('|')[i].strip()
+
+                if name.startswith('[') and name.endswith(']'):
+                    inferred = True
+                    name = name.replace('[', '').replace(']', '').strip()
+                else:
+                    inferred = False
+
+                if '?' in name:
+                    assumed = True
+                    #name = name.replace('?', '').strip()
+                else:
+                    assumed = False
+
+                if id.strip() == 'RD':
+                    get_kwargs = {'interim_designator': name}
+                else:
+                    get_kwargs = {'gnd_id': id.strip()}
+
+                target = config['model'].objects.get(**get_kwargs)
+                contributors.append({
+                        'target': target,
+                        'target_name': edition_name,
+                        'target_inferred': inferred,
+                        'target_assumed': assumed
+                    })
+        return contributors

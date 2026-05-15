@@ -159,33 +159,33 @@ class Letter(TrackedModel):
         etal = ' ' + _('et al.')
         if self.sender_persons.count():
             if self.sender_corporations.count() or self.sender_persons.count() > 1:
-                sender = self.sender_persons.first().get_default_name() + etal
+                sender = self.sender_persons.first().get_designator() + etal
             else:
-                sender = self.sender_persons.first().get_default_name()
+                sender = self.sender_persons.first().get_designator()
         else:
             if self.sender_corporations.count():
                 if self.sender_corporations.count() > 1:
-                    sender = self.sender_corporations.first().get_default_name() + etal
+                    sender = self.sender_corporations.first().get_designator() + etal
                 else:
-                    sender = self.sender_corporations.first().get_default_name()
+                    sender = self.sender_corporations.first().get_designator()
             else:
                 sender = unknown
 
         if self.receiver_persons.count():
-            if self.receiver_corporations or self.receiver_persons.count() > 1:
-                receiver = self.receiver_persons.first().get_default_name() + etal
+            if self.receiver_corporations.count() or self.receiver_persons.count() > 1:
+                receiver = self.receiver_persons.first().get_designator() + etal
             else:
-                receiver = self.receiver_persons.first().get_default_name()
+                receiver = self.receiver_persons.first().get_designator()
         else:
             if self.receiver_corporations.count():
                 if self.receiver_corporations.count() > 1:
-                    receiver = self.receiver_corporations.first().get_default_name() + etal
+                    receiver = self.receiver_corporations.first().get_designator() + etal
                 else:
-                    receiver = self.receiver_corporations.first().get_default_name()
+                    receiver = self.receiver_corporations.first().get_designator()
             else:
                 receiver = unknown
 
-        return f'{sender} {to} {receiver}, {self.source_period} ({self.get_first_mentioning()})'
+        return f'{sender} {to} {receiver}, {self.edition_period} ({self.get_first_mentioning()})'
 
 
 class LetterMentioning(models.Model):

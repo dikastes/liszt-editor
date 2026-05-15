@@ -10,7 +10,6 @@ class Command(BaseCommand):
         parser.add_argument('file_name', nargs=1, type=str)
 
     def handle(self, *args, **options):
-        #breakpoint()
         for file_name in options['file_name']:
             with open(file_name) as file:
                 csv_reader = reader(file)
