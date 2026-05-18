@@ -488,6 +488,10 @@ class BaseTrackedModelForm:
                 'editing_history': Textarea( attrs ={
                     'class': SimpleFormMixin.text_area_classes,
                     'form': 'form'
+                    }),
+                'needs_review': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
                     })
             }
 
