@@ -404,11 +404,11 @@ msgstr "Absender (Person)"
 
 #: models/letter.py:58
 msgid "receiver corporation"
-msgstr "Empfänger (Korporation)"
+msgstr "Empfänger (Körperschaft)"
 
 #: models/letter.py:64
 msgid "sender corporation"
-msgstr "Absender (Korporation)"
+msgstr "Absender (Körperschaft)"
 
 #: models/letter.py:70
 msgid "receiver place"
@@ -646,11 +646,11 @@ msgstr "Absender (Person) hinzufügen"
 
 #: templates/edwoca/letter_update.html:38
 msgid "remove sender corporation"
-msgstr "Absender (Korporation) entfernen"
+msgstr "Absender (Körperschaft) entfernen"
 
 #: templates/edwoca/letter_update.html:46
 msgid "add sender corporation"
-msgstr "Absender (Korporation) hinzufügen"
+msgstr "Absender (Körperschaft) hinzufügen"
 
 #: templates/edwoca/letter_update.html:52
 msgid "receiver"
@@ -666,11 +666,11 @@ msgstr "Empfänger (Person) hinzufügen"
 
 #: templates/edwoca/letter_update.html:70
 msgid "remove receiver corporation"
-msgstr "Empfänger (Korporation) entfernen"
+msgstr "Empfänger (Körperschaft) entfernen"
 
 #: templates/edwoca/letter_update.html:78
 msgid "add receiver corporation"
-msgstr "Empfänger (Korporation) hinzufügen"
+msgstr "Empfänger (Körperschaft) hinzufügen"
 
 #: templates/edwoca/letter_update.html:84
 #: templates/edwoca/manifestation_history.html:20
