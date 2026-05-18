@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-12 14:01+0200\n"
+"POT-Creation-Date: 2026-05-18 16:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -423,7 +423,7 @@ msgid "category"
 msgstr "Kategorie"
 
 #: models/letter.py:99 models/letter.py:104
-#: templates/edwoca/letter_update.html:225
+#: templates/edwoca/letter_update.html:237
 #: templates/edwoca/manifestation_history.html:85
 #: templates/edwoca/manifestation_manuscript.html:64
 #: templates/edwoca/manifestation_provenance.html:478
@@ -562,7 +562,8 @@ msgid "letters"
 msgstr "Briefe"
 
 #: templates/edwoca/bib_update.html:91 templates/edwoca/letter_update.html:136
-#: templates/edwoca/manifestation_digital_copy.html:42
+#: templates/edwoca/letter_update.html:211
+#: templates/edwoca/manifestation_digital_copy.html:40
 #: templates/edwoca/manifestation_history.html:43
 #: templates/edwoca/manifestation_print.html:22
 #: templates/edwoca/manifestation_print.html:184
@@ -706,7 +707,6 @@ msgid "letter proof"
 msgstr "Quellennachweis"
 
 #: templates/edwoca/letter_update.html:177
-#: templates/edwoca/letter_update.html:200
 msgid "remove letter signature"
 msgstr "Signatur entfernen"
 
@@ -714,13 +714,16 @@ msgstr "Signatur entfernen"
 msgid "add letter signature"
 msgstr "Signatur anlegen"
 
-#: templates/edwoca/letter_update.html:211
-#, fuzzy
-#| msgid "add digital copy"
+#: templates/edwoca/letter_update.html:202
+#: templates/edwoca/manifestation_digital_copy.html:30
+msgid "open"
+msgstr "öffnen"
+
+#: templates/edwoca/letter_update.html:223
 msgid "add letter digital copy"
 msgstr "Digitalisat hinzufügen"
 
-#: templates/edwoca/letter_update.html:217
+#: templates/edwoca/letter_update.html:229
 msgid "work relations"
 msgstr "Werkbezüge"
 
@@ -820,15 +823,11 @@ msgstr "Brief"
 msgid "digital copies"
 msgstr "Digitalisate"
 
-#: templates/edwoca/manifestation_digital_copy.html:32
-msgid "open"
-msgstr "öffnen"
-
-#: templates/edwoca/manifestation_digital_copy.html:50
+#: templates/edwoca/manifestation_digital_copy.html:48
 msgid "no digital copies"
 msgstr "keine Digitalisate vorhanden"
 
-#: templates/edwoca/manifestation_digital_copy.html:57
+#: templates/edwoca/manifestation_digital_copy.html:55
 msgid "add digital copy"
 msgstr "Digitalisat hinzufügen"
 
