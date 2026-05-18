@@ -36,8 +36,6 @@ class Command(BaseCommand):
                 print(f'{str(i+1)} von {total}')
                 print(f'{row["Absender Person"]}{row["Absender Körperschaft"]} an {row["Adressat Person"]}{row["Adressat Körperschaft"]}')
 
-
-                #try:
                 sender_persons_config = {
                         'gnd_ids': 'GND Absender Person',
                         'names': 'Absender Person',
@@ -76,7 +74,6 @@ class Command(BaseCommand):
                         'edition_names': 'Absendeort Edition',
                         'model': Place
                     }
-                #breakpoint()
                 sender_places = self.get_contributor_data(row, sender_places_config)
 
                 receiver_places_config = {
@@ -86,20 +83,18 @@ class Command(BaseCommand):
                         'model': Place
                     }
                 receiver_places = self.get_contributor_data(row, receiver_places_config)
-                #except:
-                    #breakpoint()
 
-                work_comments = []
+                work_mentionings = []
                 for number in roman_literals:
                     if row[f'Werkerwähnung ({number})']:
-                        work_comments += [' // '.join([
+                        work_mentionings += [' // '.join([
                                 string for
                                 string in [
                                     row[f'Werkerwähnung ({number})'],
                                     'Entstehung' if row[f'Entstehung ({number})'] else None,
                                     'Quellentransfer' if row[f'Quellentransfer ({number})'] else None,
                                     'Aufführungen' if row[f'Aufführungen ({number})'] else None,
-                                    f'Seite {row[f"Seite ({number})"]}',
+                                    #f'Seite {row[f"Seite ({number})"]}',
                                     row[f'WVZ (Raabe) ({number})'],
                                     row[f'Werktitel ({number})'],
                                     row[f'Kommentar (intern) ({number})'],
@@ -110,7 +105,7 @@ class Command(BaseCommand):
                 comment = '\n'.join([
                         row['Kommentar (intern)'],
                         row['Bemerkungen'],
-                        *work_comments
+                        *work_mentionings
                         ])
 
                 display = row['Datierung (standardisiert)']
