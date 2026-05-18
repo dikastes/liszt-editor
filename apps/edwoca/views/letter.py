@@ -185,6 +185,15 @@ def letter_update(request, pk):
                 }
             return render(request, 'edwoca/letter_update.html', context)
 
+        if 'edition_period-clear-machine-readable-date' in request.POST:
+            letter.edition_period.not_before = None
+            letter.edition_period.not_after = None
+            letter.edition_period.save()
+        if 'source_period-clear-machine-readable-date' in request.POST:
+            letter.source_period.not_before = None
+            letter.source_period.not_after = None
+            letter.source_period.save()
+
         if 'edition_period-calculate-machine-readable-date' in request.POST:
             letter.edition_period.parse_display()
             letter.edition_period.save()
