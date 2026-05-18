@@ -516,26 +516,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     setattr(self, edition_type.replace(' ', '_'), True)
 
         self.private_dedication_comment = raw_data[DEDICATION_KEY]
-        """
-        if self.dedication:
-            dedications = self.dedication.split('|')
-            for dedication in dedications:
-                if gnd_id := Manifestation.extract_gnd_id(dedication):
-                    dedicatee = Person.fetch_or_get(gnd_id)
-                    self.dedicatees.add(dedicatee)
-                else:
-                    for person in fixed_persons:
-                        if (gnd_id := fixed_persons[person]):
-                            if person in dedication:
-                                dedicatee = Person.objects.get(gnd_id = gnd_id)
-                                self.dedicatees.add(dedicatee)
-                                break
-                        else:
-                            if person in dedication:
-                                dedicatee = Person.objects.get(interim_designator = person)
-                                self.dedicatees.add(dedicatee)
-                                break
-        """
 
         self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY]#.replace(' | ', '\n')
         if raw_data[MACHINE_READABLE_DATE_KEY]:

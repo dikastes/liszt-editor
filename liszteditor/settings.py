@@ -16,6 +16,7 @@ import sys
 import dotenv
 from django.urls import reverse_lazy
 from celery import Celery
+import tomllib
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -33,7 +34,9 @@ else:
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # App version
-APP_VERSION = "0.0.2"
+with open(BASE_DIR / 'pyproject.toml', 'rb') as f:
+    data = tomllib.load(f)
+    APP_VERSION = data.get('project', {}).get('version', 'error')
 
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = 'django-insecure-g562zyg%dply65c+z#rb4_eg=wr(=3u3m5=f(vp9a%lr=9%1eh'

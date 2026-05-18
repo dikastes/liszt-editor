@@ -21,7 +21,7 @@ class TitleTypes(models.TextChoices):
     ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
 
 
-class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass):
+class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     class Meta:
         ordering = ['-needs_review', 'order_index']
 
@@ -332,29 +332,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass):
             related_name = 'collection_components',
             on_delete = models.SET_NULL,
             null = True
-        )
-    first_save = models.DateTimeField(
-            auto_now_add = True,
-            verbose_name = _('first save')
-        )
-    last_save = models.DateTimeField(
-            auto_now = True,
-            verbose_name = _('last save')
-        )
-    first_editor = models.CharField(
-            max_length = 50,
-            blank = True,
-            verbose_name = _('first editor'),
-            default = ''
-        )
-    editing_history = models.TextField(
-            blank = True,
-            verbose_name = _('editing history'),
-            default = ''
-        )
-    needs_review = models.BooleanField(
-            default = False,
-            verbose_name = _('needs review')
         )
     is_lyrics = models.BooleanField(
             default = False,

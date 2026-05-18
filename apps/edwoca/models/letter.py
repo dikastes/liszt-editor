@@ -1,6 +1,8 @@
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models.base import DocumentationStatusMixin
+from dmrism.models import TrackedModel
 from .base import *
+
 
 class LetterSignature(BaseSignature):
     letter = models.ForeignKey(
@@ -27,7 +29,7 @@ class LetterDigitalCopy(BaseDigitalCopy):
         )
 
 
-class Letter(models.Model):
+class Letter(TrackedModel):
     class Category(models.TextChoices):
         SKETCH = 'S', _('Sketch')
         LETTER = 'L', _('Letter')
@@ -37,55 +39,41 @@ class Letter(models.Model):
     class Meta:
         ordering = ['edition_period__not_before']
 
-    edition_receiver_person = models.ManyToManyField(
+    receiver_persons = models.ManyToManyField(
             'dmad.Person',
-            through = 'EditionReceiverPerson',
-            related_name = 'edition_receiver_of'
+            through = 'ReceiverPerson',
+            related_name = 'edition_receiver_of',
+            verbose_name = _('receiver person')
         )
-    source_receiver_person = models.ManyToManyField(
+    sender_persons = models.ManyToManyField(
             'dmad.Person',
-            through = 'SourceReceiverPerson',
-            related_name = 'source_receiver_of'
+            through = 'SenderPerson',
+            related_name = 'edition_sender_of',
+            verbose_name = _('sender person')
         )
-    edition_sender_person = models.ManyToManyField(
-            'dmad.Person',
-            through = 'EditionSenderPerson',
-            related_name = 'edition_sender_of'
-        )
-    source_sender_person = models.ManyToManyField(
-            'dmad.Person',
-            through = 'SourceSenderPerson',
-            related_name = 'source_sender_of'
-        )
-    edition_receiver_corporation = models.ManyToManyField(
+    receiver_corporations = models.ManyToManyField(
             'dmad.Corporation',
-            through = 'EditionReceiverCorporation',
-            related_name = 'edition_receiver_of'
+            through = 'ReceiverCorporation',
+            related_name = 'edition_receiver_of',
+            verbose_name = _('receiver corporation')
         )
-    source_receiver_corporation = models.ManyToManyField(
+    sender_corporations = models.ManyToManyField(
             'dmad.Corporation',
-            through = 'SourceReceiverCorporation',
-            related_name = 'source_receiver_of'
+            through = 'SenderCorporation',
+            related_name = 'edition_sender_of',
+            verbose_name = _('sender corporation')
         )
-    edition_sender_corporation = models.ManyToManyField(
-            'dmad.Corporation',
-            through = 'EditionSenderCorporation',
-            related_name = 'edition_sender_of'
-        )
-    source_sender_corporation = models.ManyToManyField(
-            'dmad.Corporation',
-            through = 'SourceSenderCorporation',
-            related_name = 'source_sender_of'
-        )
-    receiver_place = models.ManyToManyField(
+    receiver_places = models.ManyToManyField(
             'dmad.Place',
             through = 'ReceiverPlace',
-            related_name = 'receiver_place_of'
+            related_name = 'receiver_place_of',
+            verbose_name = _('receiver place')
         )
-    sender_place = models.ManyToManyField(
+    sender_places = models.ManyToManyField(
             'dmad.Place',
             through = 'SenderPlace',
-            related_name = 'sender_place_of'
+            related_name = 'sender_place_of',
+            verbose_name = _('sender place')
         )
     edition_period = models.OneToOneField(
             'dmad.Period',
@@ -115,6 +103,11 @@ class Letter(models.Model):
             blank = True,
             verbose_name = _('comment')
         )
+    work_mentionings = models.TextField(
+            null = True,
+            blank = True,
+            verbose_name = _('work mentionings')
+        )
     work = models.ManyToManyField(
             'Work',
             related_name = 'letters'
@@ -141,6 +134,16 @@ class Letter(models.Model):
             null = True,
             on_delete = models.SET_NULL
         )
+    sender_edition_corporation_name = models.CharField(
+            max_length = 50,
+            blank = True,
+            verbose_name = _('sender corporation name according to edition')
+        )
+    sender_source_corporation_name = models.CharField(
+            max_length = 50,
+            blank = True,
+            verbose_name = _('sender corporation name according to source')
+        )
 
     def get_first_mentioning(self):
         if self.lettermentioning_set.all():
@@ -151,29 +154,38 @@ class Letter(models.Model):
         return reverse('edwoca:letter_update', kwargs={'pk': self.id})
 
     def __str__(self):
-        if self.sender_person:
-            if self.sender_corporation:
-                sender = self.sender_person.get_default_name() + ' u. a.'
+        unknown = _('unknown')
+        to = _('writing to')
+        etal = ' ' + _('et al.')
+        if self.sender_persons.count():
+            if self.sender_corporations.count() or self.sender_persons.count() > 1:
+                sender = self.sender_persons.first().get_designator() + etal
             else:
-                sender = self.sender_person.get_default_name()
+                sender = self.sender_persons.first().get_designator()
         else:
-            if self.sender_corporation:
-                sender = self.sender_corporation.get_default_name()
+            if self.sender_corporations.count():
+                if self.sender_corporations.count() > 1:
+                    sender = self.sender_corporations.first().get_designator() + etal
+                else:
+                    sender = self.sender_corporations.first().get_designator()
             else:
-                sender = 'unbekannt'
+                sender = unknown
 
-        if self.receiver_person:
-            if self.receiver_corporation:
-                receiver = self.receiver_person.get_default_name() + ' u. a.'
+        if self.receiver_persons.count():
+            if self.receiver_corporations.count() or self.receiver_persons.count() > 1:
+                receiver = self.receiver_persons.first().get_designator() + etal
             else:
-                receiver = self.receiver_person.get_default_name()
+                receiver = self.receiver_persons.first().get_designator()
         else:
-            if self.receiver_corporation:
-                receiver = self.receiver_corporation.get_default_name()
+            if self.receiver_corporations.count():
+                if self.receiver_corporations.count() > 1:
+                    receiver = self.receiver_corporations.first().get_designator() + etal
+                else:
+                    receiver = self.receiver_corporations.first().get_designator()
             else:
-                receiver = 'unbekannt'
+                receiver = unknown
 
-        return f'{sender} an {receiver}, {self.period} ({self.get_first_mentioning()})'
+        return f'{sender} {to} {receiver}, {self.edition_period} ({self.get_first_mentioning()})'
 
 
 class LetterMentioning(models.Model):
@@ -210,26 +222,29 @@ class BaseLetterContributor(models.Model):
     letter = models.ForeignKey(
             'Letter',
             on_delete = models.CASCADE,
-            related_name = '%(class)s'
+            related_name = '%(class)s_relations'
         )
     edition_name = models.OneToOneField(
             'DocumentedEntityName',
             null = True,
             on_delete = models.SET_NULL,
-            related_name = '+'
+            related_name = '+',
+            blank = True
         )
     source_name = models.OneToOneField(
             'DocumentedEntityName',
             null = True,
             on_delete = models.SET_NULL,
-            related_name = '+'
+            related_name = '+',
+            blank = True
         )
 
 
 class SenderPlace(BaseLetterContributor):
     place = models.ForeignKey(
             'dmad.Place',
-            on_delete = models.CASCADE,
+            on_delete = models.SET_NULL,
+            null = True,
             related_name = '+'
         )
 
@@ -237,87 +252,43 @@ class SenderPlace(BaseLetterContributor):
 class ReceiverPlace(BaseLetterContributor):
     place = models.ForeignKey(
             'dmad.Place',
-            on_delete = models.CASCADE,
+            on_delete = models.SET_NULL,
+            null = True,
             related_name = '+'
         )
 
 
-class EditionSenderPerson(BaseLetterContributor):
-    edition_person = models.ForeignKey(
+class SenderPerson(BaseLetterContributor):
+    person = models.ForeignKey(
             'dmad.Person',
-            on_delete = models.CASCADE,
+            on_delete = models.SET_NULL,
+            null = True,
             related_name = '+'
         )
 
 
-class SourceSenderPerson(BaseLetterContributor):
-    source_person = models.ForeignKey(
+class ReceiverPerson(BaseLetterContributor):
+    person = models.ForeignKey(
             'dmad.Person',
-            on_delete = models.CASCADE,
+            on_delete = models.SET_NULL,
+            null = True,
             related_name = '+'
         )
 
 
-class EditionReceiverPerson(BaseLetterContributor):
-    edition_person = models.ForeignKey(
-            'dmad.Person',
-            on_delete = models.CASCADE,
-            related_name = '+'
-        )
-
-
-class SourceReceiverPerson(BaseLetterContributor):
-    source_person = models.ForeignKey(
-            'dmad.Person',
-            on_delete = models.CASCADE,
-            related_name = '+'
-        )
-
-
-class EditionSenderCorporation(BaseLetterContributor):
-    edition_corporation = models.ForeignKey(
+class SenderCorporation(BaseLetterContributor):
+    corporation = models.ForeignKey(
             'dmad.Corporation',
-            on_delete = models.CASCADE,
+            on_delete = models.SET_NULL,
+            null = True,
             related_name = '+'
         )
 
 
-class SourceSenderCorporation(BaseLetterContributor):
-    source_corporation = models.ForeignKey(
+class ReceiverCorporation(BaseLetterContributor):
+    corporation = models.ForeignKey(
             'dmad.Corporation',
-            on_delete = models.CASCADE,
+            on_delete = models.SET_NULL,
+            null = True,
             related_name = '+'
         )
-
-
-class EditionReceiverCorporation(BaseLetterContributor):
-    edition_corporation = models.ForeignKey(
-            'dmad.Corporation',
-            on_delete = models.CASCADE,
-            related_name = '+'
-        )
-
-
-class SourceReceiverCorporation(BaseLetterContributor):
-    source_corporation = models.ForeignKey(
-            'dmad.Corporation',
-            on_delete = models.CASCADE,
-            related_name = '+'
-        )
-
-class BaseLetterPlace(models.Model):
-    class Meta:
-        abstract = True
-
-    source_place_name = models.CharField(
-            max_length = 50,
-            blank = True,
-            verbose_name = _('place according to edition')
-        )
-    edition_place_name = models.CharField(
-            max_length = 50,
-            blank = True,
-            verbose_name = _('place according to edition')
-        )
-    # status source
-    # status edition
