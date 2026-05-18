@@ -2,6 +2,7 @@
 from django.urls import path
 from . import views
 from . import dal_views
+from edwoca.views.manifestation.common import bib_update_view
 
 app_name = 'bib'
 
@@ -15,4 +16,5 @@ urlpatterns = [
     path('zotitem-autocomplete/', dal_views.ZotItemAC.as_view(),
         name='zotitem-autocomplete',
     ),
+    path('bibupdate/', bib_update_view, name="bib_update_celery"),
 ]

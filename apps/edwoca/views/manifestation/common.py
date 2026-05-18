@@ -1,6 +1,6 @@
 import re
 
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from haystack.query import SQ
 from ...forms.manifestation import *
 from calendar import monthrange
@@ -12,7 +12,9 @@ from ...models import Manifestation as EdwocaManifestation, Letter, Expression, 
 from ..base import *
 from ...models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from bib.models import ZotItem
+from bib.tasks import update_zotero_items
 from django.forms import inlineformset_factory
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
@@ -689,6 +691,10 @@ class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
 
         return context
 
+def bib_update_view(request):
+    task = update_zotero_items.delay()
+
+    return redirect(request.META['HTTP_REFERER'])
 
 class ManifestationCommentUpdateView(SimpleFormView):
     model = Manifestation

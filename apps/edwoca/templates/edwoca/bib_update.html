@@ -41,7 +41,6 @@
                 <em>
                     {% translate 'no bibliographic datasets have been linked' %}
                 </em>
-
             </li>
         {% endfor %}
     </ul>
@@ -74,6 +73,14 @@
     {% endif %}
 
     {% endif %}
+
+    <!-- Hier wurde das Update-Formular unter der Bibliographie eingefügt -->
+    <div class="flex my-5">
+        <form method="post" action="{% url 'bib:bib_update_celery' %}" class="flex-0 mb-0">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline btn-primary">{% translate 'bib_update_button' %}</button>
+        </form>
+    </div>
 
     <h2 class="my-5">
         {% translate 'letters' %}
