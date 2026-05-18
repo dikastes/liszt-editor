@@ -15,7 +15,7 @@
                     {{ contributor }}
                 </div>
             </label>
-            <button class="btn btn-primary btn-outline" name="sender-{{ target }}-remove-{{ target }}" value="{{ form.instance.id }}" form="form">
+            <button class="btn btn-primary btn-outline" name="{{ role }}-{{ target }}-remove-{{ target }}" value="{{ form.instance.id }}" form="form">
                 {% translate 'remove' %}
             </button>
         </div>
