@@ -2456,6 +2456,7 @@ details.collapse summary::-webkit-details-marker {
   color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
 }
 
+<<<<<<< Updated upstream
 .label-text-alt {
   font-size: 0.75rem;
   line-height: 1rem;
@@ -2463,6 +2464,8 @@ details.collapse summary::-webkit-details-marker {
   color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
 }
 
+=======
+>>>>>>> Stashed changes
 .input input {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)));
@@ -3205,6 +3208,7 @@ details.collapse summary::-webkit-details-marker {
   margin: 0px;
 }
 
+<<<<<<< Updated upstream
 .m-5 {
   margin: 1.25rem;
 }
@@ -3226,6 +3230,11 @@ details.collapse summary::-webkit-details-marker {
 
 .mb-0 {
   margin-bottom: 0px;
+=======
+.my-5 {
+  margin-top: 1.25rem;
+  margin-bottom: 1.25rem;
+>>>>>>> Stashed changes
 }
 
 .mb-10 {
@@ -3240,14 +3249,18 @@ details.collapse summary::-webkit-details-marker {
   margin-bottom: 1.25rem;
 }
 
+<<<<<<< Updated upstream
 .ml-4 {
   margin-left: 1rem;
 }
 
+=======
+>>>>>>> Stashed changes
 .ml-5 {
   margin-left: 1.25rem;
 }
 
+<<<<<<< Updated upstream
 .mr-0 {
   margin-right: 0px;
 }
@@ -3260,6 +3273,8 @@ details.collapse summary::-webkit-details-marker {
   margin-right: 1.25rem;
 }
 
+=======
+>>>>>>> Stashed changes
 .mt-0 {
   margin-top: 0px;
 }
@@ -3286,6 +3301,10 @@ details.collapse summary::-webkit-details-marker {
 
 .flex {
   display: flex;
+}
+
+.grid {
+  display: grid;
 }
 
 .contents {
@@ -3316,10 +3335,13 @@ details.collapse summary::-webkit-details-marker {
   width: 3rem;
 }
 
+<<<<<<< Updated upstream
 .w-48 {
   width: 12rem;
 }
 
+=======
+>>>>>>> Stashed changes
 .w-52 {
   width: 13rem;
 }
@@ -3356,14 +3378,21 @@ details.collapse summary::-webkit-details-marker {
   list-style-type: disc;
 }
 
+.grid-cols-2 {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .flex-col {
   flex-direction: column;
 }
 
+<<<<<<< Updated upstream
 .content-center {
   align-content: center;
 }
 
+=======
+>>>>>>> Stashed changes
 .items-end {
   align-items: flex-end;
 }
@@ -3372,10 +3401,13 @@ details.collapse summary::-webkit-details-marker {
   align-items: center;
 }
 
+<<<<<<< Updated upstream
 .items-stretch {
   align-items: stretch;
 }
 
+=======
+>>>>>>> Stashed changes
 .justify-end {
   justify-content: flex-end;
 }
@@ -3461,6 +3493,10 @@ details.collapse summary::-webkit-details-marker {
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
+}
+
+.p-0 {
+  padding: 0px;
 }
 
 .p-2 {

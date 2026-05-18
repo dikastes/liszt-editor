@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
-from pylobid.pylobid import GNDNotFoundError, GNDIdError
+from slub_pylobid.pylobid import GNDNotFoundError, GNDIdError
 from ...models import Manifestation
 from csv import DictReader
 
