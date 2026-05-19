@@ -5,7 +5,7 @@ from django.db import models
 from django.conf import settings
 import re
 from re import split
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from .base import DocumentationStatusMixin
 
 
@@ -88,9 +88,9 @@ class Period(DocumentationStatusMixin):
 
         if str(before_string) in dates[0]:
             self.not_before = self.earliest
-            self.not_after = self._parse_date(dates[0].replace(str(before_string), ''), 'upper')
+            self.not_after = self._parse_date(dates[0].replace(str(before_string), ''), 'lower') - timedelta(days=1)
         elif str(after_string) in dates[0]:
-            self.not_before = self._parse_date(dates[0].replace(str(after_string), ''), 'lower')
+            self.not_before = self._parse_date(dates[0].replace(str(after_string), ''), 'upper') + timedelta(days=1)
             self.not_after = self.latest
         elif len(dates) == 2:
             self.not_before = self._parse_date(dates[0], 'lower')
