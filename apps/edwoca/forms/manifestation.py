@@ -720,10 +720,9 @@ class SingletonCreateForm(forms.ModelForm):
                         with div(cls=SimpleFormMixin.label_classes):
                             span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
                         raw(str(source_title_field))
-                    else:
-                        with div(cls=SimpleFormMixin.label_classes):
-                            span(working_title_field.label, cls=SimpleFormMixin.label_text_classes)
-                        raw(str(working_title_field))
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(working_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(working_title_field))
                 if not self.is_collection:
                     with label(cls=SimpleFormMixin.palette_form_control_classes):
                         with div(cls=SimpleFormMixin.label_classes):
