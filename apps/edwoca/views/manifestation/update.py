@@ -72,12 +72,13 @@ def manifestation_update(request, pk):
 
         manifestation_form = ManifestationForm(instance=manifestation)
         signature_forms = []
-        for signature in manifestation.get_single_item().signatures.all():
-            signature_form = SignatureForm(
-                    instance = signature,
-                    prefix = f"signature-{signature.id}"
-                )
-            signature_forms.append(signature_form)
+        if manifestation.is_singleton:
+            for signature in manifestation.get_single_item().signatures.all():
+                signature_form = SignatureForm(
+                        instance = signature,
+                        prefix = f"signature-{signature.id}"
+                    )
+                signature_forms.append(signature_form)
 
         context['signature_forms'] = signature_forms
         context['library_search_form'] = SearchForm()
