@@ -437,7 +437,7 @@ class BaseDigitalCopy(models.Model):
                 return BaseDigitalCopy.LinkType.DIGITIZED
             return None
 
-    url = models.URLField(verbose_name = _('URL'))
+    url = models.URLField(verbose_name = _('URL'), blank = True)
     link_type = models.TextField(
             max_length = 20,
             null = True,

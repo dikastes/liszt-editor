@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-18 16:20+0200\n"
+"POT-Creation-Date: 2026-05-19 10:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:118 forms/item.py:176
-#: forms/letter.py:68 forms/letter.py:186 forms/manifestation.py:219
+#: forms/letter.py:68 forms/letter.py:197 forms/manifestation.py:219
 #: forms/manifestation.py:757 forms/manifestation.py:889
 #: forms/modification.py:26
 msgid "based on source"
@@ -27,7 +27,7 @@ msgstr "nach Vorlage"
 
 #: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:118 forms/item.py:176
-#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:186
+#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:197
 #: forms/manifestation.py:219 forms/manifestation.py:757
 #: forms/manifestation.py:889 forms/modification.py:26
 #: templates/edwoca/manifestation_print.html:142
@@ -50,23 +50,23 @@ msgstr "nicht nach"
 msgid "clear"
 msgstr "leeren"
 
-#: forms/base.py:496 forms/letter.py:110 forms/manifestation.py:159
+#: forms/base.py:500 forms/letter.py:115 forms/manifestation.py:159
 msgid "first save"
 msgstr "Datum"
 
-#: forms/base.py:502 forms/letter.py:116 forms/manifestation.py:165
+#: forms/base.py:506 forms/letter.py:121 forms/manifestation.py:165
 msgid "last save"
 msgstr "letzte Bearbeitung"
 
-#: forms/base.py:526
+#: forms/base.py:530
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
-#: forms/base.py:527
+#: forms/base.py:531
 msgid "initial recording"
 msgstr "Ersterfassung"
 
-#: forms/base.py:539
+#: forms/base.py:543
 msgid "further recording"
 msgstr "Weitere Bearbeitung"
 
@@ -82,7 +82,7 @@ msgstr "Textart"
 msgid "date according to edition (standardized)"
 msgstr "Datierung nach Edition (standardisiert)"
 
-#: forms/letter.py:31 forms/letter.py:201
+#: forms/letter.py:31 forms/letter.py:212
 msgid "based on edition"
 msgstr "nach Edition"
 
@@ -90,20 +90,20 @@ msgstr "nach Edition"
 msgid "date according to source (standardized)"
 msgstr "Datierung nach Originalquelle (standardisiert)"
 
-#: forms/letter.py:178
+#: forms/letter.py:189
 msgid "source name"
 msgstr "Name (nach Originalquelle)"
 
-#: forms/letter.py:183
+#: forms/letter.py:194
 msgid "edtion name"
 msgstr "Name (nach Edition)"
 
-#: forms/letter.py:198 forms/letter.py:212
+#: forms/letter.py:209 forms/letter.py:223
 #: templates/edwoca/manifestation_print.html:150
 msgid "assumed"
 msgstr "unsicher"
 
-#: forms/letter.py:201
+#: forms/letter.py:212
 msgid "attributed"
 msgstr "zugeschrieben"
 
@@ -440,7 +440,7 @@ msgstr "Kommentar"
 
 #: models/letter.py:109
 msgid "work mentionings"
-msgstr ""
+msgstr "Werkerwähnungen"
 
 #: models/letter.py:130
 msgid "diplomatic date on source"
@@ -454,19 +454,23 @@ msgstr "Name der Körperschaft (nach Edition)"
 msgid "sender corporation name according to source"
 msgstr "Name der Körperschaft (nach Originalquelle)"
 
-#: models/letter.py:157
+#: models/letter.py:151
+msgid "no proof"
+msgstr "ohne Nachweis"
+
+#: models/letter.py:158
 msgid "unknown"
 msgstr "unbekannt"
 
-#: models/letter.py:158
+#: models/letter.py:159
 msgid "writing to"
 msgstr "an"
 
-#: models/letter.py:159
+#: models/letter.py:160
 msgid "et al."
 msgstr "u. a."
 
-#: models/letter.py:204 templates/edwoca/letter_update.html:125
+#: models/letter.py:205 templates/edwoca/letter_update.html:125
 msgid "pages"
 msgstr "Seiten"
 

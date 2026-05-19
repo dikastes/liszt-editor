@@ -102,11 +102,12 @@ class Command(BaseCommand):
                                 ]
                                 if string
                             ])]
-                comment = '\n'.join([
+                work_mentionings = '\n'.join(work_mentionings)
+
+                comment = '\n'.join(s for s in [
                         row['Kommentar (intern)'],
-                        row['Bemerkungen'],
-                        *work_mentionings
-                        ])
+                        row['Bemerkungen']
+                        ] if s)
 
                 display = row['Datierung (standardisiert)']
                 not_before = row['Datierung maschinenlesbar Teil 1']
@@ -132,9 +133,15 @@ class Command(BaseCommand):
                         assumed = assumed
                     )
 
+                needs_review = False
+                if row['zu überarbeiten']:
+                    needs_review = True
+
                 letter = Letter.objects.create(
                         edition_period = edition_period,
-                        comment = comment
+                        comment = comment,
+                        work_mentionings = work_mentionings,
+                        needs_review = needs_review
                     )
 
                 # contributors

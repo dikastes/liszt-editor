@@ -92,6 +92,7 @@ class LetterForm(BaseTrackedModelForm, ModelForm, SimpleFormMixin):
         model = Letter
         fields = BaseTrackedModelForm.Meta.fields + [
                 'comment',
+                'work_mentionings',
                 'diplomatic_source_date'
             ]
         widgets = dict(BaseTrackedModelForm.Meta.widgets, **{
@@ -99,6 +100,10 @@ class LetterForm(BaseTrackedModelForm, ModelForm, SimpleFormMixin):
                 'class': SimpleFormMixin.text_input_classes,
                 'form': 'form',
                 'disabled': 'true'
+            }),
+            'work_mentionings': Textarea(attrs={
+                'class': SimpleFormMixin.text_area_classes + ' bg-white border-black',
+                'form': 'form'
             }),
             'comment': Textarea(attrs={
                 'class': SimpleFormMixin.text_area_classes + ' bg-white border-black',
@@ -135,15 +140,21 @@ class LetterForm(BaseTrackedModelForm, ModelForm, SimpleFormMixin):
         form = div(cls='mb-10')
 
         comment_field = self['comment']
+        work_mentionings_field = self['work_mentionings']
 
-        comment_container = label(cls='form-control')
-        comment_label = div(comment_field.label, cls='label-text')
-        comment_container.add(comment_label)
-        comment_container.add(raw(str(comment_field)))
-        if comment_field.errors:
-            comment_container.add(div(span(comment_field.errors, cls='text-primary text-sm'), cls='label'))
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(comment_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(work_mentionings_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(work_mentionings_field))
+        #if comment_field.errors:
+            #comment_container.add(div(span(comment_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        form.add(comment_container)
+        #form.add(comment_container)
 
         return mark_safe(str(form))
 

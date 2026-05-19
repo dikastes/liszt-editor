@@ -148,7 +148,8 @@ class Letter(TrackedModel):
     def get_first_mentioning(self):
         if self.lettermentioning_set.all():
             return str(self.lettermentioning_set.first())
-        return f'<{_("no proof")}>'
+        no_proof = _('no proof')
+        return f'<{no_proof}>'
 
     def get_absolute_url(self):
         return reverse('edwoca:letter_update', kwargs={'pk': self.id})
