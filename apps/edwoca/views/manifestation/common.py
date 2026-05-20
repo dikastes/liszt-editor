@@ -999,6 +999,7 @@ class ManifestationProvenanceView(UpdateView):
             and self.corporation_formset.is_valid()
             and self._all_nested_valid()
         ):
+            self.object.save()
             return self._forms_valid(form)
 
         return self._forms_invalid(form)

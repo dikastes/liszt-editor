@@ -29,6 +29,7 @@ def manifestation_manuscript_update(request, pk):
         form = ItemManuscriptForm(request.POST, instance=item)
         if form.is_valid():
             form.save()
+            manifestation.save()
         else:
             return render(request, 'edwoca/manifestation_manuscript.html', context)
         context['form'] = form
