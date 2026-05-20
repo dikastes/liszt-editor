@@ -14,10 +14,9 @@ class LetterSearchView(EdwocaSearchView):
     model = Letter
 
 
-class LetterCreateView(CreateView):
-    model = Letter
-    template_name = 'edwoca/simple_form.html'
-    form_class = LetterForm
+def letter_create(request):
+    letter = Letter.objects.create()
+    retu:n redirect('edwoca:letter_update', pk = letter.pk)
 
 
 class LetterDeleteView(DeleteView):

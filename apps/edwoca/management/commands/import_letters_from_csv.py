@@ -141,7 +141,8 @@ class Command(BaseCommand):
                         edition_period = edition_period,
                         comment = comment,
                         work_mentionings = work_mentionings,
-                        needs_review = needs_review
+                        needs_review = needs_review,
+                        first_editor = 'Excelimport'
                     )
 
                 # contributors

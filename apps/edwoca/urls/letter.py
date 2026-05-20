@@ -4,7 +4,7 @@ from .. import views
 urlpatterns = [
     path('', views.LetterListView.as_view(), name = 'letter_list'),
     path('search', views.LetterSearchView.as_view(), name = 'letter_search'),
-    path('create', views.LetterCreateView.as_view(), name = 'letter_create'),
+    path('create', views.letter_create, name = 'letter_create'),
     path('<int:pk>/update', views.letter_update, name = 'letter_update'),
     path('<int:pk>/delete', views.LetterDeleteView.as_view(), name = 'letter_delete'),
 
