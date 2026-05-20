@@ -352,6 +352,10 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         )
     _group_field_names = ['part_of', 'component_of']
 
+    @property
+    def may_have_component(self):
+        return self.is_collection or self.part_of is not None
+
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
 

@@ -1,6 +1,5 @@
 import re
 
-from django.http import Http404
 from haystack.query import SQ
 from ...forms.manifestation import *
 from calendar import monthrange
@@ -12,7 +11,9 @@ from ...models import Manifestation as EdwocaManifestation, Letter, Expression, 
 from ..base import *
 from ...models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from bib.models import ZotItem
+from django.db.models import Q
 from django.forms import inlineformset_factory
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
@@ -407,7 +408,11 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
 
         if collection_search_form.is_valid() and collection_search_form.cleaned_data.get('q'):
             context['collection_query'] = collection_search_form.cleaned_data.get('q')
-            found_collections = collection_search_form.search().models(Manifestation)#.filter(is_collection = True)
+            found_collections = (collection_search_form
+                    .search()
+                    .models(Manifestation)
+                    .filter(may_have_component = True)
+                )
             if self.object.is_collection:
                 found_collections = found_collections.filter(is_collection = True)
             context['found_collections'] = found_collections
