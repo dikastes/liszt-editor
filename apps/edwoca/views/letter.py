@@ -16,7 +16,7 @@ class LetterSearchView(EdwocaSearchView):
 
 def letter_create(request):
     letter = Letter.objects.create()
-    retu:n redirect('edwoca:letter_update', pk = letter.pk)
+    return redirect('edwoca:letter_update', pk = letter.pk)
 
 
 class LetterDeleteView(DeleteView):

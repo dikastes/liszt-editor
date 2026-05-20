@@ -37,7 +37,7 @@ class Letter(TrackedModel):
         COPY = 'C', _('Copy')
 
     class Meta:
-        ordering = ['edition_period__not_before']
+        ordering = ['-needs_review', 'edition_period__not_before']
 
     receiver_persons = models.ManyToManyField(
             'dmad.Person',
@@ -186,7 +186,7 @@ class Letter(TrackedModel):
             else:
                 receiver = unknown
 
-        return f'{sender} {to} {receiver}, {self.edition_period} ({self.get_first_mentioning()})'
+        return self.mark_needs_review(f'{sender} {to} {receiver}, {self.edition_period} ({self.get_first_mentioning()})')
 
 
 class LetterMentioning(models.Model):
