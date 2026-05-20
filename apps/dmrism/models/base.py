@@ -317,3 +317,9 @@ class TrackedModel(models.Model):
             default = False,
             verbose_name = _('needs review'),
         )
+
+    def mark_needs_review(self, title):
+        needs_review_string = '!'
+        if self.needs_review:
+            return needs_review_string + title
+        return title

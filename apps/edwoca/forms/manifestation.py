@@ -4,6 +4,7 @@ from .base import *
 from liszt_util.forms import FramedSearchForm
 from bib.models import ZotItem
 from django import forms
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.conf import settings
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, SelectDateWidget, CharField, ChoiceField, BooleanField
 from django.forms.models import inlineformset_factory
@@ -398,6 +399,7 @@ class ManifestationClassificationForm(ModelForm):
 
         if self.instance.is_singleton:
             self.fields['source_type'].choices = [
+                    (None, BLANK_CHOICE_DASH),
                     (Manifestation.SourceType.TRANSCRIPT.value, Manifestation.SourceType.TRANSCRIPT.label),
                     (Manifestation.SourceType.CORRECTED_TRANSCRIPT.value, Manifestation.SourceType.CORRECTED_TRANSCRIPT.label),
                     (Manifestation.SourceType.AUTOGRAPH.value, Manifestation.SourceType.AUTOGRAPH.label),
@@ -405,6 +407,7 @@ class ManifestationClassificationForm(ModelForm):
                 ]
         else:
             self.fields['source_type'].choices = [
+                    (None, BLANK_CHOICE_DASH),
                     (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
                 ]
 

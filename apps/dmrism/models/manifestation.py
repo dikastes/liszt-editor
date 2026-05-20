@@ -126,6 +126,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             choices = SourceType.choices,
             default = SourceType.AUTOGRAPH,
             blank = True,
+            null = True,
             verbose_name = _('source type')
         )
     print_type = models.CharField(
@@ -373,26 +374,22 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             self.is_collection = False
 
     def render_title(self, prefix):
-        review_string = ''
-        if self.needs_review:
-            review_string = '!'
-
         if self.is_collection:
             collection = _('coll')
             title = self.source_title or _('empty')
-            return f'{review_string}({collection}) {prefix} {title}'
+            return self.mark_needs_review(f'({collection}) {prefix} {title}')
 
         title = self.working_title or _('empty')
         source_typed_title = f'{prefix} {title} ({self.get_source_type_display()})'
 
         if self.part_of:
             part = _('pt')
-            return f'{review_string}({part}) {source_typed_title}'
+            return self.mark_needs_review(f'({part}) {source_typed_title}')
         if self.component_of:
             component = _('cmp')
-            return f'{review_string}({component}) {source_typed_title}'
+            return self.mark_needs_review(f'({component}) {source_typed_title}')
 
-        return review_string + source_typed_title
+        return self.mark_needs_review(source_typed_title)
 
     def standardized_search_entry(self):
         if self.items.count():
