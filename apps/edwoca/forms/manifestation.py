@@ -190,10 +190,11 @@ class ManifestationCommentForm(BaseTrackedModelForm, CommentForm):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(public_comment_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(public_comment_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(taken_information_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(taken_information_field))
+            if self.instance.is_singleton:
+                with label(cls=SimpleFormMixin.form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(taken_information_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(taken_information_field))
             self.get_editing_history_div()
 
         return mark_safe(str(form))
