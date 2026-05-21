@@ -41,11 +41,6 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
                     }),
             }
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        wt_field = self.fields['working_title']
-        wt_field.label = f'{wt_field.label}*'
-
 
 class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
@@ -412,8 +407,8 @@ class ManifestationClassificationForm(ModelForm):
                     (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
                 ]
 
-        st_field = self.fields['source_type']
-        st_field.label = f'{st_field.label}*'
+        #st_field = self.fields['source_type']
+        #st_field.label = f'{st_field.label}*'
 
     def as_daisy(self):
         form = div(cls='mb-10')
@@ -456,7 +451,29 @@ class ManifestationClassificationForm(ModelForm):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(manifestation_form_field))
-            # lower palette with toggles
+
+            h1(_('edition type') + '*', cls='text-lg my-5')
+            if not instance.is_text:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(choir_score_field))
+                    span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(piano_reduction_field))
+                    span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(particell_field))
+                    span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(score_field))
+                    span(score_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(part_field))
+                    span(part_field.label, cls=SimpleFormMixin.label_text_classes)
+            if not (instance.choir_score or instance.piano_reduction or instance.particell or instance.score or instance.part):
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(text_field))
+                    span(text_field.label, cls=SimpleFormMixin.label_text_classes)
+
             h1(_('function'), cls='text-lg my-5')
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(album_page_field))
@@ -487,28 +504,6 @@ class ManifestationClassificationForm(ModelForm):
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
                     raw(str(further_edition_field))
                     span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
-
-            h1(_('edition type') + '*', cls='text-lg my-5')
-            if not instance.is_text:
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(choir_score_field))
-                    span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(piano_reduction_field))
-                    span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(particell_field))
-                    span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(score_field))
-                    span(score_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(part_field))
-                    span(part_field.label, cls=SimpleFormMixin.label_text_classes)
-            if not (instance.choir_score or instance.piano_reduction or instance.particell or instance.score or instance.part):
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(text_field))
-                    span(text_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
 
@@ -708,6 +703,9 @@ class SingletonCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.is_collection = kwargs.pop('is_collection', False)
         super().__init__(*args, **kwargs)
+
+        sig_field = self.fields['signature']
+        sig_field.label = f'{sig_field.label}*'
 
     def as_daisy(self):
         root = div(cls="flex flex-col gap-5")

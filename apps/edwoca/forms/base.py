@@ -403,6 +403,8 @@ class BaseSignatureForm(GenericAsDaisyMixin, ModelForm):
         super().__init__(*args, **kwargs)
         lib_field = self.fields['library']
         lib_field.label = f'{lib_field.label}*'
+        sig_field = self.fields['signature']
+        sig_field.label = f'{sig_field.label}*'
 
     def as_daisy(self):
         form_wrapper = div(cls='mb-10')
