@@ -253,7 +253,7 @@ class BaseSignature(models.Model):
             verbose_name = _('holding institution')
         )
     signature = models.CharField(
-            max_length=50,
+            max_length=200,
             blank = True,
             verbose_name = _('signature'),
             default = ''
