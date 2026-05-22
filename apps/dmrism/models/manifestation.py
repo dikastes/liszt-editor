@@ -334,18 +334,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             on_delete = models.SET_NULL,
             null = True
         )
-    is_lyrics = models.BooleanField(
-            default = False,
-            verbose_name = _('is lyrics')
-        )
-    is_program = models.BooleanField(
-            default = False,
-            verbose_name = _('is program')
-        )
-    is_explanation = models.BooleanField(
-            default = False,
-            verbose_name = _('is explanation')
-        )
     is_text = models.BooleanField(
             default = False,
             verbose_name = _('is text')
