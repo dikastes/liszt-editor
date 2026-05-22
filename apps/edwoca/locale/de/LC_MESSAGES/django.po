@@ -72,7 +72,7 @@ msgstr "Weitere Bearbeitung"
 
 #: forms/item.py:315 forms/manifestation.py:456
 msgid "function"
-msgstr "Quellenfunktion"
+msgstr "Funktion"
 
 #: forms/item.py:486 forms/manifestation.py:969
 msgid "text type"
@@ -125,7 +125,7 @@ msgstr "Plattennummer"
 
 #: forms/manifestation.py:545 forms/manifestation.py:686
 msgid "source type"
-msgstr "Quellentyp"
+msgstr "Typ"
 
 #: forms/manifestation.py:549 templates/edwoca/create_manifestation.html:16
 #: templates/edwoca/manifestation_print.html:18
