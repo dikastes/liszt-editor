@@ -885,7 +885,6 @@ class ManifestationSearchForm(FramedSearchForm):
 
 
 class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
-    #inferred = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
