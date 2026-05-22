@@ -35,10 +35,9 @@
                             &nbsp;
                         </span>
                     </div>
-                    <form action="{% url 'edwoca:manifestation_digital_copy_delete' form.instance.id %}" method="post" class="w-full m-0">
-                        {% csrf_token %}
-                        <input type="submit" class="btn btn-primary btn-outline w-full" id="delete-{{ form.instance.id }}" value="{% translate 'remove' %}"/>
-                    </form>
+                    <button name="remove-digital-copy" value="{{form.instance.id}}" type="submit" form="form" class="btn-outline btn-primary btn flex-0">
+                        {% translate 'remove' %}
+                    </button>
                 </label>
             </div>
         </div>
@@ -51,9 +50,9 @@
 
 <div class="flex items-center">
     <div class="flex-1"></div>
-    <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn-outline btn flex-0"> 
+    <button name="add-digital-copy" type="submit" form="form" class="btn-outline btn flex-0">
         {% translate 'add digital copy' %}
-    </a>
+    </button>
 </div>
 
 {% endblock %}
