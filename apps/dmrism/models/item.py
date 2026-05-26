@@ -222,6 +222,14 @@ class Library(models.Model):
             blank = True,
             verbose_name = _('siglum')
         )
+    corporation = models.ForeignKey(
+            'dmad.Corporation',
+            on_delete = models.SET_NULL,
+            related_name = '%(class)s',
+            null = True,
+            blank = True,
+            verbose_name = _('corporation')
+        )
 
     def get_absolute_url(self):
         return reverse('edwoca:library_update', kwargs = {'pk' : self.id})

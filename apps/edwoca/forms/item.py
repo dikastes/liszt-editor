@@ -225,19 +225,28 @@ class LibraryForm(ModelForm):
         fields = [ 'name', 'siglum' ]
         widgets = {
                 'name': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': SimpleFormMixin.text_input_classes
                     }),
                 'siglum': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': SimpleFormMixin.text_input_classes
                     }),
             }
 
     def as_daisy(self):
         form = div()
-        for field in self.visible_fields():
-            field_label = label(field.label, _for=field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-            field_label.add(raw(str(field)))
-            form.add(field_label)
+
+        name_field = self['name']
+        siglum_field = self['siglum']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(name_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(name_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(siglum_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(siglum_field))
 
         return mark_safe(str(form))
 

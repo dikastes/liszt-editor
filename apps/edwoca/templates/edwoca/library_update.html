@@ -1,0 +1,44 @@
+{% extends 'edwoca/base.html' %}
+
+{% load i18n %}
+
+{% block content %}
+
+<h2 class="my-5">
+    {% translate 'library' %}
+</h2>
+
+<form method="post" id="form" class="mb-0">
+    {% csrf_token %}
+    {{ form.as_daisy }}
+
+    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+</form>
+
+{% if object.corporation %}
+    <div class="flex gap-5 items-end">
+        <label class="form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'corporation' %}
+                </span>
+            </div>
+            <div class="pseudo-input border border-black flex items-center">
+                {{ object.corporation }}
+            </div>
+        </label>
+        <button type="submit" form="form" name="delete-corporation" class="btn btn-primary btn-outline">
+            {% translate 'remove' %}
+        </button>
+    </div>
+{% else %}
+    <div id="search-container-library-{{ object.id }}-corporation">
+        {% include 'edwoca/partials/htmx/search.html' with label='corporation' search_type='corporation' field_name='corporation' app='dmrism' model_name='library' target_app='dmad' target_model='corporation' target_id='corporation' id=object.id placeholder='search corporations' %}
+    </div>
+{% endif %}
+
+{% endblock %}
+
+
+
+

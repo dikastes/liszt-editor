@@ -510,8 +510,18 @@ class LibraryCreateView(CreateView):
 
 class LibraryUpdateView(EntityMixin, UpdateView):
     model = Library
-    template_name = 'edwoca/simple_form.html'
+    #template_name = 'edwoca/simple_form.html'
+    template_name = 'edwoca/library_update.html'
     form_class = LibraryForm
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+
+        if 'delete-corporation' in request.POST:
+            self.object.corporation = None
+            self.object.save()
+
+        return response
 
 
 class LibraryDeleteView(DeleteView):
