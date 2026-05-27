@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-26 14:58+0200\n"
+"POT-Creation-Date: 2026-05-27 09:49+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -226,6 +226,7 @@ msgstr "Kommentar zur Datierung"
 
 #: models/expression.py:35
 #: templates/edwoca/partials/expression/expression_menu.html:58
+#: templates/edwoca/partials/item/item_menu.html:44
 #: templates/edwoca/partials/work/work_menu.html:37
 msgid "history"
 msgstr ""
@@ -430,7 +431,7 @@ msgstr "Kategorie"
 #: templates/edwoca/manifestation_title.html:255
 #: templates/edwoca/manifestation_update.html:112
 #: templates/edwoca/partials/expression/expression_menu.html:70
-#: templates/edwoca/partials/item/item_menu.html:58
+#: templates/edwoca/partials/item/item_menu.html:72
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:100
 #: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:27
 #: templates/edwoca/partials/work/work_menu.html:56
@@ -493,6 +494,7 @@ msgstr "begleitet oder ergänzt"
 #: templates/edwoca/bib_update.html:14
 #: templates/edwoca/manifestation_provenance.html:120
 #: templates/edwoca/manifestation_provenance.html:348
+#: templates/edwoca/partials/item/item_menu.html:58
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:84
 #: templates/edwoca/partials/work/work_menu.html:49
 msgid "bibliography"
@@ -567,6 +569,7 @@ msgstr "Briefe"
 
 #: templates/edwoca/bib_update.html:91 templates/edwoca/letter_update.html:136
 #: templates/edwoca/letter_update.html:216
+#: templates/edwoca/library_update.html:31
 #: templates/edwoca/manifestation_digital_copy.html:39
 #: templates/edwoca/manifestation_history.html:43
 #: templates/edwoca/manifestation_print.html:22
@@ -740,7 +743,7 @@ msgstr "Werkbezüge"
 msgid "library"
 msgstr "Bibliothek"
 
-#: templates/edwoca/library_update.html:22
+#: templates/edwoca/library_update.html:23
 msgid "corporation"
 msgstr "Körperschaft"
 
@@ -831,7 +834,7 @@ msgid "letter"
 msgstr "Brief"
 
 #: templates/edwoca/manifestation_digital_copy.html:13
-#: templates/edwoca/partials/item/item_menu.html:51
+#: templates/edwoca/partials/item/item_menu.html:65
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:92
 msgid "digital copies"
 msgstr "Digitalisate"
@@ -1279,7 +1282,7 @@ msgstr "Titelei und Widmung"
 
 #: templates/edwoca/partials/expression/expression_menu.html:30
 #: templates/edwoca/partials/forms/_modification_form.html:38
-#: templates/edwoca/partials/item/item_menu.html:30
+#: templates/edwoca/partials/item/item_menu.html:23
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:36
 #: templates/edwoca/partials/work/work_menu.html:23
 msgid "relations"
@@ -1302,14 +1305,14 @@ msgid "performance"
 msgstr "Aufführungen"
 
 #: templates/edwoca/partials/expression/expression_menu.html:79
-#: templates/edwoca/partials/item/item_menu.html:67
+#: templates/edwoca/partials/item/item_menu.html:81
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:119
 #: templates/edwoca/partials/work/work_menu.html:65
 msgid "delete"
 msgstr "löschen"
 
 #: templates/edwoca/partials/expression/expression_menu.html:84
-#: templates/edwoca/partials/item/item_menu.html:72
+#: templates/edwoca/partials/item/item_menu.html:86
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:125
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:131
 #: templates/edwoca/partials/work/work_menu.html:70
@@ -1345,15 +1348,15 @@ msgstr ""
 msgid "head"
 msgstr "Kopf"
 
-#: templates/edwoca/partials/item/item_menu.html:23
-msgid "handwritten entries"
-msgstr "handschriftliche Eintragungen"
+#: templates/edwoca/partials/item/item_menu.html:30
+msgid "item characteristics"
+msgstr "Exemplarspezifika"
 
 #: templates/edwoca/partials/item/item_menu.html:37
 msgid "dedication"
 msgstr "Widmung"
 
-#: templates/edwoca/partials/item/item_menu.html:44
+#: templates/edwoca/partials/item/item_menu.html:51
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:76
 msgid "provenance"
 msgstr "Provenienz"
@@ -1589,6 +1592,9 @@ msgstr "Körperschaften durchsuchen"
 #: views/manifestation/title.py:198 views/manifestation/title.py:203
 msgid "search place"
 msgstr "Orte durchsuchen"
+
+#~ msgid "handwritten entries"
+#~ msgstr "handschriftliche Eintragungen"
 
 #, fuzzy
 #~| msgid "remove"

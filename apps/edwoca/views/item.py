@@ -52,6 +52,18 @@ class ItemSearchView(EdwocaSearchView):
         return super().get_queryset().filter(manifestation_is_singleton = False)
 
 
+def item_history(request, pk):
+    pass
+
+
+# derive from future base class together with manifestation
+class ItemBibliographyUpdateView(EntityMixin, UpdateView):
+    model = Item
+    fields = []
+    property = 'bib'
+    template_name = 'edwoca/bib_update.html'
+
+
 def item_update(request, pk):
     item = get_object_or_404(EdwocaItem, pk=pk)
     item_form = ItemForm(request.POST or None, instance=item)
