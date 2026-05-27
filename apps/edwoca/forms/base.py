@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from dominate.util import raw
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Period
-from dominate.tags import div, label, span
+from dominate.tags import div, label, span, a
 
 
 class SimpleFormMixin:
@@ -457,16 +457,18 @@ class BaseDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
         }
 
     def as_daisy(self):
-        form = div()
+        form = div(cls='mb-5')
 
         url_field = self['url']
         link_type_field = self['link_type']
 
         with form:
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(url_field))
+            with div(cls='flex gap-5 items-end'):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(url_field))
+                a(_('open'), cls='flex-0 btn btn-outline', href=self.instance.url, target='_blank')
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(link_type_field.label), cls=SimpleFormMixin.label_text_classes)

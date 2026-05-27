@@ -13,8 +13,11 @@
 </form>
 
 {{ edition_period_form.as_daisy }}
-{{ form.diplomatic_date_as_daisy }}
-{{ source_period_form.as_daisy }}
+
+<div class="bg-base-100 p-5">
+    {{ form.diplomatic_date_as_daisy }}
+    {{ source_period_form.as_daisy }}
+</div>
 
 <h2 class="my-5">
     {% translate 'sender' %}
@@ -196,26 +199,14 @@
 </div>
 
 {% for letter_digitized_copy_form in letter_digitized_copy_forms %}
-    <div class="flex gap-5 p-5 my-5 px-5 border border-black">
-        <div class="flex-1">
-            {{ letter_digitized_copy_form.as_daisy }}
-        </div>
-        <div class="flex-0 flex flex-col">
+    <div class="gap-5 p-5 my-5 px-5 border border-black">
+        {{ letter_digitized_copy_form.as_daisy }}
+        <div class="flex">
             <div class="flex-1"></div>
             <div class="flex-0">
-                <a class="btn btn-outline w-full " href="{{ letter_digitized_copy_form.instance.url }}" target="_blank">
-                    {% translate 'open' %}
-                </a>
-                <label class="flex-0 m-0">
-                    <div class="label">
-                        <span class="label-text">
-                            &nbsp;
-                        </span>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-outline w-full" name="remove-letter-digcopy" value="{{ letter_digitized_copy_form.instance.id }}" form="form">
-                        {% translate 'remove' %}
-                    </button>
-                </label>
+                <button type="submit" class="btn btn-primary btn-outline w-full" name="remove-letter-digcopy" value="{{ letter_digitized_copy_form.instance.id }}" form="form">
+                    {% translate 'remove digital copy' %}
+                </button>
             </div>
         </div>
     </div>

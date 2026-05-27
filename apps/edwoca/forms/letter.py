@@ -306,29 +306,30 @@ class BaseLetterContributorForm(ModelForm):
                                     checked = sw.data.get('selected', False),
                                     form='form'
                                 )
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(source_name_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(source_name_field))
-            with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
-                tags.div(cls='flex-1')
-                with tags.label(cls=SimpleFormMixin.toggle_label_classes):
-                    tags.span(_(source_name_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
-                    raw(str(source_name_assumed_field))
-                tags.div(cls='flex-1')
-                for sw in source_name_inferred_field.subwidgets:
-                    with tags.div(cls=SimpleFormMixin.form_control_classes):
-                        with tags.label(cls='label cursor-pointer gap-5'):
-                            tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
-                            tags.input_(
-                                    type='radio',
-                                    name=sw.data.get('name'),
-                                    value=str(sw.data.get('value')),
-                                    cls='radio',
-                                    checked = sw.data.get('selected', False),
-                                    form='form',
-                                    disabled = True
-                                )
+            with div(cls='bg-base-100 p-5 mb-5'):
+                with label(cls=SimpleFormMixin.form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(source_name_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(source_name_field))
+                with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
+                    tags.div(cls='flex-1')
+                    with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+                        tags.span(_(source_name_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                        raw(str(source_name_assumed_field))
+                    tags.div(cls='flex-1')
+                    for sw in source_name_inferred_field.subwidgets:
+                        with tags.div(cls=SimpleFormMixin.form_control_classes):
+                            with tags.label(cls='label cursor-pointer gap-5'):
+                                tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
+                                tags.input_(
+                                        type='radio',
+                                        name=sw.data.get('name'),
+                                        value=str(sw.data.get('value')),
+                                        cls='radio',
+                                        checked = sw.data.get('selected', False),
+                                        form='form',
+                                        disabled = True
+                                    )
 
         return mark_safe(str(form))
 

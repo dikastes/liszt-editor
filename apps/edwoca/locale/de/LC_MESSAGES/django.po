@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-27 09:49+0200\n"
+"POT-Creation-Date: 2026-05-27 17:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:118 forms/item.py:176
-#: forms/letter.py:68 forms/letter.py:197 forms/manifestation.py:216
+#: forms/letter.py:68 forms/letter.py:205 forms/manifestation.py:216
 #: forms/manifestation.py:758 forms/manifestation.py:889
 #: forms/modification.py:26
 msgid "based on source"
@@ -27,7 +27,7 @@ msgstr "nach Vorlage"
 
 #: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:118 forms/item.py:176
-#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:197
+#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:205
 #: forms/manifestation.py:216 forms/manifestation.py:758
 #: forms/manifestation.py:889 forms/modification.py:26
 #: templates/edwoca/manifestation_print.html:142
@@ -50,23 +50,27 @@ msgstr "nicht nach"
 msgid "clear"
 msgstr "leeren"
 
-#: forms/base.py:502 forms/letter.py:115 forms/manifestation.py:155
+#: forms/base.py:471
+msgid "open"
+msgstr "öffnen"
+
+#: forms/base.py:504 forms/letter.py:115 forms/manifestation.py:155
 msgid "first save"
 msgstr "Datum"
 
-#: forms/base.py:508 forms/letter.py:121 forms/manifestation.py:161
+#: forms/base.py:510 forms/letter.py:121 forms/manifestation.py:161
 msgid "last save"
 msgstr "letzte Bearbeitung"
 
-#: forms/base.py:532
+#: forms/base.py:534
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
-#: forms/base.py:533
+#: forms/base.py:535
 msgid "initial recording"
 msgstr "Ersterfassung"
 
-#: forms/base.py:545
+#: forms/base.py:547
 msgid "further recording"
 msgstr "Weitere Bearbeitung"
 
@@ -78,7 +82,7 @@ msgstr "Textart"
 msgid "date according to edition (standardized)"
 msgstr "Datierung nach Edition (standardisiert)"
 
-#: forms/letter.py:31 forms/letter.py:212
+#: forms/letter.py:31 forms/letter.py:220
 msgid "based on edition"
 msgstr "nach Edition"
 
@@ -86,20 +90,20 @@ msgstr "nach Edition"
 msgid "date according to source (standardized)"
 msgstr "Datierung nach Originalquelle (standardisiert)"
 
-#: forms/letter.py:189
+#: forms/letter.py:197
 msgid "source name"
 msgstr "Name (nach Originalquelle)"
 
-#: forms/letter.py:194
+#: forms/letter.py:202
 msgid "edtion name"
 msgstr "Name (nach Edition)"
 
-#: forms/letter.py:209 forms/letter.py:223
+#: forms/letter.py:217 forms/letter.py:231
 #: templates/edwoca/manifestation_print.html:150
 msgid "assumed"
 msgstr "unsicher"
 
-#: forms/letter.py:212
+#: forms/letter.py:220
 msgid "attributed"
 msgstr "zugeschrieben"
 
@@ -424,7 +428,7 @@ msgid "category"
 msgstr "Kategorie"
 
 #: models/letter.py:99 models/letter.py:104
-#: templates/edwoca/letter_update.html:242
+#: templates/edwoca/letter_update.html:228
 #: templates/edwoca/manifestation_history.html:85
 #: templates/edwoca/manifestation_manuscript.html:64
 #: templates/edwoca/manifestation_provenance.html:478
@@ -568,9 +572,7 @@ msgid "letters"
 msgstr "Briefe"
 
 #: templates/edwoca/bib_update.html:91 templates/edwoca/letter_update.html:136
-#: templates/edwoca/letter_update.html:216
 #: templates/edwoca/library_update.html:31
-#: templates/edwoca/manifestation_digital_copy.html:39
 #: templates/edwoca/manifestation_history.html:43
 #: templates/edwoca/manifestation_print.html:22
 #: templates/edwoca/manifestation_print.html:184
@@ -725,16 +727,16 @@ msgstr "Signatur entfernen"
 msgid "add letter signature"
 msgstr "Signatur anlegen"
 
-#: templates/edwoca/letter_update.html:207
-#: templates/edwoca/manifestation_digital_copy.html:30
-msgid "open"
-msgstr "öffnen"
+#: templates/edwoca/letter_update.html:205
+#: templates/edwoca/manifestation_digital_copy.html:28
+msgid "remove digital copy"
+msgstr "Digitalisat entfernen"
 
-#: templates/edwoca/letter_update.html:228
+#: templates/edwoca/letter_update.html:216
 msgid "add letter digital copy"
 msgstr "Digitalisat hinzufügen"
 
-#: templates/edwoca/letter_update.html:234
+#: templates/edwoca/letter_update.html:222
 msgid "work relations"
 msgstr "Werkbezüge"
 
@@ -839,11 +841,11 @@ msgstr "Brief"
 msgid "digital copies"
 msgstr "Digitalisate"
 
-#: templates/edwoca/manifestation_digital_copy.html:47
+#: templates/edwoca/manifestation_digital_copy.html:36
 msgid "no digital copies"
 msgstr "keine Digitalisate vorhanden"
 
-#: templates/edwoca/manifestation_digital_copy.html:54
+#: templates/edwoca/manifestation_digital_copy.html:43
 msgid "add digital copy"
 msgstr "Digitalisat hinzufügen"
 
@@ -1415,23 +1417,7 @@ msgstr "keine Formatangaben"
 msgid "measure not specified"
 msgstr "keine Umfangangaben"
 
-#: templates/edwoca/partials/nav_switcher.html:21
-msgid "created"
-msgstr "angelegt"
-
-#: templates/edwoca/partials/nav_switcher.html:28
-msgid "by"
-msgstr "von"
-
-#: templates/edwoca/partials/nav_switcher.html:33
-msgid "missing first editor"
-msgstr "kein*e Erstbearbeiter*in"
-
-#: templates/edwoca/partials/nav_switcher.html:39
-msgid "last update"
-msgstr "letzte Bearbeitung"
-
-#: templates/edwoca/partials/nav_switcher.html:47
+#: templates/edwoca/partials/nav_switcher.html:22
 msgid "save"
 msgstr "speichern"
 
@@ -1543,6 +1529,22 @@ msgstr ""
 #, python-format
 msgid "search %(type)s"
 msgstr "%(type)s suchen"
+
+#: templates/edwoca/partials/tracked_model_display.html:5
+msgid "created"
+msgstr "angelegt"
+
+#: templates/edwoca/partials/tracked_model_display.html:12
+msgid "by"
+msgstr "von"
+
+#: templates/edwoca/partials/tracked_model_display.html:17
+msgid "missing first editor"
+msgstr "kein*e Erstbearbeiter*in"
+
+#: templates/edwoca/partials/tracked_model_display.html:23
+msgid "last update"
+msgstr "letzte Bearbeitung"
 
 #: templates/edwoca/partials/work/work_menu.html:30
 msgid "reference"
