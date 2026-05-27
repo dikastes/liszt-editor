@@ -41,6 +41,13 @@ for entity in entities:
         )
     urlpatterns.append(
         path(
+            f"{entity}s/create",
+            getattr(views, f"{snake_to_camel_case(entity)}CreateView").as_view(),
+            name = f"{entity}_create"
+            )
+        )
+    urlpatterns.append(
+        path(
             f"{entity}s/<str:type>",
             getattr(views, f"{snake_to_camel_case(entity)}ListView").as_view(),
             name = f"{entity}_list"
@@ -51,13 +58,6 @@ for entity in entities:
             f"{entity}s",
             getattr(views, f"{snake_to_camel_case(entity)}ListView").as_view(),
             name = f"{entity}_list"
-            )
-        )
-    urlpatterns.append(
-        path(
-            f"{entity}s/create",
-            getattr(views, f"{snake_to_camel_case(entity)}CreateView").as_view(),
-            name = f"{entity}_create"
             )
         )
     for action in id_bearing_actions:

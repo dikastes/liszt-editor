@@ -1700,6 +1700,9 @@ def manifestation_digital_copy(request, pk):
     }
 
     if request.method == 'POST':
+        if 'add-digital-copy' in request.POST:
+            ItemDigitalCopy.objects.create(item = item)
+
         forms = []
         for digital_copy in item.digital_copies.all():
             prefix = f'digital_copy_{digital_copy.id}'
@@ -1707,8 +1710,19 @@ def manifestation_digital_copy(request, pk):
             if form.is_valid():
                 form.save()
             forms.append(form)
-        context['forms'] = forms
-        #return redirect('edwoca:manifestation_digital_copy', pk=pk)
+
+        if all(f.is_valid() for f in forms):
+            for form in forms:
+                form.save()
+        else:
+            context['forms'] = forms
+            return render(request, 'edwoca/manifestation_digital_copy.html', context)
+
+        if 'remove-digital-copy' in request.POST:
+            pk = request.POST.get('remove-digital-copy')
+            get_object_or_404(ItemDigitalCopy, pk=pk).delete()
+
+        return redirect('edwoca:manifestation_digital_copy', pk=manifestation.pk)
     else:
         forms = []
         for digital_copy in item.digital_copies.all():
@@ -1717,21 +1731,6 @@ def manifestation_digital_copy(request, pk):
         context['forms'] = forms
 
     return render(request, 'edwoca/manifestation_digital_copy.html', context)
-
-
-def manifestation_digital_copy_add(request, pk):
-    manifestation = get_object_or_404(Manifestation, pk=pk)
-    item = manifestation.items.first()
-    ItemDigitalCopy.objects.create(item=item)
-    return redirect('edwoca:manifestation_digital_copy', pk=pk)
-
-
-class ManifestationDigitalCopyDeleteView(DeleteView):
-    model = ItemDigitalCopy
-
-    def get_success_url(self):
-        manifestation = self.object.item.manifestation
-        return reverse('edwoca:manifestation_digital_copy',kwargs={'pk': manifestation.id})
 
 
 def person_dedication_add(request, pk):

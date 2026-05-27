@@ -348,11 +348,11 @@ msgstr "Quellentitel"
 
 #: apps/dmrism/models/manifestation.py:122
 msgid "manifestation form"
-msgstr "Quellenform"
+msgstr "Stadium"
 
 #: apps/dmrism/models/manifestation.py:129
 msgid "source type"
-msgstr "Quellentyp"
+msgstr "Typ"
 
 #: apps/dmrism/models/manifestation.py:136
 #: apps/dmrism/models/manifestation.py:142

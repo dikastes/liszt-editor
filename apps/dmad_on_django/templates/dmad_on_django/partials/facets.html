@@ -11,8 +11,8 @@
                 <li>
                     {% if type == 'rework' %}
                         <a
-                            href="{% url 'dmad_on_django:person_search' %}?q={{ query }}"
-                            hx-get="{% url 'dmad_on_django:person_search' %}"
+                            href="{% url search_url %}?q={{ query }}"
+                            hx-get="{% url search_url %}"
                             class="active"
                             hx-include="#query"
                             hx-target="#search-results-container"
@@ -24,8 +24,8 @@
                     {% endif %}
                     {% if not type %}
                         <a
-                            href="{% url 'dmad_on_django:person_search' 'rework' %}?q={{ query }}"
-                            hx-get="{% url 'dmad_on_django:person_search' 'rework' %}"
+                            href="{% url search_url 'rework' %}?q={{ query }}"
+                            hx-get="{% url search_url 'rework' %}"
                             hx-include="#query"
                             hx-target="#search-results-container"
                             hx-push-url="true"
@@ -40,8 +40,8 @@
                 <li>
                     {% if type == 'stub' %}
                         <a
-                            href="{% url 'dmad_on_django:person_search' %}?q={{ query }}" class="active"
-                            hx-get="{% url 'dmad_on_django:person_search' %}" class="active"
+                            href="{% url search_url %}?q={{ query }}" class="active"
+                            hx-get="{% url search_url %}" class="active"
                             class="active"
                             hx-include="#query"
                             hx-target="#search-results-container"
@@ -53,8 +53,8 @@
                     {% endif %}
                     {% if not type %}
                         <a
-                            href="{% url 'dmad_on_django:person_search' 'stub' %}?q={{ query }}"
-                            hx-get="{% url 'dmad_on_django:person_search' 'stub' %}"
+                            href="{% url search_url 'stub' %}?q={{ query }}"
+                            hx-get="{% url search_url 'stub' %}"
                             hx-include="#query"
                             hx-target="#search-results-container"
                             hx-push-url="true"

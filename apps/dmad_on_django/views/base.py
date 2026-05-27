@@ -201,7 +201,7 @@ class ListContextMixin(NavbarContextMixin):
         context.update({
             'active': camel_to_snake_case(self.model.__name__),
             'type': self.kwargs.get('type'),
-            'search_url': reverse_lazy(f'dmad_on_django:{self.get_model_name()}_search')
+            'search_url': f'dmad_on_django:{self.get_model_name()}_search'
         })
         if hasattr(self, 'sqs'):
             context.update({
@@ -229,7 +229,9 @@ class DmadListView(ListContextMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         placeholder = self.model.get_search_placeholder()
+
         context['form'] = FramedSearchForm(placeholder=placeholder)
+        #context['search_url'] = f'dmad_on_django:{camel_to_snake_case(self.model.__name__)}_search'
 
         return context
 
@@ -284,6 +286,7 @@ class DmadSearchView(ListContextMixin, NavbarContextMixin, SearchView):
         context = super().get_context_data(**kwargs)
 
         context['object_list'] = [r.object for r in context['object_list']]
+        #context['search_url'] = f'dmad_on_django:{camel_to_snake_case(self.model.__name__)}_search'
 
         return context
 

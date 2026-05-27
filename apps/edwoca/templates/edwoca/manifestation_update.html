@@ -39,18 +39,17 @@
             </div>
             <div class="flex">
                 <div class="flex-1"></div>
-                <form class="flex-0" method="post">
-                    {% csrf_token %}
-                    <button type="submit" name="remove-signature" value="{{ form.instance.pk }}" form="form" class="btn btn-outline text-primary">
-                        {% translate 'remove signature' %}
-                    </button>
-                </form>
+                <button type="submit" name="remove-signature" value="{{ form.instance.pk }}" form="form" class="btn btn-outline text-primary">
+                    {% translate 'remove signature' %}
+                </button>
             </div>
         {% endfor %}
 
         <div class="flex">
             <div class="flex-1"></div>
-            <input type="submit" name="add_signature" form="form" value="{% translate 'create location' %}" class="flex-0 btn btn-outline mt-2">
+            <button type="submit" name="add_signature" form="form" class="flex-0 btn btn-outline mt-2">
+                {% translate 'create location' %}
+            </button>
         </div>
     {% endif %}
 

@@ -136,21 +136,29 @@ class LetterForm(BaseTrackedModelForm, ModelForm, SimpleFormMixin):
 
         return mark_safe(str(form))
 
+    def work_mentionings_as_daisy(self):
+        form = div(cls='mb-10')
+
+        work_mentionings_field = self['work_mentionings']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(work_mentionings_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(work_mentionings_field))
+
+        return mark_safe(str(form))
+
     def comment_as_daisy(self):
         form = div(cls='mb-10')
 
         comment_field = self['comment']
-        work_mentionings_field = self['work_mentionings']
 
         with form:
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(comment_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(comment_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(work_mentionings_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(work_mentionings_field))
         #if comment_field.errors:
             #comment_container.add(div(span(comment_field.errors, cls='text-primary text-sm'), cls='label'))
 

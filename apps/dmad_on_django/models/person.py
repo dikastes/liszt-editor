@@ -55,7 +55,7 @@ class PersonName(models.Model):
         return name.parse_comma_separated_string(comma_separated_string)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.last_name}, {self.first_name}'
 
 
 class Person(DisplayableModel):

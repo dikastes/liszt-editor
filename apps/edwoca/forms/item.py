@@ -225,19 +225,28 @@ class LibraryForm(ModelForm):
         fields = [ 'name', 'siglum' ]
         widgets = {
                 'name': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': SimpleFormMixin.text_input_classes
                     }),
                 'siglum': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': SimpleFormMixin.text_input_classes
                     }),
             }
 
     def as_daisy(self):
         form = div()
-        for field in self.visible_fields():
-            field_label = label(field.label, _for=field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-            field_label.add(raw(str(field)))
-            form.add(field_label)
+
+        name_field = self['name']
+        siglum_field = self['siglum']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(name_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(name_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(siglum_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(siglum_field))
 
         return mark_safe(str(form))
 
@@ -268,10 +277,29 @@ class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):
 class ItemManuscriptForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Item
-        fields = ['extent', 'measure', 'private_manuscript_comment']
+        fields = [
+                'extent',
+                'is_lyrics',
+                'is_program',
+                'is_explanation',
+                'measure',
+                'private_manuscript_comment'
+            ]
         widgets = {
                 'extent': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
                         'form': 'form'
                     }),
                 'measure': Textarea( attrs = {
@@ -286,6 +314,9 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
 
     def as_daisy(self):
         extent_field = self['extent']
+        lyrics_field = self['is_lyrics']
+        explanation_field = self['is_explanation']
+        program_field = self['is_program']
         measure_field = self['measure']
         form = div()
 
@@ -294,6 +325,17 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
                 raw(str(extent_field))
+            with div(cls='mb-2'):
+                h3(_('text type'), cls='text-lg my-5')
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(lyrics_field))
+                    span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(program_field))
+                    span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(explanation_field))
+                    span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
             with label():
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(measure_field.label), cls=SimpleFormMixin.label_text_classes)
@@ -301,47 +343,6 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
 
         return mark_safe(str(form))
 
-        with form:
-            # upper palette with source type and manifestaion form
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(source_type_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(manifestation_form_field))
-            # lower palette with toggles
-            h1(_('function'), cls='text-lg my-5')
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(album_page_field))
-                span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(performance_material_field))
-                span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
-            if self.instance.is_singleton:
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(correction_sheet_field))
-                    span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(stitch_template_field))
-                    span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(dedication_item_field))
-                    span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
-            else:
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(authorized_edition_field))
-                    span(authorized_edition_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(first_edition_field))
-                    span(first_edition_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(proof_field))
-                    span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(further_edition_field))
-                    span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
     def comment_as_daisy(self):
         private_manuscript_comment_field = self['private_manuscript_comment']
         form = div()

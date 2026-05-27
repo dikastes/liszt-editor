@@ -222,6 +222,14 @@ class Library(models.Model):
             blank = True,
             verbose_name = _('siglum')
         )
+    corporation = models.ForeignKey(
+            'dmad.Corporation',
+            on_delete = models.SET_NULL,
+            related_name = '%(class)s',
+            null = True,
+            blank = True,
+            verbose_name = _('corporation')
+        )
 
     def get_absolute_url(self):
         return reverse('edwoca:library_update', kwargs = {'pk' : self.id})
@@ -253,7 +261,7 @@ class BaseSignature(models.Model):
             verbose_name = _('holding institution')
         )
     signature = models.CharField(
-            max_length=50,
+            max_length=200,
             blank = True,
             verbose_name = _('signature'),
             default = ''

@@ -547,7 +547,7 @@ class BaseTrackedModelForm:
                 with tags.div(cls=SimpleFormMixin.label_classes):
                     tags.span(editing_history_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(editing_history_field))
-            with tags.div(cls=SimpleFormMixin.palette_classes + ' items-end'):
+            with tags.div(cls='flex flex-col xl:flex-row gap-2 my-5 xl:items-end'):
                 with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
                     with tags.div(cls=SimpleFormMixin.label_classes):
                         tags.span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
