@@ -143,15 +143,9 @@
 
 <div class="mb-10">
     <div class="items-center">
-        <div class="label">
-            <span class="label-text">
-                {% translate 'add edition' %}
-            </span>
-        </div>
         <form method="get" class="flex">
             <label class="bg-white input input-bordered border-r-0 border-black flex items-center gap-2 flex-1">
-                {% translate 'letter edition' %}
-                <input type="text" name="edition-q" class="grow" {% if query_edition %}value="{{ query_edition }}"{% endif %}>
+                <input type="text" placeholder="{% translate 'search letter editions' %}" name="edition-q" class="grow" {% if query_edition %}value="{{ query_edition }}"{% endif %}>
             </label>
             <input type="submit" class="btn btn-outline flex-0" value="{% translate 'search' %}"/>
         </form>
