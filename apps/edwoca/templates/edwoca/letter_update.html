@@ -121,22 +121,22 @@
 
 <div class="my-5">
     {% for letter_mentioning_form in letter_mentioning_forms %}
-        <div class="flex gap-5 items-center mb-2">
-            <input type="text" value="{{ letter_mentioning_form.instance.bib.zot_short_title }} / {{ letter_mentioning_form.instance.bib }}" class="pseudo-input flex-1 border-black border w-full truncate" disabled />
-            <label class="bg-white input input-bordered flex-0 flex items-center border-black gap-2 w-48">
-                <span class="flex-0 min-w-0">
-                    {% translate 'pages' %}
-                </span>
-                {{ letter_mentioning_form.pages }}
-                {% if letter_mentioning_form.pages.errors %}
-                    <div class="label">
-                        <span class="label-text-alt text-primary">
-                            {{ letter_mentioning_form.pages.errors.0 }}
-                        </span>
-                    </div>
-                {% endif %}
+        <div class="border border-black p-5">
+            <label class="form-control">
+                <div class="label">
+                    <span class="label-text">
+                        {% translate 'edition' %}
+                    </span>
+                </div>
+                <div type="text"  class="pseudo-input flex items-center border-black border w-full truncate">
+                    {{ letter_mentioning_form.instance.bib.zot_short_title }}
+                </div>
             </label>
-            <a href="{% url 'edwoca:letter_remove_edition' object.id letter_mentioning_form.instance.bib.zot_key %}" class="btn btn-outline btn-primary flex-0"> {% translate 'remove' %} </a>
+            {{ letter_mentioning_form.as_daisy }}
+            <div class="flex">
+                <div class="flex-1"></div>
+                <a href="{% url 'edwoca:letter_remove_edition' object.id letter_mentioning_form.instance.bib.zot_key %}" class="btn btn-outline btn-primary flex-0"> {% translate 'remove bib' %} </a>
+            </div>
         </div>
     {% endfor %}
 </div>

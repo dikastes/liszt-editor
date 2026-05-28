@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models.base import DocumentationStatusMixin
-from dmrism.models import TrackedModel
+from dmrism.models import TrackedModel, BaseBib
 from .base import *
 
 
@@ -189,24 +189,19 @@ class Letter(TrackedModel):
         return self.mark_needs_review(f'{sender} {to} {receiver}, {self.edition_period} ({self.get_first_mentioning()})')
 
 
-class LetterMentioning(models.Model):
+class LetterMentioning(BaseBib):
     letter = models.ForeignKey(
             'Letter',
             on_delete = models.CASCADE
         )
-    bib = models.ForeignKey(
-            'bib.ZotItem',
-            on_delete = models.CASCADE
-        )
-    pages = models.CharField(
+    letter_number = models.CharField(
             max_length = 20,
             null = True,
-            blank = True,
-            verbose_name = _('pages')
+            blank = True
         )
 
     def __str__(self):
-        return f'{self.bib.zot_short_title}, {self.pages}'
+        return f'{self.bib.zot_short_title}, {self.location_type} {self.location}'
 
 
 class DocumentedEntityName(DocumentationStatusMixin):

@@ -170,14 +170,42 @@ class LetterForm(BaseTrackedModelForm, ModelForm, SimpleFormMixin):
         return mark_safe(str(self.get_editing_history_div()))
 
 
-class LetterMentioningForm(ModelForm):
+class LetterMentioningForm(BaseBibForm):
     class Meta:
         model = LetterMentioning
-        fields = ['pages']
-        widgets = {
-                'pages': TextInput(attrs={'form': 'form', 'class': 'flex-1 min-w-0'})
-        }
+        fields = BaseBibForm.Meta.fields + ['letter_number']
+        widgets = dict(**BaseBibForm.Meta.widgets,
+                letter_number = TextInput(attrs = {'form': 'form', 'class': SimpleFormMixin.text_input_classes})
+            )
 
+    def as_daisy(self):
+        form = div(cls='my-5')
+
+        location_field = self['location']
+        location_type_field = self['location_type']
+        letter_number_field = self['letter_number']
+
+        with form:
+            # palette
+            with div(cls=SimpleFormMixin.palette_classes):
+                with label(cls='flex-0 form-control'):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(location_type_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(location_type_field))
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(location_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(location_field))
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(letter_number_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(letter_number_field))
+
+        #for hidden in self.hidden_fields():
+            #hidden.field.widget.attrs['form'] = 'form'
+            #form.add(raw(str(hidden)))
+
+        return mark_safe(str(form))
 
 class BaseLetterContributorForm(ModelForm):
     class Meta:
