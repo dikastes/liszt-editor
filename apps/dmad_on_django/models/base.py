@@ -34,7 +34,6 @@ class DocumentationStatusMixin(models.Model):
     class Meta:
         abstract = True
 
-
     inferred = models.BooleanField(
             default=False,
             verbose_name = _("inferred")

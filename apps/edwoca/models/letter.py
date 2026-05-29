@@ -211,7 +211,7 @@ class DocumentedEntityName(DocumentationStatusMixin):
         )
 
 
-class BaseLetterContributor(models.Model):
+class BaseLetterContributor(DocumentationStatusMixin):
     class Meta:
         abstract = True
 

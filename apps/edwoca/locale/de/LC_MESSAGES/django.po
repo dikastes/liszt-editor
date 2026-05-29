@@ -711,8 +711,6 @@ msgid "remove bib"
 msgstr "Edition entfernen"
 
 #: templates/edwoca/letter_update.html:148
-#, fuzzy
-#| msgid "search letter editions"
 msgid "search editions"
 msgstr "Editionen durchsuchen"
 
