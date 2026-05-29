@@ -324,7 +324,7 @@ def letter_update(request, pk):
             edition_search_form = SearchForm(request.GET, prefix='edition')
             if edition_search_form.is_valid():
                 context['query_edition'] = edition_search_form.cleaned_data.get('q')
-                context['found_editions'] = edition_search_form.search().models(ZotItem)
+                context['found_editions'] = edition_search_form.search().models(ZotItem).order_by('text')
         else:
             edition_search_form = SearchForm(prefix='edition')
 
