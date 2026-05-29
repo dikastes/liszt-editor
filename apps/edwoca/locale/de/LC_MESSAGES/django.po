@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-29 15:19+0200\n"
+"POT-Creation-Date: 2026-05-29 16:40+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,15 +19,14 @@ msgstr ""
 
 #: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:118 forms/item.py:176
-#: forms/letter.py:68 forms/letter.py:233 forms/manifestation.py:216
-#: forms/manifestation.py:758 forms/manifestation.py:889
-#: forms/modification.py:26
+#: forms/letter.py:68 forms/manifestation.py:216 forms/manifestation.py:758
+#: forms/manifestation.py:889 forms/modification.py:26
 msgid "based on source"
 msgstr "nach Vorlage"
 
 #: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:118 forms/item.py:176
-#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:233
+#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:241
 #: forms/manifestation.py:216 forms/manifestation.py:758
 #: forms/manifestation.py:889 forms/modification.py:26
 #: templates/edwoca/manifestation_print.html:142
@@ -82,7 +81,7 @@ msgstr "Textart"
 msgid "date according to edition (standardized)"
 msgstr "Datierung nach Edition (standardisiert)"
 
-#: forms/letter.py:31 forms/letter.py:248
+#: forms/letter.py:31
 msgid "based on edition"
 msgstr "nach Edition"
 
@@ -90,20 +89,20 @@ msgstr "nach Edition"
 msgid "date according to source (standardized)"
 msgstr "Datierung nach Originalquelle (standardisiert)"
 
-#: forms/letter.py:225
+#: forms/letter.py:227
 msgid "source name"
 msgstr "Name (nach Originalquelle)"
 
-#: forms/letter.py:230
+#: forms/letter.py:232
 msgid "edtion name"
 msgstr "Name (nach Edition)"
 
-#: forms/letter.py:245 forms/letter.py:259
+#: forms/letter.py:250 forms/letter.py:266
 #: templates/edwoca/manifestation_print.html:150
 msgid "assumed"
 msgstr "unsicher"
 
-#: forms/letter.py:248
+#: forms/letter.py:258
 msgid "attributed"
 msgstr "zugeschrieben"
 
@@ -474,6 +473,10 @@ msgstr "an"
 #: models/letter.py:160
 msgid "et al."
 msgstr "u. a."
+
+#: models/letter.py:201
+msgid "letter number"
+msgstr "Briefnummer"
 
 #: models/work.py:101
 msgid "is successor of"

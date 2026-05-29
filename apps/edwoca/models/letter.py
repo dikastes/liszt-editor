@@ -197,11 +197,14 @@ class LetterMentioning(BaseBib):
     letter_number = models.CharField(
             max_length = 20,
             null = True,
-            blank = True
+            blank = True,
+            verbose_name = _('letter number')
         )
 
     def __str__(self):
-        return f'{self.bib.zot_short_title}, {self.location_type} {self.location}'
+        if self.location:
+            return f'{self.bib.zot_short_title}, {self.get_location_type_display()} {self.location}'
+        return self.bib.zot_short_title
 
 
 class DocumentedEntityName(DocumentationStatusMixin):
