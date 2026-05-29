@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-19 10:17+0200\n"
+"POT-Creation-Date: 2026-05-29 15:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,206 +18,214 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/dmad_on_django/models/base.py:22
+#: models/base.py:22
 msgid "Primary"
 msgstr "bevorzugt"
 
-#: apps/dmad_on_django/models/base.py:23
+#: models/base.py:23
 msgid "Alternative"
 msgstr "alternativ"
 
-#: apps/dmad_on_django/models/base.py:24
+#: models/base.py:24
 msgid "Temporary"
 msgstr "temporär"
 
-#: apps/dmad_on_django/models/base.py:40
+#: models/base.py:40
 msgid "inferred"
 msgstr "ermittelt"
 
-#: apps/dmad_on_django/models/base.py:44
+#: models/base.py:44
 msgid "assumed"
 msgstr "unsicher"
 
-#: apps/dmad_on_django/models/corporation.py:70
-msgid "search corporations"
-msgstr "Körperschaftend durchsuchen"
-
-#: apps/dmad_on_django/models/period.py:16
-msgid "not before"
-msgstr "nicht vor"
-
-#: apps/dmad_on_django/models/period.py:21
-msgid "not after"
-msgstr "nicht nach"
-
-#: apps/dmad_on_django/models/period.py:26
-msgid "standardized date"
-msgstr "Datierung (standardisiert)"
-
-#: apps/dmad_on_django/models/period.py:81
-#: apps/dmad_on_django/models/period.py:82
-msgid "and"
-msgstr "und"
-
-#: apps/dmad_on_django/models/period.py:86
-msgid "before"
-msgstr "vor"
-
-#: apps/dmad_on_django/models/period.py:87
-msgid "after"
-msgstr "nach"
-
-#: apps/dmad_on_django/models/period.py:105
-msgid "ies"
-msgstr "er"
-
-#: apps/dmad_on_django/models/period.py:106
-msgid "century"
-msgstr "Jahrhundert"
-
-#: apps/dmad_on_django/models/period.py:124
-msgid "without date"
-msgstr "o. D."
-
-#: apps/dmad_on_django/models/period.py:124
-msgid "without year"
-msgstr "o. J."
-
-#: apps/dmad_on_django/models/period_calculation.py:19
-msgid "january"
-msgstr "Januar"
-
-#: apps/dmad_on_django/models/period_calculation.py:20
-msgid "february"
-msgstr "Februar"
-
-#: apps/dmad_on_django/models/period_calculation.py:21
-msgid "march"
-msgstr "März"
-
-#: apps/dmad_on_django/models/period_calculation.py:22
-msgid "april"
-msgstr "April"
-
-#: apps/dmad_on_django/models/period_calculation.py:23
-msgid "may"
-msgstr "Mai"
-
-#: apps/dmad_on_django/models/period_calculation.py:24
-msgid "june"
-msgstr "Juni"
-
-#: apps/dmad_on_django/models/period_calculation.py:25
-msgid "july"
-msgstr "Juli"
-
-#: apps/dmad_on_django/models/period_calculation.py:26
-msgid "august"
-msgstr "August"
-
-#: apps/dmad_on_django/models/period_calculation.py:27
-msgid "september"
-msgstr "September"
-
-#: apps/dmad_on_django/models/period_calculation.py:28
-msgid "october"
-msgstr "Oktober"
-
-#: apps/dmad_on_django/models/period_calculation.py:29
-msgid "november"
-msgstr "November"
-
-#: apps/dmad_on_django/models/period_calculation.py:30
-msgid "december"
-msgstr "Dezember"
-
-#: apps/dmad_on_django/models/period_calculation.py:358
-msgid "beginning"
-msgstr "Anfang"
-
-#: apps/dmad_on_django/models/period_calculation.py:359
-msgid "mid"
-msgstr "Mitte"
-
-#: apps/dmad_on_django/models/period_calculation.py:360
-msgid "end"
-msgstr "Ende"
-
-#: apps/dmad_on_django/models/period_calculation.py:361
-msgid "first half"
-msgstr "Erste Hälfte"
-
-#: apps/dmad_on_django/models/period_calculation.py:362
-msgid "second half"
-msgstr "Zweite Hälfte"
-
-#: apps/dmad_on_django/models/period_calculation.py:363
-msgid "spring"
-msgstr "Frühjahr"
-
-#: apps/dmad_on_django/models/period_calculation.py:364
-msgid "summer"
-msgstr "Sommer"
-
-#: apps/dmad_on_django/models/period_calculation.py:365
-msgid "fall"
-msgstr "Herbst"
-
-#: apps/dmad_on_django/models/period_calculation.py:366
-msgid "winter"
-msgstr "Winter"
-
-#: apps/dmad_on_django/models/person.py:96
-msgid "search persons"
-msgstr "Personen durchsuchen"
-
-#: apps/dmad_on_django/models/place.py:69
-msgid "search places"
-msgstr "Orte durchsuchen"
-
-#: apps/dmad_on_django/models/place.py:132
+#: models/base.py:154
 msgid "<< error >>"
 msgstr "<< Fehler >>"
 
-#: apps/dmad_on_django/models/subjectterm.py:48
+#: models/base.py:157
+msgid "(stub)"
+msgstr "(RD)"
+
+#: models/corporation.py:70
+msgid "search corporations"
+msgstr "Körperschaftend durchsuchen"
+
+#: models/corporation.py:143 models/person.py:206 models/place.py:121
+#: models/subjectterm.py:121 models/work.py:142
+msgid "without name"
+msgstr "ohne Name"
+
+#: models/period.py:16
+msgid "not before"
+msgstr "nicht vor"
+
+#: models/period.py:21
+msgid "not after"
+msgstr "nicht nach"
+
+#: models/period.py:26
+msgid "standardized date"
+msgstr "Datierung (standardisiert)"
+
+#: models/period.py:81 models/period.py:82
+msgid "and"
+msgstr "und"
+
+#: models/period.py:86
+msgid "before"
+msgstr "vor"
+
+#: models/period.py:87
+msgid "after"
+msgstr "nach"
+
+#: models/period.py:105
+msgid "ies"
+msgstr "er"
+
+#: models/period.py:106
+msgid "century"
+msgstr "Jahrhundert"
+
+#: models/period.py:124
+msgid "without date"
+msgstr "o. D."
+
+#: models/period.py:124
+msgid "without year"
+msgstr "o. J."
+
+#: models/period_calculation.py:19
+msgid "january"
+msgstr "Januar"
+
+#: models/period_calculation.py:20
+msgid "february"
+msgstr "Februar"
+
+#: models/period_calculation.py:21
+msgid "march"
+msgstr "März"
+
+#: models/period_calculation.py:22
+msgid "april"
+msgstr "April"
+
+#: models/period_calculation.py:23
+msgid "may"
+msgstr "Mai"
+
+#: models/period_calculation.py:24
+msgid "june"
+msgstr "Juni"
+
+#: models/period_calculation.py:25
+msgid "july"
+msgstr "Juli"
+
+#: models/period_calculation.py:26
+msgid "august"
+msgstr "August"
+
+#: models/period_calculation.py:27
+msgid "september"
+msgstr "September"
+
+#: models/period_calculation.py:28
+msgid "october"
+msgstr "Oktober"
+
+#: models/period_calculation.py:29
+msgid "november"
+msgstr "November"
+
+#: models/period_calculation.py:30
+msgid "december"
+msgstr "Dezember"
+
+#: models/period_calculation.py:358
+msgid "beginning"
+msgstr "Anfang"
+
+#: models/period_calculation.py:359
+msgid "mid"
+msgstr "Mitte"
+
+#: models/period_calculation.py:360
+msgid "end"
+msgstr "Ende"
+
+#: models/period_calculation.py:361
+msgid "first half"
+msgstr "Erste Hälfte"
+
+#: models/period_calculation.py:362
+msgid "second half"
+msgstr "Zweite Hälfte"
+
+#: models/period_calculation.py:363
+msgid "spring"
+msgstr "Frühjahr"
+
+#: models/period_calculation.py:364
+msgid "summer"
+msgstr "Sommer"
+
+#: models/period_calculation.py:365
+msgid "fall"
+msgstr "Herbst"
+
+#: models/period_calculation.py:366
+msgid "winter"
+msgstr "Winter"
+
+#: models/person.py:96
+msgid "search persons"
+msgstr "Personen durchsuchen"
+
+#: models/place.py:69
+msgid "search places"
+msgstr "Orte durchsuchen"
+
+#: models/subjectterm.py:48
 msgid "search subject terms"
 msgstr "Sachschlagworte durchsuchen"
 
-#: apps/dmad_on_django/models/work.py:196
+#: models/work.py:188
 msgid "Werke suchen"
 msgstr ""
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:4
+#: templates/dmad_on_django/partials/create_button.html:4
 msgid "create"
 msgstr "anlegen"
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:7
+#: templates/dmad_on_django/partials/facets.html:7
 msgid "filters"
 msgstr "Filter"
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:21
-#: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:33
+#: templates/dmad_on_django/partials/facets.html:21
+#: templates/dmad_on_django/partials/facets.html:33
 msgid "rework"
 msgstr "überarbeiten"
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:50
-#: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:62
+#: templates/dmad_on_django/partials/facets.html:50
+#: templates/dmad_on_django/partials/facets.html:62
 msgid "stubs"
 msgstr "Rumpfdatensätze"
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/search_form.html:18
+#: templates/dmad_on_django/partials/search_form.html:18
 msgid "search"
 msgstr "suchen"
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/search_results.html:13
+#: templates/dmad_on_django/partials/search_results.html:13
 msgid "page"
 msgstr "Seite"
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/search_results.html:13
+#: templates/dmad_on_django/partials/search_results.html:13
 msgid "of"
 msgstr "von"
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/search_results.html:32
+#: templates/dmad_on_django/partials/search_results.html:32
 msgid "no search results"
 msgstr "keine Suchergebnisse"
 

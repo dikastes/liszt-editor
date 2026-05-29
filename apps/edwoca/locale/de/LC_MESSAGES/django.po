@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-28 15:11+0200\n"
+"POT-Creation-Date: 2026-05-29 15:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -711,7 +711,9 @@ msgid "remove bib"
 msgstr "Edition entfernen"
 
 #: templates/edwoca/letter_update.html:148
-msgid "search letter editions"
+#, fuzzy
+#| msgid "search letter editions"
+msgid "search editions"
 msgstr "Editionen durchsuchen"
 
 #: templates/edwoca/letter_update.html:169
