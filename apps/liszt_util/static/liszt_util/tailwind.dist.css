@@ -2847,13 +2847,6 @@ details.collapse summary::-webkit-details-marker {
   color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
 }
 
-.label-text-alt {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  --tw-text-opacity: 1;
-  color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity)));
-}
-
 .input input {
   --tw-bg-opacity: 1;
   background-color: var(--fallback-p,oklch(var(--p)/var(--tw-bg-opacity)));
@@ -4769,6 +4762,10 @@ div.modal-box {
 }
 
 @media (min-width: 1280px) {
+  .xl\:mb-5 {
+    margin-bottom: 1.25rem;
+  }
+
   .xl\:flex-row {
     flex-direction: row;
   }

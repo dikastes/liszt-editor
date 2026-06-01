@@ -169,7 +169,7 @@ class Command(BaseCommand):
                     continue
                 LetterMentioning.objects.create(
                         bib = proof,
-                        pages = proof_page[0] if len(proof_page) else '',
+                        location = proof_page[0].replace('S.', '').strip() if len(proof_page) else '',
                         letter = letter
                     )
 
@@ -182,9 +182,12 @@ class Command(BaseCommand):
                         continue
                     LetterMentioning.objects.create(
                             bib = proof,
-                            pages = proof_page[0] if len(proof_page) else '',
+                            location = proof_page[0] if len(proof_page) else '',
                             letter = letter
                         )
+
+    def turn_name(name):
+        return ' '.join(part.strip() for part in name.split(',')[::-1])
 
     def create_contributor(self, data, letter, model, target_property):
         den = DocumentedEntityName.objects.create(
@@ -218,7 +221,7 @@ class Command(BaseCommand):
                     assumed = False
 
                 if id.strip() == 'RD':
-                    get_kwargs = {'interim_designator': name}
+                    get_kwargs = {'interim_designator': Command.turn_name(name)}
                 else:
                     get_kwargs = {'gnd_id': id.strip()}
 
@@ -229,4 +232,5 @@ class Command(BaseCommand):
                         'target_inferred': inferred,
                         'target_assumed': assumed
                     })
+
         return contributors

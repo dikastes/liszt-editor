@@ -25,21 +25,20 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     class Meta:
         ordering = ['-needs_review', 'order_index']
 
+    class Completeness(models.TextChoices):
+        COMPLETE = 'c', _('complete')
+        INCOMPLETE = 'i', _('incomplete')
+
     class PartLabel(models.TextChoices):
-        CONSTITUTING = 'c', _('constituting')
-        BOUND_TOGETHER = 'b', _('bound together')
+        JOINED = 'j', _('joined')
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        EXCERPTS = 'EX', _('Excerpts')
         SKETCHES = 'SK', _('Sketches'),
-        FRAGMENTS = 'FR', _('Fragments'),
 
         def parse(string):
             match string.lower():
                 case 'sketch' | 'sketches': return Manifestation.ManifestationForm.SKETCHES
-                case 'fragment' | 'fragments': return Manifestation.ManifestationForm.FRAGMENTS
-                case 'excerpt' | 'excerpts': return Manifestation.ManifestationForm.EXCERPTS
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
@@ -248,6 +247,12 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             related_name = 'stitched_manifestations',
             on_delete = models.SET_NULL,
             null = True,
+        )
+    completeness = models.TextField(
+            max_length = 1,
+            choices = Completeness,
+            default = Completeness.COMPLETE,
+            verbose_name = _('completeness')
         )
     specific_figure = models.BooleanField(
             default = False,

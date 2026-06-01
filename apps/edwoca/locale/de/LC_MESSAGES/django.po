@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-29 16:40+0200\n"
+"POT-Creation-Date: 2026-06-01 16:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,16 +19,16 @@ msgstr ""
 
 #: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:118 forms/item.py:176
-#: forms/letter.py:68 forms/manifestation.py:216 forms/manifestation.py:758
-#: forms/manifestation.py:889 forms/modification.py:26
+#: forms/letter.py:68 forms/manifestation.py:216 forms/manifestation.py:771
+#: forms/manifestation.py:902 forms/modification.py:26
 msgid "based on source"
 msgstr "nach Vorlage"
 
 #: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:118 forms/item.py:176
 #: forms/letter.py:31 forms/letter.py:68 forms/letter.py:241
-#: forms/manifestation.py:216 forms/manifestation.py:758
-#: forms/manifestation.py:889 forms/modification.py:26
+#: forms/manifestation.py:216 forms/manifestation.py:771
+#: forms/manifestation.py:902 forms/modification.py:26
 #: templates/edwoca/manifestation_print.html:142
 msgid "inferred"
 msgstr "ermittelt"
@@ -106,53 +106,53 @@ msgstr "unsicher"
 msgid "attributed"
 msgstr "zugeschrieben"
 
-#: forms/manifestation.py:455
+#: forms/manifestation.py:468
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: forms/manifestation.py:477
+#: forms/manifestation.py:490
 msgid "function"
 msgstr "Funktion"
 
-#: forms/manifestation.py:541
+#: forms/manifestation.py:554
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
-#: forms/manifestation.py:542 forms/manifestation.py:679
+#: forms/manifestation.py:555 forms/manifestation.py:692
 msgid "source title"
 msgstr "Quellentitel"
 
-#: forms/manifestation.py:543
+#: forms/manifestation.py:556
 msgid "plate number"
 msgstr "Plattennummer"
 
-#: forms/manifestation.py:544 forms/manifestation.py:685
+#: forms/manifestation.py:557 forms/manifestation.py:698
 msgid "source type"
 msgstr "Typ"
 
-#: forms/manifestation.py:548 templates/edwoca/create_manifestation.html:16
+#: forms/manifestation.py:561 templates/edwoca/create_manifestation.html:16
 #: templates/edwoca/manifestation_print.html:18
 #: templates/edwoca/manifestation_print.html:28
 msgid "publisher"
 msgstr "Verlag"
 
-#: forms/manifestation.py:548
+#: forms/manifestation.py:561
 msgid "choose publisher"
 msgstr "Verlag auswählen"
 
-#: forms/manifestation.py:673
+#: forms/manifestation.py:686
 msgid "working title"
 msgstr "Arbeitstitel"
 
-#: forms/manifestation.py:692
+#: forms/manifestation.py:705
 msgid "holding institution"
 msgstr "Bestandeshaltende Institution"
 
-#: forms/manifestation.py:693
+#: forms/manifestation.py:706
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: forms/manifestation.py:697
+#: forms/manifestation.py:710
 msgid "Signature"
 msgstr "Signatur"
 
