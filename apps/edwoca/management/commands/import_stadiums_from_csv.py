@@ -28,9 +28,15 @@ class Command(BaseCommand):
                     if row['Quellenform'].strip().lower() == 'entwurf':
                         m.manifestation_form = Manifestation.ManifestationForm.SKETCHES
                     if row['Quellenform'].strip().lower() == 'fragment':
-                        m.manifestation_form = Manifestation.ManifestationForm.FRAGMENTS
+                        m.manifestation_form = None
+                        if m.private_comment:
+                            m.private_comment += '\nFragment'
+                        else:
+                            m.private_comment = 'Fragment'
+                        m.needs_review = True
                     if row['Quellenform'].strip().lower() == 'ausschnitt':
-                        m.manifestation_form = Manifestation.ManifestationForm.EXCERPTS
+                        m.manifestation_form = None
+                        m.completeness = Manifestation.Completeness.INCOMPLETE
                     m.save()
                 else:
                     print(f'not found: {row["edwoca-ID"]}')
