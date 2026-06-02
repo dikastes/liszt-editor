@@ -24,10 +24,24 @@ class Status(models.TextChoices):
     TEMPORARY = 'T', _('Temporary')
 
 
-class DocumentationStatus(models.TextChoices):
-    DOCUMENTED = 'D', _('documented')
-    INFERRED = 'I', _('inferred')
-    ASSUMED = 'A', _('assumed')
+#class DocumentationStatus(models.TextChoices):
+    #DOCUMENTED = 'D', _('documented')
+    #INFERRED = 'I', _('inferred')
+    #ASSUMED = 'A', _('assumed')
+
+
+class DocumentationStatusMixin(models.Model):
+    class Meta:
+        abstract = True
+
+    inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
+        )
 
 
 class GNDSubjectCategory(models.Model):
@@ -90,6 +104,18 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
     )
     gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
 
+    @property
+    def name(self):
+        if hasattr(self, 'names'):
+            return self.names.filter(status=Status.PRIMARY).first()
+
+        raise Exception(f'Class {self.__class__.__name__} has no names property.')
+
+    def is_stub(self):
+        if self.gnd_id and self.gnd_id != '':
+            return False
+        return True
+
     def concise(self):
         if (name := self.names.filter(status=Status.PRIMARY).first()):
             if hasattr(name, 'name'):
@@ -116,6 +142,19 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
 
     def get_table(self):
         raise NotImplementedError("Please override get_table")
+
+    def get_search_placeholder():
+        raise NotImplementedError("Please override get_search_placeholder")
+
+    def __str__(self):
+        if self.gnd_id:
+            if self.get_default_name():
+                return f'{self.get_default_name()} ({self.gnd_id})'
+            error = _('<< error >>')
+            return f'{error} ({self.gnd_id})'
+
+        stub = _('(stub)')
+        return f'{self.interim_designator} {stub}'
 
     class Meta:
         abstract = True

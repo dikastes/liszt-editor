@@ -15,6 +15,7 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_daisy }}
+        {{ text_type_form.as_daisy }}
 
         <input type="submit" name="save_changes" value="Speichern" class="btn btn-primary mt-3">
     </form>

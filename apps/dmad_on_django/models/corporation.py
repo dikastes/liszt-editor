@@ -1,6 +1,7 @@
 from django.db import models
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
 import requests
 
@@ -11,7 +12,7 @@ from .place import Place
 from .geographicareacodes import CorporationGeographicAreaCode
 from .subjectterm import SubjectTerm
 from .period import Period
-from pylobid.pylobid import PyLobidOrg, GNDAPIError
+from slub_pylobid.pylobid import PyLobidOrg, GNDAPIError
 
 class CorporationName(models.Model):
     name = models.CharField(max_length=50)
@@ -64,6 +65,9 @@ class Corporation(DisplayableModel):
         blank=True,
         related_name='corporations'
     )
+
+    def get_search_placeholder():
+        return _('search corporations')
 
     def get_absolute_url(self):
         return reverse('dmad_on_django:corporation_update', kwargs={'pk': self.id})
@@ -136,7 +140,7 @@ class Corporation(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _('without name')
 
     def get_table(self):
         table = CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
@@ -158,11 +162,6 @@ class Corporation(DisplayableModel):
         lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:Company OR type:CorporateBody)&size=5&format=json:suggest"
         lobid_response = requests.get(lobid_url)
         return lobid_response.json()
-
-    def __str__(self):
-        if self.gnd_id:
-            return f'{self.get_default_name()} ({self.gnd_id})'
-        return self.interim_designator
 
     def get_model(self):
         return self

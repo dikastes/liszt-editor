@@ -2,33 +2,14 @@ from django.urls import reverse_lazy
 from django.shortcuts import render
 from json import dumps
 from dmad_on_django.models import Person, Work, Place
-from dmad_on_django.forms import SearchForm
-
-from .base import (DmadCreateView,DmadUpdateView, DeleteView,
-                     LinkView, UnlinkView, PullView, DmadSearchView)
-
-from .base import get_link, search_gnd, json_search
+from .base import *
 
 class PersonSearchView(DmadSearchView):
     model = Person
-    template_name = 'dmad_on_django/person_list.html'
-    form_class = SearchForm
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        if self.kwargs.get('type') == 'rework':
-            context['object_list'] = Person.objects.filter(rework_in_gnd=True)
-        elif self.kwargs.get('type') == 'stub':
-            context['object_list'] = Person.objects.filter(gnd_id__isnull=True)
-        else:
-            context['object_list'] = [result.object for result in context['object_list']]
-        context.update({
-            'active': 'person',
-            'type': self.kwargs.get('type'),
-            'rework_count': Person.objects.filter(rework_in_gnd=True).count(),
-            'stub_count': Person.objects.filter(gnd_id__isnull=True).count()
-        })
-        return context
+
+class PersonListView(DmadListView):
+    model = Person
 
 
 def person_list(request):

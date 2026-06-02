@@ -1,1 +1,1 @@
-{{ object.preview }}
+{{ object }} {{ object.get_citation }}

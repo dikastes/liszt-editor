@@ -1,19 +1,10 @@
-from haystack.forms import SearchForm
+from haystack.forms import SearchForm as HaystackSearchForm
 from django.forms import SelectDateWidget as DjangoSelectDateWidget
 from django.utils.translation import gettext_lazy as _
 from .forms import GenericAsDaisyMixin
 
 
-class SearchForm(GenericAsDaisyMixin, SearchForm):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['q'].widget.attrs.update({
-                'class': 'grow',
-            })
-
-
-class FramedSearchForm(SearchForm):
+class SearchForm(GenericAsDaisyMixin, HaystackSearchForm):
 
     def __init__(self, *args, **kwargs):
         if 'entity_type' in kwargs:
@@ -26,10 +17,21 @@ class FramedSearchForm(SearchForm):
         super().__init__(*args, **kwargs)
 
         self.fields['q'].widget.attrs.update({
-                'class': 'input input-bordered border-black bg-white flex-1 grow w-full',
-                'placeholder': placeholder
+                'class': 'input flex-1 grow w-full',
+                'placeholder': placeholder,
+                'id': 'query'
             })
         self.fields['q'].label = ''
+
+
+class FramedSearchForm(SearchForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['q'].widget.attrs.update({
+                'class': 'input input-bordered border-black bg-white flex-1 grow w-full'
+            })
 
 
 class SelectDateWidget(DjangoSelectDateWidget):

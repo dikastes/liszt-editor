@@ -15,33 +15,8 @@
             {% include 'edwoca/partials/navigation/item_navigation.html' %}
     {% endif %}
     </div>
-    {% if entity_type == 'manifestation' %}
-        <div class="flex-0 text-xs xl:text-sm text-gray-500 mb-10">
-            <p>
-                {% translate 'created' %}
-            </p>
-            <p>
-                {{ object.first_save|date:"d.m.Y H:i:s" }}
-            </p>
-            {% if object.first_editor %}
-                </p>
-                    {% translate 'by' %}
-                    {{ object.first_editor }}
-                </p>
-            {% else %}
-                <p class="text-primary">
-                    {% translate 'missing first editor' %}
-                </p>
-            {% endif %}
-        </div>
-        <div class="flex-0 text-xs xl:text-sm text-gray-500 mb-10">
-            <p>
-                {% translate 'last update' %}
-            </p>
-            <p>
-                {{ object.last_save|date:"d.m.Y H:i:s" }}
-            </p>
-        </div>
+    {% if entity_type == 'manifestation' or entity_type == 'letter' %}
+        {% include 'edwoca/partials/tracked_model_display.html' %}
     {% endif %}
     <div class="flex-0">
         <label for="submit-form" class="w-full btn btn-sm xl:btn-base text-primary btn-outline"> {% translate 'save' %} </label>

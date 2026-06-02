@@ -8,6 +8,7 @@ module.exports = {
   ],
   safelist: [
     'xl:text-2xl',
+    'xl:mb-5',
     'text-lg',
     'text-sm',
     'xl:text-base',

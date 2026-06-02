@@ -8,10 +8,10 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
-from dmad_on_django.models.base import DocumentationStatus
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
+from liszt_util.models import Sortable
 
 
 class TitleTypes(models.TextChoices):
@@ -21,25 +21,24 @@ class TitleTypes(models.TextChoices):
     ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
 
 
-class Manifestation(RenderRawJSONMixin, WemiBaseClass):
+class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     class Meta:
-        ordering = ['-needs_review']
+        ordering = ['-needs_review', 'order_index']
+
+    class Completeness(models.TextChoices):
+        COMPLETE = 'c', _('complete')
+        INCOMPLETE = 'i', _('incomplete')
 
     class PartLabel(models.TextChoices):
-        CONSTITUTING = 'c', _('constituting')
-        BOUND_TOGETHER = 'b', _('bound together')
+        JOINED = 'j', _('joined')
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        EXCERPTS = 'EX', _('Excerpts')
         SKETCHES = 'SK', _('Sketches'),
-        FRAGMENTS = 'FR', _('Fragments'),
 
         def parse(string):
             match string.lower():
                 case 'sketch' | 'sketches': return Manifestation.ManifestationForm.SKETCHES
-                case 'fragment' | 'fragments': return Manifestation.ManifestationForm.FRAGMENTS
-                case 'excerpt' | 'excerpts': return Manifestation.ManifestationForm.EXCERPTS
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
@@ -81,19 +80,22 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     working_title = models.TextField(
             max_length = 200,
             blank = True,
-            verbose_name = _('working title')
+            verbose_name = _('working title'),
+            default = ''
         )
     source_title = models.TextField(
             max_length = 200,
             blank = True,
-            verbose_name = _('source title')
+            verbose_name = _('source title'),
+            default = ''
         )
     rism_id_unaligned = models.BooleanField(default=False)
     temporary = models.BooleanField(default=False)
     temporary_target = models.ForeignKey(
             'Manifestation',
-            on_delete = models.CASCADE,
-            related_name = 'temporary_copy'
+            on_delete = models.SET_NULL,
+            related_name = 'temporary_copy',
+            null = True
         )
     # move to edwoca?
     period = models.OneToOneField(
@@ -115,6 +117,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             choices = ManifestationForm.choices,
             default = None,
             blank = True,
+            null = True,
             verbose_name = _('manifestation form')
         )
     source_type = models.CharField(
@@ -122,12 +125,14 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             choices = SourceType.choices,
             default = SourceType.AUTOGRAPH,
             blank = True,
+            null = True,
             verbose_name = _('source type')
         )
     print_type = models.CharField(
             max_length = 10,
             choices = PrintType,
             default = None,
+            null = True,
             verbose_name = _('edition')
         )
     edition = models.CharField(
@@ -144,11 +149,13 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         )
     extent = models.TextField(
             blank = True,
-            verbose_name = _('extent')
+            verbose_name = _('extent'),
+            default = ''
         )
     history = models.TextField(
             blank = True,
-            verbose_name = _('history')
+            verbose_name = _('history'),
+            default = ''
         )
     bib = models.ManyToManyField(
             'bib.ZotItem',
@@ -158,73 +165,94 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 15,
             choices = Language,
             default = None,
+            null = True,
             verbose_name = _('language')
         )
     watermark = models.TextField(
             max_length = 100,
             blank = True,
-            verbose_name = _('watermark')
+            verbose_name = _('watermark'),
+            default = ''
         )
     watermark_url = models.URLField(
             blank=True,
-            verbose_name = _('watermark url')
+            verbose_name = _('watermark url'),
+            null = True
         )
     is_singleton = models.BooleanField(default=False)
     is_collection = models.BooleanField(default=False)
     missing_item = models.BooleanField(default=False)
     # move to edwoca?
     numerus_currens = models.IntegerField(
+            null = True,
             unique = True
         )
     rism_id = models.CharField(
             max_length=20,
             blank = True,
-            verbose_name = _('RISM id')
+            verbose_name = _('RISM id'),
+            default = ''
         )
     raw_data = models.TextField(
             blank = True,
+            default = ''
         )
     date_diplomatic = models.TextField(
             blank = True,
-            verbose_name = _('diplomatic date')
+            verbose_name = _('diplomatic date'),
+            default = ''
         )
     print_extent = models.TextField(
             blank = True,
-            verbose_name = _('print extent')
+            verbose_name = _('print extent'),
+            default = ''
         )
     private_head_comment = models.TextField(
             blank = True,
-            verbose_name = _('private head comment')
+            verbose_name = _('private head comment'),
+            default = ''
         )
     private_relations_comment = models.TextField(
             blank = True,
-            verbose_name = _('private relations comment')
+            verbose_name = _('private relations comment'),
+            default = ''
         )
     private_title_comment = models.TextField(
             blank = True,
-            verbose_name = _('private title comment')
+            verbose_name = _('private title comment'),
+            default = ''
         )
     private_history_comment = models.TextField(
             blank = True,
-            verbose_name = _('private history comment')
+            verbose_name = _('private history comment'),
+            default = ''
         )
     private_dedication_comment = models.TextField(
             blank = True,
-            verbose_name = _('private dedication comment')
+            verbose_name = _('private dedication comment'),
+            default = ''
         )
     private_print_comment = models.TextField(
             blank = True,
-            verbose_name = _('private print comment')
+            verbose_name = _('private print comment'),
+            default = ''
         )
     taken_information = models.TextField(
             blank = True,
-            verbose_name = _('taken information')
+            verbose_name = _('taken information'),
+            default = ''
         )
     stitcher = models.ForeignKey(
             'dmad.Corporation',
             related_name = 'stitched_manifestations',
             on_delete = models.SET_NULL,
             null = True,
+        )
+    completeness = models.TextField(
+            max_length = 1,
+            choices = Completeness,
+            default = Completeness.COMPLETE,
+            verbose_name = _('completeness')
         )
     specific_figure = models.BooleanField(
             default = False,
@@ -233,7 +261,8 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
     plate_number = models.CharField(
             max_length=20,
             blank = True,
-            verbose_name = _('plate number')
+            verbose_name = _('plate number'),
+            default = ''
         )
     album_page = models.BooleanField(
             default = False,
@@ -301,6 +330,7 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             max_length = 1,
             choices = PartLabel,
             default = None,
+            null = True,
             verbose_name = _('part label')
         )
     component_of = models.ForeignKey(
@@ -309,27 +339,15 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
             on_delete = models.SET_NULL,
             null = True
         )
-    first_save = models.DateTimeField(
-            auto_now_add = True,
-            verbose_name = _('first save')
-        )
-    last_save = models.DateTimeField(
-            auto_now = True,
-            verbose_name = _('last save')
-        )
-    first_editor = models.CharField(
-            max_length = 50,
-            blank = True,
-            verbose_name = _('first editor')
-        )
-    editing_history = models.TextField(
-            blank = True,
-            verbose_name = _('editing history')
-        )
-    needs_review = models.BooleanField(
+    is_text = models.BooleanField(
             default = False,
-            verbose_name = _('needs review')
+            verbose_name = _('is text')
         )
+    _group_field_names = ['part_of', 'component_of']
+
+    @property
+    def may_have_component(self):
+        return self.is_collection or self.part_of is not None
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -387,26 +405,22 @@ class Manifestation(RenderRawJSONMixin, WemiBaseClass):
         return False
 
     def render_title(self, prefix):
-        review_string = ''
-        if self.needs_review:
-            review_string = '!'
-
         if self.is_collection:
             collection = _('coll')
             title = self.source_title or _('empty')
-            return f'{review_string}({collection}) {prefix} {title}'
+            return self.mark_needs_review(f'({collection}) {prefix} {title}')
 
         title = self.working_title or _('empty')
         source_typed_title = f'{prefix} {title} ({self.get_source_type_display()})'
 
         if self.part_of:
             part = _('pt')
-            return f'{review_string}({part}) {source_typed_title}'
+            return self.mark_needs_review(f'({part}) {source_typed_title}')
         if self.component_of:
             component = _('cmp')
-            return f'{review_string}({component}) {source_typed_title}'
+            return self.mark_needs_review(f'({component}) {source_typed_title}')
 
-        return review_string + source_typed_title
+        return self.mark_needs_review(source_typed_title)
 
     def standardized_search_entry(self):
         if self.items.count():

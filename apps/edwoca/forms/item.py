@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from dmad_on_django.models import Period
 from dmrism.models.item import *
-from dominate.tags import div, label, span, form, input_
+from dominate.tags import div, label, span, form, input_, h3
 from dominate.util import raw
 from django import forms
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, SelectDateWidget, CharField, BooleanField
@@ -36,72 +36,11 @@ class ItemForm(ModelForm):
 
         return mark_safe(str(form))
 
-class SignatureForm(GenericAsDaisyMixin, ModelForm):
-    layout = Layouts.LABEL_OUTSIDE
-
+class SignatureForm(BaseSignatureForm):
     class Meta:
         model = ItemSignature
-        fields = ['library', 'signature', 'status', 'id']
-        widgets = {
-                'library': Select( attrs = {
-                        'class': SimpleFormMixin.autocomplete_classes,
-                        'form': 'form'
-                    }),
-                'signature': TextInput( attrs = {
-                        'class': SimpleFormMixin.text_input_classes,
-                        'form': 'form'
-                    }),
-                'status': Select( attrs = {
-                        'class': SimpleFormMixin.select_classes,
-                        'form': 'form'
-                    }),
-                'id': HiddenInput()
-            }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        lib_field = self.fields['library']
-        lib_field.label = f'{lib_field.label}*'
-
-    def as_daisy(self):
-        form_wrapper = div(cls='mb-10')
-
-        library_field = self['library']
-        signature_field = self['signature']
-        status_field = self['status']
-
-        library_container = label(cls='form-control w-full flex-1')
-        library_span = span(library_field.label, cls='label-text')
-        library_div = div(cls='label')
-        library_div.add(library_span)
-        library_container.add(library_div)
-        library_container.add(raw(str(library_field)))
-
-        signature_container = label(cls='form-control w-full flex-1')
-        signature_span = span(signature_field.label, cls='label-text')
-        signature_div = div(cls='label')
-        signature_div.add(signature_span)
-        signature_container.add(signature_div)
-        signature_container.add(raw(str(signature_field)))
-
-        status_container = label(cls='form-control w-full max-w-xs flex-0')
-        status_span = span(status_field.label, cls='label-text')
-        status_div = div(cls='label')
-        status_div.add(status_span)
-        status_container.add(status_div)
-        status_container.add(raw(str(status_field)))
-
-        upper_palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        lower_palette = div(cls='flex flex-rows w-full gap-10 my-5')
-
-        upper_palette.add(library_container)
-        upper_palette.add(status_container)
-        lower_palette.add(signature_container)
-
-        form_wrapper.add(upper_palette)
-        form_wrapper.add(lower_palette)
-
-        return mark_safe(str(form_wrapper))
+        fields = BaseSignatureForm.Meta.fields
+        widgets = BaseSignatureForm.Meta.widgets
 
 
 SignatureFormSet = inlineformset_factory(
@@ -286,50 +225,37 @@ class LibraryForm(ModelForm):
         fields = [ 'name', 'siglum' ]
         widgets = {
                 'name': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': SimpleFormMixin.text_input_classes
                     }),
                 'siglum': TextInput( attrs = {
-                        'class': 'grow w-full'
+                        'class': SimpleFormMixin.text_input_classes
                     }),
             }
 
     def as_daisy(self):
         form = div()
-        for field in self.visible_fields():
-            field_label = label(field.label, _for=field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
-            field_label.add(raw(str(field)))
-            form.add(field_label)
 
-        return mark_safe(str(form))
-
-
-class ItemDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
-    layout = Layouts.LABEL_OUTSIDE
-    class Meta:
-        model = ItemDigitalCopy
-        fields = ['url', 'link_type']
-        widgets = {
-                'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}),
-                'link_type': Select(attrs={'class': SimpleFormMixin.select_classes, 'form': 'form'})
-        }
-
-    def as_daisy(self):
-        form = div()
-
-        url_field = self['url']
-        link_type_field = self['link_type']
+        name_field = self['name']
+        siglum_field = self['siglum']
 
         with form:
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
-                    span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(url_field))
+                    span(name_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(name_field))
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
-                    span(_(link_type_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(link_type_field))
+                    span(siglum_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(siglum_field))
 
         return mark_safe(str(form))
+
+
+class ItemDigitizedCopyForm(BaseDigitizedCopyForm):
+    class Meta:
+        model = ItemDigitalCopy
+        fields = BaseDigitizedCopyForm.Meta.fields
+        widgets = BaseDigitizedCopyForm.Meta.widgets
 
 
 class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):
@@ -351,10 +277,29 @@ class ItemProvenanceCommentForm(ModelForm, SimpleFormMixin):
 class ItemManuscriptForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Item
-        fields = ['extent', 'measure', 'private_manuscript_comment']
+        fields = [
+                'extent',
+                'is_lyrics',
+                'is_program',
+                'is_explanation',
+                'measure',
+                'private_manuscript_comment'
+            ]
         widgets = {
                 'extent': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
                         'form': 'form'
                     }),
                 'measure': Textarea( attrs = {
@@ -369,6 +314,9 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
 
     def as_daisy(self):
         extent_field = self['extent']
+        lyrics_field = self['is_lyrics']
+        explanation_field = self['is_explanation']
+        program_field = self['is_program']
         measure_field = self['measure']
         form = div()
 
@@ -377,6 +325,17 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
                 raw(str(extent_field))
+            with div(cls='mb-2'):
+                h3(_('text type'), cls='text-lg my-5')
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(lyrics_field))
+                    span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(program_field))
+                    span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(explanation_field))
+                    span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
             with label():
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(measure_field.label), cls=SimpleFormMixin.label_text_classes)
@@ -496,3 +455,44 @@ CorporationProvenanceBibFormSet = inlineformset_factory(
     extra=0,
     can_delete=False
 )
+
+
+class ItemTextTypeForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        model = Item
+        fields = ['is_lyrics', 'is_program', 'is_explanation']
+        widgets = {
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        lyrics_field = self['is_lyrics']
+        program_field = self['is_program']
+        explanation_field = self['is_explanation']
+
+        form = div()
+
+        with form:
+            h3(_('text type'), cls='text-lg my-5')
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(lyrics_field))
+                span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(program_field))
+                span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(explanation_field))
+                span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))

@@ -49,6 +49,10 @@ p.note {
     @apply italic;
 }
 
+input:disabled {
+    border-color: black;
+}
+
 .textarea:focus-within, .select:focus-within, .input:focus-within {
     border-color: black;
     outline-style: solid;
@@ -97,5 +101,14 @@ div.modal-box {
 @screen xl {
     .update-menu a, .navigation a {
         @apply text-base;
+    }
+}
+
+@layer components {
+    .input:disabled,
+    .input[disabled],
+    .select:disabled,
+    .select[disabled] {
+        @apply border-black border-opacity-100 opacity-100;
     }
 }

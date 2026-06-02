@@ -1,22 +1,25 @@
 import dominate.tags as tags
+from liszt_util.forms import GenericAsDaisyMixin
+from liszt_util.forms.layouts import Layouts
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateField, SelectDateWidget, BooleanField, TypedChoiceField, RadioSelect
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateField, SelectDateWidget, BooleanField, TypedChoiceField, RadioSelect, DateTimeField
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe
 from dominate.util import raw
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Period
-from dominate.tags import div, label, span
+from dominate.tags import div, label, span, a
 
 
 class SimpleFormMixin:
     text_area_classes = 'textarea textarea-bordered w-full bg-white border-black'
-    text_input_classes = 'input input-bordered w-full border-black bg-white'
+    text_input_classes = 'input input-bordered w-full border-black bg-white disabled:border-black'
     text_label_classes = 'input input-bordered w-full border-black bg-white flex gap-2 items-center'
     autocomplete_classes = 'autocomplete-select select select-bordered w-full border-black bg-white'
     select_classes = 'select select-bordered w-full border-black bg-white'
     toggle_classes = 'toggle'
+    radio_classes = 'radio'
     palette_classes = 'flex w-full gap-10 my-5'
     form_control_classes = 'form-control'
     palette_form_control_classes = 'form-control flex-1'
@@ -256,24 +259,26 @@ class DateFormMixin:
         }
     not_before = DateField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = { 'class': SimpleFormMixin.radio_classes, 'form': 'form'}
                 ),
             required = False
         )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     def __init__(self, *args, **kwargs):
+        self.period_property = kwargs.pop('period_property', 'period')
         super().__init__(*args, **kwargs)
+
 
         if self.is_bound:
             return
 
-        period = getattr(self.instance, 'period', None)
+        period = getattr(self.instance, self.period_property, None)
         if period:
             self.initial.update({
                 'not_before': period.not_before,
@@ -287,10 +292,10 @@ class DateFormMixin:
         instance = super().save(commit=False)
 
         # Ensure period exists or create it
-        if not instance.period:
-            instance.period = Period.objects.create()
+        if not getattr(self.instance, self.period_property):
+            setattr(self.instance, self.period_property, Period.objects.create())
 
-        period_instance = instance.period
+        period_instance = getattr(self.instance, self.period_property)
         period_instance.not_before = self.cleaned_data['not_before']
         period_instance.not_after = self.cleaned_data['not_after']
         period_instance.display = self.cleaned_data['display']
@@ -302,7 +307,7 @@ class DateFormMixin:
 
         return instance
 
-    def get_date_div(self):
+    def get_date_div(self, disable_inferred = False):
         date_div = tags.div()
         not_before_field = self['not_before']
         not_after_field = self['not_after']
@@ -322,7 +327,8 @@ class DateFormMixin:
             with tags.div(cls='flex gap-5 items-end w-full mb-5'):
                 with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
                     with tags.div(cls=SimpleFormMixin.label_classes):
-                        tags.label(_('standardized date'), cls=SimpleFormMixin.label_text_classes)
+                        # display_field.label retrieves for some reason display instead of standardized date
+                        tags.label(display_field.label, cls=SimpleFormMixin.label_text_classes)
                     raw(str(display_field))
                     if display_field.errors:
                         with div(cls='label'):
@@ -363,9 +369,197 @@ class DateFormMixin:
                                     value=str(sw.data.get('value')),
                                     cls='radio',
                                     checked = sw.data.get('selected', False),
-                                    form='form'
+                                    form='form',
+                                    disabled = disable_inferred
                                 )
                 tags.div(cls='flex-1')
                 tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=clear_name)
 
         return date_div
+
+
+class BaseSignatureForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
+    class Meta:
+        fields = ['library', 'signature', 'status', 'id']
+        widgets = {
+                'library': Select( attrs = {
+                        'class': SimpleFormMixin.autocomplete_classes,
+                        'form': 'form'
+                    }),
+                'signature': TextInput( attrs = {
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
+                    }),
+                'status': Select( attrs = {
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
+                    }),
+                'id': HiddenInput()
+            }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        lib_field = self.fields['library']
+        lib_field.label = f'{lib_field.label}*'
+        sig_field = self.fields['signature']
+        sig_field.label = f'{sig_field.label}*'
+
+    def as_daisy(self):
+        form_wrapper = div(cls='mb-10')
+
+        library_field = self['library']
+        signature_field = self['signature']
+        status_field = self['status']
+
+        library_container = label(cls='form-control w-full flex-1')
+        library_span = span(library_field.label, cls='label-text')
+        library_div = div(cls='label')
+        library_div.add(library_span)
+        library_container.add(library_div)
+        library_container.add(raw(str(library_field)))
+
+        signature_container = label(cls='form-control w-full flex-1')
+        signature_span = span(signature_field.label, cls='label-text')
+        signature_div = div(cls='label')
+        signature_div.add(signature_span)
+        signature_container.add(signature_div)
+        signature_container.add(raw(str(signature_field)))
+
+        status_container = label(cls='form-control w-full max-w-xs flex-0')
+        status_span = span(status_field.label, cls='label-text')
+        status_div = div(cls='label')
+        status_div.add(status_span)
+        status_container.add(status_div)
+        status_container.add(raw(str(status_field)))
+
+        upper_palette = div(cls='flex flex-rows w-full gap-10 my-5')
+        lower_palette = div(cls='flex flex-rows w-full gap-10 my-5')
+
+        upper_palette.add(library_container)
+        upper_palette.add(status_container)
+        lower_palette.add(signature_container)
+
+        form_wrapper.add(upper_palette)
+        form_wrapper.add(lower_palette)
+
+        return mark_safe(str(form_wrapper))
+
+
+class BaseDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
+    layout = Layouts.LABEL_OUTSIDE
+    class Meta:
+        fields = ['url', 'link_type']
+        widgets = {
+                'url': TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}),
+                'link_type': Select(attrs={'class': SimpleFormMixin.select_classes, 'form': 'form'})
+        }
+
+    def as_daisy(self):
+        form = div(cls='mb-5')
+
+        url_field = self['url']
+        link_type_field = self['link_type']
+
+        with form:
+            with div(cls='flex gap-5 items-end'):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(url_field))
+                a(_('open'), cls='flex-0 btn btn-outline', href=self.instance.url, target='_blank')
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_(link_type_field.label), cls=SimpleFormMixin.label_text_classes)
+                raw(str(link_type_field))
+
+        return mark_safe(str(form))
+
+
+class BaseTrackedModelForm:
+    class Meta:
+        fields = [
+                'first_editor',
+                'editing_history',
+                'needs_review'
+            ]
+        widgets = {
+                'first_editor': TextInput( attrs ={
+                    'class': SimpleFormMixin.text_input_classes,
+                    'form': 'form'
+                    }),
+                'editing_history': Textarea( attrs ={
+                    'class': SimpleFormMixin.text_area_classes,
+                    'form': 'form'
+                    }),
+                'needs_review': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    # these fields must be copied to the inheriting classes
+    first_save = DateTimeField(
+            label=_('first save') + '*',
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black' })
+        )
+    last_save = DateTimeField(
+            label=_('last save'),
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black'})
+        )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.pk:
+            self.fields['first_save'].initial = self.instance.first_save
+            self.fields['last_save'].initial = self.instance.last_save
+        fe_field = self.fields['first_editor']
+        fe_field.label = f'{fe_field.label}*'
+
+    def get_editing_history_div(self):
+        editing_history_div = div()
+
+        first_editor_field = self['first_editor']
+        first_save_field = self['first_save']
+        last_save_field = self['last_save']
+        needs_review_field = self['needs_review']
+        editing_history_field = self['editing_history']
+
+        with editing_history_div:
+            tags.h2(_('editing history'), cls='my-5')
+            tags.h3(_('initial recording'), cls='my-5')
+            with tags.label(cls=SimpleFormMixin.form_control_classes):
+                with tags.div(cls=SimpleFormMixin.label_classes):
+                    tags.span(first_editor_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(first_editor_field))
+            with tags.label(cls=SimpleFormMixin.form_control_classes):
+                with tags.div(cls=SimpleFormMixin.label_classes):
+                    tags.span(first_save_field.label, cls=SimpleFormMixin.label_text_classes)
+                with tags.div(cls='flex'):
+                    with tags.div(cls='flex'):
+                        raw(str(first_save_field))
+                    tags.div(cls='flex-1')
+            tags.h3(_('further recording'), cls='my-5')
+            with tags.label(cls=SimpleFormMixin.form_control_classes):
+                with tags.div(cls=SimpleFormMixin.label_classes):
+                    tags.span(editing_history_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(editing_history_field))
+            with tags.div(cls='flex flex-col xl:flex-row gap-2 my-5 xl:items-end'):
+                with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with tags.div(cls=SimpleFormMixin.label_classes):
+                        tags.span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
+                    with tags.div(cls='flex'):
+                        with tags.div(cls='flex'):
+                            raw(str(last_save_field))
+                        tags.div(cls='flex-1')
+                tags.div(cls='flex-1')
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0'):
+                    tags.span(needs_review_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(needs_review_field))
+
+        return editing_history_div

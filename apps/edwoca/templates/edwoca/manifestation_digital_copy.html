@@ -9,36 +9,24 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/digitized_copy_prolog.html' %}
 
-<h2> Digitalisate </h2>
+<h2>
+    {% translate 'digital copies' %}
+</h2>
 
-{% for form in forms %}
-{% endfor %}
 <form method="post" id="form" class="mt-5 flex flex-col gap-5 mb-10">
     {% csrf_token %}
     <input type="submit" name="save_changes" class="hidden" id="submit-form">
 </form>
 
 {% for form in forms %}
-    <div class="flex gap-5 bg-base-100 p-5 my-5">
-        <div class="flex-1">
-            {{ form.as_daisy }}
-        </div>
-        <div class="flex-0 flex flex-col">
+    <div class="border border-black p-5 my-5">
+        {{ form.as_daisy }}
+        <div class="flex">
             <div class="flex-1"></div>
             <div class="flex-0">
-                <a class="btn btn-outline w-full " href="{{ form.instance.url }}" target="_blank">
-                    {% translate 'open' %}
-                </a>
-                <label class="flex-0 m-0">
-                    <div class="label">
-                        <span class="label-text">
-                            &nbsp;
-                        </span>
-                    </div>
-                    <form action="{% url 'edwoca:manifestation_digital_copy_delete' form.instance.id %}" method="post" class="w-full m-0">
-                        {% csrf_token %}
-                        <input type="submit" class="btn btn-primary btn-outline w-full" id="delete-{{ form.instance.id }}" value="{% translate 'remove' %}"/>
-                    </form>
+                <button name="remove-digital-copy" value="{{form.instance.id}}" type="submit" form="form" class="btn-outline btn-primary btn flex-0">
+                    {% translate 'remove digital copy' %}
+                </button>
                 </label>
             </div>
         </div>
@@ -51,9 +39,9 @@
 
 <div class="flex items-center">
     <div class="flex-1"></div>
-    <a href="{% url 'edwoca:manifestation_digital_copy_add' object.id %}" class="btn-outline btn flex-0"> 
+    <button name="add-digital-copy" type="submit" form="form" class="btn-outline btn flex-0">
         {% translate 'add digital copy' %}
-    </a>
+    </button>
 </div>
 
 {% endblock %}

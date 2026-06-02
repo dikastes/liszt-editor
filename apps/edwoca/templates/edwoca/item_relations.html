@@ -1,88 +1,101 @@
 {% extends 'edwoca/base.html' %}
 
-
-
 {% block content %}
 
 {% include 'edwoca/partials/item/preview-divs/relations_prolog.html' %}
 
 <div class="bg-white border border-base-300 p-5 mb-10">
-	<div class="prose">
-		<h2> Manifestation </h2>
+    <div class="prose">
+        <h2>
+            {% translate 'manifestation' %}
+        </h2>
 
-		<a href="{% url 'edwoca:manifestation_relations' object.manifestation.id %}"> {{ object.manifestation }} </a>
-	</div>
+        <a href="{% url 'edwoca:manifestation_relations' object.manifestation.id %}"> {{ object.manifestation }} </a>
+    </div>
 </div>
 
 <div class="bg-white border border-base-300 p-5 mb-10">
-	<div class="prose">
-		<h2> Exemplare </h2>
+    <div class="prose">
+        <h2> 
+            {% translate 'items' %}
+        </h2>
 
-		<ul>
-		{% for item_relation in object.source_item_of.all %}
-			<li>
-				<div class="flex">
-					<a href="{% url 'edwoca:item_update' item.id %}" class="flex-1">
-						{{ item_relation.item }}
-					</a>
-					<form method="post" action="{% url 'edwoca:related_item_remove' item_relation.id %}" class="flex-0">
-						{% csrf_token %}
-						<input type="submit" class="btn btn-small" value="entfernen">
-					</form>
-				</div>
-			</li>
-		{% empty %}
-			<li> <em> keine Exemplare verknüpft </em> <span class="badge badge-primary">!</span> </li>
-		{% endfor %}
-		</ul>
+        <ul>
+        {% for item_relation in object.source_item_of.all %}
+            <li>
+                <div class="flex">
+                    <a href="{% url 'edwoca:item_update' item.id %}" class="flex-1">
+                        {{ item_relation.item }}
+                    </a>
+                    <form method="post" action="{% url 'edwoca:related_item_remove' item_relation.id %}" class="flex-0">
+                        {% csrf_token %}
+                        <input type="submit" class="btn btn-small" value="entfernen">
+                    </form>
+                </div>
+            </li>
+        {% empty %}
+            <li>
+                <em>
+                    {% translate 'no items' %}
+                </em>
+                <span class="badge badge-primary">!</span>
+            </li>
+        {% endfor %}
+        </ul>
 
-		<h3> neues Exemplar verknüpfen </h3>
+        <h3>
+            {% translate 'link item' %}
+        </h3>
 
-		{% if show_search_form == True %}
+        {% if show_search_form == True %}
 
-		<form action="{% url 'edwoca:item_relations' object.id %}" method="get">
-			{{ searchform.q }}
-			<input type="hidden" name="target_model" value="item">
-			<input type="submit" id="submit-form" class="btn" />
-		</form>
-		
-		<ul>
-		{% if query %}
-			{% for found_item in found_items %}
-				<li>
-					<a href="{% url 'edwoca:related_item_add' object.id found_item.object.id %}">
-						{{ found_item.object }}
-					</a>
-				</li>
-			{% empty %}
-				<li> <em> keine Suchergebnisse </em> </li>
-			{% endfor %}
-		{% else %}
-			<li> <em> bitte Suchbegriff eingeben </em> </li>
-		{% endif %}
-		</ul>
+        <form action="{% url 'edwoca:item_relations' object.id %}" method="get">
+            {{ searchform.q }}
+            <input type="hidden" name="target_model" value="item">
+            <input type="submit" id="submit-form" class="btn" />
+        </form>
 
-		{% else %}
+        <ul>
+        {% if query %}
+            {% for found_item in found_items %}
+                <li>
+                    <a href="{% url 'edwoca:related_item_add' object.id found_item.object.id %}">
+                        {{ found_item.object }}
+                    </a>
+                </li>
+            {% empty %}
+                <li>
+                    <em>
+                        {% translate 'no search results' %}
+                    </em>
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>
+                <em>
+                    {% translate 'please enter search term' %}
+                </em>
+            </li>
+        {% endif %}
+        </ul>
 
-		<form method="post">
-			{% csrf_token %}
-			{{ object }} mit {{ target_item }} verknüpfen als:
-			{{ related_item_form }}
-			<input type="submit" id="submit-form" class="btn" />
-		</form>
+        {% else %}
 
-		{% endif %}
+        <form method="post">
+            {% csrf_token %}
+            {{ object }} mit {{ target_item }} verknüpfen als:
+            {{ related_item_form }}
+            <input type="submit" id="submit-form" class="btn" />
+        </form>
 
-		{% comment %}
-		<a href="{% url 'edwoca:manifestation_create' %}" class="btn btn-primary"> neue Quelle anlegen </a>
-		{% endcomment %}
-	</div>
+        {% endif %}
+
+        {% comment %}
+        <a href="{% url 'edwoca:manifestation_create' %}" class="btn btn-primary"> neue Quelle anlegen </a>
+        {% endcomment %}
+    </div>
 </div>
 
 {% include 'edwoca/partials/item/preview-divs/relations_epilog.html' %}
 
 {% endblock %}
-
-
-
-

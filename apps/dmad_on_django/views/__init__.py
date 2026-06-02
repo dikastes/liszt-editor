@@ -5,17 +5,17 @@ from .base import (
     get_link, search_gnd, json_search
 )
 from .person import (
-    PersonSearchView, PersonCreateView, PersonUpdateView,
+    PersonSearchView, PersonCreateView, PersonUpdateView, PersonListView,
     PersonDeleteView, PersonLinkView, PersonUnlinkView, PersonPullView,
     person_list
 )
 from .place import (
     PlaceSearchView, PlaceCreateView, PlaceUpdateView,
-    PlaceLinkView, PlaceUnlinkView, PlacePullView,
+    PlaceLinkView, PlaceUnlinkView, PlacePullView, PlaceListView,
     place_list
 )
 from .work import (
-    WorkSearchView, WorkCreateView, WorkUpdateView,
+    WorkSearchView, WorkCreateView, WorkUpdateView, WorkListView,
     WorkDeleteView, WorkLinkView, WorkUnlinkView, WorkPullView,
     work_list
 )
@@ -23,13 +23,13 @@ from .work import (
 from .subjectterm import (
     SubjectTermSearchView, SubjectTermCreateView, SubjectTermUpdateView,
     SubjectTermDeleteView, SubjectTermLinkView, SubjectTermUnlinkView,
-    SubjectTermPullView, subject_term_list
+    SubjectTermPullView, subject_term_list, SubjectTermListView
 )
 
 from .corporation import (
     CorporationSearchView, CorporationCreateView, CorporationUpdateView,
     CorporationDeleteView, CorporationLinkView, CorporationUnlinkView,
-    CorporationPullView, corporation_list
+    CorporationPullView, corporation_list, CorporationListView
 )
 __all__ = [
     "index",

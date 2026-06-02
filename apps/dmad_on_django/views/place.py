@@ -2,32 +2,17 @@ from django.urls import reverse_lazy
 from django.shortcuts import render
 from .base import DmadSearchView
 from json import dumps
-
 from dmad_on_django.models import Place, Person, Work
-from dmad_on_django.forms import SearchForm
-from .base import DmadCreateView, DmadUpdateView, LinkView, UnlinkView, PullView
-from .base import get_link
+from .base import *
+
 
 class PlaceSearchView(DmadSearchView):
     model = Place
-    template_name = 'dmad_on_django/place_list.html'
-    form_class = SearchForm
-    search_field = "q"
 
-    def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data(*args, **kwargs)
-        if self.kwargs.get('type') == 'rework':
-            context['object_list'] = Place.objects.filter(rework_in_gnd=True)
-        elif self.kwargs.get('type') == 'stub':
-            context['object_list'] = Place.objects.filter(gnd_id__isnull=True)
-        else:
-            context['object_list'] = [result.object for result in context['object_list']]
-        context.update({
-            'type': self.kwargs.get('type'),
-            'rework_count': Place.objects.filter(rework_in_gnd=True).count(),
-            'stub_count': Place.objects.filter(gnd_id__isnull=True).count()
-        })
-        return context
+
+class PlaceListView(DmadListView):
+    model = Place
+
 
 def place_list(request):
     context = {

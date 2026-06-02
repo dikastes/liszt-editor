@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 
@@ -286,3 +287,39 @@ class BaseCorporationDedication(BaseDedication):
 
         return f'{super_str} ({dedicatee_str})'
 
+
+class TrackedModel(models.Model):
+    class Meta:
+        abstract = True
+
+    first_save = models.DateTimeField(
+            auto_now_add = True,
+            verbose_name = _('first save'),
+            null = True
+        )
+    last_save = models.DateTimeField(
+            auto_now = True,
+            verbose_name = _('last save'),
+            null = True
+        )
+    first_editor = models.CharField(
+            max_length = 50,
+            blank = True,
+            verbose_name = _('first editor'),
+            default = ''
+        )
+    editing_history = models.TextField(
+            blank = True,
+            verbose_name = _('editing history'),
+            default = ''
+        )
+    needs_review = models.BooleanField(
+            default = False,
+            verbose_name = _('needs review'),
+        )
+
+    def mark_needs_review(self, title):
+        needs_review_string = '!'
+        if self.needs_review:
+            return needs_review_string + title
+        return title

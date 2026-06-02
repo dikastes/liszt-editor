@@ -1,11 +1,12 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
 from .geographicareacodes import PlaceGeographicAreaCode
 from django.utils.translation import gettext_lazy as _
 
 from .base import Status, Language, max_trials, DisplayableModel
-from pylobid.pylobid import PyLobidPlace, GNDAPIError
+from slub_pylobid.pylobid import PyLobidPlace, GNDAPIError
 import requests
 
 class PlaceName(models.Model):
@@ -64,6 +65,9 @@ class Place(DisplayableModel):
 
     description = models.TextField(null=True)
 
+    def get_search_placeholder():
+        return _('search places')
+
     def update_from_raw(self):
         pl_place = PyLobidPlace()
         pl_place.process_data(data=loads(self.raw_data))
@@ -114,7 +118,7 @@ class Place(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _('without name')
 
     def get_designator(self):
         if self.gnd_id:
@@ -124,20 +128,12 @@ class Place(DisplayableModel):
     def get_absolute_url(self):
         return reverse('dmad_on_django:place_update', kwargs={'pk': self.pk})
 
-    def __str__(self):
-        name = _('<< error >>')
-        if self.names.filter(status=Status.PRIMARY).count():
-            name = self.names.filter(status=Status.PRIMARY).first()
-        if self.gnd_id:
-            return f'{name} ({self.gnd_id})'
-        return self.interim_designator
-
     def get_table(self):
 
         return [("Long", self.long),
                 ("Lat", self.lat)]+\
                 PlaceGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
-    
+
     def get_overview_title(self):
 
         return "Angaben"

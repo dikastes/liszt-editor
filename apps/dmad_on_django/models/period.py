@@ -5,11 +5,11 @@ from django.db import models
 from django.conf import settings
 import re
 from re import split
-from datetime import date, datetime
-from .base import DocumentationStatus
+from datetime import date, datetime, timedelta
+from .base import DocumentationStatusMixin
 
 
-class Period(models.Model):
+class Period(DocumentationStatusMixin):
     not_before = models.DateField(
             null=True,
             blank=True,
@@ -25,21 +25,13 @@ class Period(models.Model):
             blank=True,
             verbose_name = _("standardized date")
         )
-    status = models.TextField(
-            choices = DocumentationStatus,
-            max_length = 1,
-            null = True,
-            blank = True,
-            verbose_name = _("status")
-        )
-    inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
-        )
-    assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
-        )
+    #status = models.TextField(
+            #choices = DocumentationStatus,
+            #max_length = 1,
+            #null = True,
+            #blank = True,
+            #verbose_name = _("status")
+        #)
 
     def render_detailed(self):
         if self.not_before == self.not_after:
@@ -96,9 +88,9 @@ class Period(models.Model):
 
         if str(before_string) in dates[0]:
             self.not_before = self.earliest
-            self.not_after = self._parse_date(dates[0].replace(str(before_string), ''), 'upper')
+            self.not_after = self._parse_date(dates[0].replace(str(before_string), ''), 'lower') - timedelta(days=1)
         elif str(after_string) in dates[0]:
-            self.not_before = self._parse_date(dates[0].replace(str(after_string), ''), 'lower')
+            self.not_before = self._parse_date(dates[0].replace(str(after_string), ''), 'upper') + timedelta(days=1)
             self.not_after = self.latest
         elif len(dates) == 2:
             self.not_before = self._parse_date(dates[0], 'lower')
@@ -228,8 +220,7 @@ class Period(models.Model):
 
             return date(year, month, day)
 
-        date_parts = date_string.split('.')
-        #day = self._parse_date_part(date_parts, bound, 'day')
+        date_parts = [s.strip() for s in date_string.split('.')]
         if len(date_parts) == 3:
             day = self._parse_date_part(date_parts[0], bound, 'day')
             month = self._parse_date_part(date_parts[1], bound, 'month')

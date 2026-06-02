@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
 import requests
 
@@ -9,7 +10,7 @@ from .base import Status, Language, max_trials, DisplayableModel, GNDSubjectCate
 from .place import Place
 from .geographicareacodes import PersonGeographicAreaCode
 from .subjectterm import SubjectTerm
-from pylobid.pylobid import PyLobidPerson, GNDAPIError
+from slub_pylobid.pylobid import PyLobidPerson, GNDAPIError
 
 
 class PersonName(models.Model):
@@ -54,7 +55,7 @@ class PersonName(models.Model):
         return name.parse_comma_separated_string(comma_separated_string)
 
     def __str__(self):
-        return f'{self.first_name} {self.last_name}'
+        return f'{self.last_name}, {self.first_name}'
 
 
 class Person(DisplayableModel):
@@ -91,9 +92,11 @@ class Person(DisplayableModel):
 
     professions = models.ManyToManyField(SubjectTerm)
 
+    def get_search_placeholder():
+        return _('search persons')
+
     def get_absolute_url(self):
         return reverse('dmad_on_django:person_update', kwargs={'pk': self.id})
-
 
     def get_description(self):
         birth_date = self.birth_date.strftime('%d.%m.%Y') if self.birth_date else 'o.D.'
@@ -200,7 +203,7 @@ class Person(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _('without name')
 
     def get_table(self):
             rows = [
@@ -234,11 +237,6 @@ class Person(DisplayableModel):
 
     def str_with_link(self):
         return get_model_link(self)
-
-    def __str__(self):
-        if self.gnd_id:
-            return f'{self.get_default_name()} ({self.gnd_id})'
-        return self.interim_designator
 
     @staticmethod
     def map_gender(gnd_gender):

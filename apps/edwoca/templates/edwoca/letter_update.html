@@ -3,241 +3,140 @@
 {% load i18n %}
 
 {% block content %}
-<h2 class="my-5">Brief bearbeiten</h2>
+<h2 class="my-5">
+    {% translate 'date' %}
+</h2>
 
 <form id="form" method="post" class="mt-5">
     {% csrf_token %}
-    {{ form.as_daisy }}
-    <input type="submit" value="Speichern" class="hidden" id="submit-form">
+    <input type="submit" class="hidden" id="submit-form">
 </form>
 
-<h3>Absender</h3>
+{{ edition_period_form.as_daisy }}
 
-<div class="flex gap-5 my-5">
-    {% if object.sender_person %}
-        <div class="flex-1  min-w-0">
-            <div class="flex">
-                <label class="pseudo-input border-r-0 border min-w-0 border-black flex-1 flex items-center gap-2">
-                    <span class="flex-0"> {% translate 'person' %} </span>
-                    <input type="text" class="flex-1 truncate min-w-0 cursor-not-allowed" disabled value="{{ object.sender_person }}" />
-                </label>
-                <a class="btn flex-0 btn-outline border-black" href="{% url 'edwoca:letter_remove_sender_person' object.id %}">{% translate 'remove' %}</a>
-            </div>
-        </div>
-    {% else %}
-        <div class="flex-1 min-w-0">
-            <form method="get" class="flex m-0">
-                <label class="input input-bordered bg-white border-r-0 border-black flex items-center gap-2 min-w-0 flex-1">
-                    {% translate 'person' %}
-                    <input type="text" name="sender_person-q" class="grow" {% if query_sender_person %}value="{{ query_sender_person }}"{% endif %}>
-                </label>
-                <input type="submit" class="btn flex-0 btn-outline border-black" value="{% translate 'search' %}"/>
-            </form>
-            {% if query_sender_person %}
-                <ul class="border border-black p-2 h-32 overflow-auto">
-                {% for person in found_sender_persons %}
-                    <li>
-                        <a href="{% url 'edwoca:letter_add_sender_person' object.id person.pk %}">{{ person.object }}</a>
-                    </li>
-                {% empty %}
-                    <li> {% translate 'no search results' %} </li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    {% endif %}
-    {% if object.sender_corporation %}
-        <div class="flex-1 min-w-0 ">
-            <div class="flex">
-                <label class="pseudo-input min-w-0 border-r-0 border border-black flex-1 flex items-center gap-2">
-                    <span class="flex-0">{% translate 'corporation' %}</span>
-                    <input type="text" class="grow cursor-not-allowed flex-1 min-w-0 truncate" disabled value="{{ object.sender_corporation }}" />
-                </label>
-                <a class="btn flex-0 btn-outline border-black" href="{% url 'edwoca:letter_remove_sender_corporation' object.id %}">{% translate 'remove' %}</a>
-            </div>
-        </div>
-    {% else %}
-        <div class="flex-1 min-w-0">
-            <form method="get" class="flex m-0">
-                <label class="input input-bordered bg-white border-r-0 border-black flex items-center gap-2 flex-1 min-w-0">
-                    {% translate 'corporation' %}
-                    <input type="text" name="sender_corporation-q" class="grow" {% if query_sender_corporation %}value="{{ query_sender_corporation }}"{% endif %}>
-                </label>
-                <input type="submit" class="btn flex-0 btn-outline border-black" value="{% translate 'search' %}"/>
-            </form>
-            {% if query_sender_corporation %}
-                <ul class="border border-black p-2 h-32 overflow-auto">
-                {% for person in found_sender_corporations %}
-                    <li>
-                        <a href="{% url 'edwoca:letter_add_sender_corporation' object.id person.pk %}">{{ person.object }}</a>
-                    </li>
-                {% empty %}
-                    <li>Keine Suchergebnisse</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    {% endif %}
+<div class="bg-base-100 p-5">
+    {{ form.diplomatic_date_as_daisy }}
+    {{ source_period_form.as_daisy }}
 </div>
 
-<h3>Empfänger</h3>
+<h2 class="my-5">
+    {% translate 'sender' %}
+</h2>
 
-<div class="flex gap-5 my-5">
-    {% if object.receiver_person %}
-        <div class="flex-1 min-w-0 flex">
-            <div class="flex">
-                <label class="pseudo-input cursor-not-allowed border-r-0 border border-black flex-1 min-w-0 flex items-center gap-2">
-                    <span class="flex-0"> {% translate 'person' %} </span>
-                    <input type="text" class="grow cursor-not-allowed flex-1 min-w-0 truncate" disabled value="{{ object.receiver_person }}" />
-                </label>
-                <a class="btn flex-0 btn-outline border-black" href="{% url 'edwoca:letter_remove_receiver_person' object.id %}">{% translate 'remove' %}</a>
-            </div>
-        </div>
-    {% else %}
-        <div class="flex-1 min-w-0">
-            <form method="get" class="flex m-0">
-                <label class="input input-bordered bg-white border-r-0 border-black flex items-center gap-2 flex-1 min-w-0">
-                    {% translate 'person' %}
-                    <input type="text" name="receiver_person-q" class="grow" {% if query_receiver_person %}value="{{ query_receiver_person }}"{% endif %}>
-                </label>
-                <input type="submit" class="btn flex-0 btn-outline border-black" value="{% translate 'search' %}"/>
-            </form>
-            {% if query_receiver_person %}
-                <ul class="border border-black p-2 h-32 overflow-auto">
-                {% for person in found_receiver_persons %}
-                    <li>
-                        <a href="{% url 'edwoca:letter_add_receiver_person' object.id person.pk %}">{{ person.object }}</a>
-                    </li>
-                {% empty %}
-                    <li> {% translate 'no search results' %} </li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    {% endif %}
-    {% if object.receiver_corporation %}
-        <div class="flex-1 min-w-0">
-            <div class="flex">
-                <label class="pseudo-input cursor-not-allowed border-r-0 border border-black flex-1 min-w-0 flex items-center gap-2">
-                    <span class="flex-0"> {% translate 'corporation' %} </span>
-                    <input type="text" class="grow cursor-not-allowed flex-1 min-w-0 truncate" disabled value="{{ object.receiver_corporation }}" />
-                </label>
-                <a class="btn flex-0 btn-outline border-black" href="{% url 'edwoca:letter_remove_receiver_corporation' object.id %}">{% translate 'remove' %}</a>
-            </div>
-        </div>
-    {% else %}
-        <div class="flex-1 min-w-0">
-            <form method="get" class="flex m-0">
-                <label class="input input-bordered bg-white border-r-0 border-black flex items-center gap-2 flex-1 min-w-0">
-                    {% translate 'corporation' %}
-                    <input type="text" name="receiver_corporation-q" class="grow" {% if query_receiver_corporation %}value="{{ query_receiver_corporation }}"{% endif %}>
-                </label>
-                <input type="submit" class="btn flex-0 btn-outline border-black" value="{% translate 'search' %}"/>
-            </form>
-            {% if query_receiver_corporation %}
-                <ul class="border border-black p-2 h-32 overflow-auto">
-                {% for person in found_receiver_corporations %}
-                    <li>
-                        <a href="{% url 'edwoca:letter_add_receiver_corporation' object.id person.pk %}">{{ person.object }}</a>
-                    </li>
-                {% empty %}
-                    <li>Keine Suchergebnisse</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    {% endif %}
+{% for sender_person_form in sender_person_forms %}
+    {% translate 'remove sender person' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_person_form target='person' contributor=sender_person_form.instance.person model_name='senderperson' role='sender' remove_button_label=remove_button_label %}
+{% endfor %}
+
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" type="submit" name="add-sender-person" form="form">
+            {% translate 'add sender person' %}
+        </button>
+    </div>
 </div>
 
-<h3>Orte</h3>
+{% for sender_corporation_form in sender_corporation_forms %}
+    {% translate 'remove sender corporation' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_corporation_form target='corporation' contributor=sender_corporation_form.instance.corporation model_name='sendercorporation' role='sender' remove_button_label=remove_button_label %}
+{% endfor %}
 
-<div class="flex gap-5 my-5">
-    {% if object.sender_place %}
-        <div class="flex-1 min-w-0">
-            <div class="flex">
-                <label class="pseudo-input cursor-not-allowed border-r-0 border border-black flex-1 min-w-0 flex items-center gap-2">
-                    <span class="flex-0"> {% translate 'place (sender)' %} </span>
-                    <input type="text" class="grow cursor-not-allowed flex-1 min-w-0 truncate" disabled value="{{ object.sender_place }}" />
-                </label>
-                <a class="btn flex-0 btn-outline border-black" href="{% url 'edwoca:letter_remove_sender_place' object.id %}">{% translate 'remove' %}</a>
-            </div>
-        </div>
-    {% else %}
-        <div class="flex-1 min-w-0">
-            <form method="get" class="flex m-0">
-                <label class="input input-bordered bg-white border-r-0 border-black flex items-center gap-2 flex-1 min-w-0">
-                    {% translate 'place (sender)' %}
-                    <input type="text" name="sender_place-q" class="grow" {% if query_sender_place %}value="{{ query_sender_place }}"{% endif %}>
-                </label>
-                <input type="submit" class="btn flex-0 btn-outline border-black" value="{% translate 'search' %}"/>
-            </form>
-            {% if query_sender_place %}
-                <ul class="border border-black p-2 h-32 overflow-auto">
-                {% for person in found_sender_places %}
-                    <li>
-                        <a href="{% url 'edwoca:letter_add_sender_place' object.id person.pk %}">{{ person.object }}</a>
-                    </li>
-                {% empty %}
-                    <li> {% translate 'no search results' %} </li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    {% endif %}
-    {% if object.receiver_place %}
-        <div class="flex-1 min-w-0">
-            <div class="flex">
-                <label class="pseudo-input cursor-not-allowed border-r-0 border border-black flex-1 min-w-0 flex items-center gap-2">
-                    <span class="flex-0"> {% translate 'place (receiver)' %} </span>
-                    <input type="text" class="grow cursor-not-allowed flex-1 min-w-0 truncate" disabled value="{{ object.receiver_place }}" />
-                </label>
-                <a class="btn flex-0 btn-outline border-black" href="{% url 'edwoca:letter_remove_receiver_place' object.id %}">{% translate 'remove' %}</a>
-            </div>
-        </div>
-    {% else %}
-        <div class="flex-1 min-w-0">
-            <form method="get" class="flex m-0">
-                <label class="input input-bordered bg-white border-r-0 border-black flex items-center gap-2 flex-1 min-w-0">
-                    {% translate 'place (receiver)' %}
-                    <input type="text" name="receiver_place-q" class="grow" {% if query_receiver_place %}value="{{ query_receiver_place }}"{% endif %}>
-                </label>
-                <input type="submit" class="btn flex-0 btn-outline border-black" value="{% translate 'search' %}"/>
-            </form>
-            {% if query_receiver_place %}
-                <ul class="border border-black p-2 h-32 overflow-auto">
-                {% for person in found_receiver_places %}
-                    <li>
-                        <a href="{% url 'edwoca:letter_add_receiver_place' object.id person.pk %}">{{ person.object }}</a>
-                    </li>
-                {% empty %}
-                    <li>Keine Suchergebnisse</li>
-                {% endfor %}
-                </ul>
-            {% endif %}
-        </div>
-    {% endif %}
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" type="submit" name="add-sender-corporation" form="form">
+            {% translate 'add sender corporation' %}
+        </button>
+    </div>
 </div>
 
-<h3>Editionen</h3>
+<h2 class="my-5">
+    {% translate 'receiver' %}
+</h2>
+
+{% for receiver_person_form in receiver_person_forms %}
+    {% translate 'remove receiver person' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_person_form target='person' contributor=receiver_person_form.instance.person model_name='receiverperson' role='receiver' remove_button_label=remove_button_label %}
+{% endfor %}
+
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" type="submit" name="add-receiver-person" form="form">
+            {% translate 'add receiver person' %}
+        </button>
+    </div>
+</div>
+
+{% for receiver_corporation_form in receiver_corporation_forms %}
+    {% translate 'remove receiver corporation' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_corporation_form target='corporation' contributor=receiver_corporation_form.instance.corporation model_name='receivercorporation' role='receiver' remove_button_label=remove_button_label %}
+{% endfor %}
+
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" type="submit" name="add-receiver-corporation" form="form">
+            {% translate 'add receiver corporation' %}
+        </button>
+    </div>
+</div>
+
+<h2>
+    {% translate 'places' %}
+</h2>
+
+{% for receiver_place_form in receiver_place_forms %}
+    {% translate 'remove receiver place' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=receiver_place_form target='place' contributor=receiver_place_form.instance.place model_name='receiverplace' role='receiver' remove_button_label=remove_button_label %}
+{% endfor %}
+
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" type="submit" name="add-receiver-place" form="form">
+            {% translate 'add receiver place' %}
+        </button>
+    </div>
+</div>
+
+{% for sender_place_form in sender_place_forms %}
+    {% translate 'remove sender place' as remove_button_label %}
+    {% include 'edwoca/partials/letter/contributor_form.html' with form=sender_place_form target='place' contributor=sender_place_form.instance.place model_name='senderplace' role='sender' remove_button_label=remove_button_label %}
+{% endfor %}
+
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" type="submit" name="add-sender-place" form="form">
+            {% translate 'add sender place' %}
+        </button>
+    </div>
+</div>
+
+<h2>
+    {% translate 'editions' %}
+</h2>
 
 <div class="my-5">
     {% for letter_mentioning_form in letter_mentioning_forms %}
-        <div class="flex gap-5 items-center mb-2">
-            <input type="text" value="{{ letter_mentioning_form.instance.bib.zot_short_title }} / {{ letter_mentioning_form.instance.bib }}" class="pseudo-input flex-1 border-black border w-full truncate" disabled />
-            <label class="bg-white input input-bordered flex-0 flex items-center border-black gap-2 w-48">
-                <span class="flex-0 min-w-0">
-                    {% translate 'pages' %}
-                </span>
-                {{ letter_mentioning_form.pages }}
-                {% if letter_mentioning_form.pages.errors %}
-                    <div class="label">
-                        <span class="label-text-alt text-primary">
-                            {{ letter_mentioning_form.pages.errors.0 }}
-                        </span>
-                    </div>
-                {% endif %}
+        <div class="border border-black p-5 my-5">
+            <label class="form-control">
+                <div class="label">
+                    <span class="label-text">
+                        {% translate 'edition' %}
+                    </span>
+                </div>
+                <div type="text"  class="pseudo-input flex items-center border-black border w-full truncate">
+                    {{ letter_mentioning_form.instance.bib.zot_short_title }}
+                </div>
             </label>
-            <a href="{% url 'edwoca:letter_remove_edition' object.id letter_mentioning_form.instance.bib.zot_key %}" class="btn btn-outline flex-0"> {% translate 'remove' %} </a>
+            {{ letter_mentioning_form.as_daisy }}
+            <div class="flex">
+                <div class="flex-1"></div>
+                <a href="{% url 'edwoca:letter_remove_edition' object.id letter_mentioning_form.instance.bib.zot_key %}" class="btn btn-outline btn-primary flex-0"> {% translate 'remove bib' %} </a>
+            </div>
         </div>
     {% endfor %}
 </div>
@@ -246,8 +145,7 @@
     <div class="items-center">
         <form method="get" class="flex">
             <label class="bg-white input input-bordered border-r-0 border-black flex items-center gap-2 flex-1">
-                Edition
-                <input type="text" name="edition-q" class="grow" {% if query_edition %}value="{{ query_edition }}"{% endif %}>
+                <input type="text" placeholder="{% translate 'search editions' %}" name="edition-q" class="grow" {% if query_edition %}value="{{ query_edition }}"{% endif %}>
             </label>
             <input type="submit" class="btn btn-outline flex-0" value="{% translate 'search' %}"/>
         </form>
@@ -259,9 +157,76 @@
                 <a href="{% url 'edwoca:letter_add_edition' object.id edition.pk %}">{{ edition.object }}</a>
             </li>
         {% empty %}
-            <li>Keine Suchergebnisse</li>
+            <li>
+                {% translate 'no search results' %}
+            </li>
         {% endfor %}
         </ul>
     {% endif %}
 </div>
+
+<h2 class="my-5">
+    {% translate 'letter proof' %}
+</h2>
+
+{% for letter_signature_form in letter_signature_forms %}
+    <div class="my-5 px-5 border border-black">
+        {{ letter_signature_form.as_daisy }}
+        <div class="flex">
+            <div class="flex-1"></div>
+            <div class="flex-0">
+                <button class="btn btn-outline btn-primary mb-5" form="form" name="remove-signature" value="{{ letter_signature_form.instance.id }}">
+                    {% translate 'remove letter signature' %}
+                </button>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" name="add-signature" form="form">
+            {% translate 'add letter signature' %}
+        </button>
+    </div>
+</div>
+
+{% for letter_digitized_copy_form in letter_digitized_copy_forms %}
+    <div class="gap-5 p-5 my-5 px-5 border border-black">
+        {{ letter_digitized_copy_form.as_daisy }}
+        <div class="flex">
+            <div class="flex-1"></div>
+            <div class="flex-0">
+                <button type="submit" class="btn btn-primary btn-outline w-full" name="remove-letter-digcopy" value="{{ letter_digitized_copy_form.instance.id }}" form="form">
+                    {% translate 'remove digital copy' %}
+                </button>
+            </div>
+        </div>
+    </div>
+{% endfor %}
+
+<div class="flex my-5">
+    <div class="flex-1"></div>
+    <div class="flex-0">
+        <button class="btn btn-outline" name="add-digcopy" form="form">
+            {% translate 'add letter digital copy' %}
+        </button>
+    </div>
+</div>
+
+<h2 class="my-5">
+    {% translate 'work relations' %}
+</h2>
+
+{{ form.work_mentionings_as_daisy }}
+
+<h2 class="my-5">
+    {% translate 'comment' %}
+</h2>
+
+{{ form.comment_as_daisy }}
+
+{{ form.editing_history_as_daisy }}
+
 {% endblock %}

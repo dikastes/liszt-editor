@@ -4,3 +4,4 @@ from .expression import *
 from .manifestation import *
 from .item import *
 from .composite import *
+from .letter import *
