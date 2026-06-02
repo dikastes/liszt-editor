@@ -112,6 +112,10 @@ class Letter(TrackedModel):
             'Work',
             related_name = 'letters'
         )
+    manifestation = models.ManyToManyField(
+            'Manifestation',
+            related_name = 'letters'
+        )
     expression = models.ManyToManyField(
             'Expression',
             related_name = 'letters'
