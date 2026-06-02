@@ -359,9 +359,9 @@ class BaseLetterContributorForm(ModelForm):
                     with tags.label(cls=SimpleFormMixin.toggle_label_classes):
                         tags.span(_(source_name_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
                         raw(str(source_name_assumed_field))
-                    with tags.label(cls=SimpleFormMixin.toggle_label_classes):
-                        tags.span(_(source_name_inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
-                        raw(str(source_name_inferred_field))
+                    #with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+                        #tags.span(_(source_name_inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                        #raw(str(source_name_inferred_field))
 
         return mark_safe(str(form))
 

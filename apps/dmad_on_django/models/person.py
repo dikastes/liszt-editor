@@ -57,6 +57,9 @@ class PersonName(models.Model):
     def __str__(self):
         return f'{self.last_name}, {self.first_name}'
 
+    def get_natural_name(self):
+        return f'{self.first_name} {self.last_name}'
+
 
 class Person(DisplayableModel):
     class Gender(models.TextChoices):
@@ -203,6 +206,11 @@ class Person(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
+        return _('without name')
+
+    def get_natural_name(self):
+        if self.names.count() > 0:
+            return self.names.get(status=Status.PRIMARY).get_natural_name()
         return _('without name')
 
     def get_table(self):
