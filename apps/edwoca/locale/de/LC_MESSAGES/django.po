@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-01 16:21+0200\n"
+"POT-Creation-Date: 2026-06-02 11:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -127,6 +127,7 @@ msgid "plate number"
 msgstr "Plattennummer"
 
 #: forms/manifestation.py:557 forms/manifestation.py:698
+#: templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:6
 msgid "source type"
 msgstr "Typ"
 
@@ -706,8 +707,8 @@ msgid "editions"
 msgstr "Editionen"
 
 #: templates/edwoca/letter_update.html:128
-msgid "edition"
-msgstr "Editionen"
+msgid "letter edition"
+msgstr "Titel"
 
 #: templates/edwoca/letter_update.html:138
 msgid "remove bib"
@@ -1419,6 +1420,10 @@ msgstr "keine Formatangaben"
 msgid "measure not specified"
 msgstr "keine Umfangangaben"
 
+#: templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:15
+msgid "no edition type"
+msgstr "keine Ausgabeform"
+
 #: templates/edwoca/partials/nav_switcher.html:22
 msgid "save"
 msgstr "speichern"
@@ -1596,6 +1601,9 @@ msgstr "Körperschaften durchsuchen"
 #: views/manifestation/title.py:198 views/manifestation/title.py:203
 msgid "search place"
 msgstr "Orte durchsuchen"
+
+#~ msgid "edition"
+#~ msgstr "Editionen"
 
 #~ msgid "pages"
 #~ msgstr "Seiten"
