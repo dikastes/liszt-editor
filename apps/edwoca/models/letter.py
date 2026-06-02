@@ -160,9 +160,9 @@ class Letter(TrackedModel):
         etal = ' ' + _('et al.')
         if self.sender_persons.count():
             if self.sender_corporations.count() or self.sender_persons.count() > 1:
-                sender = self.sender_persons.first().get_designator() + etal
+                sender = self.sender_persons.first().get_natural_name() + etal
             else:
-                sender = self.sender_persons.first().get_designator()
+                sender = self.sender_persons.first().get_natural_name()
         else:
             if self.sender_corporations.count():
                 if self.sender_corporations.count() > 1:
@@ -174,9 +174,9 @@ class Letter(TrackedModel):
 
         if self.receiver_persons.count():
             if self.receiver_corporations.count() or self.receiver_persons.count() > 1:
-                receiver = self.receiver_persons.first().get_designator() + etal
+                receiver = self.receiver_persons.first().get_natural_name() + etal
             else:
-                receiver = self.receiver_persons.first().get_designator()
+                receiver = self.receiver_persons.first().get_natural_name()
         else:
             if self.receiver_corporations.count():
                 if self.receiver_corporations.count() > 1:
