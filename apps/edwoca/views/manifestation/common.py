@@ -193,12 +193,11 @@ def manifestation_create(request, publisher_pk=None):
     publisher = get_object_or_404(Corporation, pk=publisher_pk) if publisher_pk else None
 
     if request.method == 'POST':
-        '''if not publisher:
-            # handle error, maybe redirect to search page
-            return redirect('edwoca:manifestation_create')
-        '''
+
         data = request.POST.copy()
-        data['publisher'] = publisher
+        if publisher:
+            data['publisher'] = publisher.pk
+
         form = ManifestationCreateForm(data)
         if form.is_valid():
             manifestation = EdwocaManifestation.objects.create(
@@ -206,24 +205,26 @@ def manifestation_create(request, publisher_pk=None):
                     plate_number = form.cleaned_data.get('plate_number'),
                     working_title = form.cleaned_data['temporary_title']
                     )
-            Publication.objects.create(
-                    publisher = form.cleaned_data.get('publisher'),
-                    manifestation = manifestation
-                )
+
+            chosen_publisher = form.cleaned_data.get('publisher')
+            if chosen_publisher:
+                Publication.objects.create(
+                        publisher = chosen_publisher,
+                        manifestation = manifestation
+                    )
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
     else:
         if publisher:
             form = ManifestationCreateForm(initial = {'publisher': publisher})
-            context = {
-                    'form': form,
-                    'referrer': 'manifestation_create'
-                }
+
         else:
             form = ManifestationCreateForm()
-            context = {
-                    'referrer': 'manifestation_create'
-                }
+
+        context = {
+            'form': form,
+            'referrer': 'manifestation_create'
+        }
 
 
     if not publisher:
