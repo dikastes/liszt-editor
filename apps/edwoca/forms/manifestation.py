@@ -704,9 +704,6 @@ class SingletonCreateForm(forms.ModelForm):
         self.is_collection = kwargs.pop('is_collection', False)
         super().__init__(*args, **kwargs)
 
-        sig_field = self.fields['signature']
-        sig_field.label = f'{sig_field.label}*'
-
     def as_daisy(self):
         root = div(cls="flex flex-col gap-5")
         source_title_field = self['source_title']

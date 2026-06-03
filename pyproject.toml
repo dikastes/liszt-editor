@@ -44,3 +44,10 @@ dependencies = [
     "urllib3==2.5.0",
     "whoosh==2.7.4",
 ]
+
+[dependency-groups]
+dev = [
+    "django-extensions>=4.1",
+    "pydotplus>=2.0.2",
+    "pyparsing>=3.2.3",
+]

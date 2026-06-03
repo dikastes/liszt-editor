@@ -193,10 +193,10 @@ def manifestation_create(request, publisher_pk=None):
     publisher = get_object_or_404(Corporation, pk=publisher_pk) if publisher_pk else None
 
     if request.method == 'POST':
-        if not publisher:
+        '''if not publisher:
             # handle error, maybe redirect to search page
             return redirect('edwoca:manifestation_create')
-
+        '''
         data = request.POST.copy()
         data['publisher'] = publisher
         form = ManifestationCreateForm(data)
