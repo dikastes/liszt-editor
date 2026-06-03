@@ -111,7 +111,7 @@ def item_update(request, pk):
 
         return redirect('edwoca:item_update', pk = pk)
     else:
-        item_form = ItemForm(request.POST, instance=item)
+        item_form = ItemForm(instance=item)
 
         signature_forms = []
 
@@ -357,7 +357,7 @@ def item_digital_copy(request, pk):
             forms.append(ItemDigitizedCopyForm(instance=digital_copy, prefix=prefix))
         context['forms'] = forms
 
-    return render(request, 'edwoca/item_digcopy.html', context)
+    return render(request, 'edwoca/manifestation_digital_copy.html', context)
 
 
 def item_digital_copy_add(request, item_id):

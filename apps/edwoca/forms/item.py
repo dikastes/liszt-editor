@@ -21,7 +21,8 @@ class ItemForm(ModelForm):
         fields = ['rism_id']
         widgets = {
                 'rism_id': TextInput( attrs = {
-                        'class': 'grow'
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
                     })
             }
 
@@ -29,10 +30,12 @@ class ItemForm(ModelForm):
         form = div(cls='mb-10')
 
         rism_id_field = self['rism_id']
-        rism_id_field_label = label(rism_id_field.label, cls='input input-bordered flex flex-1 items-center gap-2 my-5')
-        rism_id_field_label.add(raw(str(rism_id_field)))
 
-        form.add(rism_id_field_label)
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(rism_id_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(rism_id_field))
 
         return mark_safe(str(form))
 

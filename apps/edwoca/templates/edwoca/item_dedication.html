@@ -1,6 +1,7 @@
 {% extends 'edwoca/base.html' %}
 
 {% block modals %}
+{# probably the view should use a generic template for item and manifestation manuscript characteristics #}
     {% for person_dedication_form in person_dedication_forms %}
         <div class="modal" role="dialog" id="person-dedication-modal-{{ person_dedication_form.instance.id }}">
             <div class="modal-box w-11/12 max-w-5xl">
