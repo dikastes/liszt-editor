@@ -7,6 +7,11 @@ class BibIndex(indexes.SearchIndex, indexes.Indexable):
             document=True,
             use_template=True
         )
+    short_title_normalized = indexes.CharField(
+            model_attr = 'get_short_title_normalized',
+            indexed = True,
+            stored = True
+        )
 
     def get_model(self):
         return ZotItem

@@ -66,30 +66,67 @@ class ItemBibliographyUpdateView(EntityMixin, UpdateView):
 
 def item_update(request, pk):
     item = get_object_or_404(EdwocaItem, pk=pk)
-    item_form = ItemForm(request.POST or None, instance=item)
-
-    if request.POST and 'add_signature' in request.POST:
-        data = request.POST.copy()
-        total_forms = int(data.get('signatures-TOTAL_FORMS', 0))
-        data['signatures-TOTAL_FORMS'] = str(total_forms + 1)
-        signature_formset = SignatureFormSet(data, instance=item)
-    else:
-        signature_formset = SignatureFormSet(request.POST or None, instance=item)
-
-    if request.method == 'POST' and 'add_signature' not in request.POST:
-        if item_form.is_valid():
-            item_form.save()
-        if signature_formset.is_valid():
-            signature_formset.save()
-            return redirect('edwoca:item_update', pk=pk)
 
     context = {
-        'object': item,
-        'signature_formset': signature_formset,
-        'entity_type': 'item',
-        'item_form': item_form
-    }
-    return render(request, 'edwoca/item_update.html', context)
+            'object': item,
+            'entity_type': 'item'
+        }
+
+    if request.method == 'POST':
+        item_form = ItemForm(request.POST, instance=item)
+
+        signature_forms = []
+        for signature in item.signatures.all():
+            signature_form = SignatureForm(
+                    request.POST,
+                    instance = signature,
+                    prefix = f"signature-{signature.id}"
+                )
+            signature_forms.append(signature_form)
+
+        all_forms = signature_forms + [ item_form ]
+        if all(f.is_valid() for f in all_forms):
+            for f in all_forms:
+                f.save()
+        else:
+            context.update({
+                    'form': item_form,
+                    'signature_forms': signature_forms
+                })
+            return render(request, 'edwoca/item_update.html', context)
+
+        if 'add-signature' in request.POST:
+            status = ItemSignature.Status.CURRENT
+            if item.signatures.count():
+                status = ItemSignature.Status.FORMER
+            signature = ItemSignature.objects.create(
+                    item = item,
+                    status = status
+                )
+
+        if 'remove-signature' in request.POST:
+            signature_pk = request.POST.get('remove-signature')
+            item_signature = get_object_or_404(ItemSignature, pk=request.POST.get('remove-signature'))
+            item_signature.delete()
+
+        return redirect('edwoca:item_update', pk = pk)
+    else:
+        item_form = ItemForm(request.POST, instance=item)
+
+        signature_forms = []
+
+        for signature in item.signatures.all():
+            signature_form = SignatureForm(
+                    instance = signature,
+                    prefix = f"signature-{signature.id}"
+                )
+            signature_forms.append(signature_form)
+
+        context.update({
+                'form': item_form,
+                'signature_forms': signature_forms
+            })
+        return render(request, 'edwoca/item_update.html', context)
 
 
 @require_POST

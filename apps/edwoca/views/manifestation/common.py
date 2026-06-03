@@ -7,6 +7,7 @@ from ...forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenance
 from ...forms.modification import ItemModificationForm, ModificationHandwritingForm
 from ...forms.publication import PublicationForm
 from ...forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
+from ...forms.base import BibSearchForm
 from ...models import Manifestation as EdwocaManifestation, Letter, Expression, Work, ItemModification, ModificationHandwriting
 from ..base import *
 from ...models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
@@ -676,7 +677,7 @@ class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
             manifestation_bib_forms.append(manifestation_bib_form)
         context['manifestation_bib_forms'] = manifestation_bib_forms
 
-        zotitem_search_form = SearchForm(self.request.GET or None, prefix='zotitem')
+        zotitem_search_form = BibSearchForm(self.request.GET or None, prefix='zotitem')
         context['zotitem_searchform'] = zotitem_search_form
         context['show_zotitem_search_form'] = True
 
