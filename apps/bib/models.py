@@ -2,6 +2,7 @@
 import ast
 from django.db import models
 from django.conf import settings
+import re
 
 from pyzotero import zotero
 
@@ -143,3 +144,6 @@ class ZotItem(models.Model):
             return f"{creator['firstName']} {creator['lastName']}"
         except KeyError:
             return f"{creator.get('name', '')}"
+
+    def get_short_title_normalized(self):
+        return re.sub(r'[^A-Za-z0-9]', '', self.zot_short_title or '').lower()

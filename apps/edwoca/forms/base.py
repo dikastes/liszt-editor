@@ -1,5 +1,7 @@
 import dominate.tags as tags
-from liszt_util.forms import GenericAsDaisyMixin
+import re
+from haystack.query import SQ
+from liszt_util.forms import GenericAsDaisyMixin, FramedSearchForm
 from liszt_util.forms.layouts import Layouts
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
@@ -563,3 +565,23 @@ class BaseTrackedModelForm:
                     raw(str(needs_review_field))
 
         return editing_history_div
+
+
+class BibSearchForm(FramedSearchForm):
+    def search(self):
+        if not self.is_valid():
+            return self.no_query_found()
+
+        query = self.cleaned_data.get('q')
+
+        if not query:
+            return self.searchqueryset
+
+        query_norm = re.sub(r'[^A-Za-z0-9]', '', query).lower()
+
+        sqs = self.searchqueryset.filter(
+                SQ(content = query) |
+                SQ(short_title_normalized = query_norm)
+            )
+
+        return sqs
