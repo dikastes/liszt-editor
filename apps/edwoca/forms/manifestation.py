@@ -211,7 +211,7 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
         }
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes }))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
@@ -465,7 +465,7 @@ class ManifestationClassificationForm(ModelForm):
                         raw(str(completeness_field))
                 with div(cls='flex-1'):
                 # right palette with toggles
-                    h1(_('edition type') + '*', cls='text-lg mb-5')
+                    h1(_('edition type'), cls='text-lg mb-5')
                     if not instance.is_text:
                         with label(cls=SimpleFormMixin.toggle_inverted_classes):
                             raw(str(choir_score_field))
@@ -557,7 +557,7 @@ class ManifestationCreateForm(forms.Form):
     source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
     publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label=_('publisher'), empty_label=_('choose publisher'), widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
 
     def __init__(self, *args, **kwargs):
@@ -766,7 +766,7 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
         }
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow', 'form': 'form'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',

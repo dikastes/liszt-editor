@@ -113,7 +113,7 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     }
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
@@ -171,7 +171,7 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     }
     not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
     not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
