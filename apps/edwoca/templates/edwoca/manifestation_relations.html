@@ -28,11 +28,8 @@
 
 {% if object.part_of %}
     <p>
-        {% if object.part_label == 'c' %}
-            {% translate 'this object is part of (constituting)' %}
-        {% endif %}
-        {% if object.part_label == 'b' %}
-            {% translate 'this object is part of (bound together)' %}
+        {% if object.part_label == 'j' %}
+            {% translate 'this object is part of' %}
         {% endif %}
         {% if object.part_label == 's' %}
             {% translate 'this object is part of (separated)' %}
@@ -111,15 +108,9 @@
                             {% if found_collection.object.is_collection %}
                                 <form method="post" class="flex-0">
                                     {% csrf_token %}
-                                    <input type="hidden" name="collection-link-type" value="constituting" />
+                                    <input type="hidden" name="collection-link-type" value="joined" />
                                     <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
-                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (constituting) of' %}" />
-                                </form>
-                                <form method="post" class="flex-0">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="collection-link-type" value="bound_together" />
-                                    <input type="hidden" name="collection-link" value="{{ found_collection.object.id }}" />
-                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part (bound together) of' %}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is part of' %}" />
                                 </form>
                                 <form method="post" class="flex-0">
                                     {% csrf_token %}
@@ -179,17 +170,12 @@
         <div class="flex-1"></div>
         <details class="dropdown dropdown-end my-5 flex-0">
             <summary class="btn btn-outline">
-                {% translate 'create' %}
+                {% translate 'create new' %}
             </summary>
             <ul class="menu dropdown-content bg-white shadow">
                 <li>
-                    <a href="{% url 'edwoca:singleton_part_create' object.id 'constituting' %}">
-                        {% translate 'create manuscript part (constituting)' %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'edwoca:singleton_part_create' object.id 'bound_together' %}">
-                        {% translate 'create manuscript part (bound together)' %}
+                    <a href="{% url 'edwoca:singleton_part_create' object.id 'joined' %}">
+                        {% translate 'create manuscript part' %}
                     </a>
                 </li>
                 <li>
@@ -209,7 +195,7 @@
 
 {% if object.part_of %}
     <h3 class="my-5">
-        {% translate 'collection' %}
+        {% translate 'components' %}
     </h3>
 
     {% comment %} hier eigenes feld part_components? {% endcomment %}

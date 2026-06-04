@@ -276,11 +276,11 @@ msgstr "Umschlagstitel oder Titelseite"
 
 #: models/manifestation.py:29 models/manifestation.py:77
 msgid "complete"
-msgstr "vollständig"
+msgstr "vollständig erhalten"
 
 #: models/manifestation.py:30 models/manifestation.py:78
 msgid "incomplete"
-msgstr "unvollständig"
+msgstr "unvollständig erhalten"
 
 #: models/manifestation.py:33
 msgid "joined"
