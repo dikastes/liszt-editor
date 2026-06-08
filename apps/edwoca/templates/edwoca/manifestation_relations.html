@@ -99,6 +99,18 @@
                 {{ collection_search_form.q }}
                 <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />
             </div>
+            <div class="label">
+                <span class="label-text-alt">
+                    {% translate 'short hand search without spaces and special characters is possible, e. g.' %}
+                    <em>
+                        GSA 60 D 2
+                    </em>
+                    &rarr;
+                    <em>
+                        gsa60d2
+                    </em>
+                </span>
+            </div>
         </label>
     </form>
     {% if found_collections %}
@@ -315,15 +327,29 @@
     {% endfor %}
 
     <form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get" class="w-full">
-        <div class="label">
-            <span class="label-text">
-                {% translate 'manuscripts' %}
-            </span>
-        </div>
-        <div class="flex">
-            {{ manuscript_search_form.q }}
-            <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />
-        </div>
+        <label class="form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'manuscripts' %}
+                </span>
+            </div>
+            <div class="flex">
+                {{ manuscript_search_form.q }}
+                <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />
+            </div>
+            <div class="label">
+                <span class="label-text-alt">
+                    {% translate 'short hand search without spaces and special characters is possible, e. g.' %}
+                    <em>
+                        GSA 60 D 2
+                    </em>
+                    &rarr;
+                    <em>
+                        gsa60d2
+                    </em>
+                </span>
+            </div>
+        </label>
     </form>
 
     {% if manuscript_query %}
@@ -410,15 +436,29 @@
     {% endfor %}
 
     <form action="{% url 'edwoca:manifestation_relations' object.id %}" method="get" class="w-full">
-        <div class="label">
-            <span class="label-text">
-                {% translate 'prints' %}
-            </span>
-        </div>
-        <div class="flex">
-            {{ print_search_form.q }}
-            <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />
-        </div>
+        <label class="form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'prints' %}
+                </span>
+            </div>
+            <div class="flex">
+                {{ print_search_form.q }}
+                <input type="submit" value="{% translate 'search' %}" class="btn btn-outline border-l-0" />
+            </div>
+            <div class="label">
+                <span class="label-text-alt">
+                    {% translate 'short hand search without spaces and special characters is possible, e. g.' %}
+                    <em>
+                        GSA 60 D 2
+                    </em>
+                    &rarr;
+                    <em>
+                        gsa60d2
+                    </em>
+                </span>
+            </div>
+        </label>
     </form>
 
     {% if print_query %}

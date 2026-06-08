@@ -10,6 +10,8 @@ from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInpu
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from django.utils.html import format_html
+from django.utils.functional import lazy
 from dmad_on_django.models import Period, Corporation
 from dmad_on_django.models.base import DocumentationStatusMixin
 from dmrism.models.item import Item, Library
@@ -444,6 +446,8 @@ class ManifestationClassificationForm(ModelForm):
         score_field = self['score']
         text_field = self['is_text']
 
+        tool_tip = _("Selecting 'Text' disables musical attributes and vice versa.")
+
         instance = self.instance
 
         with form:
@@ -465,7 +469,9 @@ class ManifestationClassificationForm(ModelForm):
                         raw(str(completeness_field))
                 with div(cls='flex-1'):
                 # right palette with toggles
-                    h1(_('edition type') + '*', cls='text-lg mb-5')
+                    h1(_('edition type') + '*', cls='text-lg')
+                    with div(cls='mb-2'):
+                        span(tool_tip, cls='text-xs')
                     if not instance.is_text:
                         with label(cls=SimpleFormMixin.toggle_inverted_classes):
                             raw(str(choir_score_field))
@@ -487,7 +493,7 @@ class ManifestationClassificationForm(ModelForm):
                             raw(str(text_field))
                             span(text_field.label, cls=SimpleFormMixin.label_text_classes)
 
-                    h1(_('function'), cls='text-lg my-5')
+                    h1(_('function'), cls='text-lg mt-5 mb-2')
                     with label(cls=SimpleFormMixin.toggle_inverted_classes):
                         raw(str(album_page_field))
                         span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
