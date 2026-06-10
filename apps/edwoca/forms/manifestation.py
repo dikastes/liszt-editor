@@ -558,7 +558,23 @@ class ManifestationCreateForm(forms.Form):
     not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
-    publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label=_('publisher'), empty_label=_('choose publisher'), widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+
+    publisher = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required = False,
+    )
+
+    publisher_search = forms.CharField(
+        label=_('publisher'),
+        required=False,
+        widget=TextInput(attrs={
+            'class': 'input input-bordered w-full',
+            'placeholder': _('search publisher'),
+            'hx-get': '/edwoca/manifestations/publisher-search',
+            'hx-trigger': 'keyup changed delay:300ms',
+            'hx-target': '#publisher-results'
+        })
+    )
 
     def __init__(self, *args, **kwargs):
         self.is_collection = kwargs.pop('is_collection', False)
@@ -600,16 +616,21 @@ class ManifestationCreateForm(forms.Form):
                 temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
             form.add(temporary_title_container)
 
-        # Publisher
-        publisher_field = self['publisher']
+        publisher_wrapper = div(cls='w-full relative')
+        publisher_wrapper.add(raw(str(self['publisher'])))
+
         publisher_container = label(cls='form-control w-full')
         publisher_label = div(cls='label')
-        publisher_label.add(span(publisher_field.label, cls='label-text'))
+        publisher_label.add(span(self['publisher_search'].label, cls='label-text'))
         publisher_container.add(publisher_label)
-        publisher_container.add(raw(str(publisher_field)))
-        if publisher_field.errors:
-            publisher_container.add(div(span(publisher_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(publisher_container)
+        publisher_container.add(raw(str(self['publisher_search'])))
+        if self['publisher'].errors:
+            publisher_container.add(div(span(self['publisher'].errors, cls='text-primary text-sm'), cls='label'))
+
+        publisher_wrapper.add(publisher_container)
+        publisher_wrapper.add(
+            div(id='publisher-results', cls='absolute z-50 w-full top-[85px] bg-base-100 rounded-box shadow-lg'))
+        form.add(publisher_wrapper)
 
         # Plate Number
         plate_number_field = self['plate_number']
@@ -716,9 +737,6 @@ class SingletonCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.is_collection = kwargs.pop('is_collection', False)
         super().__init__(*args, **kwargs)
-
-        sig_field = self.fields['signature']
-        sig_field.label = f'{sig_field.label}*'
 
     def as_daisy(self):
         root = div(cls="flex flex-col gap-5")

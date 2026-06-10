@@ -1,6 +1,8 @@
 import re
 
-from haystack.query import SQ
+from haystack.query import SearchQuerySet
+
+from dmad_on_django.models import Corporation
 from ...forms.manifestation import *
 from calendar import monthrange
 from ...forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm, ItemTextTypeForm
@@ -11,9 +13,9 @@ from ...models import Manifestation as EdwocaManifestation, Letter, Expression, 
 from ..base import *
 from ...models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from bib.models import ZotItem
-from django.db.models import Q
+from django.db.models import Q, Model
 from django.forms import inlineformset_factory
-from django.http import Http404
+from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
@@ -193,12 +195,11 @@ def manifestation_create(request, publisher_pk=None):
     publisher = get_object_or_404(Corporation, pk=publisher_pk) if publisher_pk else None
 
     if request.method == 'POST':
-        if not publisher:
-            # handle error, maybe redirect to search page
-            return redirect('edwoca:manifestation_create')
 
         data = request.POST.copy()
-        data['publisher'] = publisher
+        if publisher:
+            data['publisher'] = publisher.pk
+
         form = ManifestationCreateForm(data)
         if form.is_valid():
             manifestation = EdwocaManifestation.objects.create(
@@ -206,36 +207,33 @@ def manifestation_create(request, publisher_pk=None):
                     plate_number = form.cleaned_data.get('plate_number'),
                     working_title = form.cleaned_data['temporary_title']
                     )
-            Publication.objects.create(
-                    publisher = form.cleaned_data.get('publisher'),
-                    manifestation = manifestation
-                )
+
+            chosen_publisher = form.cleaned_data.get('publisher')
+            if chosen_publisher:
+                chosen_publisher = Corporation.objects.get(pk=chosen_publisher)
+                Publication.objects.create(
+                        publisher = chosen_publisher,
+                        manifestation = manifestation
+                    )
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
     else:
-        if publisher:
-            form = ManifestationCreateForm(initial = {'publisher': publisher})
-            context = {
-                    'form': form,
-                    'referrer': 'manifestation_create'
-                }
-        else:
-            form = ManifestationCreateForm()
-            context = {
-                    'referrer': 'manifestation_create'
-                }
 
+        context = {
+            'form': ManifestationCreateForm(),
+            'referrer': 'manifestation_create'
+        }
 
-    if not publisher:
-        if request.GET.get('q'):
-            search_form = SearchForm(request.GET)
-            context['search_form'] = search_form
-            context['publisher_list'] = search_form.search().models(Corporation)
-        else:
-            context['search_form'] = SearchForm()
+        return render(request, 'edwoca/create_manifestation.html', context)
 
-    return render(request, 'edwoca/create_manifestation.html', context)
+def publisher_search_view(request):
+    search_text = request.GET.get('publisher_search', '')
 
+    if len(search_text) < 2:
+        return HttpResponse('')
+
+    publisher = SearchQuerySet().models(Corporation).filter(content=search_text)
+    return render(request, 'edwoca/partials/manifestation/publisher_results.html', {'publisher_list': publisher})
 
 def manifestation_update(request, pk):
     manifestation = Manifestation.objects.get(id=pk)
