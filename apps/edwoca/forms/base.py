@@ -375,8 +375,8 @@ class DateFormMixin:
                 tags._input(type='submit', cls='btn btn-outline flex-1', form='form', value=_('calculate'), name=calculate_name)
                 tags._input(type='submit', cls='btn btn-outline btn-primary flex-1', form='form' ,value=_('clear'), name=clear_name)
             # fourth row: not before
-            with tags.div(cls='flex flex-col lg:flex-row gap-5 mb-5'):
-                with tags.label(cls='form-control flex-0 date-container'):
+            with tags.div(cls='flex flex-col lg:flex-row lg:gap-5 mb-5'):
+                with tags.label(cls='form-control flex-none date-container'):
                     with tags.div(cls=SimpleFormMixin.label_classes):
                         tags.span(not_before_field.label, cls=SimpleFormMixin.label_text_classes)
                     with tags.div(cls='flex'):
@@ -386,13 +386,13 @@ class DateFormMixin:
                             with span(cls='text-primary text-sm'):
                                 not_before_field.errors
                 tags.div(cls='flex-1')
-                with tags.label(cls=SimpleFormMixin.form_control_classes + ' flex-1'):
+                with tags.label(cls=SimpleFormMixin.form_control_classes + ' flex-none'):
                     with tags.div(cls=SimpleFormMixin.label_classes + ''):
                         tags.label(start_qualifier_field.label, cls=SimpleFormMixin.label_text_classes)
                     raw(str(start_qualifier_field))
             # fifth row: not after
-            with tags.div(cls='flex flex-col lg:flex-row gap-5 mb-5'):
-                with tags.label(cls='form-control flex-0 date-container'):
+            with tags.div(cls='flex flex-col lg:flex-row lg:gap-5 mb-5'):
+                with tags.label(cls='form-control flex-none date-container'):
                     with tags.div(cls=SimpleFormMixin.label_classes):
                         tags.span(not_after_field.label, cls=SimpleFormMixin.label_text_classes)
                     with tags.div(cls='flex'):
@@ -402,14 +402,14 @@ class DateFormMixin:
                             with span(cls='text-primary text-sm'):
                                 not_after_field.errors
                 tags.div(cls='flex-1')
-                with tags.label(cls=SimpleFormMixin.form_control_classes + ' flex-1'):
+                with tags.label(cls=SimpleFormMixin.form_control_classes + ' flex-none'):
                     with tags.div(cls=SimpleFormMixin.label_classes):
                         tags.label(end_qualifier_field.label, cls=SimpleFormMixin.label_text_classes)
                     raw(str(end_qualifier_field))
             # third row: controls
             with tags.div(cls='flex flexcol lg:flex-row gap-5'):
                 tags.div(cls='flex-1')
-                with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0'):
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-none'):
                     tags.span(_(assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
                     raw(str(assumed_field))
                 tags.div(cls='flex-1')
