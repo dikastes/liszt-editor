@@ -404,29 +404,39 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             return ', '.join(truthy_types)
         return False
 
-    def render_title(self, prefix):
+    def render_title_body(self):
         if self.is_collection:
-            collection = _('coll')
-            title = self.source_title or _('empty')
-            return self.mark_needs_review(f'({collection}) {prefix} {title}')
+            return self.source_title or _('empty')
+        return self.working_title or _('empty')
 
-        title = self.working_title or _('empty')
-        source_typed_title = f'{prefix} {title} ({self.get_source_type_display()})'
+    def render_title(self, prefix):
+        return ' '.join([
+                self.render_title_prefix(),
+                self.render_title_body(),
+                self.render_title_suffix()
+            ])
 
-        if self.part_of:
-            part = _('pt')
-            return self.mark_needs_review(f'({part}) {source_typed_title}')
-        if self.component_of:
-            component = _('cmp')
-            return self.mark_needs_review(f'({component}) {source_typed_title}')
-
-        return self.mark_needs_review(source_typed_title)
+    def render_title_suffix(self):
+        return f'({self.get_source_type_display()})'
 
     def standardized_search_entry(self):
         if self.items.count():
             prefix = self.items.first().get_current_signature()
             return self.render_title(prefix)
         return '<Fehler: keine Items>'
+
+    def render_title_prefix(self):
+        signature = self.get_current_signature()
+        if self.is_collection:
+            collection = _('coll')
+            return self.mark_needs_review(f'({collection}) {signature}')
+        if self.part_of:
+            part = _('pt')
+            return self.mark_needs_review(f'({part}) {signature}')
+        if self.component_of:
+            component = _('cmp')
+            return self.mark_needs_review(f'({component}) {signature}')
+        return self.mark_needs_review(signature)
 
     def __str__(self):
         return self.standardized_search_entry()

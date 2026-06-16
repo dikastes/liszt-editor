@@ -28,6 +28,18 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         proxy = True
 
     @property
+    def title_prefix(self):
+        return self.render_title_prefix()
+
+    @property
+    def title_body(self):
+        return self.render_title_body()
+
+    @property
+    def title_suffix(self):
+        return self.render_title_suffix()
+
+    @property
     def collection_parts(self):
         return Manifestation.objects.filter(part_of = self)
 
@@ -882,7 +894,7 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     def __str__(self):
         manifestation = self.manifestation
         if (title := self.manifestation.working_title):
-            return super().__str__() + title
+            return f'{super().__str__()} {title}'
         return super().__str__()
 
 

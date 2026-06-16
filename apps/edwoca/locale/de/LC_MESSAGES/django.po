@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-08 11:53+0200\n"
+"POT-Creation-Date: 2026-06-12 16:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,59 +17,71 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
+#: forms/base.py:262 forms/manifestation.py:216
+msgid "time mode"
+msgstr "Art der Datierung"
+
+#: forms/base.py:267 forms/manifestation.py:221
+msgid "not before mode"
+msgstr "Typ"
+
+#: forms/base.py:273 forms/manifestation.py:227
+msgid "not after mode"
+msgstr "Typ"
+
+#: forms/base.py:279 forms/manifestation.py:233
+msgid "start"
+msgstr "Start"
+
+#: forms/base.py:284 forms/manifestation.py:238
+msgid "end"
+msgstr "Ende"
+
+#: forms/base.py:290 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:121 forms/item.py:179
-#: forms/letter.py:68 forms/manifestation.py:218 forms/manifestation.py:777
-#: forms/manifestation.py:908 forms/modification.py:26
+#: forms/letter.py:68 forms/manifestation.py:248 forms/manifestation.py:807
+#: forms/manifestation.py:938 forms/modification.py:26
 msgid "based on source"
 msgstr "nach Vorlage"
 
-#: forms/base.py:264 forms/dedication.py:28 forms/dedication.py:106
+#: forms/base.py:290 forms/dedication.py:28 forms/dedication.py:106
 #: forms/dedication.py:139 forms/item.py:121 forms/item.py:179
 #: forms/letter.py:31 forms/letter.py:68 forms/letter.py:241
-#: forms/manifestation.py:218 forms/manifestation.py:777
-#: forms/manifestation.py:908 forms/modification.py:26
+#: forms/manifestation.py:248 forms/manifestation.py:807
+#: forms/manifestation.py:938 forms/modification.py:26
 #: templates/edwoca/manifestation_print.html:142
 msgid "inferred"
 msgstr "ermittelt"
 
-#: forms/base.py:337
+#: forms/base.py:375
 msgid "calculate"
-msgstr "berechnen"
-
-#: forms/base.py:341
-msgid "not before"
-msgstr "nicht vor"
-
-#: forms/base.py:349
-msgid "not after"
-msgstr "nicht nach"
+msgstr "Datierung berechnen"
 
 #: forms/base.py:376
 msgid "clear"
-msgstr "leeren"
+msgstr "Datierung leeren"
 
-#: forms/base.py:471
+#: forms/base.py:523
 msgid "open"
 msgstr "öffnen"
 
-#: forms/base.py:504 forms/letter.py:115 forms/manifestation.py:157
+#: forms/base.py:556 forms/letter.py:115 forms/manifestation.py:157
 msgid "first save"
 msgstr "Datum"
 
-#: forms/base.py:510 forms/letter.py:121 forms/manifestation.py:163
+#: forms/base.py:562 forms/letter.py:121 forms/manifestation.py:163
 msgid "last save"
 msgstr "letzte Bearbeitung"
 
-#: forms/base.py:534
+#: forms/base.py:586
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
-#: forms/base.py:535
+#: forms/base.py:587
 msgid "initial recording"
 msgstr "Ersterfassung"
 
-#: forms/base.py:547
+#: forms/base.py:599
 msgid "further recording"
 msgstr "Weitere Bearbeitung"
 
@@ -106,58 +118,64 @@ msgstr "unsicher"
 msgid "attributed"
 msgstr "zugeschrieben"
 
-#: forms/manifestation.py:449
-msgid "Selecting 'Text' disables musical attributes and vice versa."
-msgstr "Die Auswahl von 'Text' verhindert die Auswahl musikalischer Attribute und umgekehrt."
+#: forms/manifestation.py:243
+msgid "display"
+msgstr "Datierung (standardisiert)"
 
-#: forms/manifestation.py:472
+#: forms/manifestation.py:479
+msgid "Selecting 'Text' disables musical attributes and vice versa."
+msgstr ""
+"Die Auswahl von 'Text' verhindert die Auswahl musikalischer Attribute und "
+"umgekehrt."
+
+#: forms/manifestation.py:502
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: forms/manifestation.py:496
+#: forms/manifestation.py:526
 msgid "function"
 msgstr "Funktion"
 
-#: forms/manifestation.py:560
+#: forms/manifestation.py:590
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
-#: forms/manifestation.py:561 forms/manifestation.py:698
+#: forms/manifestation.py:591 forms/manifestation.py:728
 msgid "source title"
 msgstr "Quellentitel"
 
-#: forms/manifestation.py:562
+#: forms/manifestation.py:592
 msgid "plate number"
 msgstr "Plattennummer"
 
-#: forms/manifestation.py:563 forms/manifestation.py:704
+#: forms/manifestation.py:593 forms/manifestation.py:734
 #: templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:6
 msgid "source type"
 msgstr "Typ"
 
-#: forms/manifestation.py:567 templates/edwoca/create_manifestation.html:16
+#: forms/manifestation.py:597 templates/edwoca/create_manifestation.html:16
 #: templates/edwoca/manifestation_print.html:18
 #: templates/edwoca/manifestation_print.html:28
 msgid "publisher"
 msgstr "Verlag"
 
-#: forms/manifestation.py:567
+#: forms/manifestation.py:597
 msgid "choose publisher"
 msgstr "Verlag auswählen"
 
-#: forms/manifestation.py:692
+#: forms/manifestation.py:722
 msgid "working title"
 msgstr "Arbeitstitel"
 
-#: forms/manifestation.py:711
+#: forms/manifestation.py:741
 msgid "holding institution"
 msgstr "Bestandeshaltende Institution"
 
-#: forms/manifestation.py:712
+#: forms/manifestation.py:742
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: forms/manifestation.py:716
+#: forms/manifestation.py:746
 msgid "Signature"
 msgstr "Signatur"
 
@@ -234,7 +252,6 @@ msgstr "Kommentar zur Datierung"
 
 #: models/expression.py:35
 #: templates/edwoca/partials/expression/expression_menu.html:58
-#: templates/edwoca/partials/item/item_menu.html:44
 #: templates/edwoca/partials/work/work_menu.html:37
 msgid "history"
 msgstr ""
@@ -617,6 +634,18 @@ msgstr "Bitte bestätigen Sie, dass Sie %(object)s löschen möchten."
 msgid "confirm"
 msgstr "bestätigen"
 
+#: templates/edwoca/item_manuscript.html:17
+#: templates/edwoca/manifestation_manuscript.html:16
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:69
+#: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:5
+msgid "manuscript characteristics"
+msgstr "Manuskriptspezifika"
+
+#: templates/edwoca/item_manuscript.html:29
+#: templates/edwoca/manifestation_manuscript.html:39
+msgid "modifications"
+msgstr "Modifikationen"
+
 #: templates/edwoca/item_relations.html:10 templatetags/entity_labels.py:16
 msgid "manifestation"
 msgstr "Druck"
@@ -890,12 +919,6 @@ msgstr "Ort"
 msgid "search places"
 msgstr "Orte durchsuchen"
 
-#: templates/edwoca/manifestation_manuscript.html:16
-#: templates/edwoca/partials/manifestation/manifestation_menu.html:69
-#: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:5
-msgid "manuscript characteristics"
-msgstr "Manuskriptspezifika"
-
 #: templates/edwoca/manifestation_manuscript.html:23
 msgid "writers / hands"
 msgstr "Schreiber"
@@ -903,10 +926,6 @@ msgstr "Schreiber"
 #: templates/edwoca/manifestation_manuscript.html:31
 msgid "create writer"
 msgstr "Schreiber hinzufügen"
-
-#: templates/edwoca/manifestation_manuscript.html:39
-msgid "modifications"
-msgstr "Modifikationen"
 
 #: templates/edwoca/manifestation_manuscript.html:45
 msgid "no modifications"
@@ -1379,6 +1398,11 @@ msgstr "Exemplarspezifika"
 msgid "dedication"
 msgstr "Widmung"
 
+#: templates/edwoca/partials/item/item_menu.html:44
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:51
+msgid "date and place"
+msgstr "Datierung und Ort"
+
 #: templates/edwoca/partials/item/item_menu.html:51
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:76
 msgid "provenance"
@@ -1417,10 +1441,6 @@ msgstr "bewegen"
 #: views/manifestation/common.py:827
 msgid "source category"
 msgstr "Quellenart"
-
-#: templates/edwoca/partials/manifestation/manifestation_menu.html:51
-msgid "date and place"
-msgstr "Datierung und Ort"
 
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:108
 msgid "copy"
@@ -1583,7 +1603,7 @@ msgstr "Uraufführung"
 msgid "singleton"
 msgstr "Handschrift"
 
-#: views/manifestation/common.py:291 views/manifestation/update.py:64
+#: views/manifestation/common.py:291 views/manifestation/update.py:65
 msgid "search expressions"
 msgstr "Fassungen durchsuchen"
 
@@ -1710,9 +1730,6 @@ msgstr "Orte durchsuchen"
 
 #~ msgid "mid"
 #~ msgstr "Mitte"
-
-#~ msgid "end"
-#~ msgstr "Ende"
 
 #~ msgid "second half"
 #~ msgstr "Zweite Hälfte"

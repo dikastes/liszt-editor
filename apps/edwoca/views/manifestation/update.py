@@ -1,3 +1,4 @@
+from ...models.base import Manifestation as EdwocaManifestation
 from ...models.base import *
 from ...forms.manifestation import *
 from ...forms.item import *
@@ -6,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def manifestation_update(request, pk):
-    manifestation = Manifestation.objects.get(id=pk)
+    manifestation = EdwocaManifestation.objects.get(id=pk)
     context = {
         'object': manifestation,
         'entity_type': 'manifestation'

@@ -1,4 +1,6 @@
 {% extends 'edwoca/base.html' %}
+
+{% load i18n %}
 {% load edwoca_extras %}
 
 {% block modals %}
@@ -11,18 +13,21 @@
 
 {# probably the view should use a generic template for item and manifestation manuscript characteristics #}
 <div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0"> Manuskriptspezifika </h2>
+    <h2 class="card-title mt-0">
+        {% translate 'manuscript characteristics' %}
+    </h2>
 
-    <form method="post">
+    <form method="post" class="hidden">
         {% csrf_token %}
-        {{ form.as_daisy }}
-        {{ text_type_form.as_daisy }}
-
-        <input type="submit" name="save_changes" value="Speichern" class="btn btn-primary mt-3">
+        <input type="submit" id="submit-form">
     </form>
 
+    {{ form.as_daisy }}
+
     <div class="mt-5">
-        <h3 class="text-lg font-bold mb-5 prose">Modifikationen</h3>
+        <h3 class="text-lg font-bold mb-5 prose">
+            {% translate 'modifications' %}
+        </h3>
         {% for modification in modifications %}
             <div class="border border-base-300 p-5 mb-5 rounded-lg">
                 <div class="prose">

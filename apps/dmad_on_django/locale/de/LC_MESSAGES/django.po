@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-29 15:21+0200\n"
+"POT-Creation-Date: 2026-06-12 16:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,19 +30,19 @@ msgstr "alternativ"
 msgid "Temporary"
 msgstr "temporär"
 
-#: models/base.py:40
+#: models/base.py:39
 msgid "inferred"
 msgstr "ermittelt"
 
-#: models/base.py:44
+#: models/base.py:43
 msgid "assumed"
 msgstr "unsicher"
 
-#: models/base.py:154
+#: models/base.py:153
 msgid "<< error >>"
 msgstr "<< Fehler >>"
 
-#: models/base.py:157
+#: models/base.py:156
 msgid "(stub)"
 msgstr "(RD)"
 
@@ -50,48 +50,80 @@ msgstr "(RD)"
 msgid "search corporations"
 msgstr "Körperschaftend durchsuchen"
 
-#: models/corporation.py:143 models/person.py:206 models/place.py:121
-#: models/subjectterm.py:121 models/work.py:142
+#: models/corporation.py:143 models/person.py:209 models/person.py:214
+#: models/place.py:121 models/subjectterm.py:121 models/work.py:142
 msgid "without name"
 msgstr "ohne Name"
 
-#: models/period.py:16
+#: models/period.py:14
+msgid "span"
+msgstr "Zeitraum"
+
+#: models/period.py:15
+msgid "point"
+msgstr "Zeitpunkt"
+
+#: models/period.py:17
 msgid "not before"
 msgstr "nicht vor"
 
-#: models/period.py:21
+#: models/period.py:18 models/period.py:21
+msgid "exact"
+msgstr "exakt"
+
+#: models/period.py:20
 msgid "not after"
-msgstr "nicht nach"
+msgstr "nicht vor"
 
 #: models/period.py:26
+msgid "start"
+msgstr "Start"
+
+#: models/period.py:31 models/period_calculation.py:360
+msgid "end"
+msgstr "Ende"
+
+#: models/period.py:36
 msgid "standardized date"
 msgstr "Datierung (standardisiert)"
 
-#: models/period.py:81 models/period.py:82
+#: models/period.py:42
+msgid "time mode"
+msgstr "Art der Datierung"
+
+#: models/period.py:48
+msgid "not before mode"
+msgstr "Typ"
+
+#: models/period.py:56
+msgid "not after mode"
+msgstr "Typ"
+
+#: models/period.py:106 models/period.py:107
 msgid "and"
 msgstr "und"
 
-#: models/period.py:86
+#: models/period.py:111
 msgid "before"
 msgstr "vor"
 
-#: models/period.py:87
+#: models/period.py:112
 msgid "after"
 msgstr "nach"
 
-#: models/period.py:105
+#: models/period.py:130
 msgid "ies"
 msgstr "er"
 
-#: models/period.py:106
+#: models/period.py:131
 msgid "century"
 msgstr "Jahrhundert"
 
-#: models/period.py:124
+#: models/period.py:149
 msgid "without date"
 msgstr "o. D."
 
-#: models/period.py:124
+#: models/period.py:149
 msgid "without year"
 msgstr "o. J."
 
@@ -151,10 +183,6 @@ msgstr "Anfang"
 msgid "mid"
 msgstr "Mitte"
 
-#: models/period_calculation.py:360
-msgid "end"
-msgstr "Ende"
-
 #: models/period_calculation.py:361
 msgid "first half"
 msgstr "Erste Hälfte"
@@ -179,7 +207,7 @@ msgstr "Herbst"
 msgid "winter"
 msgstr "Winter"
 
-#: models/person.py:96
+#: models/person.py:99
 msgid "search persons"
 msgstr "Personen durchsuchen"
 
