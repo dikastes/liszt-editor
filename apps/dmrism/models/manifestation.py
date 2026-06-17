@@ -133,7 +133,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             choices = PrintType,
             default = None,
             null = True,
-            verbose_name = _('edition')
+            verbose_name = _('print type')
         )
     edition = models.CharField(
             max_length = 10,

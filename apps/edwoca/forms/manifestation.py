@@ -266,8 +266,6 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
             'display',
             'inferred',
             'assumed',
-            #'place_inferred',
-            #'place_assumed'
         ]
         widgets = {
                 'history': Textarea( attrs = {
@@ -280,15 +278,7 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
                 'private_history_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
-                    }),
-                #'place_inferred': CheckboxInput( attrs = {
-                        #'class': SimpleFormMixin.toggle_classes,
-                        #'form': 'form'
-                    #}),
-                #'place_assumed': CheckboxInput( attrs = {
-                        #'class': SimpleFormMixin.toggle_classes,
-                        #'form': 'form'
-                    #})
+                    })
             }
 
     def as_daisy(self):
@@ -798,20 +788,47 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
             'attrs': {
                 'class': SimpleFormMixin.select_classes,
                 'form': 'form'
-            },
+            }
         }
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow', 'form': 'form'}))
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = { 'class': SimpleFormMixin.radio_classes, 'form': 'form'}
                 ),
             required = False
         )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    period_instance = None
 
     class Meta:
         model = Manifestation

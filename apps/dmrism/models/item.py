@@ -120,6 +120,18 @@ class Item(Sortable, WemiBaseClass):
             return self.manifestation.__str__()
         return self.get_current_signature()
 
+    @property
+    def title_suffix(self):
+        return self.manifestation.title_suffix
+
+    @property
+    def title_body(self):
+        return self.manifestation.title_body
+
+    @property
+    def title_prefix(self):
+        return self.get_current_signature()
+
     def get_siblings(self):
         return self.manifestation.items.exclude(id = self.id)
 
@@ -331,8 +343,8 @@ class BaseProvenanceStation(models.Model):
     class PeriodStatus(models.TextChoices):
         ACQUISITION = 'acq', _('acquisition')
         DISPOSITION = 'dis', _('disposition')
-        OWNERSHIP_PERIOD = 'per', _('ownership period')
-        OWNERSHIP_DATE = 'dat', _('ownership date')
+        OWNERSHIP = 'own', _('ownership')
+
 
 class PersonProvenanceStation(models.Model):
     item = models.ForeignKey(
@@ -359,7 +371,7 @@ class PersonProvenanceStation(models.Model):
     period_status = models.CharField(
             max_length = 3,
             choices = BaseProvenanceStation.PeriodStatus,
-            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP_PERIOD,
+            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP,
             verbose_name = _('period status')
         )
 
@@ -401,7 +413,7 @@ class CorporationProvenanceStation(models.Model):
     period_status = models.CharField(
             max_length = 3,
             choices = BaseProvenanceStation.PeriodStatus,
-            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP_PERIOD,
+            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP,
             verbose_name = _('period status')
         )
 

@@ -3,7 +3,7 @@ from dominate.util import raw
 from .base import SimpleFormMixin, DateFormMixin
 from django import forms
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField, TypedChoiceField, RadioSelect
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField, TypedChoiceField, RadioSelect, ChoiceField, DateField
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from liszt_util.forms import SelectDateWidget
@@ -95,13 +95,42 @@ class ManifestationPersonDedicationForm(DateFormMixin, ManifestationBaseDedicati
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'form': 'form',
-                'class': 'select select-bordered'
+                'class': SimpleFormMixin.select_classes
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': SimpleFormMixin.text_input_classes}))
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes })
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
@@ -111,7 +140,6 @@ class ManifestationPersonDedicationForm(DateFormMixin, ManifestationBaseDedicati
             required = False
         )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
-
 
     class Meta:
         model = ManifestationPersonDedication
