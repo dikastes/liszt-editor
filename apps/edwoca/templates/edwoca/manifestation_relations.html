@@ -28,11 +28,8 @@
 
 {% if object.part_of %}
     <p>
-        {% if object.part_label == 'c' %}
-            {% translate 'this object is part of (constituting)' %}
-        {% endif %}
-        {% if object.part_label == 'b' %}
-            {% translate 'this object is part of (bound together)' %}
+        {% if object.part_label == 'j' %}
+            {% translate 'this object is part of' %}
         {% endif %}
         {% if object.part_label == 's' %}
             {% translate 'this object is part of (separated)' %}
@@ -191,27 +188,22 @@
         <div class="flex-1"></div>
         <details class="dropdown dropdown-end my-5 flex-0">
             <summary class="btn btn-outline">
-                {% translate 'create' %}
+                {% translate 'create new' %}
             </summary>
             <ul class="menu dropdown-content bg-white shadow">
                 <li>
-                    <a href="{% url 'edwoca:singleton_part_create' object.id 'constituting' %}">
-                        {% translate 'create manuscript part (constituting)' %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'edwoca:singleton_part_create' object.id 'bound_together' %}">
-                        {% translate 'create manuscript part (bound together)' %}
+                    <a href="{% url 'edwoca:singleton_part_create' object.id 'joined' %}">
+                        {% translate 'manuscript part' %}
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'edwoca:singleton_part_create' object.id 'separated' %}">
-                        {% translate 'create manuscript part (separated)' %}
+                        {% translate 'manuscript part (separated)' %}
                     </a>
                 </li>
                 <li>
                     <a href="{% url 'edwoca:singleton_component_create' object.id %}">
-                        {% translate 'create manuscript component' %}
+                        {% translate 'manuscript component' %}
                     </a>
                 </li>
             </ul>
