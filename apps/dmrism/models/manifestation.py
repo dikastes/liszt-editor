@@ -405,9 +405,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return False
 
     def render_title_body(self):
-        if self.is_collection:
-            return self.source_title or _('empty')
-        return self.working_title or _('empty')
+        return self.working_title or self.source_title or str(_('empty'))
 
     def render_title(self, prefix):
         return ' '.join([
