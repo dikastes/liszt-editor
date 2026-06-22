@@ -31,25 +31,27 @@
         <div class="collapse-content mt-5">
             {{ title_form.as_daisy }}
 
-            <div class="mt-5">
-                <h3>
-                    {% translate 'writers/hands' %}
-                </h3>
-                {% for handwriting_form in title_form.handwriting_forms %}
-                    <div class="border border-black p-5 my-5">
-                        {% include 'edwoca/partials/forms/handwriting_form.html' with model='manifestationtitlehandwriting' app='dmrism' form=handwriting_form %}
+            {% if object.is_singleton %}
+                <div class="mt-5">
+                    <h3>
+                        {% translate 'writers/hands' %}
+                    </h3>
+                    {% for handwriting_form in title_form.handwriting_forms %}
+                        <div class="border border-black p-5 my-5">
+                            {% include 'edwoca/partials/forms/handwriting_form.html' with model='manifestationtitlehandwriting' app='dmrism' form=handwriting_form %}
+                        </div>
+                    {% endfor %}
+
+                    <div class="flex">
+                        <div class="flex-1"></div>
+                        <button class="btn btn-outline my-5" name="add-manifestation-title-handwriting" form="form" value="{{ title_form.instance.id }}">
+                            {% translate 'create handwriting' %}
+                        </button>
                     </div>
-                {% endfor %}
-
-                <div class="flex">
-                    <div class="flex-1"></div>
-                    <button class="btn btn-outline my-5" name="add-manifestation-title-handwriting" form="form" value="{{ title_form.instance.id }}">
-                        {% translate 'create handwriting' %}
-                    </button>
                 </div>
-            </div>
+            {% endif %}
 
-            <div class="flex">
+            <div class="flex mt-5">
                 <div class="flex-1"></div>
                 <button class="btn btn-primary btn-outline" name="remove-title" type="submit" form="form" value="{{ title_form.instance.id }}">
                     {% translate 'remove title' %}
