@@ -25,10 +25,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     class Meta:
         ordering = ['-needs_review', 'order_index']
 
-    class Completeness(models.TextChoices):
-        COMPLETE = 'c', _('complete')
-        INCOMPLETE = 'i', _('incomplete')
-
     class PartLabel(models.TextChoices):
         JOINED = 'j', _('joined')
         SEPARATED = 's', _('separated')
@@ -248,11 +244,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             on_delete = models.SET_NULL,
             null = True,
         )
-    completeness = models.TextField(
-            max_length = 1,
-            choices = Completeness,
-            default = Completeness.COMPLETE,
-            verbose_name = _('completeness')
+    is_incomplete = models.BooleanField(
+            default = False,
+            verbose_name = 'is incomplete'
         )
     specific_figure = models.BooleanField(
             default = False,

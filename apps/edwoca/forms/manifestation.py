@@ -341,7 +341,7 @@ class ManifestationClassificationForm(ModelForm):
         model = Manifestation
         fields = [
                 'manifestation_form',
-                'completeness',
+                'is_incomplete',
                 'source_type',
                 'album_page',
                 'performance_material',
@@ -360,8 +360,8 @@ class ManifestationClassificationForm(ModelForm):
                 'is_text'
             ]
         widgets = {
-                'completeness': Select( attrs = {
-                        'class': SimpleFormMixin.select_classes,
+                'is_incomplete': CheckboxInput( attrs = {
+                        'class': 'toggle'
                     }),
                 'manifestation_form': Select( attrs = {
                         'class': SimpleFormMixin.select_classes,
@@ -433,15 +433,12 @@ class ManifestationClassificationForm(ModelForm):
                     (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
                 ]
 
-        #st_field = self.fields['source_type']
-        #st_field.label = f'{st_field.label}*'
-
     def as_daisy(self):
         form = div(cls='mb-10')
 
         source_type_field = self['source_type']
         manifestation_form_field = self['manifestation_form']
-        completeness_field = self['completeness']
+        completeness_field = self['is_incomplete']
 
         # common source functions
         album_page_field = self['album_page']
@@ -483,10 +480,9 @@ class ManifestationClassificationForm(ModelForm):
                         with div(cls=SimpleFormMixin.label_classes):
                             span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
                         raw(str(manifestation_form_field))
-                    with label(cls=SimpleFormMixin.form_control_classes):
-                        with div(cls=SimpleFormMixin.label_classes):
-                            span(completeness_field.label, cls=SimpleFormMixin.label_text_classes)
+                    with label(cls=SimpleFormMixin.toggle_inverted_classes):
                         raw(str(completeness_field))
+                        span(completeness_field.label, cls=SimpleFormMixin.label_text_classes)
                 with div(cls='flex-1'):
                 # right palette with toggles
                     h1(_('edition type') + '*', cls='text-lg')
