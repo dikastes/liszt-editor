@@ -1448,7 +1448,7 @@ msgstr "Vorlageexemplar"
 
 #: templates/edwoca/partials/manifestation/item_list.html:66
 msgid "move"
-msgstr "bewegen"
+msgstr "verschieben"
 
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:29
 #: views/manifestation/common.py:827
