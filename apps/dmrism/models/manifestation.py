@@ -401,7 +401,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     def render_title_body(self):
         return self.working_title or self.source_title or str(_('empty'))
 
-    def render_title(self, prefix):
+    def render_title(self):
         return ' '.join([
                 self.render_title_prefix(),
                 self.render_title_body(),
@@ -412,10 +412,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return f'({self.get_source_type_display()})'
 
     def standardized_search_entry(self):
-        if self.items.count():
-            prefix = self.items.first().get_current_signature()
-            return self.render_title(prefix)
-        return '<Fehler: keine Items>'
+        return self.render_title()
 
     def render_title_prefix(self):
         signature = self.get_current_signature()

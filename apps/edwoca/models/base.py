@@ -872,9 +872,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         return self.standardized_search_entry()
 
 
-
-
-
 class ManifestationTitle(DmRismManifestationTitle):
     class Meta:
         proxy = True

@@ -474,3 +474,9 @@
         {% endif %}
     {% endif %}
 </ul>
+
+{% if not object.items.count %}
+    <span class="text-xs xl:text-sm text-primary">
+        {% translate 'no items' %}
+    </span>
+{% endif %}
