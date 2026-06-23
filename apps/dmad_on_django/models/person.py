@@ -57,6 +57,9 @@ class PersonName(models.Model):
     def __str__(self):
         return f'{self.last_name}, {self.first_name}'
 
+    def get_natural_name(self):
+        return f'{self.first_name} {self.last_name}'
+
 
 class Person(DisplayableModel):
     class Gender(models.TextChoices):
@@ -203,7 +206,12 @@ class Person(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _('without name')
+
+    def get_natural_name(self):
+        if self.names.count() > 0:
+            return self.names.get(status=Status.PRIMARY).get_natural_name()
+        return _('without name')
 
     def get_table(self):
             rows = [
@@ -237,11 +245,6 @@ class Person(DisplayableModel):
 
     def str_with_link(self):
         return get_model_link(self)
-
-    def __str__(self):
-        if self.gnd_id:
-            return f'{self.get_default_name()} ({self.gnd_id})'
-        return self.interim_designator
 
     @staticmethod
     def map_gender(gnd_gender):

@@ -26,20 +26,15 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         ordering = ['-needs_review', 'order_index']
 
     class PartLabel(models.TextChoices):
-        CONSTITUTING = 'c', _('constituting')
-        BOUND_TOGETHER = 'b', _('bound together')
+        JOINED = 'j', _('joined')
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        EXCERPTS = 'EX', _('Excerpts')
         SKETCHES = 'SK', _('Sketches'),
-        FRAGMENTS = 'FR', _('Fragments'),
 
         def parse(string):
             match string.lower():
                 case 'sketch' | 'sketches': return Manifestation.ManifestationForm.SKETCHES
-                case 'fragment' | 'fragments': return Manifestation.ManifestationForm.FRAGMENTS
-                case 'excerpt' | 'excerpts': return Manifestation.ManifestationForm.EXCERPTS
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
@@ -134,7 +129,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             choices = PrintType,
             default = None,
             null = True,
-            verbose_name = _('edition')
+            verbose_name = _('print type')
         )
     edition = models.CharField(
             max_length = 10,
@@ -248,6 +243,10 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             related_name = 'stitched_manifestations',
             on_delete = models.SET_NULL,
             null = True,
+        )
+    is_incomplete = models.BooleanField(
+            default = False,
+            verbose_name = 'is incomplete'
         )
     specific_figure = models.BooleanField(
             default = False,
@@ -365,29 +364,68 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 self.working_title = self.source_title
             self.is_collection = False
 
-    def render_title(self, prefix):
-        if self.is_collection:
-            collection = _('coll')
-            title = self.source_title or _('empty')
-            return self.mark_needs_review(f'({collection}) {prefix} {title}')
+    def get_edition_type(self):
+        potential_edition_types = [
+                'choir_score',
+                'piano_reduction',
+                'particell',
+                'score',
+                'part'
+            ]
 
-        title = self.working_title or _('empty')
-        source_typed_title = f'{prefix} {title} ({self.get_source_type_display()})'
+        return self._render_types(potential_edition_types)
 
-        if self.part_of:
-            part = _('pt')
-            return self.mark_needs_review(f'({part}) {source_typed_title}')
-        if self.component_of:
-            component = _('cmp')
-            return self.mark_needs_review(f'({component}) {source_typed_title}')
+    def get_source_type(self):
+        potential_edition_types = [
+                'album_page',
+                'performance_material',
+                'authorized_edition',
+                'first_edition',
+                'proof',
+                'part',
+                'further_edition',
+                'correction_sheet',
+                'stitch_template',
+                'dedication_item'
+            ]
 
-        return self.mark_needs_review(source_typed_title)
+        return self._render_types(potential_edition_types)
+
+    def _render_types(self, types):
+        truthy_types = [ str(getattr(Manifestation, t).field.verbose_name) for t in types if getattr(self, t) ]
+
+        if truthy_types:
+            return ', '.join(truthy_types)
+        return False
+
+    def render_title_body(self):
+        return self.working_title or self.source_title or str(_('empty'))
+
+    def render_title(self):
+        return ' '.join([
+                self.render_title_prefix(),
+                self.render_title_body(),
+                self.render_title_suffix()
+            ])
+
+    def render_title_suffix(self):
+        return f'({self.get_source_type_display()})'
 
     def standardized_search_entry(self):
-        if self.items.count():
-            prefix = self.items.first().get_current_signature()
-            return self.render_title(prefix)
-        return '<Fehler: keine Items>'
+        return self.render_title()
+
+    def render_title_prefix(self):
+        signature = self.get_current_signature()
+        if self.is_collection:
+            collection = _('coll')
+            return self.mark_needs_review(f'({collection}) {signature}')
+        if self.part_of:
+            part = _('pt')
+            return self.mark_needs_review(f'({part}) {signature}')
+        if self.component_of:
+            component = _('cmp')
+            return self.mark_needs_review(f'({component}) {signature}')
+        return self.mark_needs_review(signature)
 
     def __str__(self):
         return self.standardized_search_entry()

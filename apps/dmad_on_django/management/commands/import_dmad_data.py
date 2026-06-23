@@ -9,6 +9,10 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('file_name', nargs=1, type=str)
 
+    def polish_interim_designator(designator):
+        # splits designator by comma, turns parts and rejoins by space
+        return ' '.join(part.strip() for part in designator.split(',')[::-1])
+
     def handle(self, *args, **options):
         TYPE = 'edwoca'
         INTERIM_DESIGNATOR = 'Name (RD)'
@@ -33,7 +37,7 @@ class Command(BaseCommand):
                     model = MODEL_MAP[row[MODEL]]
 
                     if row[TYPE] == STUB:
-                        interim_designator = row[INTERIM_DESIGNATOR]
+                        interim_designator = Command.polish_interim_designator(row[INTERIM_DESIGNATOR])
                         print(f'{str(i+1)} von {total}: Rumpfdatensatz {interim_designator}')
 
                         if not model.objects.filter(interim_designator = interim_designator).first():

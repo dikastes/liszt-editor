@@ -28,6 +28,18 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         proxy = True
 
     @property
+    def title_prefix(self):
+        return self.render_title_prefix()
+
+    @property
+    def title_body(self):
+        return self.render_title_body()
+
+    @property
+    def title_suffix(self):
+        return self.render_title_suffix()
+
+    @property
     def collection_parts(self):
         return Manifestation.objects.filter(part_of = self)
 
@@ -817,12 +829,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     url = raw_data[DIGITAL_COPY_KEY]
                 )
 
-    def render_title(self, prefix):
+    def render_title_prefix(self):
         if self.is_singleton:
-            return super().render_title(prefix)
-
-        #if self.missing_item:
-            #return f"{catalog_number} unbekannt {numerus_currens}"
+            return super().render_title_prefix()
 
         publisher_addition = self.period
         if self.plate_number:
@@ -832,9 +841,26 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.publications.first() and self.publications.first().publisher:
             publisher_string = self.publications.first().publisher.get_designator()
 
-        prefix = f"{publisher_string} {publisher_addition}"
+        return f"{publisher_string} {publisher_addition}"
 
-        return super().render_title(prefix)
+    #def render_title(self, prefix):
+        #if self.is_singleton:
+            #return super().render_title(prefix)
+
+        #if self.missing_item:
+            #return f"{catalog_number} unbekannt {numerus_currens}"
+
+        #publisher_addition = self.period
+        #if self.plate_number:
+            #publisher_addition = self.plate_number
+
+        #publisher_string = _('<< publisher >>')
+        #if self.publications.first() and self.publications.first().publisher:
+            #publisher_string = self.publications.first().publisher.get_designator()
+
+        #prefix = f"{publisher_string} {publisher_addition}"
+
+        #return super().render_title(prefix)
 
     def __str__(self):
         if self.get_current_signature_normalized():
@@ -844,9 +870,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     return f'{self.pk} {self.standardized_search_entry()}'
 
         return self.standardized_search_entry()
-
-
-
 
 
 class ManifestationTitle(DmRismManifestationTitle):
@@ -882,7 +905,7 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     def __str__(self):
         manifestation = self.manifestation
         if (title := self.manifestation.working_title):
-            return super().__str__() + title
+            return f'{super().__str__()} {title}'
         return super().__str__()
 
 

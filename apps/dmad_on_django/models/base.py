@@ -34,7 +34,6 @@ class DocumentationStatusMixin(models.Model):
     class Meta:
         abstract = True
 
-
     inferred = models.BooleanField(
             default=False,
             verbose_name = _("inferred")
@@ -146,6 +145,16 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
 
     def get_search_placeholder():
         raise NotImplementedError("Please override get_search_placeholder")
+
+    def __str__(self):
+        if self.gnd_id:
+            if self.get_default_name():
+                return f'{self.get_default_name()} ({self.gnd_id})'
+            error = _('<< error >>')
+            return f'{error} ({self.gnd_id})'
+
+        stub = _('(stub)')
+        return f'{self.interim_designator} {stub}'
 
     class Meta:
         abstract = True

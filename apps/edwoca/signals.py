@@ -6,16 +6,17 @@ def close_gap_on_delete(sender, instance, **kwargs):
     if not issubclass(sender, Sortable):
         return
 
-    group_field_name = instance._group_field_name
+    group_field_names = instance._group_field_names
 
-    try:
-        group_object = getattr(instance, group_field_name)
-    except AttributeError:
-        return
-    
-    group_filter = {group_field_name: group_object}
+    for group_field_name in group_field_names:
+        try:
+            group_object = getattr(instance, group_field_name)
+        except AttributeError:
+            continue
 
-    sender.objects.filter(
-        **group_filter,
-        order_index__gt=instance.order_index
-    ).update(order_index=F('order_index') - 1)
+        group_filter = {group_field_name: group_object}
+
+        sender.objects.filter(
+            **group_filter,
+            order_index__gt=instance.order_index
+        ).update(order_index=F('order_index') - 1)

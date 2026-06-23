@@ -1,4 +1,4 @@
-<div class="content-center text-primary min-h-inherit p-2 xl:p-5 rounded-none border-none text-lg xl:text-2xl font-bold h-full">
+<div class="content-center text-primary min-h-inherit p-2 lg:p-5 rounded-none border-none text-lg lg:text-2xl font-bold h-full">
 {% if entity_type == 'expression' %}
     E-{{ object.id }}
 {% elif entity_type == 'work' %}
@@ -9,5 +9,7 @@
     M-{{ object.id }}
 {% elif entity_type == 'item' %}
     I-{{ object.id }}
+{% elif entity_type == 'letter' %}
+    L-{{ object.id }}
 {% endif %}
 </div>

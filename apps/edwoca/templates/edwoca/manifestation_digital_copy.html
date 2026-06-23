@@ -19,25 +19,14 @@
 </form>
 
 {% for form in forms %}
-    <div class="flex gap-5 border border-black p-5 my-5">
-        <div class="flex-1">
-            {{ form.as_daisy }}
-        </div>
-        <div class="flex-0 flex flex-col">
+    <div class="border border-black p-5 my-5">
+        {{ form.as_daisy }}
+        <div class="flex">
             <div class="flex-1"></div>
             <div class="flex-0">
-                <a class="btn btn-outline w-full " href="{{ form.instance.url }}" target="_blank">
-                    {% translate 'open' %}
-                </a>
-                <label class="flex-0 m-0">
-                    <div class="label">
-                        <span class="label-text">
-                            &nbsp;
-                        </span>
-                    </div>
-                    <button name="remove-digital-copy" value="{{form.instance.id}}" type="submit" form="form" class="btn-outline btn-primary btn flex-0">
-                        {% translate 'remove' %}
-                    </button>
+                <button name="remove-digital-copy" value="{{form.instance.id}}" type="submit" form="form" class="btn-outline btn-primary btn flex-0">
+                    {% translate 'remove digital copy' %}
+                </button>
                 </label>
             </div>
         </div>

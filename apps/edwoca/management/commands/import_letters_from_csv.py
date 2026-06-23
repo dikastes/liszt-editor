@@ -161,30 +161,33 @@ class Command(BaseCommand):
                 for receiver_place in receiver_places:
                     self.create_contributor(receiver_place, letter, ReceiverPlace, 'place')
 
-                for mentioning in row['Sigle / Kurztitel'].split(' / '):
-                    proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
+                #for mentioning in row['Sigle / Kurztitel'].split(' / '):
+                proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
+                proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
+                if not proof:
+                    print(f"{proof_title} not found")
+                    continue
+                LetterMentioning.objects.create(
+                        bib = proof,
+                        location = proof_page[0].replace('S.', '').strip() if len(proof_page) else '',
+                        letter = letter
+                    )
+
+                #for mentioning in row['Weitere Editionen'].split(' / '):
+                if row['Weitere Editionen']:
+                    proof_title, *proof_page = row['Weitere Editionen'].split(', ')
                     proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
                     if not proof:
                         print(f"{proof_title} not found")
                         continue
                     LetterMentioning.objects.create(
                             bib = proof,
-                            pages = proof_page[0] if len(proof_page) else '',
+                            location = proof_page[0] if len(proof_page) else '',
                             letter = letter
                         )
 
-                for mentioning in row['Weitere Editionen'].split(' / '):
-                    if mentioning:
-                        proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
-                        proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
-                        if not proof:
-                            print(f"{proof_title} not found")
-                            continue
-                        LetterMentioning.objects.create(
-                                bib = proof,
-                                pages = proof_page[0] if len(proof_page) else '',
-                                letter = letter
-                            )
+    def turn_name(name):
+        return ' '.join(part.strip() for part in name.split(',')[::-1])
 
     def create_contributor(self, data, letter, model, target_property):
         den = DocumentedEntityName.objects.create(
@@ -218,7 +221,7 @@ class Command(BaseCommand):
                     assumed = False
 
                 if id.strip() == 'RD':
-                    get_kwargs = {'interim_designator': name}
+                    get_kwargs = {'interim_designator': Command.turn_name(name)}
                 else:
                     get_kwargs = {'gnd_id': id.strip()}
 
@@ -229,4 +232,5 @@ class Command(BaseCommand):
                         'target_inferred': inferred,
                         'target_assumed': assumed
                     })
+
         return contributors

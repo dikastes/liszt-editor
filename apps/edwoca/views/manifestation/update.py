@@ -1,3 +1,4 @@
+from ...models.base import Manifestation as EdwocaManifestation
 from ...models.base import *
 from ...forms.manifestation import *
 from ...forms.item import *
@@ -6,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def manifestation_update(request, pk):
-    manifestation = Manifestation.objects.get(id=pk)
+    manifestation = EdwocaManifestation.objects.get(id=pk)
     context = {
         'object': manifestation,
         'entity_type': 'manifestation'
@@ -30,11 +31,12 @@ def manifestation_update(request, pk):
 
         if manifestation_form.is_valid() and all(s.is_valid() for s in signature_forms):
             manifestation_form.save()
-            for signature in manifestation.get_single_item().signatures.all():
-                signature.status = ItemSignature.Status.FORMER
-                signature.save()
-            for signature_form in signature_forms:
-                signature_form.save()
+            if manifestation.is_singleton:
+                for signature in manifestation.get_single_item().signatures.all():
+                    signature.status = ItemSignature.Status.FORMER
+                    signature.save()
+                for signature_form in signature_forms:
+                    signature_form.save()
         else:
             context['manifestation_form'] = manifestation_form
             context['signature_forms'] = signature_forms

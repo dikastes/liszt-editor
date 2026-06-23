@@ -3,13 +3,13 @@ from liszt_util.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateField, SelectDateWidget, BooleanField, TypedChoiceField, RadioSelect, DateTimeField
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateField, SelectDateWidget, BooleanField, TypedChoiceField, RadioSelect, DateTimeField, ChoiceField
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe
 from dominate.util import raw
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Period
-from dominate.tags import div, label, span
+from dominate.tags import div, label, span, a
 
 
 class SimpleFormMixin:
@@ -257,8 +257,34 @@ class DateFormMixin:
                 'form': 'form'
             }
         }
-    not_before = DateField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateField(widget = SelectDateWidget(**kwargs), required = False)
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
     display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
@@ -269,11 +295,17 @@ class DateFormMixin:
             required = False
         )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    period_instance = None
 
     def __init__(self, *args, **kwargs):
         self.period_property = kwargs.pop('period_property', 'period')
         super().__init__(*args, **kwargs)
 
+        self.period_instance = getattr(self.instance, self.period_property)
+        if not self.period_instance:
+            self.period_instance = Period()
+        if self.period_instance.time_mode == Period.TimeMode.POINT:
+            self.fields['start_qualifier'].widget.attrs['disabled'] = True
 
         if self.is_bound:
             return
@@ -285,6 +317,9 @@ class DateFormMixin:
                 'not_after': period.not_after,
                 'display': period.display,
                 'inferred': period.inferred,
+                'time_mode': period.time_mode,
+                'start_qualifier': period.start_qualifier,
+                'end_qualifier': period.end_qualifier,
                 'assumed': period.assumed
             })
 
@@ -295,20 +330,32 @@ class DateFormMixin:
         if not getattr(self.instance, self.period_property):
             setattr(self.instance, self.period_property, Period.objects.create())
 
-        period_instance = getattr(self.instance, self.period_property)
-        period_instance.not_before = self.cleaned_data['not_before']
-        period_instance.not_after = self.cleaned_data['not_after']
-        period_instance.display = self.cleaned_data['display']
-        period_instance.inferred = self.cleaned_data['inferred'] or False
-        period_instance.assumed = self.cleaned_data['assumed']
+        self.period_instance.not_before = self.cleaned_data['not_before']
+        self.period_instance.time_mode = self.cleaned_data['time_mode']
 
-        period_instance.save()
+        if self.period_instance.time_mode == Period.TimeMode.POINT:
+            self.period_instance.not_after = self.cleaned_data['not_before']
+            self.period_instance.start_qualifier = Period.StartQualifier.EXACT
+            self.period_instance.end_qualifier = Period.EndQualifier.EXACT
+        else:
+            self.period_instance.not_after = self.cleaned_data['not_after']
+            self.period_instance.start_qualifier = self.cleaned_data['start_qualifier']
+            self.period_instance.end_qualifier = self.cleaned_data['end_qualifier']
+
+        self.period_instance.display = self.cleaned_data['display']
+        self.period_instance.inferred = self.cleaned_data['inferred'] or False
+        self.period_instance.assumed = self.cleaned_data['assumed']
+
+        self.period_instance.save()
         instance.save()
 
         return instance
 
     def get_date_div(self, disable_inferred = False):
         date_div = tags.div()
+        time_mode_field = self['time_mode']
+        start_qualifier_field = self['start_qualifier']
+        end_qualifier_field = self['end_qualifier']
         not_before_field = self['not_before']
         not_after_field = self['not_after']
         display_field = self['display']
@@ -324,38 +371,64 @@ class DateFormMixin:
 
         with date_div:
             # first row: standardized date
-            with tags.div(cls='flex gap-5 items-end w-full mb-5'):
-                with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
+            with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
+                with tags.div(cls=SimpleFormMixin.label_classes):
+                    # display_field.label retrieves for some reason display instead of standardized date
+                    tags.label(display_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(display_field))
+                if display_field.errors:
+                    with div(cls='label'):
+                        with span(cls='text-primary text-sm'):
+                            display_field.errors
+            # second row: time mode
+            with tags.label(cls=SimpleFormMixin.form_control_classes):
+                with tags.div(cls=SimpleFormMixin.label_classes):
+                    tags.label(time_mode_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(time_mode_field))
+            # third row: controls
+            with tags.div(cls='flex gap-5 w-full my-5'):
+                tags._input(type='submit', cls='btn btn-outline flex-1', form='form', value=_('calculate'), name=calculate_name)
+                tags._input(type='submit', cls='btn btn-outline btn-primary flex-1', form='form' ,value=_('clear'), name=clear_name)
+            # fourth row: not before
+            with tags.div(cls='flex flex-col lg:flex-row lg:gap-5 mb-5'):
+                with tags.label(cls='form-control flex-none date-container'):
                     with tags.div(cls=SimpleFormMixin.label_classes):
-                        # display_field.label retrieves for some reason display instead of standardized date
-                        tags.label(display_field.label, cls=SimpleFormMixin.label_text_classes)
-                    raw(str(display_field))
-                    if display_field.errors:
-                        with div(cls='label'):
-                            with span(cls='text-primary text-sm'):
-                                display_field.errors
-                tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=calculate_name)
-            # second row: not before & not after
-            with tags.div(cls='flex flex-col xl:flex-row gap-5'):
-                with tags.label(cls='form-control flex-0'):
-                    tags.div(_('not before'), cls=SimpleFormMixin.label_text_classes)
+                        if self.period_instance.time_mode == Period.TimeMode.SPAN:
+                            tags.span(not_before_field.label, cls=SimpleFormMixin.label_text_classes)
+                        else:
+                            tags.span(_('point in time'), cls=SimpleFormMixin.label_text_classes)
                     with tags.div(cls='flex'):
                         raw(str(not_before_field))
                     if not_before_field.errors:
                         with div(cls='label'):
                             with span(cls='text-primary text-sm'):
                                 not_before_field.errors
-                with tags.label(cls='form-control flex-0'):
-                    tags.div(_('not after'), cls=SimpleFormMixin.label_text_classes)
-                    with tags.div(cls='flex'):
-                        raw(str(not_after_field))
-                    if not_after_field.errors:
-                        with div(cls='label'):
-                            with span(cls='text-primary text-sm'):
-                                not_after_field.errors
+                tags.div(cls='flex-1')
+                with tags.label(cls=SimpleFormMixin.form_control_classes + ' flex-none'):
+                    with tags.div(cls=SimpleFormMixin.label_classes + ''):
+                        tags.label(start_qualifier_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(start_qualifier_field))
+            # fifth row: not after
+            if self.period_instance.time_mode == Period.TimeMode.SPAN:
+                with tags.div(cls='flex flex-col lg:flex-row lg:gap-5 mb-5'):
+                    with tags.label(cls='form-control flex-none date-container'):
+                        with tags.div(cls=SimpleFormMixin.label_classes):
+                            tags.span(not_after_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with tags.div(cls='flex'):
+                            raw(str(not_after_field))
+                        if not_after_field.errors:
+                            with div(cls='label'):
+                                with span(cls='text-primary text-sm'):
+                                    not_after_field.errors
+                    tags.div(cls='flex-1')
+                    with tags.label(cls=SimpleFormMixin.form_control_classes + ' flex-none'):
+                        with tags.div(cls=SimpleFormMixin.label_classes):
+                            tags.label(end_qualifier_field.label, cls=SimpleFormMixin.label_text_classes)
+                        raw(str(end_qualifier_field))
             # third row: controls
-            with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
-                with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+            with tags.div(cls='flex flexcol lg:flex-row gap-5'):
+                tags.div(cls='flex-1')
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-none'):
                     tags.span(_(assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
                     raw(str(assumed_field))
                 tags.div(cls='flex-1')
@@ -372,8 +445,6 @@ class DateFormMixin:
                                     form='form',
                                     disabled = disable_inferred
                                 )
-                tags.div(cls='flex-1')
-                tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=clear_name)
 
         return date_div
 
@@ -457,16 +528,18 @@ class BaseDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
         }
 
     def as_daisy(self):
-        form = div()
+        form = div(cls='mb-5')
 
         url_field = self['url']
         link_type_field = self['link_type']
 
         with form:
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(url_field))
+            with div(cls='flex gap-5 items-end'):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(url_field))
+                a(_('open'), cls='flex-0 btn btn-outline', href=self.instance.url, target='_blank')
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(link_type_field.label), cls=SimpleFormMixin.label_text_classes)
@@ -547,7 +620,7 @@ class BaseTrackedModelForm:
                 with tags.div(cls=SimpleFormMixin.label_classes):
                     tags.span(editing_history_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(editing_history_field))
-            with tags.div(cls='flex flex-col xl:flex-row gap-2 my-5 xl:items-end'):
+            with tags.div(cls='flex flex-col lg:flex-row gap-2 my-5 lg:items-end'):
                 with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
                     with tags.div(cls=SimpleFormMixin.label_classes):
                         tags.span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)

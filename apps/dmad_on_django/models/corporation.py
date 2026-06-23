@@ -140,7 +140,7 @@ class Corporation(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _('without name')
 
     def get_table(self):
         table = CorporationGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
@@ -162,11 +162,6 @@ class Corporation(DisplayableModel):
         lobid_url = f"https://lobid.org/gnd/search?q={search_string}&filter=(type:Company OR type:CorporateBody)&size=5&format=json:suggest"
         lobid_response = requests.get(lobid_url)
         return lobid_response.json()
-
-    def __str__(self):
-        if self.gnd_id:
-            return f'{self.get_default_name()} ({self.gnd_id})'
-        return self.interim_designator
 
     def get_model(self):
         return self

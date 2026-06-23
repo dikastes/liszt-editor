@@ -10,6 +10,8 @@ from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInpu
 from django.forms.models import inlineformset_factory
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from django.utils.html import format_html
+from django.utils.functional import lazy
 from dmad_on_django.models import Period, Corporation
 from dmad_on_django.models.base import DocumentationStatusMixin
 from dmrism.models.item import Item, Library
@@ -209,9 +211,39 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
                 'class': SimpleFormMixin.select_classes
             }
         }
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes }))
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes })
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
@@ -234,8 +266,6 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
             'display',
             'inferred',
             'assumed',
-            #'place_inferred',
-            #'place_assumed'
         ]
         widgets = {
                 'history': Textarea( attrs = {
@@ -248,15 +278,7 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
                 'private_history_comment': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
-                    }),
-                #'place_inferred': CheckboxInput( attrs = {
-                        #'class': SimpleFormMixin.toggle_classes,
-                        #'form': 'form'
-                    #}),
-                #'place_assumed': CheckboxInput( attrs = {
-                        #'class': SimpleFormMixin.toggle_classes,
-                        #'form': 'form'
-                    #})
+                    })
             }
 
     def as_daisy(self):
@@ -319,6 +341,7 @@ class ManifestationClassificationForm(ModelForm):
         model = Manifestation
         fields = [
                 'manifestation_form',
+                'is_incomplete',
                 'source_type',
                 'album_page',
                 'performance_material',
@@ -337,6 +360,9 @@ class ManifestationClassificationForm(ModelForm):
                 'is_text'
             ]
         widgets = {
+                'is_incomplete': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
                 'manifestation_form': Select( attrs = {
                         'class': SimpleFormMixin.select_classes,
                     }),
@@ -407,14 +433,12 @@ class ManifestationClassificationForm(ModelForm):
                     (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
                 ]
 
-        #st_field = self.fields['source_type']
-        #st_field.label = f'{st_field.label}*'
-
     def as_daisy(self):
         form = div(cls='mb-10')
 
         source_type_field = self['source_type']
         manifestation_form_field = self['manifestation_form']
+        completeness_field = self['is_incomplete']
 
         # common source functions
         album_page_field = self['album_page']
@@ -439,71 +463,82 @@ class ManifestationClassificationForm(ModelForm):
         score_field = self['score']
         text_field = self['is_text']
 
+        tool_tip = _("Selecting 'Text' disables musical attributes and vice versa.")
+
         instance = self.instance
 
         with form:
-            # upper palette with source type and manifestaion form
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(source_type_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(manifestation_form_field))
+            with div(cls='flex flex-col xl:flex-row gap-10'):
+                # left palette with dropdown menus
+                with div(cls='flex-1'):
+                    # upper palette with source type and manifestaion form
+                    with label(cls=SimpleFormMixin.form_control_classes + ' xl:mb-5'):
+                        with div(cls=SimpleFormMixin.label_classes):
+                            span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
+                        raw(str(source_type_field))
+                    with label(cls=SimpleFormMixin.form_control_classes + ' xl:mb-5'):
+                        with div(cls=SimpleFormMixin.label_classes):
+                            span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
+                        raw(str(manifestation_form_field))
+                    with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                        raw(str(completeness_field))
+                        span(completeness_field.label, cls=SimpleFormMixin.label_text_classes)
+                with div(cls='flex-1'):
+                # right palette with toggles
+                    h1(_('edition type') + '*', cls='text-lg')
+                    with div(cls='mb-2'):
+                        span(tool_tip, cls='text-xs')
+                    if not instance.is_text:
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(choir_score_field))
+                            span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(piano_reduction_field))
+                            span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(particell_field))
+                            span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(score_field))
+                            span(score_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(part_field))
+                            span(part_field.label, cls=SimpleFormMixin.label_text_classes)
+                    if not (instance.choir_score or instance.piano_reduction or instance.particell or instance.score or instance.part):
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(text_field))
+                            span(text_field.label, cls=SimpleFormMixin.label_text_classes)
 
-            h1(_('edition type') + '*', cls='text-lg my-5')
-            if not instance.is_text:
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(choir_score_field))
-                    span(choir_score_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(piano_reduction_field))
-                    span(piano_reduction_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(particell_field))
-                    span(particell_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(score_field))
-                    span(score_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(part_field))
-                    span(part_field.label, cls=SimpleFormMixin.label_text_classes)
-            if not (instance.choir_score or instance.piano_reduction or instance.particell or instance.score or instance.part):
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(text_field))
-                    span(text_field.label, cls=SimpleFormMixin.label_text_classes)
-
-            h1(_('function'), cls='text-lg my-5')
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(album_page_field))
-                span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(performance_material_field))
-                span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
-            if instance.is_singleton:
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(correction_sheet_field))
-                    span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(stitch_template_field))
-                    span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(dedication_item_field))
-                    span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
-            else:
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(authorized_edition_field))
-                    span(authorized_edition_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(first_edition_field))
-                    span(first_edition_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(proof_field))
-                    span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
-                with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                    raw(str(further_edition_field))
-                    span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                    h1(_('function'), cls='text-lg mt-5 mb-2')
+                    with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                        raw(str(album_page_field))
+                        span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
+                    with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                        raw(str(performance_material_field))
+                        span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
+                    if instance.is_singleton:
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(correction_sheet_field))
+                            span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(stitch_template_field))
+                            span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(dedication_item_field))
+                            span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
+                    else:
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(authorized_edition_field))
+                            span(authorized_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(first_edition_field))
+                            span(first_edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(proof_field))
+                            span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(further_edition_field))
+                            span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
 
@@ -745,20 +780,47 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
             'attrs': {
                 'class': SimpleFormMixin.select_classes,
                 'form': 'form'
-            },
+            }
         }
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow', 'form': 'form'}))
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = { 'class': SimpleFormMixin.radio_classes, 'form': 'form'}
                 ),
             required = False
         )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    period_instance = None
 
     class Meta:
         model = Manifestation

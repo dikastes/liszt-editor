@@ -41,7 +41,7 @@
             <a href="{% url 'edwoca:item_history' object.id %}"
                 {% if 'history' in request.path %}class="active"{% endif %}
                 >
-                {% translate 'history' %}
+                {% translate 'date and place' %}
             </a>
         </li>
         <li>
@@ -76,7 +76,11 @@
     <ul class="menu p-0 flex-0">
         <li>
             <a href="{% url 'edwoca:item_delete' object.id %}"
-                {% if 'delete' in request.path %}class="active"{% endif %}
+                {% if 'delete' in request.path %}
+                   class="text-primary active"
+                {% else %}
+                   class="text-primary"
+                {% endif %}
                 >
                 {% translate 'delete' %}
             </a>

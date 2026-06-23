@@ -21,7 +21,8 @@ class ItemForm(ModelForm):
         fields = ['rism_id']
         widgets = {
                 'rism_id': TextInput( attrs = {
-                        'class': 'grow'
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
                     })
             }
 
@@ -29,10 +30,12 @@ class ItemForm(ModelForm):
         form = div(cls='mb-10')
 
         rism_id_field = self['rism_id']
-        rism_id_field_label = label(rism_id_field.label, cls='input input-bordered flex flex-1 items-center gap-2 my-5')
-        rism_id_field_label.add(raw(str(rism_id_field)))
 
-        form.add(rism_id_field_label)
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(rism_id_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(rism_id_field))
 
         return mark_safe(str(form))
 
@@ -105,15 +108,44 @@ class RelatedItemForm(ModelForm):
 
 class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
-        'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
-        'attrs': {
-            'class': 'select select-bordered border-black bg-white',
-            'form': 'form'
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes
+            }
         }
-    }
-    not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes })
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
@@ -163,15 +195,44 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
 
 class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
-        'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
-        'attrs': {
-            'class': 'select select-bordered border-black bg-white',
-            'form': 'form'
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes
+            }
         }
-    }
-    not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = forms.CharField(required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes })
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',

@@ -170,19 +170,49 @@ class LetterForm(BaseTrackedModelForm, ModelForm, SimpleFormMixin):
         return mark_safe(str(self.get_editing_history_div()))
 
 
-class LetterMentioningForm(ModelForm):
+class LetterMentioningForm(BaseBibForm):
     class Meta:
         model = LetterMentioning
-        fields = ['pages']
-        widgets = {
-                'pages': TextInput(attrs={'form': 'form', 'class': 'flex-1 min-w-0'})
-        }
+        fields = BaseBibForm.Meta.fields + ['letter_number']
+        widgets = dict(**BaseBibForm.Meta.widgets,
+                letter_number = TextInput(attrs = {'form': 'form', 'class': SimpleFormMixin.text_input_classes})
+            )
 
+    def as_daisy(self):
+        form = div(cls='my-5')
+
+        location_field = self['location']
+        location_type_field = self['location_type']
+        letter_number_field = self['letter_number']
+
+        with form:
+            # palette
+            with div(cls=SimpleFormMixin.palette_classes):
+                with label(cls='flex-0 form-control'):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(location_type_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(location_type_field))
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(location_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(location_field))
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(letter_number_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(letter_number_field))
+
+        #for hidden in self.hidden_fields():
+            #hidden.field.widget.attrs['form'] = 'form'
+            #form.add(raw(str(hidden)))
+
+        return mark_safe(str(form))
 
 class BaseLetterContributorForm(ModelForm):
     class Meta:
-        fields = [ ]
+        fields = [ 'inferred', 'assumed' ]
         widgets = {
+                'inferred': CheckboxInput(attrs = {'form': 'form', 'class': SimpleFormMixin.toggle_classes}),
+                'assumed': CheckboxInput(attrs = {'form': 'form', 'class': SimpleFormMixin.toggle_classes}),
                 'edition_name': TextInput(attrs = {'form': 'form', 'class': SimpleFormMixin.text_input_classes}),
                 'source_name': TextInput(attrs = {'form': 'form', 'class': SimpleFormMixin.text_input_classes}),
                 'edition_name_inferred': RadioSelect(attrs = {'form': 'form', 'class': SimpleFormMixin.radio_classes}),
@@ -201,11 +231,14 @@ class BaseLetterContributorForm(ModelForm):
             widget = Meta.widgets['edition_name'],
             label = _('edtion name')
         )
-    source_name_inferred = TypedChoiceField(
-            choices = ((False, _('based on source')), (True, _('inferred'))),
-            coerce = lambda x: x == 'True',
+    source_name_inferred = BooleanField(
+            widget = CheckboxInput(attrs = {
+                    'class': SimpleFormMixin.toggle_classes,
+                    'form': 'form'
+                }),
+            disabled = True,
             required = False,
-            empty_value = False
+            label = _('inferred')
         )
     source_name_assumed = BooleanField(
             widget = CheckboxInput(attrs = {
@@ -216,11 +249,13 @@ class BaseLetterContributorForm(ModelForm):
             required = False,
             label = _('assumed')
         )
-    edition_name_inferred = TypedChoiceField(
-            choices = ((False, _('based on edition')), (True, _('attributed'))),
-            coerce = lambda x: x == 'True',
+    edition_name_inferred = BooleanField(
+            widget = CheckboxInput(attrs = {
+                    'class': SimpleFormMixin.toggle_classes,
+                    'form': 'form'
+                }),
             required = False,
-            empty_value = False
+            label = _('attributed')
         )
     edition_name_assumed = BooleanField(
             widget = CheckboxInput(attrs = {
@@ -276,6 +311,8 @@ class BaseLetterContributorForm(ModelForm):
     def as_daisy(self):
         form = div()
 
+        inferred_field = self['inferred']
+        assumed_field = self['assumed']
         edition_name_field = self['edition_name']
         source_name_field = self['source_name']
         edition_name_inferred_field = self['edition_name_inferred']
@@ -283,52 +320,48 @@ class BaseLetterContributorForm(ModelForm):
         edition_name_assumed_field = self['edition_name_assumed']
         source_name_assumed_field = self['source_name_assumed']
 
+        palette_classes = 'flex gap-10 items-center mt-2'
+
         with form:
+            # palette for contributor
+            with tags.div(cls=palette_classes):
+                tags.div(cls='flex-1')
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+                    tags.span(_(assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(assumed_field))
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+                    tags.span(_(inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(inferred_field))
+            # name according to edition
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(edition_name_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(edition_name_field))
-            with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
+            # palette for name according to edition
+            with tags.div(cls=palette_classes):
                 tags.div(cls='flex-1')
                 with tags.label(cls=SimpleFormMixin.toggle_label_classes):
                     tags.span(_(edition_name_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
                     raw(str(edition_name_assumed_field))
-                tags.div(cls='flex-1')
-                for sw in edition_name_inferred_field.subwidgets:
-                    with tags.div(cls=SimpleFormMixin.form_control_classes):
-                        with tags.label(cls='label cursor-pointer gap-5'):
-                            tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
-                            tags.input_(
-                                    type='radio',
-                                    name=sw.data.get('name'),
-                                    value=str(sw.data.get('value')),
-                                    cls='radio',
-                                    checked = sw.data.get('selected', False),
-                                    form='form'
-                                )
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(source_name_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(source_name_field))
-            with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
-                tags.div(cls='flex-1')
                 with tags.label(cls=SimpleFormMixin.toggle_label_classes):
-                    tags.span(_(source_name_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
-                    raw(str(source_name_assumed_field))
-                tags.div(cls='flex-1')
-                for sw in source_name_inferred_field.subwidgets:
-                    with tags.div(cls=SimpleFormMixin.form_control_classes):
-                        with tags.label(cls='label cursor-pointer gap-5'):
-                            tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
-                            tags.input_(
-                                    type='radio',
-                                    name=sw.data.get('name'),
-                                    value=str(sw.data.get('value')),
-                                    cls='radio',
-                                    checked = sw.data.get('selected', False),
-                                    form='form',
-                                    disabled = True
-                                )
+                    tags.span(_(edition_name_inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(edition_name_inferred_field))
+            # gray area for disabled inputs
+            with div(cls='bg-base-100 p-5 my-5'):
+                # name according to source
+                with label(cls=SimpleFormMixin.form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(source_name_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(source_name_field))
+                # palette for name according to source
+                with tags.div(cls=palette_classes):
+                    tags.div(cls='flex-1')
+                    with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+                        tags.span(_(source_name_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                        raw(str(source_name_assumed_field))
+                    #with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+                        #tags.span(_(source_name_inferred_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                        #raw(str(source_name_inferred_field))
 
         return mark_safe(str(form))
 

@@ -1,28 +1,40 @@
 {% extends 'edwoca/base.html' %}
+{% load i18n %}
 
 {% block content %}
-<div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ object }} bearbeiten </h2>
 
-	<form method="post">
-		{% csrf_token %}
-		{{ item_form.as_daisy }}
+<h2 class="card-title mt-0">
+    {% translate 'item' %}
+</h2>
 
-                <h3 class="text-lg font-bold mt-5">Standorte</h3>
-                {{ signature_formset.management_form }}
-                {% for form in signature_formset %}
-                    {{ form.as_daisy }}
-                {% endfor %}
+<form id="form" class="hidden" method="post">
+    {% csrf_token %}
+    <input type="submit" id="submit-form">
+</form>
 
-                <div class="flex">
-                        <div class="flex-1"></div>
-                        <div class="flex-0">
-                                <input type="submit" name="add_signature" value="Standort hinzufügen" class="btn btn-secondary mt-2">
-                                <input type="submit" value="Speichern" class="hidden" id="submit-form">
-                        </div>
-                </div>
-	</form>
+{{ form.as_daisy }}
 
+<h3 class="text-lg font-bold mt-5">
+    {% translate 'locations' %}
+</h3>
+
+{% for form in signature_forms %}
+    <div class="my-5">
+        {{ form.as_daisy }}
+    </div>
+    <div class="flex">
+        <div class="flex-1"></div>
+        <button type="submit" name="remove-signature" value="{{ form.instance.pk }}" form="form" class="btn btn-outline text-primary">
+            {% translate 'remove signature' %}
+        </button>
+    </div>
+{% endfor %}
+
+<div class="flex">
+    <div class="flex-1"></div>
+    <button type="submit" name="add-signature" form="form" class="flex-0 btn btn-outline mt-2">
+        {% translate 'create location' %}
+    </button>
 </div>
 
 {% include 'edwoca/partials/item/preview-divs/head_epilog.html' %}

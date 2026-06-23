@@ -1,6 +1,6 @@
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models.base import DocumentationStatusMixin
-from dmrism.models import TrackedModel
+from dmrism.models import TrackedModel, BaseBib
 from .base import *
 
 
@@ -112,6 +112,10 @@ class Letter(TrackedModel):
             'Work',
             related_name = 'letters'
         )
+    manifestation = models.ManyToManyField(
+            'Manifestation',
+            related_name = 'letters'
+        )
     expression = models.ManyToManyField(
             'Expression',
             related_name = 'letters'
@@ -160,9 +164,9 @@ class Letter(TrackedModel):
         etal = ' ' + _('et al.')
         if self.sender_persons.count():
             if self.sender_corporations.count() or self.sender_persons.count() > 1:
-                sender = self.sender_persons.first().get_designator() + etal
+                sender = self.sender_persons.first().get_natural_name() + etal
             else:
-                sender = self.sender_persons.first().get_designator()
+                sender = self.sender_persons.first().get_natural_name()
         else:
             if self.sender_corporations.count():
                 if self.sender_corporations.count() > 1:
@@ -174,9 +178,9 @@ class Letter(TrackedModel):
 
         if self.receiver_persons.count():
             if self.receiver_corporations.count() or self.receiver_persons.count() > 1:
-                receiver = self.receiver_persons.first().get_designator() + etal
+                receiver = self.receiver_persons.first().get_natural_name() + etal
             else:
-                receiver = self.receiver_persons.first().get_designator()
+                receiver = self.receiver_persons.first().get_natural_name()
         else:
             if self.receiver_corporations.count():
                 if self.receiver_corporations.count() > 1:
@@ -189,24 +193,22 @@ class Letter(TrackedModel):
         return self.mark_needs_review(f'{sender} {to} {receiver}, {self.edition_period} ({self.get_first_mentioning()})')
 
 
-class LetterMentioning(models.Model):
+class LetterMentioning(BaseBib):
     letter = models.ForeignKey(
             'Letter',
             on_delete = models.CASCADE
         )
-    bib = models.ForeignKey(
-            'bib.ZotItem',
-            on_delete = models.CASCADE
-        )
-    pages = models.CharField(
+    letter_number = models.CharField(
             max_length = 20,
             null = True,
             blank = True,
-            verbose_name = _('pages')
+            verbose_name = _('letter number')
         )
 
     def __str__(self):
-        return f'{self.bib.zot_short_title}, {self.pages}'
+        if self.location:
+            return f'{self.bib.zot_short_title}, {self.get_location_type_display()} {self.location}'
+        return self.bib.zot_short_title
 
 
 class DocumentedEntityName(DocumentationStatusMixin):
@@ -216,7 +218,7 @@ class DocumentedEntityName(DocumentationStatusMixin):
         )
 
 
-class BaseLetterContributor(models.Model):
+class BaseLetterContributor(DocumentationStatusMixin):
     class Meta:
         abstract = True
 
