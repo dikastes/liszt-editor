@@ -643,27 +643,7 @@ class ManifestationCreateForm(forms.Form):
             form.add(source_type_container)
 
         # Date Fields
-        not_before_field = self['not_before']
-        not_after_field = self['not_after']
         display_field = self['display']
-
-        not_before_container = label(cls='form-control')
-        not_before_label = div(not_before_field.label, cls='label-text')
-        not_before_selects = div(cls='flex')
-        not_before_selects.add(raw(str(not_before_field)))
-        not_before_container.add(not_before_label)
-        not_before_container.add(not_before_selects)
-        if not_before_field.errors:
-            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        not_after_container = label(cls='form-control')
-        not_after_label = div(not_after_field.label, cls='label-text')
-        not_after_selects = div(cls='flex')
-        not_after_selects.add(raw(str(not_after_field)))
-        not_after_container.add(not_after_label)
-        not_after_container.add(not_after_selects)
-        if not_after_field.errors:
-            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
 
         display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
         display_container.add(raw(str(display_field)))
@@ -671,8 +651,6 @@ class ManifestationCreateForm(forms.Form):
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
 
         period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        period_palette.add(not_before_container)
-        period_palette.add(not_after_container)
         form.add(period_palette)
         form.add(display_container)
 
