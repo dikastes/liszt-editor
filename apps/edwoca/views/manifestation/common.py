@@ -2,7 +2,8 @@ import re
 
 from haystack.query import SearchQuerySet
 
-from dmad_on_django.models import Corporation
+from dmad_on_django.models import Corporation, Period
+
 from ...forms.manifestation import *
 from calendar import monthrange
 from ...forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm, ItemTextTypeForm
@@ -202,11 +203,22 @@ def manifestation_create(request, publisher_pk=None):
 
         form = ManifestationCreateForm(data)
         if form.is_valid():
+            
+            display = form.cleaned_data.get('display')
+            period = Period.objects.create(
+                display=display,
+            )
+            try:
+                period.parse_display()
+            except Exception:
+                pass
+
             manifestation = EdwocaManifestation.objects.create(
                     source_type = form.cleaned_data.get('source_type'),
                     plate_number = form.cleaned_data.get('plate_number'),
-                    working_title = form.cleaned_data['temporary_title']
-                    )
+                    working_title = form.cleaned_data['temporary_title'],
+                    period = period
+            )
 
             chosen_publisher = form.cleaned_data.get('publisher')
             if chosen_publisher:
@@ -214,7 +226,10 @@ def manifestation_create(request, publisher_pk=None):
                 Publication.objects.create(
                         publisher = chosen_publisher,
                         manifestation = manifestation
-                    )
+                )
+
+           
+            
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
     else:
