@@ -208,10 +208,12 @@ def manifestation_create(request, publisher_pk=None):
             period = Period.objects.create(
                 display=display,
             )
+            
             try:
                 period.parse_display()
-            except Exception:
-                pass
+                period.save()
+            except Exception as e:
+                print(e)
 
             manifestation = EdwocaManifestation.objects.create(
                     source_type = form.cleaned_data.get('source_type'),
