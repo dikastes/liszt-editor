@@ -393,65 +393,90 @@ def item_dedication(request, pk):
     }
 
     if request.method == 'POST':
-        # Handle existing PersonDedication forms
-        for person_dedication in item.itempersondedication_set.all():
-            prefix = f'person_dedication_{person_dedication.id}'
-            form = ItemPersonDedicationForm(request.POST, instance=person_dedication, prefix=prefix)
-            if form.is_valid():
-                form.save()
+        if 'create-person-dedication' in request.POST:
+            ItemPersonDedication.objects.create(
+                    item = item
+                )
+        if 'create-corporation-dedication' in request.POST:
+            ItemCorporationDedication.objects.create(
+                    item = item
+                )
 
-        # Handle existing CorporationDedication forms
-        for corporation_dedication in item.itemcorporationdedication_set.all():
-            prefix = f'corporation_dedication_{corporation_dedication.id}'
-            form = ItemCorporationDedicationForm(request.POST, instance=corporation_dedication, prefix=prefix)
-            if form.is_valid():
-                form.save()
-
-        return redirect('edwoca:item_dedication', pk=pk)
-    else:
-        # Initialize forms for existing PersonDedication
         person_dedication_forms = []
         for person_dedication in item.itempersondedication_set.all():
             prefix = f'person_dedication_{person_dedication.id}'
-            person_dedication_forms.append(ItemPersonDedicationForm(instance=person_dedication, prefix=prefix))
-        context['person_dedication_forms'] = person_dedication_forms
+            form = ItemPersonDedicationForm(request.POST, instance=person_dedication, prefix=prefix)
+            person_dedication_forms += [ form ]
 
-        # Initialize forms for existing CorporationDedication
         corporation_dedication_forms = []
         for corporation_dedication in item.itemcorporationdedication_set.all():
             prefix = f'corporation_dedication_{corporation_dedication.id}'
-            corporation_dedication_forms.append(ItemCorporationDedicationForm(instance=corporation_dedication, prefix=prefix))
+            form = ItemCorporationDedicationForm(request.POST, instance=corporation_dedication, prefix=prefix)
+            corporation_dedication_forms += [ form ]
+
+        all_forms = person_dedication_forms + corporation_dedication_forms
+        if all(f.is_valid for f in all_forms):
+            for f in all_forms:
+                f.save()
+        else:
+            context['person_dedication_forms'] = person_dedication_forms
+            context['person_dedication_forms'] = person_dedication_forms
+
+            return render(request, 'edwoca/item_dedication.html', context)
+
+        if 'remove-person-dedication' in request.POST:
+            person_dedication = get_object_or_404(ItemPersonDedication, pk = request.POST.get('remove-person-dedication'))
+            person_dedication.delete()
+        if 'remove-corporation-dedication' in request.POST:
+            corporation_dedication = get_object_or_404(ItemCorporationDedication, pk = request.POST.get('remove-corporation-dedication'))
+            corporation_dedication.delete()
+
+        return redirect('edwoca:item_dedication', pk=pk)
+    else:
+        person_dedication_forms = []
+        for person_dedication in item.itempersondedication_set.all():
+            prefix = f'person_dedication_{person_dedication.id}'
+            form = ItemPersonDedicationForm(instance=person_dedication, prefix=prefix)
+            person_dedication_forms += [ form ]
+
+        corporation_dedication_forms = []
+        for corporation_dedication in item.itemcorporationdedication_set.all():
+            prefix = f'corporation_dedication_{corporation_dedication.id}'
+            form = ItemCorporationDedicationForm(instance=corporation_dedication, prefix=prefix)
+            corporation_dedication_forms += [ form ]
+
+        context['person_dedication_forms'] = person_dedication_forms
         context['corporation_dedication_forms'] = corporation_dedication_forms
 
-    q_dedicatee = request.GET.get('dedicatee-q')
-    q_place = request.GET.get('place-q')
+    #q_dedicatee = request.GET.get('dedicatee-q')
+    #q_place = request.GET.get('place-q')
 
-    if q_dedicatee:
-        dedicatee_search_form = SearchForm(request.GET, prefix='dedicatee')
-        if dedicatee_search_form.is_valid():
-            context['query_dedicatee'] = dedicatee_search_form.cleaned_data.get('q')
-            context['found_persons'] = dedicatee_search_form.search().models(Person)
-            context['found_corporations'] = dedicatee_search_form.search().models(Corporation)
-    else:
-        dedicatee_search_form = SearchForm(prefix='dedicatee')
+    #if q_dedicatee:
+        #dedicatee_search_form = SearchForm(request.GET, prefix='dedicatee')
+        #if dedicatee_search_form.is_valid():
+            #context['query_dedicatee'] = dedicatee_search_form.cleaned_data.get('q')
+            #context['found_persons'] = dedicatee_search_form.search().models(Person)
+            #context['found_corporations'] = dedicatee_search_form.search().models(Corporation)
+    #else:
+        #dedicatee_search_form = SearchForm(prefix='dedicatee')
 
-    if q_place:
-        place_search_form = SearchForm(request.GET, prefix='place')
-        if place_search_form.is_valid():
-            context['query_place'] = place_search_form.cleaned_data.get('q')
-            context['found_places'] = place_search_form.search().models(Place)
-    else:
-        place_search_form = SearchForm(prefix='place')
+    #if q_place:
+        #place_search_form = SearchForm(request.GET, prefix='place')
+        #if place_search_form.is_valid():
+            #context['query_place'] = place_search_form.cleaned_data.get('q')
+            #context['found_places'] = place_search_form.search().models(Place)
+    #else:
+        #place_search_form = SearchForm(prefix='place')
 
-    context['dedicatee_search_form'] = dedicatee_search_form
-    context['place_search_form'] = place_search_form
+    #context['dedicatee_search_form'] = dedicatee_search_form
+    #context['place_search_form'] = place_search_form
 
-    if request.GET.get('person_dedication_id'):
-        context['person_dedication_id'] = int(request.GET.get('person_dedication_id'))
-    if request.GET.get('corporation_dedication_id'):
-        context['corporation_dedication_id'] = int(request.GET.get('corporation_dedication_id'))
+    #if request.GET.get('person_dedication_id'):
+        #context['person_dedication_id'] = int(request.GET.get('person_dedication_id'))
+    #if request.GET.get('corporation_dedication_id'):
+        #context['corporation_dedication_id'] = int(request.GET.get('corporation_dedication_id'))
 
-    return render(request, 'edwoca/item_dedication.html', context)
+        return render(request, 'edwoca/item_dedication.html', context)
 
 
 def item_person_dedication_add(request, pk):

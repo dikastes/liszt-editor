@@ -6,57 +6,46 @@
 
 {% include 'edwoca/partials/item/preview-divs/dedication_prolog.html' %}
 
-<h2 class="card-title mt-0 flex-1"> 
+<h2 class="my-5">
     {% translate 'dedication' %}
 </h2>
 
-<div class="mt-5">
-    <h3 class="my-5">
-        {% translate 'person dedications' %}
-    </h3>
+<form method="post" class="hidden" id="form">
+    {% csrf_token %}
+    <input type="submit" id="submit-form" />
+</form>
 
-    {% for person_dedication in object.itempersondedication_set.all %}
-        <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
-            <div class="flex-1 m-0">
-                <p class="font-bold">{{ person_dedication.dedicatee }}</p>
-                <p class="text-sm">{{ person_dedication.diplomatic_dedication }}</p>
-            </div>
-            <a href="#person-dedication-modal-{{ person_dedication.id }}" class="btn flex-0"> bearbeiten </a>
-            <form action="{% url 'edwoca:item_person_dedication_delete' person_dedication.id %}" method="post" class="flex-0 m-0">
-                {% csrf_token %}
-                <input type="submit" class="btn btn-primary" value="löschen"/>
-            </form>
-        </div>
-    {% empty %}
-        <p> keine Personenwidmungen </p>
-    {% endfor %}
-    <div class="flex items-center mt-5">
-        <div class="flex-1"></div>
-        <a href="{% url 'edwoca:item_person_dedication_add' object.id %}" class="btn flex-0"> Personenwidmung hinzufügen </a>
-    </div>
+<h3 class="my-5">
+    {% translate 'person dedications' %}
+</h3>
+
+{% for person_dedication_form in person_dedication_forms %}
+    {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=person_dedication_form dedicatee_class='person' %}
+{% empty %}
+    <p class="note"> {% translate 'no person dedications' %} </p>
+{% endfor %}
+<div class="flex items-center mt-5">
+    <div class="flex-1"></div>
+    <button class="btn-outline btn flex-0" name="create-person-dedication" type="submit" form="form">
+        {% translate 'create person dedication' %}
+    </button>
 </div>
 
-<div class="mt-5">
-    <h3 class="text-lg font-bold">Körperschaftswidmungen</h3>
-    {% for corporation_dedication in object.itemcorporationdedication_set.all %}
-        <div class="flex gap-5 items-center mb-2 p-2 rounded-lg">
-            <div class="flex-1 m-0">
-                <p class="font-bold">{{ corporation_dedication.dedicatee }}</p>
-                <p class="text-sm">{{ corporation_dedication.diplomatic_dedication }}</p>
-            </div>
-            <a href="#corporation-dedication-modal-{{ corporation_dedication.id }}" class="btn flex-0"> bearbeiten </a>
-            <form action="{% url 'edwoca:item_corporation_dedication_delete' corporation_dedication.id %}" method="post" class="flex-0 m-0">
-                {% csrf_token %}
-                <input type="submit" class="btn btn-primary" value="löschen"/>
-            </form>
-        </div>
-    {% empty %}
-        <p> keine Körperschaftswidmungen </p>
-    {% endfor %}
-    <div class="flex items-center mt-5">
-        <div class="flex-1"></div>
-        <a href="{% url 'edwoca:item_corporation_dedication_add' object.id %}" class="btn flex-0"> Körperschaftswidmung hinzufügen </a>
-    </div>
+<h3 class="my-5">
+    {% translate 'corporation dedications' %}
+</h3>
+{% for corporation_dedication_form in corporation_dedication_forms %}
+    {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=corporation_dedication_form dedicatee_class='corporation' %}
+{% empty %}
+    <p class="note">
+        {% translate 'no corporation dedications' %}
+    </p>
+{% endfor %}
+<div class="flex items-center mt-5">
+    <div class="flex-1"></div>
+    <button class="btn-outline btn flex-0" name="create-corporation-dedication" type="submit" form="form">
+        {% translate 'create corporation dedication' %}
+    </button>
 </div>
 
 {% include 'edwoca/partials/item/preview-divs/dedication_epilog.html' %}
