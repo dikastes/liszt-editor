@@ -730,6 +730,7 @@ def manifestation_print_update(request, pk):
             context['text_type_form'] = text_type_form
             return render(request, 'edwoca/manifestation_print.html', context)
 
+        #breakpoint()
         if 'calculate-machine-readable-date' in request.POST:
             manifestation.period.parse_display()
             manifestation.period.save()

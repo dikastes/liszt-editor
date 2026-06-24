@@ -789,19 +789,28 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
             required = False
         )
     start_qualifier = ChoiceField(
             label = _('not before mode'),
             choices = Period.StartQualifier,
-            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            widget = Select(attrs = {
+                    'class': 'select border border-black bg-white w-40',
+                    'form': 'form'
+                }),
             required = False
         )
     end_qualifier = ChoiceField(
             label = _('not after mode'),
             choices = Period.EndQualifier,
-            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            widget = Select(attrs = {
+                    'class': 'select border border-black bg-white w-40',
+                    'form': 'form'
+                }),
             required = False
         )
     not_before = DateField(
@@ -814,16 +823,31 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
             widget = SelectDateWidget(**kwargs),
             required = False
         )
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
+    display = CharField(required=False, widget = TextInput(
+            attrs = {
+                'class': SimpleFormMixin.text_input_classes,
+                'form': 'form'
+            }),
+            label=Period.display.field.verbose_name
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': SimpleFormMixin.radio_classes, 'form': 'form'}
+                    attrs = {
+                            'class': SimpleFormMixin.radio_classes,
+                            'form': 'form'
+                        }
                 ),
             required = False
         )
-    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(
+            attrs = {
+                    'class': 'toggle',
+                    'form': 'form'
+                }),
+            required = False
+        )
     period_instance = None
 
     class Meta:

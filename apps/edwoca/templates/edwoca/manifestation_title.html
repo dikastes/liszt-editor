@@ -170,6 +170,7 @@
             {{ corporation_dedication_form.as_daisy }}
 
             {% for dedicatee in corporation_dedication_form.instance.dedicatee.all %}
+                {# you started to generalize this in partials/forms/dedication_form.html #}
                 <div class="flex items-center my-5">
                     <label class="flex-1 gap-2">
                         <div class="label">

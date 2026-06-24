@@ -135,24 +135,37 @@
     <h3 class="mb-5">
         {% translate 'template copy' %}
     </h3>
-    {% for signature in object.template_item.signatures.all %}
-        <div class="signature-form">
-            <div class="flex gap-10 mb-5">
+
+    {% if object.template_item %}
+        {% for signature in object.template_item.signatures.all %}
+            <div class="signature-form">
+                <div class="flex gap-10 mb-5">
+                    <label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
+                        {% translate 'library' %}
+                        <input class="w-full grow" value="{{ signature.library }}"/>
+                    </label>
+                    <label class="input input-bordered flex-0 gap-5 items-center flex" disabled>
+                        {% translate 'status' %}
+                        <input class="w-24" value="{{ signature.get_status_display }}"/>
+                    </label>
+                </div>
                 <label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
-                    {% translate 'library' %}
-                    <input class="w-full grow" value="{{ signature.library }}"/>
-                </label>
-                <label class="input input-bordered flex-0 gap-5 items-center flex" disabled>
-                    {% translate 'status' %}
-                    <input class="w-24" value="{{ signature.get_status_display }}"/>
+                    Signatur
+                    <input class="w-full grow" value="{{ signature.signature }}"/>
                 </label>
             </div>
-            <label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
-                Signatur
-                <input class="w-full grow" value="{{ signature.signature }}"/>
-            </label>
-        </div>
-    {% endfor %}
+        {% endfor %}
+    {% else %}
+        {% if object.items.count %}
+            <p class="text-primary">
+                {% translate 'no template item' %}
+            </p>
+        {% else %}
+            <p class="text-primary">
+                {% translate 'no items' %}
+            </p>
+        {% endif %}
+    {% endif %}
 
 {% endif %}
 

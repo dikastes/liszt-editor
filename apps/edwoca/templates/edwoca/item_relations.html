@@ -39,40 +39,34 @@
 {% endfor %}
 </ul>
 
-<h3>
+<h3 class="my-5">
     {% translate 'link item' %}
 </h3>
 
 {% if show_search_form == True %}
 
-<form action="{% url 'edwoca:item_relations' object.id %}" method="get">
+<form class="flex" action="{% url 'edwoca:item_relations' object.id %}" method="get">
     {{ searchform.q }}
     <input type="hidden" name="target_model" value="item">
-    <input type="submit" id="submit-form" class="btn" />
+    <input class="btn btn-outline border-l-0" value="{% translate 'search' %}" type="submit" id="submit-form" class="btn" />
 </form>
 
 <ul>
-{% if query %}
-    {% for found_item in found_items %}
-        <li>
-            <a href="{% url 'edwoca:related_item_add' object.id found_item.object.id %}">
-                {{ found_item.object }}
-            </a>
-        </li>
-    {% empty %}
-        <li>
-            <em>
-                {% translate 'no search results' %}
-            </em>
-        </li>
-    {% endfor %}
-{% else %}
-    <li>
-        <em>
-            {% translate 'please enter search term' %}
-        </em>
-    </li>
-{% endif %}
+    {% if query %}
+        {% for found_item in found_items %}
+            <li>
+                <a href="{% url 'edwoca:related_item_add' object.id found_item.object.id %}">
+                    {{ found_item.object }}
+                </a>
+            </li>
+        {% empty %}
+            <li>
+                <em>
+                    {% translate 'no search results' %}
+                </em>
+            </li>
+        {% endfor %}
+    {% endif %}
 </ul>
 
 {% else %}
