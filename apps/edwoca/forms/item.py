@@ -110,25 +110,26 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'class': SimpleFormMixin.select_classes
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
             }
         }
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
             required = False
         )
     start_qualifier = ChoiceField(
             label = _('not before mode'),
             choices = Period.StartQualifier,
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
             required = False
         )
     end_qualifier = ChoiceField(
             label = _('not after mode'),
             choices = Period.EndQualifier,
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
             required = False
         )
     not_before = DateField(
@@ -144,13 +145,16 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     display = CharField(
             label = _('display'),
             required=False,
-            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes })
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes , 'form': 'form'})
         )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = {
+                        'class': 'radio', 'form': 'form',
+                        'form': 'form'
+                    }
                 ),
             required = False
         )
@@ -197,25 +201,26 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'class': SimpleFormMixin.select_classes
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
             }
         }
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
             required = False
         )
     start_qualifier = ChoiceField(
             label = _('not before mode'),
             choices = Period.StartQualifier,
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
             required = False
         )
     end_qualifier = ChoiceField(
             label = _('not after mode'),
             choices = Period.EndQualifier,
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
             required = False
         )
     not_before = DateField(
@@ -231,13 +236,16 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     display = CharField(
             label = _('display'),
             required=False,
-            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes })
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes , 'form': 'form'})
         )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = {
+                        'class': 'radio', 'form': 'form',
+                        'form': 'form'
+                    }
                 ),
             required = False
         )

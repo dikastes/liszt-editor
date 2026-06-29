@@ -3,6 +3,21 @@
 import django.db.migrations.operations.special
 from django.db import migrations, models
 
+
+def migrate_completeness(apps, schema_editor):
+    Manifestation = apps.get_model('edwoca', 'manifestation')
+
+    Manifestation.objects.filter(manifestation_form = 'EX').update(completeness = 'i')
+
+    for m in Manifestation.objects.filter(manifestation_form = 'FR'):
+        m.private_comment = m.private_comment + '\nFragment'
+        m.needs_review = True
+        m.save()
+
+    Manifestation.objects.filter(manifestation_form = 'EX').update(manifestation_form = None)
+    Manifestation.objects.filter(manifestation_form = 'FR').update(manifestation_form = None)
+
+
 def update_ownership(apps, schema_editor):
     Pps = apps.get_model('dmrism', 'PersonProvenanceStation')
     Cps = apps.get_model('dmrism', 'CorporationProvenanceStation')
@@ -68,6 +83,7 @@ class Migration(migrations.Migration):
             name='print_type',
             field=models.CharField(choices=[('P', 'Plate Print'), ('L', 'Lithograph')], default=None, max_length=10, null=True, verbose_name='print type'),
         ),
+        migrations.RunPython(migrate_completeness, reverse_code=migrations.RunPython.noop),
         migrations.RunPython(
             code=transfer_completeness,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,

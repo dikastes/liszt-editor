@@ -1,0 +1,180 @@
+{% load i18n %}
+
+<div class="collapse collapse-arrow bg-base-100 my-5">
+    <input type="checkbox" />
+
+    <div class="collapse-title truncate">
+        {{ station.instance }}
+    </div>
+
+    <div class="collapse-content mt-5">
+
+        {# there may be many persons involved as owners #}
+        {% if provenance_class == 'person' %}
+            {% for owner in station.form.instance.owner.all %}
+                <div class="flex items-end mt-5 gap-5">
+                    <label class="flex-1 gap-2">
+                        <div class="label">
+                            <span class="label-text">
+                                {% translate 'owner' %}
+                            </span>
+                        </div>
+                        <div class="w-full bg-white border border-black pseudo-input flex items-center">
+                            {{ owner }}
+                        </div>
+                    </label>
+                    <button class="btn btn-outline btn-primary" type="submit" form="form" name="remove-provenance-owner-person" value="{{ station.instance.id }}/{{ owner.id }}">
+                        {% translate 'remove' %}
+                    </button>
+                </div>
+            {% endfor %}
+            <div id="search-container-personprovenancestation-{{station.instance.id }}-owner">
+            </div>
+            <div class="my-5">
+                <div>
+                    {% include 'edwoca/partials/htmx/search.html' with label='owner' search_type='person_owner' field_name='owner' app='dmrism' model_name='personprovenancestation' target_app='dmad' target_model='person' target_id=station.instance.id|stringformat:"s"|add:"-pers" id=station.instance.id placeholder='search persons' multiplicity='multiple' %}
+                </div>
+            </div>
+        {% else %}
+        {# corporation owner #}
+            {% if station.instance.owner %}
+                <div class="flex items-end mt-5 gap-5">
+                    <label class="flex-1 gap-2">
+                        <div class="label">
+                            <span class="label-text">
+                                {% translate 'owner' %}
+                            </span>
+                        </div>
+                        <div class="w-full bg-white border border-black pseudo-input flex items-center">
+                            {{ station.instance.owner }}
+                        </div>
+                    </label>
+                    <button class="btn btn-outline btn-primary" type="submit" form="form" name="remove-provenance-owner-corporation" value="{{ station.instance.id }}">
+                        {% translate 'remove' %}
+                    </button>
+                </div>
+            {% else %}
+                <div id="search-container-{{ provenance_class }}provenancestation-{{station.instance.id }}-owner">
+                    <div class="my-5">
+                        <div>
+                            {% include 'edwoca/partials/htmx/search.html' with label='owner' search_type=provenance_class|add:'_owner' field_name='owner' app='dmrism' model_name=provenance_class|add:'provenancestation' target_app='dmad' target_model=provenance_class target_id=station.instance.id|stringformat:"s"|add:"-pers" id=station.instance.id placeholder='search '|add:provenance_class|add:'s' %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        {% endif %}
+
+        {% comment %}
+        {% if entry.owner_results %}
+            <ul class="border bg-white border-black p-2 h-32 overflow-auto">
+                {% for person in entry.owner_results %}
+                    <li>
+                        <a href="{% url 'edwoca:person_provenance_add_owner' item.id entry.form.instance.id person.pk %}">
+                            {{ person.object }}
+                        </a>
+                    </li>
+                {% empty %}
+                    <li>{% translate 'no search results' %}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+        {% endcomment %}
+
+        {{ station.form.as_daisy }}
+
+        <h3 class="my-5">
+            {% translate 'provenance proof (bibliography)' %}
+        </h3>
+
+        <ul>
+            {% for bib_form in station.bib_forms %}
+                <li class="my-5">
+                    <div class="p-5 border-black border">
+                        <div class="label">
+                            <span class="label-text">{% translate 'title' %}</span>
+                        </div>
+
+                        <div class="pseudo-input bg-white border border-black flex items-center">
+                            {{ bib_form.instance.bib }}
+                        </div>
+
+                        {{ bib_form.as_daisy }}
+
+                        <div class="flex">
+                            <div class="flex-1"></div>
+                            <button form="form" type="submit" name="remove-{{ provenance_class }}-provenance-bib" class="btn btn-outline btn-primary" value="{{ bib_form.instance.bib.zot_key }}">
+                                {% translate 'remove reference' %}
+                            </button>
+                        </div>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div id="search-container-{{ provenance_class }}provenancestation-{{ station.instance.id }}-bib">
+        </div>
+        <div class="my-5">
+            <div>
+                {% include 'edwoca/partials/htmx/search.html' with label='title' search_type=provenance_class|add:'_bib' field_name='bib' app='dmrism' model_name=provenance_class|add:'provenancestation' target_app='bib' target_model='zotitem' target_id=station.instance.id|stringformat:"s"|add:"-pers" id=station.instance.id placeholder='search bibliography' multiplicity='multiple' %}
+            </div>
+        </div>
+
+        <h3 class="my-5">
+            {% translate 'provenance proof (letter)' %}
+        </h3>
+
+        <ul>
+            {% for letter in station.instance.letters.all %}
+                <li class="my-5">
+                    <div class="flex gap-5 items-center">
+                        <label class="pseudo-input bg-white border border-black flex-1 flex items-center">
+                            {{ letter }}
+                        </label>
+                        <button name="remove-{{ provenance_class }}-provenance-letter" form="form" type="submit" class="btn btn-primary btn-outline" value="{{ station.instance.id }}/{{ letter.id }}">
+                            {% translate 'remove' %}
+                        </button>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+
+        <div id="search-container-{{ provenance_class }}provenancestation-{{ station.instance.id }}-letters">
+        </div>
+        <div class="my-5">
+            <div>
+                {# letter knows provstation, probably logic must be reversed #}
+                {% include 'edwoca/partials/htmx/search.html' with label='letter' search_type=provenance_class|add:'_letter' field_name='letters' app='dmrism' model_name=provenance_class|add:'provenancestation' target_app='edwoca' target_model='letter' target_id=station.instance.id|stringformat:"s"|add:"-pers" id=station.instance.id placeholder='search letters' multiplicity='multiple' %}
+            </div>
+        </div>
+
+        <h3 class="my-5">
+            {% translate 'provenance proof (web)' %}
+        </h3>
+
+        {% for web_reference_form in station.webref_forms %}
+            <div class="my-5 border border-black p-5 my-5">
+                    {{ web_reference_form.as_daisy }}
+                <div class="flex mt-5">
+                    <div class="flex-1"></div>
+                    <button class="btn btn-outline btn-primary" form="form" name="remove-{{ provenance_class }}-provenance-webref" value="{{ web_reference_form.instance.id }}">
+                        {% translate 'remove web reference' %}
+                    </button>
+                </div>
+            </div>
+        {% endfor %}
+
+        <div class="flex my-5 justify-end">
+            <button form="form" name="add-{{ provenance_class }}-provenance-webref" value="{{ station.instance.id }}" class="btn btn-outline">
+                {% translate 'add web reference' %}
+            </button>
+        </div>
+
+        <div class="flex">
+            <div class="flex-1"></div>
+            <button form="form" name="remove-{{ provenance_class }}-provenance-station" value="{{ station.instance.id }}" class="btn btn-outline btn-primary">
+                {% translate 'remove provenance station' %}
+            </button>
+        </div>
+
+    </div>
+</div>
