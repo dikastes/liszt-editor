@@ -1,9 +1,10 @@
 import re
 
 from haystack.query import SearchQuerySet
-
 from dmad_on_django.models import Corporation, Period
-
+from dmrism import models as dmrism_models
+from edwoca import forms as edwoca_forms
+from haystack.query import SQ
 from ...forms.manifestation import *
 from calendar import monthrange
 from ...forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm, ItemTextTypeForm
@@ -203,12 +204,12 @@ def manifestation_create(request, publisher_pk=None):
 
         form = ManifestationCreateForm(data)
         if form.is_valid():
-            
+
             display = form.cleaned_data.get('display')
             period = Period.objects.create(
                 display=display,
             )
-            
+
             try:
                 period.parse_display()
                 period.save()
@@ -229,9 +230,6 @@ def manifestation_create(request, publisher_pk=None):
                         publisher = chosen_publisher,
                         manifestation = manifestation
                 )
-
-           
-            
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
     else:
@@ -745,6 +743,7 @@ def manifestation_print_update(request, pk):
             context['text_type_form'] = text_type_form
             return render(request, 'edwoca/manifestation_print.html', context)
 
+        #breakpoint()
         if 'calculate-machine-readable-date' in request.POST:
             manifestation.period.parse_display()
             manifestation.period.save()
@@ -840,6 +839,171 @@ class ManifestationClassificationUpdateView(SimpleFormView):
     model = Manifestation
     property = 'classification'
     view_title = _('source category')
+
+
+def manifestation_provenance(request, pk):
+    manifestation = get_object_or_404(EdwocaManifestation, pk=pk)
+    item = manifestation.get_single_item()
+    context = {
+        'object': manifestation,
+        'entity_type': 'manifestation',
+    }
+
+    def construct_ps_set(ps_class, post = None):
+        stations = []
+
+        for obj in getattr(item, f'{ps_class}_provenance_stations').all():
+            prefix = f'{ps_class}_provenance_{obj.id}'
+            form = getattr(edwoca_forms, f'{ps_class.capitalize()}ProvenanceStationForm')(post, instance=obj, prefix=prefix)
+            bib_forms = []
+            for bib in obj.bib_set.all():
+                prefix = f'{ps_class}_ps_bib_{bib.bib.zot_key}'
+                bib_form = getattr(edwoca_forms, f'{ps_class.capitalize()}ProvenanceStationBibForm')(post, instance=bib, prefix=prefix)
+                bib_forms += [ bib_form ]
+            webref_forms = []
+            for pp_webref in obj.web_references.all():
+                prefix = f'{ps_class}_ps_webref_{pp_webref.id}'
+                webref_form = getattr(edwoca_forms, f'{ps_class.capitalize()}ProvenanceStationWebReferenceForm')(post, instance=pp_webref, prefix=prefix)
+                webref_forms += [ webref_form ]
+            stations.append({
+                'instance': obj,
+                'form': form,
+                'bib_forms': bib_forms,
+                'webref_forms': webref_forms
+                })
+
+        return stations
+
+    if request.method == 'POST':
+
+        # create provenance station
+        pp_stations = construct_ps_set('person', request.POST)
+        cp_stations = construct_ps_set('corporation', request.POST)
+
+        for ps_class in ['person', 'corporation']:
+            ps_key = f'add-{ps_class}-provenance-station'
+            if ps_key in request.POST:
+                period = Period.objects.create()
+                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item, period = period)
+            webref_key = f'add-{ps_class}-provenance-webref'
+            if webref_key in request.POST:
+                station_id = request.POST.get(webref_key)
+                station = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = station_id)
+                creation_kwargs = { f'{ps_class}_provenance_station': station }
+                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStationWebReference').objects.create(**creation_kwargs)
+
+        pps_forms = []
+        pps_bib_forms = []
+        pps_webref_forms = []
+
+        # take care of saving webref forms, bib forms
+        pps_forms = []
+        for pps_obj in pp_stations:
+            prefix = f'person_provenance_{pps_obj['instance'].id}'
+            pps_form = PersonProvenanceStationForm(request.POST, instance=pps_obj['instance'], prefix=prefix)
+            pps_forms += [ pps_form ]
+            for bib_form in pps_obj['bib_forms']:
+                pps_bib_forms += [ bib_form ]
+            for webref_form in pps_obj['webref_forms']:
+                pps_webref_forms += [ webref_form ]
+
+        cps_forms = []
+        cps_bib_forms = []
+        cps_webref_forms = []
+
+        for cps_obj in cp_stations:
+            prefix = f'corporation_provenance_{cps_obj['instance'].id}'
+            cps_form = PersonProvenanceStationForm(request.POST, instance=cps_obj['instance'], prefix=prefix)
+            cps_forms += [ cps_form ]
+            for bib_form in cps_obj['bib_forms']:
+                cps_bib_forms += [ bib_form ]
+            for webref_form in cps_obj['webref_forms']:
+                cps_webref_forms += [ webref_form ]
+
+        provenance_comment_form = ItemProvenanceCommentForm(request.POST, instance=item)
+
+        all_forms = (pps_forms +
+            pps_bib_forms +
+            pps_webref_forms +
+            cps_forms +
+            cps_bib_forms +
+            cps_webref_forms +
+            [ provenance_comment_form ]
+        )
+
+        if all(form.is_valid() for form in all_forms):
+            for form in all_forms:
+                form.save()
+        else:
+            context['pp_stations'] = pp_stations
+            context['cp_stations'] = cp_stations
+            context['form'] = provenance_comment_form
+            return render(request, 'edwoca/provenance.html', context)
+
+        powner_key = 'remove-provenance-owner-person'
+        if powner_key in request.POST:
+            ps_station_id, person_id = request.POST.get(powner_key).split('/')
+            ps_station = PersonProvenanceStation.objects.get(pk=ps_station_id)
+            person = Person.objects.get(pk=person_id)
+            ps_station.owner.remove(person)
+        cowner_key = 'remove-provenance-owner-corporation'
+        if cowner_key in request.POST:
+            ps_station_id = request.POST.get(cowner_key)
+            ps_station = CorporationProvenanceStation.objects.get(pk=ps_station_id)
+            ps_station.owner = None
+            ps_station.save()
+
+        for ps_class in ['person', 'corporation']:
+            # remove bib from provenance station
+            bib_key = f'remove-{ps_class}-provenance-bib'
+            if bib_key in request.POST:
+                bib_id = request.POST.get(bib_key)
+                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStationBib').objects.get(bib__zot_key=bib_id).delete()
+            # remove letter from provenance station
+            letter_key = f'remove-{ps_class}-provenance-letter'
+            if letter_key in request.POST:
+                ps_station_id, letter_id = request.POST.get(letter_key).split('/')
+                ps_station = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk=ps_station_id)
+                letter = Letter.objects.get(pk=letter_id)
+                getattr(letter, f'{ps_class}_provenance').remove(ps_station)
+            # remove webref from provenance station
+            webref_key = f'remove-{ps_class}-provenance-webref'
+            if webref_key in request.POST:
+                webref_id = request.POST.get(webref_key)
+                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStationWebReference').objects.get(pk=webref_id).delete()
+            # remove provenance station
+            ps_key = f'remove-{ps_class}-provenance-station'
+            if ps_key in request.POST:
+                ps_id = request.POST.get(ps_key)
+                ps = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = ps_id)
+                ps.delete()
+
+        calculate_date_string = '-calculate-machine-readable-date'
+        clear_date_string = '-clear-machine-readable-date'
+        separator = '_provenance_'
+        for key in request.POST.keys():
+            if calculate_date_string in key:
+                ps_class, id = key.replace(calculate_date_string, '').split(separator)
+                ps = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = id)
+                ps.period.parse_display()
+                ps.period.save()
+            if clear_date_string in key:
+                ps_class, id = key.replace(clear_date_string, '').split(separator)
+                ps = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = id)
+                ps.period.not_before = None
+                ps.period.not_after = None
+                ps.period.save()
+
+        return redirect('edwoca:manifestation_provenance', pk=pk)
+    else:
+        pp_stations = construct_ps_set('person')
+        cp_stations = construct_ps_set('corporation')
+        provenance_comment_form = ItemProvenanceCommentForm(instance=item)
+
+        context['pp_stations'] = pp_stations
+        context['cp_stations'] = cp_stations
+        context['form'] = provenance_comment_form
+        return render(request, 'edwoca/provenance.html', context)
 
 
 class ManifestationProvenanceView(UpdateView):
@@ -1100,158 +1264,6 @@ class ManifestationProvenanceView(UpdateView):
             instance.save(update_fields=['period'])
         return instance.period
 
-
-"""
-def manifestation_provenance(request, pk):
-    manifestation = get_object_or_404(Manifestation, pk=pk)
-    item = manifestation.items.all()[0]
-
-    context = {
-        'object': manifestation,
-        'entity_type': 'manifestation',
-        'item': item
-    }
-
-    if request.method == 'POST':
-        person_provenance_forms = []
-        for pps_obj in item.person_provenance_stations.all():
-            prefix = f'person_provenance_{pps_obj.id}'
-            pps_form = PersonProvenanceStationForm(request.POST, instance=pps_obj, prefix=prefix)
-            pps_bib_forms = []
-            for pps_bib in pps_obj.bib_set.all():
-                prefix = f'person_provenance_bib_{pps_bib.id}'
-                pps_bib_forms.append(PersonProvenanceStationBibForm(request.POST, instance=pps_bib, prefix=prefix))
-
-            if f'{prefix}-calculate-machine-readable-date' in request.POST:
-                period = pps_obj.period
-                period.parse_display()
-                period.save()
-                pps_form = PersonProvenanceStationForm(instance=pps_obj, prefix=prefix)
-            if f'{prefix}-clear-machine-readable-date' in request.POST:
-                period = pps_obj.period
-                period.not_before = None
-                period.not_after = None
-                period.assumed = False
-                period.inferred = False
-                period.save()
-                pps_form = PersonProvenanceStationForm(instance=pps_obj, prefix=prefix)
-            person_provenance_forms.append(pps_form)
-
-        corporation_provenance_forms = []
-        for cps_obj in item.corporation_provenance_stations.all():
-            prefix = f'corporation_provenance_{cps_obj.id}'
-            cps_form = CorporationProvenanceStationForm(request.POST, instance=cps_obj, prefix=prefix)
-
-            if f'{prefix}-calculate-machine-readable-date' in request.POST:
-                period = cps_obj.period
-                period.parse_display()
-                period.save()
-                cps_form = PersonProvenanceStationForm(instance=cps_obj, prefix=prefix)
-            if f'{prefix}-clear-machine-readable-date' in request.POST:
-                period = cps_obj.period
-                period.not_before = None
-                period.not_after = None
-                period.assumed = False
-                period.inferred = False
-                period.save()
-                cps_form = PersonProvenanceStationForm(instance=cps_obj, prefix=prefix)
-            corporation_provenance_forms.append(cps_form)
-
-        # Handle private_provenance_comment form
-        provenance_comment_form = ItemProvenanceCommentForm(request.POST, instance=item)
-        if provenance_comment_form.is_valid():
-            provenance_comment_form.save()
-
-        context['provenance_comment_form'] = provenance_comment_form
-        breakpoint()
-        if pps_form.is_valid()\
-            and all(f.is_valid() for f in pps_bib_forms)\
-            and cps_form.is_valid()\
-            and all(f.is_valid() for f in cps_bib_forms)\
-            and provenance_comment_form.is_valid():
-            cps_form.save()
-            pps_form.save()
-            provenance_comment_form.save()
-
-            for form in pps_bib_forms + cps_bib_forms:
-                form.save()
-
-        else:
-            context['person_provenance_forms'] = person_provenance_forms
-            context['corporation_provenance_forms'] = corporation_provenance_forms
-            # ab hier muss ergänzt werden
-            context['']
-
-        return redirect()
-
-    else:
-        # Initialize forms for existing PersonProvenanceStation
-        person_provenance_forms = []
-        for pps_obj in item.person_provenance_stations.all():
-            prefix = f'person_provenance_{pps_obj.id}'
-            person_provenance_station_bib_forms = []
-            for bib_obj in pps_obj.bib_set.all():
-                prefix = f'person_provenance_bib_{bib_obj.id}'
-                person_provenance_station_bib_forms.append(PersonProvenanceStationBibForm(instance=bib_obj, prefix=prefix))
-            person_provenance_forms.append({
-                    'pps_form': PersonProvenanceStationForm(instance=pps_obj, prefix=prefix),
-                    'pps_bib_forms': person_provenance_station_bib_forms
-                })
-        context['person_provenance_forms'] = person_provenance_forms
-
-        # Initialize forms for existing CorporationProvenanceStation
-        corporation_provenance_forms = []
-        for cps_obj in item.corporation_provenance_stations.all():
-            prefix = f'corporation_provenance_{cps_obj.id}'
-            corporation_provenance_station_bib_forms = []
-            for bib_obj in cps_obj.bib_set.all():
-                prefix = f'corporation_provenance_bib_{bib_obj.id}'
-                corporation_provenance_station_bib_forms.append(CorporationProvenanceStationBibForm(instance=bib_obj, prefix=prefix))
-            corporation_provenance_forms.append({
-                    'cps_form': CorporationProvenanceStationForm(instance=cps_obj, prefix=prefix),
-                    'cps_bib_forms': corporation_provenance_station_bib_forms
-                })
-        context['corporation_provenance_forms'] = corporation_provenance_forms
-
-        # Initialize private_provenance_comment form
-        provenance_comment_form = ItemProvenanceCommentForm(instance=item)
-        context['provenance_comment_form'] = provenance_comment_form
-
-    q_bib = request.GET.get('bib-q')
-    q_owner = request.GET.get('owner-q')
-
-    if q_bib:
-        bib_search_form = FramedSearchForm(request.GET, prefix='bib')
-        if bib_search_form.is_valid():
-            context['query_bib'] = bib_search_form.cleaned_data.get('q')
-            context['found_bibs'] = bib_search_form.search().models(ZotItem)
-    else:
-        bib_search_form = FramedSearchForm(prefix='bib', placeholder=_('search zotero'))
-
-    if q_owner:
-        owner_search_form = FramedSearchForm(request.GET, prefix='owner')
-        if owner_search_form.is_valid():
-            context['query_owner'] = owner_search_form.cleaned_data.get('q')
-            context['found_persons'] = owner_search_form.search().models(Person)
-            context['found_corporations'] = owner_search_form.search().models(Corporation)
-    else:
-        owner_search_form = FramedSearchForm(prefix='owner', placeholder=_('search persons'))
-
-    context['bib_search_form'] = bib_search_form
-    context['owner_search_form'] = owner_search_form
-
-    q_letter = request.GET.get('letter-q')
-    if q_letter:
-        letter_search_form = FramedSearchForm(request.GET, prefix='letter')
-        if letter_search_form.is_valid():
-            context['query_letter'] = letter_search_form.cleaned_data.get('q')
-            context['found_letters'] = letter_search_form.search().models(Letter)
-    else:
-        letter_search_form = FramedSearchForm(prefix='letter', placeholder=_('search letters'))
-    context['letter_search_form'] = letter_search_form
-
-    return render(request, 'edwoca/manifestation_provenance.html', context)
-"""
 
 def person_provenance_add(request, item_id):
     item = get_object_or_404(Item, pk=item_id)

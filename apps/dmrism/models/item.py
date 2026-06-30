@@ -372,17 +372,19 @@ class PersonProvenanceStation(models.Model):
             max_length = 3,
             choices = BaseProvenanceStation.PeriodStatus,
             default = BaseProvenanceStation.PeriodStatus.OWNERSHIP,
-            verbose_name = _('period status')
+            verbose_name = _('period status'),
+            blank = True,
+            null = True
         )
 
     def __str__(self):
         if len(self.owner.all()) > 1:
-            owner_string = str(self.owner.first()) + ' et al.'
+            owner_string = str(self.owner.first()) + _(' et al.')
         elif len(self.owner.all()) == 1:
             owner_string = str(self.owner.first())
         else:
             return str(_('<< new provenance station >>'))
-        period_string = self.period or 'ohne Zeitraum'
+        period_string = self.period or _('no year')
         return f'{str(owner_string)} ({str(period_string)})'
 
 
@@ -414,7 +416,9 @@ class CorporationProvenanceStation(models.Model):
             max_length = 3,
             choices = BaseProvenanceStation.PeriodStatus,
             default = BaseProvenanceStation.PeriodStatus.OWNERSHIP,
-            verbose_name = _('period status')
+            verbose_name = _('period status'),
+            blank = True,
+            null = True
         )
 
     def __str__(self):
@@ -503,7 +507,9 @@ class BaseProvenanceStationWebReference(models.Model):
         abstract = True
 
     url = models.URLField(
-            verbose_name = _('URL')
+            verbose_name = _('URL'),
+            blank = True,
+            null = True
         )
     comment = models.TextField(
             blank = True,

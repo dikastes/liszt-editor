@@ -577,7 +577,7 @@ class ManifestationCreateForm(forms.Form):
     source_title = forms.CharField(label=_('source title'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))
 
     publisher = forms.IntegerField(
         widget=forms.HiddenInput(),
@@ -588,7 +588,7 @@ class ManifestationCreateForm(forms.Form):
         label=_('publisher'),
         required=False,
         widget=TextInput(attrs={
-            'class': 'input input-bordered w-full',
+            'class': 'input input-bordered w-full bg-white border-black',
             'placeholder': _('search publisher'),
             'hx-get': '/edwoca/manifestations/publisher-search',
             'hx-trigger': 'keyup changed delay:300ms',
@@ -599,10 +599,6 @@ class ManifestationCreateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.is_collection = kwargs.pop('is_collection', False)
         self.publisher_instance = kwargs.pop('publisher', None)
-        #if self.publisher_instance:
-            #self.initial['publisher'] = self.publisher_instance
-            #self.fields['publisher'].queryset = Corporation.objects.filter(pk=self.publisher_instance.pk)
-            #self.fields['publisher'].widget.attrs['disabled'] = True
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -678,13 +674,14 @@ class ManifestationCreateForm(forms.Form):
         # Date Fields
         display_field = self['display']
 
-        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container = label(cls='form-control w-full')
+        display_label = div(cls='label')
+        display_label.add(span(_('display'), cls='label-text'))
+        display_container.add(display_label)
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        form.add(period_palette)
         form.add(display_container)
 
         return mark_safe(str(form))
@@ -783,19 +780,28 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
             required = False
         )
     start_qualifier = ChoiceField(
             label = _('not before mode'),
             choices = Period.StartQualifier,
-            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            widget = Select(attrs = {
+                    'class': 'select border border-black bg-white w-40',
+                    'form': 'form'
+                }),
             required = False
         )
     end_qualifier = ChoiceField(
             label = _('not after mode'),
             choices = Period.EndQualifier,
-            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            widget = Select(attrs = {
+                    'class': 'select border border-black bg-white w-40',
+                    'form': 'form'
+                }),
             required = False
         )
     not_before = DateField(
@@ -808,16 +814,31 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
             widget = SelectDateWidget(**kwargs),
             required = False
         )
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
+    display = CharField(required=False, widget = TextInput(
+            attrs = {
+                'class': SimpleFormMixin.text_input_classes,
+                'form': 'form'
+            }),
+            label=Period.display.field.verbose_name
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': SimpleFormMixin.radio_classes, 'form': 'form'}
+                    attrs = {
+                            'class': SimpleFormMixin.radio_classes,
+                            'form': 'form'
+                        }
                 ),
             required = False
         )
-    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(widget = CheckboxInput(
+            attrs = {
+                    'class': 'toggle',
+                    'form': 'form'
+                }),
+            required = False
+        )
     period_instance = None
 
     class Meta:

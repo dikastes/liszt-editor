@@ -303,7 +303,7 @@ class DateFormMixin:
 
         self.period_instance = getattr(self.instance, self.period_property)
         if not self.period_instance:
-            self.period_instance = Period()
+            self.period_instance = Period.objects.create()
         if self.period_instance.time_mode == Period.TimeMode.POINT:
             self.fields['start_qualifier'].widget.attrs['disabled'] = True
 

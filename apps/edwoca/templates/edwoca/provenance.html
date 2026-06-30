@@ -1,0 +1,66 @@
+{% extends 'edwoca/base.html' %}
+
+{% load i18n %}
+
+{% block content %}
+
+{% include 'edwoca/partials/manifestation/preview-divs/provenance_prolog.html' %}
+
+<form method="post" id="form" class="hidden">
+    {% csrf_token %}
+    <input type="submit" class="hidden" id="submit-form">
+</form>
+
+<h2 class="my-5">
+    {% translate 'provenance persons' %}
+</h2>
+
+{% include 'edwoca/partials/formset_management.html' with formset=person_formset form_id='form' %}
+
+<div class="my-5">
+    {% for pp_station in pp_stations %}
+        {% include 'edwoca/partials/forms/provenance_station_form.html' with provenance_class='person' station=pp_station %}
+    {% empty %}
+        <p class="note">
+            {% translate 'no provenance entries' %}
+        </p>
+    {% endfor %}
+</div>
+
+<div class="flex justify-end">
+    <button form="form" class="btn btn-outline flex-0" name="add-person-provenance-station">
+        {% translate 'add person provenance station' %}
+    </button>
+</div>
+
+<h2 class="my-5">
+    {% translate 'provenance corporations' %}
+</h2>
+
+{% include 'edwoca/partials/formset_management.html' with formset=corporation_formset form_id='form' %}
+
+<div class="my-5">
+    {% for cp_station in cp_stations %}
+        {% include 'edwoca/partials/forms/provenance_station_form.html' with provenance_class='corporation' station=cp_station %}
+    {% empty %}
+        <p class="note">
+            {% translate 'no provenance entries' %}
+        </p>
+    {% endfor %}
+</div>
+
+<div class="flex justify-end">
+    <button form="form" class="btn btn-outline flex-0" name="add-corporation-provenance-station">
+        {% translate 'add corporation provenance station' %}
+    </button>
+</div>
+
+<h2>
+    {% translate 'comment' %}
+</h2>
+
+{{ form.as_daisy }}
+
+{% include 'edwoca/partials/manifestation/preview-divs/provenance_epilog.html' %}
+
+{% endblock %}
