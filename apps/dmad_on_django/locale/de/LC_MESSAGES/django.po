@@ -73,7 +73,7 @@ msgstr "exakt"
 
 #: models/period.py:20
 msgid "not after"
-msgstr "nicht vor"
+msgstr "nicht nach"
 
 #: models/period.py:26
 msgid "start"
