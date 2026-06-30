@@ -577,18 +577,28 @@ class ManifestationCreateForm(forms.Form):
     source_title = forms.CharField(label=_('source title'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
-    publisher = forms.ModelChoiceField(queryset=Corporation.objects.all(), label=_('publisher'), empty_label=_('choose publisher'), widget=forms.Select(attrs={'class': 'select select-bordered w-full'}))
+    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))
+
+    publisher = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required = False,
+    )
+
+    publisher_search = forms.CharField(
+        label=_('publisher'),
+        required=False,
+        widget=TextInput(attrs={
+            'class': 'input input-bordered w-full bg-white border-black',
+            'placeholder': _('search publisher'),
+            'hx-get': '/edwoca/manifestations/publisher-search',
+            'hx-trigger': 'keyup changed delay:300ms',
+            'hx-target': '#publisher-results'
+        })
+    )
 
     def __init__(self, *args, **kwargs):
         self.is_collection = kwargs.pop('is_collection', False)
         self.publisher_instance = kwargs.pop('publisher', None)
-        #if self.publisher_instance:
-            #self.initial['publisher'] = self.publisher_instance
-            #self.fields['publisher'].queryset = Corporation.objects.filter(pk=self.publisher_instance.pk)
-            #self.fields['publisher'].widget.attrs['disabled'] = True
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -622,16 +632,21 @@ class ManifestationCreateForm(forms.Form):
                 temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
             form.add(temporary_title_container)
 
-        # Publisher
-        publisher_field = self['publisher']
+        publisher_wrapper = div(cls='w-full relative')
+        publisher_wrapper.add(raw(str(self['publisher'])))
+
         publisher_container = label(cls='form-control w-full')
         publisher_label = div(cls='label')
-        publisher_label.add(span(publisher_field.label, cls='label-text'))
+        publisher_label.add(span(self['publisher_search'].label, cls='label-text'))
         publisher_container.add(publisher_label)
-        publisher_container.add(raw(str(publisher_field)))
-        if publisher_field.errors:
-            publisher_container.add(div(span(publisher_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(publisher_container)
+        publisher_container.add(raw(str(self['publisher_search'])))
+        if self['publisher'].errors:
+            publisher_container.add(div(span(self['publisher'].errors, cls='text-primary text-sm'), cls='label'))
+
+        publisher_wrapper.add(publisher_container)
+        publisher_wrapper.add(
+            div(id='publisher-results', cls='absolute z-50 w-full top-[85px] bg-base-100 rounded-box shadow-lg'))
+        form.add(publisher_wrapper)
 
         # Plate Number
         plate_number_field = self['plate_number']
@@ -657,37 +672,16 @@ class ManifestationCreateForm(forms.Form):
             form.add(source_type_container)
 
         # Date Fields
-        not_before_field = self['not_before']
-        not_after_field = self['not_after']
         display_field = self['display']
 
-        not_before_container = label(cls='form-control')
-        not_before_label = div(not_before_field.label, cls='label-text')
-        not_before_selects = div(cls='flex')
-        not_before_selects.add(raw(str(not_before_field)))
-        not_before_container.add(not_before_label)
-        not_before_container.add(not_before_selects)
-        if not_before_field.errors:
-            not_before_container.add(div(span(not_before_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        not_after_container = label(cls='form-control')
-        not_after_label = div(not_after_field.label, cls='label-text')
-        not_after_selects = div(cls='flex')
-        not_after_selects.add(raw(str(not_after_field)))
-        not_after_container.add(not_after_label)
-        not_after_container.add(not_after_selects)
-        if not_after_field.errors:
-            not_after_container.add(div(span(not_after_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        display_container = label(display_field.label, _for = display_field.id_for_label, cls='input input-bordered flex items-center gap-2 my-5')
+        display_container = label(cls='form-control w-full')
+        display_label = div(cls='label')
+        display_label.add(span(_('display'), cls='label-text'))
+        display_container.add(display_label)
         display_container.add(raw(str(display_field)))
         if display_field.errors:
             display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        period_palette = div(cls='flex flex-rows w-full gap-10 my-5')
-        period_palette.add(not_before_container)
-        period_palette.add(not_after_container)
-        form.add(period_palette)
         form.add(display_container)
 
         return mark_safe(str(form))
@@ -738,9 +732,6 @@ class SingletonCreateForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.is_collection = kwargs.pop('is_collection', False)
         super().__init__(*args, **kwargs)
-
-        sig_field = self.fields['signature']
-        sig_field.label = f'{sig_field.label}*'
 
     def as_daisy(self):
         root = div(cls="flex flex-col gap-5")

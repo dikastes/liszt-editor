@@ -81,4 +81,5 @@ urlpatterns = [
     path('<int:pk>/delete', views.ManifestationDeleteView.as_view(), name = 'manifestation_delete'),
     path('<int:pk>/addplace/<int:place_id>', views.manifestation_add_place_view, name = 'manifestation_place_add'),
     path('<int:pk>/remove_place/<int:place_id>', views.manifestation_remove_place_view, name = 'manifestation_remove_place'),
+    path('publisher-search', views.publisher_search_view, name='publisher_search_view'),
 ]
