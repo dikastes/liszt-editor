@@ -38,7 +38,7 @@ class Period(DocumentationStatusMixin):
     time_mode = models.CharField(
             max_length = 1,
             choices = TimeMode.choices,
-            default = TimeMode.SPAN,
+            default = TimeMode.POINT,
             verbose_name = _("time mode")
         )
     start_qualifier = models.CharField(
