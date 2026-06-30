@@ -281,7 +281,8 @@ def item_provenance(request, pk):
         for ps_class in ['person', 'corporation']:
             ps_key = f'add-{ps_class}-provenance-station'
             if ps_key in request.POST:
-                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item)
+                period = Period.objects.create()
+                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item, period = period)
             webref_key = f'add-{ps_class}-provenance-webref'
             if webref_key in request.POST:
                 station_id = request.POST.get(webref_key)
@@ -335,7 +336,7 @@ def item_provenance(request, pk):
             context['pp_stations'] = pp_stations
             context['cp_stations'] = cp_stations
             context['form'] = provenance_comment_form
-            return render(request, 'edwoca/manifestation_provenance.html', context)
+            return render(request, 'edwoca/provenance.html', context)
 
         powner_key = 'remove-provenance-owner-person'
         if powner_key in request.POST:
@@ -375,6 +376,22 @@ def item_provenance(request, pk):
                 ps = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = ps_id)
                 ps.delete()
 
+        calculate_date_string = '-calculate-machine-readable-date'
+        clear_date_string = '-clear-machine-readable-date'
+        separator = '_provenance_'
+        for key in request.POST.keys():
+            if calculate_date_string in key:
+                ps_class, id = key.replace(calculate_date_string, '').split(separator)
+                ps = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = id)
+                ps.period.parse_display()
+                ps.period.save()
+            if clear_date_string in key:
+                ps_class, id = key.replace(clear_date_string, '').split(separator)
+                ps = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = id)
+                ps.period.not_before = None
+                ps.period.not_after = None
+                ps.period.save()
+
         return redirect('edwoca:item_provenance', pk=pk)
     else:
         pp_stations = construct_ps_set('person')
@@ -384,7 +401,7 @@ def item_provenance(request, pk):
         context['pp_stations'] = pp_stations
         context['cp_stations'] = cp_stations
         context['form'] = provenance_comment_form
-        return render(request, 'edwoca/manifestation_provenance.html', context)
+        return render(request, 'edwoca/provenance.html', context)
     #q_bib = request.GET.get('bib-q')
     #q_owner = request.GET.get('owner-q')
 
