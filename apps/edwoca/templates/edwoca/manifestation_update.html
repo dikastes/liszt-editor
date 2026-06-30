@@ -4,16 +4,16 @@
 
 {% block content %}
 
+<form method="post" id="form">
+    {% csrf_token %}
+    <input type="submit" id="submit-form" class="hidden" />
+</form>
+
 {% if object.is_singleton %}
 
     <h2>
         {% translate 'manuscript' %}
     </h2>
-
-    <form method="post" id="form">
-        {% csrf_token %}
-        <input type="submit" id="submit-form" class="hidden" />
-    </form>
 
     <label>
         <div class="label">
@@ -126,11 +126,7 @@
         {% translate 'print' %}
     </h2>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ manifestation_form.as_daisy }}
-        <input type="submit" name="save_changes" id="submit-form" class="hidden">
-    </form>
+    {{ manifestation_form.as_daisy }}
 
     <h3 class="mb-5">
         {% translate 'template copy' %}
