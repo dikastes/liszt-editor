@@ -7,3 +7,13 @@ services:
     ports:
       - "6379:6379"
 
+  flower:
+    image: mher/flower:latest
+    container_name: liszt_flower
+    restart: unless-stopped
+    command: celery --broker=redis://redis:6379/0 flower
+    ports:
+      - "5555:5555"
+    depends_on:
+      - redis
+
