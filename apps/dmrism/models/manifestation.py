@@ -86,6 +86,12 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             verbose_name = _('source title'),
             default = ''
         )
+    title_page = models.TextField(
+            max_length = 200,
+            blank = True,
+            verbose_name = _('title page diplomatic'),
+            default = ''
+        )
     rism_id_unaligned = models.BooleanField(default=False)
     temporary = models.BooleanField(default=False)
     temporary_target = models.ForeignKey(
@@ -248,7 +254,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         )
     specific_figure = models.BooleanField(
             default = False,
-            verbose_name = 'specific figure'
+            verbose_name = _('specific figure')
         )
     plate_number = models.CharField(
             max_length=20,

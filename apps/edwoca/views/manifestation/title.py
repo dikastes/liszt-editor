@@ -20,9 +20,9 @@ def manifestation_title_update(request, pk):
             form.save()
         context['form'] = form
 
-        print_form = ManifestationPrintForm(request.POST, instance=manifestation)
-        if print_form.is_valid():
-            print_form.save()
+        title_page_form = ManifestationTitlePageForm(request.POST, instance=manifestation)
+        if title_page_form.is_valid():
+            title_page_form.save()
 
         if 'remove-title' in request.POST:
             manifestation_title = get_object_or_404(ManifestationTitle, pk = request.POST.get('remove-title'))
@@ -148,7 +148,9 @@ def manifestation_title_update(request, pk):
     else:
         # Initialize forms for existing titles
         form = ManifestationTitleDedicationForm(instance=manifestation)
+        title_page_form = ManifestationTitlePageForm(instance=manifestation)
         context['form'] = form
+        context['title_page_form'] = title_page_form
 
         title_forms = []
         for title_obj in manifestation.titles.all():
@@ -179,36 +181,6 @@ def manifestation_title_update(request, pk):
             prefix = f'corporation_dedication_{corporation_dedication.id}'
             corporation_dedication_forms.append(ManifestationCorporationDedicationForm(instance=corporation_dedication, prefix=prefix))
         context['corporation_dedication_forms'] = corporation_dedication_forms
-
-    context['print_form'] = ManifestationPrintForm(instance=manifestation)
-
-    #q_dedicatee = request.GET.get('dedicatee-q')
-    #q_place = request.GET.get('place-q')
-
-    #if q_dedicatee:
-        #dedicatee_search_form = FramedSearchForm(request.GET, prefix='dedicatee', placeholder=_('search persons'))
-        #if dedicatee_search_form.is_valid():
-            #context['query_dedicatee'] = dedicatee_search_form.cleaned_data.get('q')
-            #context['found_persons'] = dedicatee_search_form.search().models(Person)
-            #context['found_corporations'] = dedicatee_search_form.search().models(Corporation)
-    #else:
-        #dedicatee_search_form = FramedSearchForm(prefix='dedicatee', placeholder=_('search persons'))
-
-    #if q_place:
-        #place_search_form = FramedSearchForm(request.GET, prefix='place', placeholder=_('search place'))
-        #if place_search_form.is_valid():
-            #context['query_place'] = place_search_form.cleaned_data.get('q')
-            #context['found_places'] = place_search_form.search().models(Place)
-    #else:
-        #place_search_form = FramedSearchForm(prefix='place', placeholder=_('search place'))
-
-    #context['dedicatee_search_form'] = dedicatee_search_form
-    #context['place_search_form'] = place_search_form
-
-    #if request.GET.get('person_dedication_id'):
-        #context['person_dedication_id'] = int(request.GET.get('person_dedication_id'))
-    #if request.GET.get('corporation_dedication_id'):
-        #context['corporation_dedication_id'] = int(request.GET.get('corporation_dedication_id'))
 
     search_form = FramedSearchForm(request.GET or None, placeholder=_('search persons'))
     context['search_form'] = search_form

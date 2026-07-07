@@ -71,7 +71,15 @@
     </button>
 </div>
 
-<h2 class="mb-5"> {% translate 'dedications' %} </h2>
+{% if not object.is_singleton %}
+    <h3 class="my-5">
+        {% translate 'title page' %}
+    </h3>
+
+    {{ title_page_form.as_daisy }}
+{% endif %}
+
+<h2 class="my-5"> {% translate 'dedications' %} </h2>
 
 <h3 class="my-5"> {% translate 'person dedications' %} </h3>
 {% for person_dedication_form in person_dedication_forms %}

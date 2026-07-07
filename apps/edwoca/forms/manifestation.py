@@ -103,10 +103,44 @@ class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
         return mark_safe(str(form_control))
 
 
+class ManifestationTitlePageForm(ModelForm):
+    class Meta:
+        model = Manifestation
+        fields = [
+                'specific_figure',
+                'title_page'
+            ]
+        widgets = {
+                'title_page': Textarea(attrs={'form': 'form', 'class': 'textarea border-black bg-white textarea-bordered h-64'}),
+                'specific_figure': CheckboxInput(attrs={'class': 'toggle', 'form': 'form'})
+            }
+
+    def as_daisy(self):
+        form = div(cls='flex flex-col gap-5')
+
+        figure_field = self['specific_figure']
+        title_page_field = self['title_page']
+
+        with form:
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(figure_field))
+                span(figure_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(title_page_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(title_page_field))
+
+        return mark_safe(str(form))
+
+
 class ManifestationTitleForm(ModelForm):
     class Meta:
         model = ManifestationTitle
-        fields = ['title', 'title_type', 'manifestation']
+        fields = [
+                'title',
+                'title_type',
+                'manifestation'
+            ]
         widgets = {
             'title': Textarea(attrs={'form': 'form', 'class': 'textarea border-black bg-white textarea-bordered h-64'}),
             'title_type': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
