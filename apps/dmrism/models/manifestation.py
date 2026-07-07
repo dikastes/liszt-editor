@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
+from dmad_on_django.models.base import DocumentationStatusMixin
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
@@ -129,6 +130,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             choices = PrintType,
             default = None,
             null = True,
+            blank = True,
             verbose_name = _('print type')
         )
     edition = models.CharField(
@@ -244,10 +246,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             on_delete = models.SET_NULL,
             null = True,
         )
-    is_incomplete = models.BooleanField(
-            default = False,
-            verbose_name = 'is incomplete'
-        )
     specific_figure = models.BooleanField(
             default = False,
             verbose_name = 'specific figure'
@@ -338,6 +336,34 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             verbose_name = _('is text')
         )
     _group_field_names = ['part_of', 'component_of']
+    is_lyrics = models.BooleanField(
+            default = False,
+            verbose_name = _('is lyrics')
+        )
+    is_program = models.BooleanField(
+            default = False,
+            verbose_name = _('is program')
+        )
+    is_explanation = models.BooleanField(
+            default = False,
+            verbose_name = _('is explanation')
+        )
+    price = models.CharField(
+            max_length = 50,
+            verbose_name = _('price'),
+            null = True,
+            blank = True
+        )
+    edition_by_source = models.CharField(
+            max_length = 200,
+            null = True,
+            blank = True,
+            verbose_name = _('edition by source')
+        )
+    is_partial_edition = models.BooleanField(
+            default = False,
+            verbose_name = _('partial edition')
+        )
 
     @property
     def may_have_component(self):
@@ -674,18 +700,26 @@ class Publication(models.Model):
             null = True,
             on_delete = models.SET_NULL
         )
-    place = models.ManyToManyField(
+    places = models.ManyToManyField(
             'dmad.Place',
+            through = 'PublicationPlace',
             related_name = 'published_manifestations'
         )
-    inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
+
+
+class PublicationPlace(DocumentationStatusMixin, models.Model):
+    publication = models.ForeignKey(
+            'Publication',
+            on_delete = models.CASCADE,
+            related_name = 'place_relations'
         )
-    assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.SET_NULL,
+            related_name = 'publications',
+            null = True
         )
+
 
 
 class ManifestationPlace(models.Model):

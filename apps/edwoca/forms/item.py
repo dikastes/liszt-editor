@@ -114,6 +114,15 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
                 'form': 'form'
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
@@ -205,6 +214,15 @@ class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
                 'form': 'form'
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
@@ -352,9 +370,13 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 'is_program',
                 'is_explanation',
                 'measure',
+                'is_incomplete',
                 'private_manuscript_comment'
             ]
         widgets = {
+                'is_incomplete': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
                 'extent': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
@@ -380,6 +402,15 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                         'form': 'form'
                     })
             }
+
+    def completeness_as_daisy(self):
+        form = div()
+        completeness_field = self['is_incomplete']
+        with form:
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(completeness_field))
+                span(completeness_field.label, cls=SimpleFormMixin.label_text_classes)
+        return mark_safe(str(form))
 
     def as_daisy(self):
         extent_field = self['extent']
@@ -526,42 +557,8 @@ CorporationProvenanceBibFormSet = inlineformset_factory(
 )
 
 
-class ItemTextTypeForm(ModelForm, SimpleFormMixin):
+class ItemTextTypeForm(BaseTextTypeForm):
     class Meta:
         model = Item
-        fields = ['is_lyrics', 'is_program', 'is_explanation']
-        widgets = {
-                'is_lyrics': CheckboxInput( attrs = {
-                        'class': 'toggle',
-                        'form': 'form'
-                    }),
-                'is_program': CheckboxInput( attrs = {
-                        'class': 'toggle',
-                        'form': 'form'
-                    }),
-                'is_explanation': CheckboxInput( attrs = {
-                        'class': 'toggle',
-                        'form': 'form'
-                    })
-            }
-
-    def as_daisy(self):
-        lyrics_field = self['is_lyrics']
-        program_field = self['is_program']
-        explanation_field = self['is_explanation']
-
-        form = div()
-
-        with form:
-            h3(_('text type'), cls='text-lg my-5')
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(lyrics_field))
-                span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(program_field))
-                span(program_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(explanation_field))
-                span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
-
-        return mark_safe(str(form))
+        fields = BaseTextTypeForm.Meta.fields
+        widgets = BaseTextTypeForm.Meta.widgets

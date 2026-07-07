@@ -211,6 +211,15 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
                 'class': SimpleFormMixin.select_classes
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
@@ -341,7 +350,6 @@ class ManifestationClassificationForm(ModelForm):
         model = Manifestation
         fields = [
                 'manifestation_form',
-                'is_incomplete',
                 'source_type',
                 'album_page',
                 'performance_material',
@@ -360,9 +368,6 @@ class ManifestationClassificationForm(ModelForm):
                 'is_text'
             ]
         widgets = {
-                'is_incomplete': CheckboxInput( attrs = {
-                        'class': 'toggle'
-                    }),
                 'manifestation_form': Select( attrs = {
                         'class': SimpleFormMixin.select_classes,
                     }),
@@ -438,7 +443,6 @@ class ManifestationClassificationForm(ModelForm):
 
         source_type_field = self['source_type']
         manifestation_form_field = self['manifestation_form']
-        completeness_field = self['is_incomplete']
 
         # common source functions
         album_page_field = self['album_page']
@@ -480,9 +484,6 @@ class ManifestationClassificationForm(ModelForm):
                         with div(cls=SimpleFormMixin.label_classes):
                             span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
                         raw(str(manifestation_form_field))
-                    with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                        raw(str(completeness_field))
-                        span(completeness_field.label, cls=SimpleFormMixin.label_text_classes)
                 with div(cls='flex-1'):
                 # right palette with toggles
                     h1(_('edition type') + '*', cls='text-lg')
@@ -777,6 +778,15 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
                 'form': 'form'
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
@@ -848,9 +858,30 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
                 'private_print_comment',
                 'print_type',
                 'extent',
-                'edition'
+                'edition',
+                'price',
+                'edition_by_source',
+                'is_partial_edition'
             ]
         widgets = {
+            'is_partial_edition': CheckboxInput(
+                    attrs = {
+                            'class': SimpleFormMixin.toggle_classes,
+                            'form': 'form'
+                    }
+                ),
+            'edition_by_source': TextInput(
+                    attrs={
+                            'class': SimpleFormMixin.text_input_classes,
+                            'form': 'form'
+                        }
+                ),
+            'price': TextInput(
+                    attrs={
+                            'class': SimpleFormMixin.text_input_classes,
+                            'form': 'form'
+                        }
+                ),
             'plate_number': TextInput(
                     attrs={
                             'class': SimpleFormMixin.text_input_classes,
@@ -883,6 +914,18 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
                 ),
         }
 
+    def price_as_daisy(self):
+        form = div()
+        price_field = self['price']
+
+        with form:
+            with label(cls='form-control w-full'):
+                with div(cls='label'):
+                    span(price_field.label, cls='label-text')
+                raw(str(price_field))
+
+        return mark_safe(str(form))
+
     def platenumber_as_daisy(self):
         form = div()
         plate_number_field = self['plate_number']
@@ -896,13 +939,11 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
         return mark_safe(str(form))
 
 
-    def publication_characteristics_as_daisy(self):
+    def comment_as_daisy(self):
         form = div()
         comment_field = self['private_print_comment']
 
         with form:
-            with div(cls='my-10'):
-                self.get_date_div()
             with label(cls='form-control w-full'):
                 with div(cls='label'):
                     span(comment_field.label, cls='label-text')
@@ -913,25 +954,32 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
     def print_characteristics_as_daisy(self):
         form = div()
         type_field = self['print_type']
+        edition_by_source_field = self['edition_by_source']
         extent_field = self['extent']
         edition_field = self['edition']
 
         with form:
-            with div(cls='flex gap-5'):
-                with label(cls='flex-1 form-control w-full'):
-                    with div(cls='label'):
-                        span(type_field.label, cls='label-text')
-                    raw(str(type_field))
-                with label(cls='flex-1 form-control w-full'):
-                    with div(cls='label'):
-                        span(edition_field.label, cls='label-text')
-                    raw(str(edition_field))
+            with label(cls='flex-1 form-control w-full'):
+                with div(cls='label'):
+                    span(type_field.label, cls='label-text')
+                raw(str(type_field))
+            with label(cls='flex-1 form-control w-full'):
+                with div(cls='label'):
+                    span(edition_by_source_field.label, cls='label-text')
+                raw(str(edition_by_source_field))
+            with label(cls='flex-1 form-control w-full'):
+                with div(cls='label'):
+                    span(edition_field.label, cls='label-text')
+                raw(str(edition_field))
             with label(cls='form-control w-full'):
                 with div(cls='label'):
                     span(extent_field.label, cls='label-text')
                 raw(str(extent_field))
 
         return mark_safe(str(form))
+
+    def date_as_daisy(self):
+        return mark_safe(str(self.get_date_div()))
 
 class ManifestationTitleHandwritingForm(HandwritingForm):
     class Meta(HandwritingForm.Meta):
@@ -959,6 +1007,62 @@ class ManifestationSearchForm(FramedSearchForm):
             )
 
         return sqs
+
+
+class PublicationPlaceForm(ModelForm, SimpleFormMixin):
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
+    class Meta:
+        model = ManifestationPlace
+        fields = [
+            'inferred',
+            'assumed'
+        ]
+        widgets = {
+                'inferred': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    }),
+                'assumed': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        palette = div(cls='flex gap-10 items-center')
+
+        place_assumed_field = self['assumed']
+        place_inferred_field = self['inferred']
+
+        with palette:
+            div(cls='flex-1')
+            with div(cls='form-control flex-0'):
+                with label(cls='cursor-pointer label flex gap-5'):
+                    span(_(place_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(place_assumed_field))
+            for sw in place_inferred_field.subwidgets:
+                with tags.div(cls=SimpleFormMixin.form_control_classes):
+                    with tags.label(cls='label cursor-pointer gap-5'):
+                        tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
+                        tags.input_(
+                                type='radio',
+                                name=sw.data.get('name'),
+                                value=str(sw.data.get('value')),
+                                cls='radio',
+                                checked = sw.data.get('selected', False),
+                                form='form'
+                            )
+
+        return mark_safe(str(palette))
 
 
 class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
@@ -1015,3 +1119,10 @@ class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
                             )
 
         return mark_safe(str(palette))
+
+
+class ManifestationTextTypeForm(BaseTextTypeForm):
+    class Meta:
+        model = Manifestation
+        fields = BaseTextTypeForm.Meta.fields
+        widgets = BaseTextTypeForm.Meta.widgets

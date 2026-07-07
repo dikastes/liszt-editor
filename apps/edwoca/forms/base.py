@@ -257,10 +257,16 @@ class DateFormMixin:
                 'form': 'form'
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
             required = False
         )
     start_qualifier = ChoiceField(
@@ -302,10 +308,18 @@ class DateFormMixin:
         super().__init__(*args, **kwargs)
 
         self.period_instance = getattr(self.instance, self.period_property)
+
         if not self.period_instance:
             self.period_instance = Period.objects.create()
-        if self.period_instance.time_mode == Period.TimeMode.POINT:
+
+        self.is_precise_date = (
+                self.period_instance.imprecision == Period.Imprecision.PRECISE and
+                self.period_instance.time_mode == Period.TimeMode.POINT
+            )
+
+        if self.period_instance.imprecision == Period.Imprecision.PRECISE:
             self.fields['start_qualifier'].widget.attrs['disabled'] = True
+            self.fields['end_qualifier'].widget.attrs['disabled'] = True
 
         if self.is_bound:
             return
@@ -320,7 +334,8 @@ class DateFormMixin:
                 'time_mode': period.time_mode,
                 'start_qualifier': period.start_qualifier,
                 'end_qualifier': period.end_qualifier,
-                'assumed': period.assumed
+                'assumed': period.assumed,
+                'imprecision': period.imprecision
             })
 
     def save(self, commit=True):
@@ -332,13 +347,17 @@ class DateFormMixin:
 
         self.period_instance.not_before = self.cleaned_data['not_before']
         self.period_instance.time_mode = self.cleaned_data['time_mode']
+        self.period_instance.imprecision = self.cleaned_data['imprecision']
 
         if self.period_instance.time_mode == Period.TimeMode.POINT:
             self.period_instance.not_after = self.cleaned_data['not_before']
+        else:
+            self.period_instance.not_after = self.cleaned_data['not_after']
+
+        if self.period_instance.imprecision == Period.Imprecision.PRECISE:
             self.period_instance.start_qualifier = Period.StartQualifier.EXACT
             self.period_instance.end_qualifier = Period.EndQualifier.EXACT
         else:
-            self.period_instance.not_after = self.cleaned_data['not_after']
             self.period_instance.start_qualifier = self.cleaned_data['start_qualifier']
             self.period_instance.end_qualifier = self.cleaned_data['end_qualifier']
 
@@ -361,6 +380,7 @@ class DateFormMixin:
         display_field = self['display']
         assumed_field = self['assumed']
         inferred_field = self['inferred']
+        imprecision_field = self['imprecision']
 
         calculate = 'calculate'
         clear = 'clear'
@@ -380,11 +400,16 @@ class DateFormMixin:
                     with div(cls='label'):
                         with span(cls='text-primary text-sm'):
                             display_field.errors
-            # second row: time mode
-            with tags.label(cls=SimpleFormMixin.form_control_classes):
-                with tags.div(cls=SimpleFormMixin.label_classes):
-                    tags.label(time_mode_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(time_mode_field))
+            # second row: time mode and imprecision
+            with tags.div(cls='flex flex-col lg:flex-row gap-5 w-full my-5'):
+                with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with tags.div(cls=SimpleFormMixin.label_classes):
+                        tags.label(time_mode_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(time_mode_field))
+                with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with tags.div(cls=SimpleFormMixin.label_classes):
+                        tags.label(imprecision_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(imprecision_field))
             # third row: controls
             with tags.div(cls='flex gap-5 w-full my-5'):
                 tags._input(type='submit', cls='btn btn-outline flex-1', form='form', value=_('calculate'), name=calculate_name)
@@ -409,7 +434,7 @@ class DateFormMixin:
                         tags.label(start_qualifier_field.label, cls=SimpleFormMixin.label_text_classes)
                     raw(str(start_qualifier_field))
             # fifth row: not after
-            if self.period_instance.time_mode == Period.TimeMode.SPAN:
+            if not self.is_precise_date:
                 with tags.div(cls='flex flex-col lg:flex-row lg:gap-5 mb-5'):
                     with tags.label(cls='form-control flex-none date-container'):
                         with tags.div(cls=SimpleFormMixin.label_classes):
@@ -634,3 +659,43 @@ class BaseTrackedModelForm:
                     raw(str(needs_review_field))
 
         return editing_history_div
+
+
+class BaseTextTypeForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        fields = ['is_lyrics', 'is_program', 'is_explanation']
+        widgets = {
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        lyrics_field = self['is_lyrics']
+        program_field = self['is_program']
+        explanation_field = self['is_explanation']
+
+        form = div()
+
+        with form:
+            tags.h3(_('text type'), cls='text-lg my-5')
+            with tags.label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(lyrics_field))
+                tags.span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+            with tags.label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(program_field))
+                tags.span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+            with tags.label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(explanation_field))
+                tags.span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-19 15:54+0200\n"
+"POT-Creation-Date: 2026-07-06 17:20+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,96 +17,105 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: forms/base.py:262 forms/dedication.py:103 forms/item.py:118
-#: forms/item.py:205 forms/manifestation.py:216 forms/manifestation.py:795
+#: forms/base.py:262 forms/dedication.py:103 forms/dedication.py:186
+#: forms/dedication.py:268 forms/dedication.py:375 forms/item.py:119
+#: forms/item.py:210 forms/manifestation.py:216 forms/manifestation.py:774
 #: forms/modification.py:23
 msgid "time mode"
 msgstr "Art der Datierung"
 
-#: forms/base.py:267 forms/dedication.py:108 forms/item.py:123
-#: forms/item.py:210 forms/manifestation.py:221 forms/manifestation.py:800
+#: forms/base.py:267 forms/dedication.py:111 forms/dedication.py:194
+#: forms/dedication.py:276 forms/dedication.py:383 forms/item.py:124
+#: forms/item.py:215 forms/manifestation.py:221 forms/manifestation.py:782
 #: forms/modification.py:28
 msgid "not before mode"
 msgstr "Typ"
 
-#: forms/base.py:273 forms/dedication.py:114 forms/item.py:129
-#: forms/item.py:216 forms/manifestation.py:227 forms/manifestation.py:806
+#: forms/base.py:273 forms/dedication.py:120 forms/dedication.py:203
+#: forms/dedication.py:285 forms/dedication.py:392 forms/item.py:130
+#: forms/item.py:221 forms/manifestation.py:227 forms/manifestation.py:791
 #: forms/modification.py:34
 msgid "not after mode"
 msgstr "Typ"
 
-#: forms/base.py:279 forms/dedication.py:120 forms/item.py:135
-#: forms/item.py:222 forms/manifestation.py:233 forms/manifestation.py:812
+#: forms/base.py:279 forms/dedication.py:129 forms/dedication.py:212
+#: forms/dedication.py:294 forms/dedication.py:401 forms/item.py:136
+#: forms/item.py:227 forms/manifestation.py:233 forms/manifestation.py:800
 #: forms/modification.py:40
 msgid "start"
 msgstr "Start"
 
-#: forms/base.py:284 forms/dedication.py:125 forms/item.py:140
-#: forms/item.py:227 forms/manifestation.py:238 forms/manifestation.py:817
+#: forms/base.py:284 forms/dedication.py:134 forms/dedication.py:217
+#: forms/dedication.py:299 forms/dedication.py:406 forms/item.py:141
+#: forms/item.py:232 forms/manifestation.py:238 forms/manifestation.py:805
 #: forms/modification.py:45
 msgid "end"
 msgstr "Ende"
 
-#: forms/base.py:290 forms/dedication.py:28 forms/dedication.py:135
-#: forms/dedication.py:167 forms/item.py:150 forms/item.py:237
-#: forms/letter.py:68 forms/manifestation.py:248 forms/manifestation.py:823
-#: forms/manifestation.py:955 forms/modification.py:55
+#: forms/base.py:290 forms/dedication.py:28 forms/dedication.py:147
+#: forms/dedication.py:230 forms/dedication.py:312 forms/dedication.py:419
+#: forms/item.py:151 forms/item.py:242 forms/letter.py:68
+#: forms/manifestation.py:248 forms/manifestation.py:817
+#: forms/manifestation.py:998 forms/manifestation.py:1054
+#: forms/modification.py:55
 msgid "based on source"
 msgstr "nach Vorlage"
 
-#: forms/base.py:290 forms/dedication.py:28 forms/dedication.py:135
-#: forms/dedication.py:167 forms/item.py:150 forms/item.py:237
-#: forms/letter.py:31 forms/letter.py:68 forms/letter.py:241
-#: forms/manifestation.py:248 forms/manifestation.py:823
-#: forms/manifestation.py:955 forms/modification.py:55
-#: templates/edwoca/manifestation_print.html:142
+#: forms/base.py:290 forms/dedication.py:28 forms/dedication.py:147
+#: forms/dedication.py:230 forms/dedication.py:312 forms/dedication.py:419
+#: forms/item.py:151 forms/item.py:242 forms/letter.py:31 forms/letter.py:68
+#: forms/letter.py:241 forms/manifestation.py:248 forms/manifestation.py:817
+#: forms/manifestation.py:998 forms/manifestation.py:1054
+#: forms/modification.py:55
 msgid "inferred"
 msgstr "ermittelt"
 
-#: forms/base.py:388
+#: forms/base.py:390
 msgid "calculate"
 msgstr "Datierung berechnen"
 
-#: forms/base.py:389
+#: forms/base.py:391
 msgid "clear"
 msgstr "Datierung leeren"
 
-#: forms/base.py:397
+#: forms/base.py:399
 msgid "point in time"
 msgstr "Zeitpunkt"
 
-#: forms/base.py:540
+#: forms/base.py:542
 msgid "open"
 msgstr "öffnen"
 
-#: forms/base.py:573 forms/letter.py:115 forms/manifestation.py:157
+#: forms/base.py:575 forms/letter.py:115 forms/manifestation.py:157
 msgid "first save"
 msgstr "Datum"
 
-#: forms/base.py:579 forms/letter.py:121 forms/manifestation.py:163
+#: forms/base.py:581 forms/letter.py:121 forms/manifestation.py:163
 msgid "last save"
 msgstr "letzte Bearbeitung"
 
-#: forms/base.py:603
+#: forms/base.py:605
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
-#: forms/base.py:604
+#: forms/base.py:606
 msgid "initial recording"
 msgstr "Ersterfassung"
 
-#: forms/base.py:616
+#: forms/base.py:618
 msgid "further recording"
 msgstr "Weitere Bearbeitung"
 
-#: forms/dedication.py:130 forms/item.py:145 forms/item.py:232
-#: forms/manifestation.py:243 forms/modification.py:50
-msgid "display"
-msgstr "Datierung (standardisiert)"
-
-#: forms/item.py:390 forms/item.py:548
+#: forms/base.py:665 forms/item.py:411
 msgid "text type"
 msgstr "Textart"
+
+#: forms/dedication.py:139 forms/dedication.py:222 forms/dedication.py:304
+#: forms/dedication.py:411 forms/item.py:146 forms/item.py:237
+#: forms/manifestation.py:243 forms/manifestation.py:671
+#: forms/modification.py:50
+msgid "display"
+msgstr "Datierung (standardisiert)"
 
 #: forms/letter.py:29
 msgid "date according to edition (standardized)"
@@ -129,7 +138,6 @@ msgid "edtion name"
 msgstr "Name (nach Edition)"
 
 #: forms/letter.py:250 forms/letter.py:266
-#: templates/edwoca/manifestation_print.html:150
 msgid "assumed"
 msgstr "unsicher"
 
@@ -137,60 +145,59 @@ msgstr "unsicher"
 msgid "attributed"
 msgstr "zugeschrieben"
 
-#: forms/manifestation.py:469
+#: forms/manifestation.py:461
 msgid "Selecting 'Text' disables musical attributes and vice versa."
 msgstr ""
 "Die Auswahl von 'Text' verhindert die Auswahl musikalischer Attribute und "
 "umgekehrt."
 
-#: forms/manifestation.py:492
+#: forms/manifestation.py:480
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: forms/manifestation.py:516
+#: forms/manifestation.py:504
 msgid "function"
 msgstr "Funktion"
 
-#: forms/manifestation.py:580
+#: forms/manifestation.py:568
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
-#: forms/manifestation.py:581 forms/manifestation.py:718
+#: forms/manifestation.py:569 forms/manifestation.py:700
 msgid "source title"
 msgstr "Quellentitel"
 
-#: forms/manifestation.py:582
+#: forms/manifestation.py:570
 msgid "plate number"
 msgstr "Plattennummer"
 
-#: forms/manifestation.py:583 forms/manifestation.py:724
+#: forms/manifestation.py:571 forms/manifestation.py:706
 #: templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:6
 msgid "source type"
 msgstr "Typ"
 
-#: forms/manifestation.py:587 templates/edwoca/create_manifestation.html:16
-#: templates/edwoca/manifestation_print.html:18
-#: templates/edwoca/manifestation_print.html:28
+#: forms/manifestation.py:580 templates/edwoca/create_manifestation.html:16
+#: templates/edwoca/manifestation_print.html:21
 msgid "publisher"
 msgstr "Verlag"
 
-#: forms/manifestation.py:587
-msgid "choose publisher"
-msgstr "Verlag auswählen"
+#: forms/manifestation.py:584 templates/edwoca/create_manifestation.html:18
+msgid "search publisher"
+msgstr "Verlag suchen"
 
-#: forms/manifestation.py:712
+#: forms/manifestation.py:694
 msgid "working title"
 msgstr "Arbeitstitel"
 
-#: forms/manifestation.py:731
+#: forms/manifestation.py:713
 msgid "holding institution"
 msgstr "Bestandeshaltende Institution"
 
-#: forms/manifestation.py:732
+#: forms/manifestation.py:714
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: forms/manifestation.py:736
+#: forms/manifestation.py:718
 msgid "Signature"
 msgstr "Signatur"
 
@@ -202,46 +209,45 @@ msgstr "Kopie von"
 msgid "<< publisher >>"
 msgstr "<< Verlag >>"
 
-#: models/base.py:943
+#: models/base.py:940
 msgid "Composer"
 msgstr "Komponist"
 
-#: models/base.py:944
+#: models/base.py:941
 msgid "Writer"
 msgstr "Schreiber"
 
-#: models/base.py:945
+#: models/base.py:942
 msgid "Translator"
 msgstr "Übersetzer"
 
-#: models/base.py:946
+#: models/base.py:943
 msgid "Poet"
 msgstr "Dichter"
 
-#: models/base.py:947
+#: models/base.py:944
 msgid "Dedicatee"
 msgstr "Widmungsträger"
 
-#: models/base.py:967 models/expression.py:165
+#: models/base.py:964 models/expression.py:165
 #: templates/edwoca/bib_update.html:23
-#: templates/edwoca/manifestation_provenance.html:93
-#: templates/edwoca/manifestation_provenance.html:321
+#: templates/edwoca/partials/forms/provenance_station_form.html:95
 msgid "title"
 msgstr "Titel"
 
-#: models/base.py:973
+#: models/base.py:970 templates/edwoca/manifestation_update.html:145
 msgid "status"
 msgstr "Status"
 
-#: models/base.py:979
+#: models/base.py:976
 msgid "language"
 msgstr "Sprache"
 
-#: models/base.py:996
+#: models/base.py:993
 msgid "Published"
 msgstr "veröffentlicht"
 
-#: models/base.py:1048 models/expression.py:247
+#: models/base.py:1045 models/expression.py:247
 msgid "note"
 msgstr "Note"
 
@@ -466,16 +472,15 @@ msgstr "Kategorie"
 #: models/letter.py:99 models/letter.py:104
 #: templates/edwoca/letter_update.html:225
 #: templates/edwoca/manifestation_history.html:85
-#: templates/edwoca/manifestation_manuscript.html:64
-#: templates/edwoca/manifestation_provenance.html:478
-#: templates/edwoca/manifestation_title.html:255
+#: templates/edwoca/manifestation_manuscript.html:60
+#: templates/edwoca/manifestation_title.html:114
 #: templates/edwoca/manifestation_update.html:112
 #: templates/edwoca/partials/expression/expression_menu.html:70
 #: templates/edwoca/partials/item/item_menu.html:72
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:100
 #: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:27
 #: templates/edwoca/partials/work/work_menu.html:56
-#: views/manifestation/common.py:701
+#: templates/edwoca/provenance.html:59 views/manifestation/common.py:713
 msgid "comment"
 msgstr "Kommentar"
 
@@ -532,8 +537,6 @@ msgid "accompanies or complements"
 msgstr "begleitet oder ergänzt"
 
 #: templates/edwoca/bib_update.html:14
-#: templates/edwoca/manifestation_provenance.html:120
-#: templates/edwoca/manifestation_provenance.html:348
 #: templates/edwoca/partials/item/item_menu.html:58
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:84
 #: templates/edwoca/partials/work/work_menu.html:49
@@ -541,8 +544,7 @@ msgid "bibliography"
 msgstr "Literatur"
 
 #: templates/edwoca/bib_update.html:34
-#: templates/edwoca/manifestation_provenance.html:109
-#: templates/edwoca/manifestation_provenance.html:337
+#: templates/edwoca/partials/forms/provenance_station_form.html:107
 msgid "remove reference"
 msgstr "Nachweis entfernen"
 
@@ -556,17 +558,9 @@ msgstr "Literatur durchsuchen"
 
 #: templates/edwoca/bib_update.html:54 templates/edwoca/bib_update.html:109
 #: templates/edwoca/create_manifestation.html:20
+#: templates/edwoca/item_relations.html:51
 #: templates/edwoca/letter_update.html:150
 #: templates/edwoca/manifestation_history.html:62
-#: templates/edwoca/manifestation_print.html:43
-#: templates/edwoca/manifestation_print.html:66
-#: templates/edwoca/manifestation_print.html:194
-#: templates/edwoca/manifestation_provenance.html:63
-#: templates/edwoca/manifestation_provenance.html:124
-#: templates/edwoca/manifestation_provenance.html:170
-#: templates/edwoca/manifestation_provenance.html:290
-#: templates/edwoca/manifestation_provenance.html:352
-#: templates/edwoca/manifestation_provenance.html:398
 #: templates/edwoca/manifestation_relations.html:97
 #: templates/edwoca/manifestation_relations.html:332
 #: templates/edwoca/manifestation_relations.html:441
@@ -581,20 +575,9 @@ msgstr "suchen"
 #: templates/edwoca/item_relations.html:65
 #: templates/edwoca/letter_update.html:161
 #: templates/edwoca/manifestation_history.html:77
-#: templates/edwoca/manifestation_print.html:38
-#: templates/edwoca/manifestation_print.html:80
-#: templates/edwoca/manifestation_print.html:203
-#: templates/edwoca/manifestation_provenance.html:75
-#: templates/edwoca/manifestation_provenance.html:136
-#: templates/edwoca/manifestation_provenance.html:182
-#: templates/edwoca/manifestation_provenance.html:302
-#: templates/edwoca/manifestation_provenance.html:364
-#: templates/edwoca/manifestation_provenance.html:410
 #: templates/edwoca/manifestation_relations.html:154
 #: templates/edwoca/manifestation_relations.html:382
 #: templates/edwoca/manifestation_relations.html:491
-#: templates/edwoca/manifestation_title.html:113
-#: templates/edwoca/manifestation_title.html:199
 #: templates/edwoca/manifestation_update.html:104
 #: templates/edwoca/partials/forms/_modification_form.html:72
 #: templates/edwoca/partials/forms/_modification_form.html:115
@@ -609,21 +592,19 @@ msgstr "Briefe"
 
 #: templates/edwoca/bib_update.html:91 templates/edwoca/library_update.html:31
 #: templates/edwoca/manifestation_history.html:43
-#: templates/edwoca/manifestation_print.html:22
-#: templates/edwoca/manifestation_print.html:184
-#: templates/edwoca/manifestation_provenance.html:45
-#: templates/edwoca/manifestation_provenance.html:156
-#: templates/edwoca/manifestation_provenance.html:279
-#: templates/edwoca/manifestation_provenance.html:384
-#: templates/edwoca/manifestation_title.html:92
-#: templates/edwoca/manifestation_title.html:129
-#: templates/edwoca/manifestation_title.html:179
-#: templates/edwoca/manifestation_title.html:215
+#: templates/edwoca/manifestation_print.html:29
+#: templates/edwoca/manifestation_print.html:51
+#: templates/edwoca/manifestation_print.html:108
 #: templates/edwoca/manifestation_update.html:81
 #: templates/edwoca/partials/forms/_modification_form.html:47
 #: templates/edwoca/partials/forms/_modification_form.html:86
+#: templates/edwoca/partials/forms/dedication_form.html:19
+#: templates/edwoca/partials/forms/dedication_form.html:43
 #: templates/edwoca/partials/forms/handwriting_form.html:18
 #: templates/edwoca/partials/forms/handwriting_form.html:72
+#: templates/edwoca/partials/forms/provenance_station_form.html:27
+#: templates/edwoca/partials/forms/provenance_station_form.html:53
+#: templates/edwoca/partials/forms/provenance_station_form.html:135
 #: templates/edwoca/partials/letter/contributor_form.html:19
 msgid "remove"
 msgstr "entfernen"
@@ -632,13 +613,9 @@ msgstr "entfernen"
 msgid "no letters have been linked"
 msgstr "keine verknüpften Briefe"
 
-#: templates/edwoca/bib_update.html:107 views/manifestation/common.py:846
+#: templates/edwoca/bib_update.html:107 views/manifestation/common.py:1079
 msgid "search letters"
 msgstr "Briefe durchsuchen"
-
-#: templates/edwoca/create_manifestation.html:18
-msgid "search publisher"
-msgstr "Verlag suchen"
 
 #: templates/edwoca/delete.html:8
 #, python-format
@@ -649,17 +626,60 @@ msgstr "Bitte bestätigen Sie, dass Sie %(object)s löschen möchten."
 msgid "confirm"
 msgstr "bestätigen"
 
-#: templates/edwoca/item_manuscript.html:17
-#: templates/edwoca/manifestation_manuscript.html:16
-#: templates/edwoca/partials/manifestation/manifestation_menu.html:69
-#: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:5
-msgid "manuscript characteristics"
-msgstr "Manuskriptspezifika"
+#: templates/edwoca/item_dedication.html:10
+#: templates/edwoca/partials/item/item_menu.html:37
+msgid "dedication"
+msgstr "Widmung"
 
-#: templates/edwoca/item_manuscript.html:29
+#: templates/edwoca/item_dedication.html:19
+#: templates/edwoca/manifestation_title.html:76
+msgid "person dedications"
+msgstr "Personenwidmungen"
+
+#: templates/edwoca/item_dedication.html:25
+#: templates/edwoca/manifestation_title.html:81
+msgid "no person dedications"
+msgstr "keine Personenwidmungen"
+
+#: templates/edwoca/item_dedication.html:30
+#: templates/edwoca/manifestation_title.html:87
+msgid "create person dedication"
+msgstr "Personenwidmung anlegen"
+
+#: templates/edwoca/item_dedication.html:35
+#: templates/edwoca/manifestation_title.html:91
+msgid "corporation dedications"
+msgstr "Körperschaftswidmungen"
+
+#: templates/edwoca/item_dedication.html:41
+#: templates/edwoca/manifestation_title.html:95
+msgid "no corporation dedications"
+msgstr "keine Körperschaftswidmungen"
+
+#: templates/edwoca/item_dedication.html:47
+#: templates/edwoca/manifestation_title.html:101
+msgid "create corporation dedication"
+msgstr "Körperschaftswidmung anlegen"
+
+#: templates/edwoca/item_manuscript.html:16
+#: templates/edwoca/partials/item/item_menu.html:30
+msgid "item characteristics"
+msgstr "Exemplarspezifika"
+
+#: templates/edwoca/item_manuscript.html:28
 #: templates/edwoca/manifestation_manuscript.html:39
 msgid "modifications"
 msgstr "Modifikationen"
+
+#: templates/edwoca/item_manuscript.html:35
+#: templates/edwoca/manifestation_manuscript.html:45
+msgid "no modifications"
+msgstr "keine Modifikationen"
+
+#: templates/edwoca/item_manuscript.html:41
+#: templates/edwoca/manifestation_manuscript.html:52
+msgid "create modification"
+msgstr "Modifikation anlegen"
 
 #: templates/edwoca/item_relations.html:10 templatetags/entity_labels.py:16
 msgid "manifestation"
@@ -671,18 +691,16 @@ msgid "items"
 msgstr "Druckexemplare"
 
 #: templates/edwoca/item_relations.html:35
+#: templates/edwoca/manifestation_update.html:162
 #: templates/edwoca/partials/manifestation/item_list.html:71
 #: templates/edwoca/partials/manifestation/preview-paragraphs/head.html:9
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:480
 msgid "no items"
 msgstr "keine Exemplare"
 
 #: templates/edwoca/item_relations.html:43
 msgid "link item"
 msgstr "Exemplar verknüpfen"
-
-#: templates/edwoca/item_relations.html:72
-msgid "please enter search term"
-msgstr "Bitte Suchbegriff eingeben"
 
 #: templates/edwoca/item_update.html:7 templatetags/entity_labels.py:17
 msgid "item"
@@ -705,6 +723,7 @@ msgstr "Standort anlegen"
 
 #: templates/edwoca/letter_update.html:7
 #: templates/edwoca/manifestation_history.html:10
+#: templates/edwoca/manifestation_print.html:122
 msgid "date"
 msgstr "Datierung"
 
@@ -811,6 +830,7 @@ msgid "work relations"
 msgstr "Werkbezüge"
 
 #: templates/edwoca/library_update.html:8 templates/edwoca/list.html:166
+#: templates/edwoca/manifestation_update.html:141
 #: templatetags/entity_labels.py:18
 msgid "library"
 msgstr "Bibliothek"
@@ -876,7 +896,7 @@ msgstr "neu"
 msgid "work"
 msgstr "Werk"
 
-#: templates/edwoca/list.html:151 templates/edwoca/manifestation_update.html:10
+#: templates/edwoca/list.html:151 templates/edwoca/manifestation_update.html:15
 msgid "manuscript"
 msgstr "Handschrift"
 
@@ -884,7 +904,7 @@ msgstr "Handschrift"
 msgid "manuscript collection"
 msgstr "Handschrift (Sammlung)"
 
-#: templates/edwoca/list.html:157 templates/edwoca/manifestation_print.html:214
+#: templates/edwoca/list.html:157
 #: templates/edwoca/manifestation_update.html:127
 msgid "print"
 msgstr "Druck"
@@ -897,10 +917,7 @@ msgstr "Druck (Sammlung)"
 msgid "composite"
 msgstr "Konvolut"
 
-#: templates/edwoca/list.html:169
-#: templates/edwoca/manifestation_provenance.html:166
-#: templates/edwoca/manifestation_provenance.html:394
-#: templatetags/entity_labels.py:19
+#: templates/edwoca/list.html:169 templatetags/entity_labels.py:19
 msgid "letter"
 msgstr "Brief"
 
@@ -923,15 +940,20 @@ msgid "no linked place"
 msgstr "kein Ort verknüpft"
 
 #: templates/edwoca/manifestation_history.html:57
-#: templates/edwoca/manifestation_print.html:63
-#: templates/edwoca/manifestation_title.html:124
-#: templates/edwoca/manifestation_title.html:210
+#: templates/edwoca/manifestation_print.html:43
+#: templates/edwoca/partials/forms/dedication_form.html:38
 msgid "place"
 msgstr "Ort"
 
 #: templates/edwoca/manifestation_history.html:60
 msgid "search places"
 msgstr "Orte durchsuchen"
+
+#: templates/edwoca/manifestation_manuscript.html:16
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:69
+#: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:5
+msgid "manuscript characteristics"
+msgstr "Manuskriptspezifika"
 
 #: templates/edwoca/manifestation_manuscript.html:23
 msgid "writers / hands"
@@ -940,14 +962,6 @@ msgstr "Schreiber"
 #: templates/edwoca/manifestation_manuscript.html:31
 msgid "create writer"
 msgstr "Schreiber hinzufügen"
-
-#: templates/edwoca/manifestation_manuscript.html:45
-msgid "no modifications"
-msgstr "keine Modifikationen"
-
-#: templates/edwoca/manifestation_manuscript.html:52
-msgid "create modification"
-msgstr "Modifikation anlegen"
 
 #: templates/edwoca/manifestation_print.html:8
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:60
@@ -958,100 +972,33 @@ msgstr "Verlag und Druckspezifika"
 msgid "publication"
 msgstr "Veröffentlichung"
 
-#: templates/edwoca/manifestation_print.html:55
+#: templates/edwoca/manifestation_print.html:62
 msgid "remove place"
 msgstr "Ort entfernen"
 
-#: templates/edwoca/manifestation_print.html:127
-msgid "place inferred assumed"
-msgstr "Ort unsicher ermittelt"
+#: templates/edwoca/manifestation_print.html:68
+msgid "add place"
+msgstr "Ort hinzufügen"
 
-#: templates/edwoca/manifestation_print.html:129
-msgid "place assumed"
-msgstr "Ort unsicher"
-
-#: templates/edwoca/manifestation_print.html:133
-msgid "place inferred"
-msgstr "Ort ermittelt"
-
-#: templates/edwoca/manifestation_print.html:135
-msgid "place as documented"
-msgstr "Ort nach Vorlage"
-
-#: templates/edwoca/manifestation_print.html:160
+#: templates/edwoca/manifestation_print.html:74
 msgid "remove publication"
 msgstr "Veröffentlichung entfernen"
 
-#: templates/edwoca/manifestation_print.html:170
-msgid "create print"
-msgstr "Veröffentlichung anlegen"
+#: templates/edwoca/manifestation_print.html:83
+msgid "add publication"
+msgstr "Veröffentlichung hinzufügen"
 
-#: templates/edwoca/manifestation_print.html:181
-#: templates/edwoca/manifestation_print.html:189
+#: templates/edwoca/manifestation_print.html:88
+msgid "more information"
+msgstr "Weitere Angaben"
+
+#: templates/edwoca/manifestation_print.html:100
 msgid "stitcher"
 msgstr "Stecher"
 
-#: templates/edwoca/manifestation_print.html:192
-msgid "search stitcher"
-msgstr "Stecher suchen"
-
-#: templates/edwoca/manifestation_provenance.html:15
-msgid "provenance persons"
-msgstr "Vorbesitzende Person"
-
-#: templates/edwoca/manifestation_provenance.html:36
-#: templates/edwoca/manifestation_provenance.html:59
-#: templates/edwoca/manifestation_provenance.html:270
-#: templates/edwoca/manifestation_provenance.html:286
-msgid "owner"
-msgstr "Vorbesitzer*in"
-
-#: templates/edwoca/manifestation_provenance.html:83
-#: templates/edwoca/manifestation_provenance.html:311
-msgid "provenance proof (bibliography)"
-msgstr "Provenienzbeleg (Literatur)"
-
-#: templates/edwoca/manifestation_provenance.html:142
-#: templates/edwoca/manifestation_provenance.html:370
-msgid "provenance proof (letter)"
-msgstr "Provenienzbeleg (Brief)"
-
-#: templates/edwoca/manifestation_provenance.html:188
-#: templates/edwoca/manifestation_provenance.html:416
-msgid "provenance proof (web)"
-msgstr "Provenienzbeleg (Web)"
-
-#: templates/edwoca/manifestation_provenance.html:203
-#: templates/edwoca/manifestation_provenance.html:431
-msgid "remove web reference"
-msgstr "Nachweis entfernen"
-
-#: templates/edwoca/manifestation_provenance.html:217
-#: templates/edwoca/manifestation_provenance.html:445
-msgid "add web reference"
-msgstr "Webnachweis hinzufügen"
-
-#: templates/edwoca/manifestation_provenance.html:228
-#: templates/edwoca/manifestation_provenance.html:457
-msgid "remove provenance station"
-msgstr "Provenienz entfernen"
-
-#: templates/edwoca/manifestation_provenance.html:236
-#: templates/edwoca/manifestation_provenance.html:465
-msgid "no provenance entries"
-msgstr "keine Provenienzeinträge"
-
-#: templates/edwoca/manifestation_provenance.html:244
-msgid "add person provenance station"
-msgstr "Provenienz anlegen"
-
-#: templates/edwoca/manifestation_provenance.html:249
-msgid "provenance corporations"
-msgstr "Vorbesitzende Körperschaft"
-
-#: templates/edwoca/manifestation_provenance.html:473
-msgid "add corporation provenance station"
-msgstr "Provenienz anlegen"
+#: templates/edwoca/manifestation_print.html:128
+msgid "print characteristics"
+msgstr "Druckspezifika"
 
 #: templates/edwoca/manifestation_relations.html:14
 msgid "set collection status"
@@ -1247,64 +1194,30 @@ msgstr "Titelansetzung"
 msgid "diplomatic titles"
 msgstr "Diplomatische Titel"
 
-#: templates/edwoca/manifestation_title.html:36
+#: templates/edwoca/manifestation_title.html:37
 msgid "writers/hands"
 msgstr "Schreiber"
 
-#: templates/edwoca/manifestation_title.html:47
+#: templates/edwoca/manifestation_title.html:48
 #: templates/edwoca/partials/forms/_modification_form.html:31
 msgid "create handwriting"
 msgstr "Schreiber hinzufügen"
 
-#: templates/edwoca/manifestation_title.html:55
+#: templates/edwoca/manifestation_title.html:57
 msgid "remove title"
 msgstr "Titel entfernen"
 
-#: templates/edwoca/manifestation_title.html:61
+#: templates/edwoca/manifestation_title.html:63
 msgid "no titles"
 msgstr "keine Titel"
 
-#: templates/edwoca/manifestation_title.html:68
+#: templates/edwoca/manifestation_title.html:70
 msgid "create title"
 msgstr "Titel anlegen"
 
-#: templates/edwoca/manifestation_title.html:72
+#: templates/edwoca/manifestation_title.html:74
 msgid "dedications"
 msgstr "Widmungen"
-
-#: templates/edwoca/manifestation_title.html:74
-msgid "person dedications"
-msgstr "Personenwidmungen"
-
-#: templates/edwoca/manifestation_title.html:87
-#: templates/edwoca/manifestation_title.html:174
-msgid "dedicatee"
-msgstr "Widmungsträger"
-
-#: templates/edwoca/manifestation_title.html:144
-#: templates/edwoca/manifestation_title.html:230
-msgid "remove dedication"
-msgstr "Widmung entfernen"
-
-#: templates/edwoca/manifestation_title.html:150
-msgid "no person dedications"
-msgstr "keine Personenwidmungen"
-
-#: templates/edwoca/manifestation_title.html:156
-msgid "create person dedication"
-msgstr "Personenwidmung anlegen"
-
-#: templates/edwoca/manifestation_title.html:160
-msgid "corporation dedications"
-msgstr "Körperschaftswidmungen"
-
-#: templates/edwoca/manifestation_title.html:236
-msgid "no corporation dedications"
-msgstr "keine Körperschaftswidmungen"
-
-#: templates/edwoca/manifestation_title.html:242
-msgid "create corporation dedication"
-msgstr "Körperschaftswidmung anlegen"
 
 #: templates/edwoca/manifestation_update.html:58
 #: templates/edwoca/partials/expression/expression_menu.html:23
@@ -1318,9 +1231,13 @@ msgstr "Identifizierung"
 msgid "expression"
 msgstr "Fassung"
 
-#: templates/edwoca/manifestation_update.html:137
+#: templates/edwoca/manifestation_update.html:133
 msgid "template copy"
 msgstr "Vorlageexemplar"
+
+#: templates/edwoca/manifestation_update.html:158
+msgid "no template item"
+msgstr "kein Vorlageexemplar"
 
 #: templates/edwoca/partials/expression/expression_menu.html:9
 #: templates/edwoca/partials/item/item_menu.html:9
@@ -1360,14 +1277,14 @@ msgid "performance"
 msgstr "Aufführungen"
 
 #: templates/edwoca/partials/expression/expression_menu.html:79
-#: templates/edwoca/partials/item/item_menu.html:81
+#: templates/edwoca/partials/item/item_menu.html:85
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:119
 #: templates/edwoca/partials/work/work_menu.html:65
 msgid "delete"
 msgstr "löschen"
 
 #: templates/edwoca/partials/expression/expression_menu.html:84
-#: templates/edwoca/partials/item/item_menu.html:86
+#: templates/edwoca/partials/item/item_menu.html:90
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:125
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:131
 #: templates/edwoca/partials/work/work_menu.html:70
@@ -1390,9 +1307,46 @@ msgstr "zur Fassung"
 msgid "remove modification"
 msgstr "Modifikation entfernen"
 
+#: templates/edwoca/partials/forms/dedication_form.html:14
+msgid "dedicatee"
+msgstr "Widmungsträger"
+
+#: templates/edwoca/partials/forms/dedication_form.html:58
+msgid "remove dedication"
+msgstr "Widmung entfernen"
+
 #: templates/edwoca/partials/forms/handwriting_form.html:8
 msgid "writer"
 msgstr "Schreiber"
+
+#: templates/edwoca/partials/forms/provenance_station_form.html:19
+#: templates/edwoca/partials/forms/provenance_station_form.html:45
+msgid "owner"
+msgstr "Vorbesitzer*in"
+
+#: templates/edwoca/partials/forms/provenance_station_form.html:87
+msgid "provenance proof (bibliography)"
+msgstr "Provenienzbeleg (Literatur)"
+
+#: templates/edwoca/partials/forms/provenance_station_form.html:124
+msgid "provenance proof (letter)"
+msgstr "Provenienzbeleg (Brief)"
+
+#: templates/edwoca/partials/forms/provenance_station_form.html:152
+msgid "provenance proof (web)"
+msgstr "Provenienzbeleg (Web)"
+
+#: templates/edwoca/partials/forms/provenance_station_form.html:161
+msgid "remove web reference"
+msgstr "Nachweis entfernen"
+
+#: templates/edwoca/partials/forms/provenance_station_form.html:169
+msgid "add web reference"
+msgstr "Webnachweis hinzufügen"
+
+#: templates/edwoca/partials/forms/provenance_station_form.html:176
+msgid "remove provenance station"
+msgstr "Provenienz entfernen"
 
 #: templates/edwoca/partials/htmx/selected.html:10
 msgid "Saved (Reload to edit)"
@@ -1402,14 +1356,6 @@ msgstr ""
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:22
 msgid "head"
 msgstr "Kopf"
-
-#: templates/edwoca/partials/item/item_menu.html:30
-msgid "item characteristics"
-msgstr "Exemplarspezifika"
-
-#: templates/edwoca/partials/item/item_menu.html:37
-msgid "dedication"
-msgstr "Widmung"
 
 #: templates/edwoca/partials/item/item_menu.html:44
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:51
@@ -1451,7 +1397,7 @@ msgid "move"
 msgstr "verschieben"
 
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:29
-#: views/manifestation/common.py:827
+#: views/manifestation/common.py:895
 msgid "source category"
 msgstr "Quellenart"
 
@@ -1612,42 +1558,84 @@ msgstr "Referenzen"
 msgid "first performance"
 msgstr "Uraufführung"
 
+#: templates/edwoca/provenance.html:15
+msgid "provenance persons"
+msgstr "Vorbesitzende Person"
+
+#: templates/edwoca/provenance.html:25 templates/edwoca/provenance.html:47
+msgid "no provenance entries"
+msgstr "keine Provenienzeinträge"
+
+#: templates/edwoca/provenance.html:32
+msgid "add person provenance station"
+msgstr "Provenienz anlegen"
+
+#: templates/edwoca/provenance.html:37
+msgid "provenance corporations"
+msgstr "Vorbesitzende Körperschaft"
+
+#: templates/edwoca/provenance.html:54
+msgid "add corporation provenance station"
+msgstr "Provenienz anlegen"
+
 #: templatetags/entity_labels.py:15
 msgid "singleton"
 msgstr "Handschrift"
 
-#: views/manifestation/common.py:291 views/manifestation/update.py:65
+#: views/manifestation/common.py:303 views/manifestation/update.py:66
 msgid "search expressions"
 msgstr "Fassungen durchsuchen"
 
-#: views/manifestation/common.py:390
+#: views/manifestation/common.py:402
 msgid "search manuscripts"
 msgstr "Handschriften durchsuchen"
 
-#: views/manifestation/common.py:391
+#: views/manifestation/common.py:403
 msgid "search manifestations"
 msgstr "Handschriften durchsuchen"
 
-#: views/manifestation/common.py:392
+#: views/manifestation/common.py:404
 msgid "search prints"
 msgstr "Drucke durchsuchen"
 
-#: views/manifestation/common.py:842
+#: views/manifestation/common.py:1075
 msgid "search zotero"
 msgstr "Literatur durchsuchen"
 
-#: views/manifestation/common.py:852 views/manifestation/title.py:189
-#: views/manifestation/title.py:195 views/manifestation/title.py:213
+#: views/manifestation/common.py:1085 views/manifestation/title.py:213
 msgid "search persons"
 msgstr "Personen durchsuchen"
 
-#: views/manifestation/common.py:858
+#: views/manifestation/common.py:1091
 msgid "search corporations"
 msgstr "Körperschaften durchsuchen"
 
-#: views/manifestation/title.py:198 views/manifestation/title.py:203
-msgid "search place"
-msgstr "Orte durchsuchen"
+#~ msgid "choose publisher"
+#~ msgstr "Verlag auswählen"
+
+#~ msgid "please enter search term"
+#~ msgstr "Bitte Suchbegriff eingeben"
+
+#~ msgid "place inferred assumed"
+#~ msgstr "Ort unsicher ermittelt"
+
+#~ msgid "place assumed"
+#~ msgstr "Ort unsicher"
+
+#~ msgid "place inferred"
+#~ msgstr "Ort ermittelt"
+
+#~ msgid "place as documented"
+#~ msgstr "Ort nach Vorlage"
+
+#~ msgid "create print"
+#~ msgstr "Veröffentlichung anlegen"
+
+#~ msgid "search stitcher"
+#~ msgstr "Stecher suchen"
+
+#~ msgid "search place"
+#~ msgstr "Orte durchsuchen"
 
 #~ msgid "this object is part of (constituting)"
 #~ msgstr "Dieses Objekt ist Teil von (konstituierend)"

@@ -2,6 +2,7 @@ from django.db import models
 from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from django.utils.dateformat import format
 from json import dumps, loads
 import requests
 
@@ -133,13 +134,13 @@ class Corporation(DisplayableModel):
             return corporation
 
     def get_designator(self):
-        if self.gnd_id:
-            return self.get_default_name()
-        return self.interim_designator or ''
+        return self.get_default_name()
 
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
+        if self.interim_designator:
+            return self.interim_designator
         return _('without name')
 
     def get_table(self):
@@ -168,3 +169,20 @@ class Corporation(DisplayableModel):
 
     def get_overview_title(self):
         return "Angaben"
+
+    def __str__(self):
+        if self.period:
+            if self.period.not_before:
+                if self.period.not_after:
+                    date_string = f'{format(self.period.not_before, 'Y')}-{format(self.period.not_after, 'Y')}'
+                else:
+                    date_string = format(self.period.not_before, 'Y')
+            else:
+                if self.period.not_after:
+                    date_string = format(self.period.not_after, 'Y')
+                else:
+                    date_string = ''
+        else:
+            date_string = ''
+
+        return f'{super().__str__()} {date_string}'

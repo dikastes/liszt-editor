@@ -1,7 +1,6 @@
 from ..forms.composite import *
 from ..forms.item import SignatureFormSet, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm
 from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
-from ..forms.publication import PublicationForm
 from ..forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
 from ..models import Manifestation as EdwocaManifestation, Letter, Expression, Work, ItemModification, ModificationHandwriting
 from .base import *

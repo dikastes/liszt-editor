@@ -18,6 +18,15 @@ class ItemModificationForm(DateFormMixin, ModelForm):
                 'class': SimpleFormMixin.select_classes
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),

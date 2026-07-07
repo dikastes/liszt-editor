@@ -7,9 +7,8 @@ from edwoca import forms as edwoca_forms
 from haystack.query import SQ
 from ...forms.manifestation import *
 from calendar import monthrange
-from ...forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm, ItemTextTypeForm
+from ...forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm
 from ...forms.modification import ItemModificationForm, ModificationHandwritingForm
-from ...forms.publication import PublicationForm
 from ...forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
 from ...models import Manifestation as EdwocaManifestation, Letter, Expression, Work, ItemModification, ModificationHandwriting
 from ..base import *
@@ -30,7 +29,7 @@ from liszt_util.forms import SearchForm
 from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting
 from liszt_util.tools import swap_order
 from dmrism.models.item import ItemSignature, PersonProvenanceStation, CorporationProvenanceStation, Item, Library, ItemHandwriting, CorporationProvenanceStationBib, PersonProvenanceStationBib
-from dmrism.models.manifestation import Manifestation as DmrismManifestation, Publication, ManifestationPersonDedication, ManifestationCorporationDedication
+from dmrism.models.manifestation import Manifestation as DmrismManifestation, Publication, ManifestationPersonDedication, ManifestationCorporationDedication, PublicationPlace
 from dmrism.models.manifestation import ManifestationBib, Publication
 
 
@@ -726,24 +725,40 @@ def manifestation_print_update(request, pk):
             Publication.objects.create(manifestation=manifestation)
             return redirect('edwoca:manifestation_print', pk=pk)
 
-        for publication in manifestation.publications.all():
-            prefix = f'publication_{publication.id}'
-            publication_form = PublicationForm(request.POST, instance=publication, prefix=prefix)
-            if publication_form.is_valid():
-                publication_form.save()
+        add_place_string = 'add-publication-place'
+        if add_place_string in request.POST:
+            publication_id = request.POST.get(add_place_string)
+            publication = Publication.objects.get(pk=publication_id)
+            PublicationPlace.objects.create(publication = publication)
 
         form = ManifestationPrintForm(request.POST, instance=manifestation)
-        text_type_form = ItemTextTypeForm(request.POST, instance=manifestation)
+        text_type_form = ManifestationTextTypeForm(request.POST, instance=manifestation)
 
-        if form.is_valid() and text_type_form.is_valid():
-            form.save()
-            text_type_form.save()
+        all_forms = [ form, text_type_form ]
+        publications = []
+        for publication in manifestation.publications.all():
+            prefix = f'publication_{publication.id}'
+            #publication_form = PublicationForm(request.POST, instance = publication, prefix = prefix)
+            publication_place_forms = []
+            for publication_place in publication.place_relations.all():
+                prefix = f'publication_place_relation_{publication_place.id}'
+                publication_place_form = PublicationPlaceForm(request.POST, instance = publication_place, prefix = prefix)
+                publication_place_forms.append(publication_place_form)
+                all_forms.append(publication_place_form)
+            publications.append({
+                    'publication': publication,
+                    'publication_place_forms': publication_place_forms
+                })
+
+        if all(f.is_valid() for f in all_forms):
+            for f in all_forms:
+                f.save()
         else:
             context['form'] = form
             context['text_type_form'] = text_type_form
+            context['publications'] = publications
             return render(request, 'edwoca/manifestation_print.html', context)
 
-        #breakpoint()
         if 'calculate-machine-readable-date' in request.POST:
             manifestation.period.parse_display()
             manifestation.period.save()
@@ -754,45 +769,84 @@ def manifestation_print_update(request, pk):
             manifestation.period.inferred = False
             manifestation.period.save()
 
+        remove_place_string = 'remove-place'
+        if remove_place_string in request.POST:
+            publication_place_id = request.POST.get(remove_place_string)
+            publication_place = PublicationPlace.objects.get(pk = publication_place_id)
+            publication_place.place = None
+            publication_place.save()
+
+        remove_stitcher_string = 'remove-stitcher'
+        if remove_stitcher_string in request.POST:
+            manifestation.stitcher = None
+            manifestation.save()
+
+        remove_publisher_string = 'remove-publisher'
+        if remove_publisher_string in request.POST:
+            publication_id = request.POST.get(remove_publisher_string)
+            publication = Publication.objects.get(pk = publication_id)
+            publication.publisher = None
+            publication.save()
+
+        remove_place_string = 'remove-publication-place'
+        if remove_place_string in request.POST:
+            publication_place_id = request.POST.get(remove_place_string)
+            PublicationPlace.objects.get(pk=publication_place_id).delete()
+
+        remove_publication_string = 'remove-publication'
+        if remove_publication_string in request.POST:
+            publication_id = request.POST.get(remove_publication_string)
+            Publication.objects.get(pk=publication_id).delete
+
         return redirect('edwoca:manifestation_print', pk=pk)
 
     context['form'] = ManifestationPrintForm(instance = manifestation)
-    context['text_type_form'] = ItemTextTypeForm(instance=manifestation)
+    context['text_type_form'] = ManifestationTextTypeForm(instance=manifestation)
 
-    publication_forms = []
+    publications = []
     for publication in manifestation.publications.all():
         prefix = f'publication_{publication.id}'
 
-        publisher_search_form = SearchForm(request.GET or None, prefix='publisher')
-        found_publishers = []
-        if publisher_search_form.is_valid() and publisher_search_form.cleaned_data.get('q'):
-            found_publishers = publisher_search_form.search().models(Corporation)
-
-        place_search_form = SearchForm(request.GET or None, prefix='place')
-        found_places = []
-        if place_search_form.is_valid() and place_search_form.cleaned_data.get('q'):
-            found_places = place_search_form.search().models(Place)
-
-        publication_forms.append({
-                'publication_form': PublicationForm(instance=publication, prefix=prefix),
-                'publisher_search_form': publisher_search_form,
-                'found_publishers': found_publishers,
-                'place_search_form': place_search_form,
-                'found_places':found_places
+        publication_place_forms = []
+        for publication_place in publication.place_relations.all():
+            prefix = f'publication_place_relation_{publication_place.id}'
+            publication_place_form = PublicationPlaceForm(instance = publication_place, prefix = prefix)
+            publication_place_forms.append(publication_place_form)
+        publications.append({
+                'publication': publication,
+                'publication_place_forms': publication_place_forms
             })
 
-    context['publication_forms'] = publication_forms
+        #publisher_search_form = SearchForm(request.GET or None, prefix='publisher')
+        #found_publishers = []
+        #if publisher_search_form.is_valid() and publisher_search_form.cleaned_data.get('q'):
+            #found_publishers = publisher_search_form.search().models(Corporation)
+
+        #place_search_form = SearchForm(request.GET or None, prefix='place')
+        #found_places = []
+        #if place_search_form.is_valid() and place_search_form.cleaned_data.get('q'):
+            #found_places = place_search_form.search().models(Place)
+
+        #publication_forms.append({
+                #'publication_form': PublicationForm(instance = publication, prefix = prefix),
+                #'publication': publication,
+                #'publisher_search_form': publisher_search_form,
+                #'found_publishers': found_publishers,
+                #'place_search_form': place_search_form,
+                #'found_places':found_places
+            #})
+
+    context['publications'] = publications
 
     if manifestation.stitcher:
         context['linked_stitcher'] = manifestation.stitcher
-    else:
-        search_form = SearchForm(request.GET or None, prefix='stitcher')
-        context['stitcher_searchform'] = search_form
-        context['show_stitcher_search_form'] = True
+        #search_form = SearchForm(request.GET or None, prefix='stitcher')
+        #context['stitcher_searchform'] = search_form
+        #context['show_stitcher_search_form'] = True
 
-        if search_form.is_valid() and search_form.cleaned_data.get('q'):
-            context['stitcher_query'] = search_form.cleaned_data.get('q')
-            context[f'found_stitchers'] = search_form.search().models(Corporation)
+        #if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            #context['stitcher_query'] = search_form.cleaned_data.get('q')
+            #context[f'found_stitchers'] = search_form.search().models(Corporation)
 
     return render(request, 'edwoca/manifestation_print.html', context)
 
@@ -1323,7 +1377,7 @@ def manifestation_manuscript_update(request, pk):
 
     if request.method == 'POST':
         form = ItemManuscriptForm(request.POST, instance=item)
-        manifestation_form = ItemTextTypeForm(request.POST, instance=manifestation)
+        manifestation_form = ManifestationTextTypeForm(request.POST, instance=manifestation)
         if form.is_valid() and manifestation_form.is_valid():
             form.save()
             manifestation_form.save()
@@ -1436,7 +1490,7 @@ def manifestation_manuscript_update(request, pk):
                         }
 
         form = ItemManuscriptForm(instance=item)
-        manifestation_form = ItemTextTypeForm(instance=manifestation)
+        manifestation_form = ManifestationTextTypeForm(instance=manifestation)
         handwriting_forms = []
         for handwriting in item.handwritings.all():
             prefix = f'handwriting_{handwriting.id}'

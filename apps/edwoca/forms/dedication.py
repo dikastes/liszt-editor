@@ -98,6 +98,15 @@ class ManifestationPersonDedicationForm(DateFormMixin, BaseDedicationMixin, form
                 'class': SimpleFormMixin.select_classes
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
@@ -181,6 +190,15 @@ class ManifestationCorporationDedicationForm(DateFormMixin, BaseDedicationMixin,
                 'class': 'select select-bordered'
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
@@ -263,6 +281,15 @@ class ItemPersonDedicationForm(DateFormMixin, BaseDedicationMixin, forms.ModelFo
                 'class': 'select select-bordered'
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
@@ -370,6 +397,15 @@ class ItemCorporationDedicationForm(DateFormMixin, BaseDedicationMixin, forms.Mo
                 'class': 'select select-bordered'
             }
         }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),

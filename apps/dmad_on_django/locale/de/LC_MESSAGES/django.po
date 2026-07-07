@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-06-12 16:02+0200\n"
+"POT-Creation-Date: 2026-07-07 12:52+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -46,84 +46,96 @@ msgstr "<< Fehler >>"
 msgid "(stub)"
 msgstr "(RD)"
 
-#: models/corporation.py:70
+#: models/corporation.py:71
 msgid "search corporations"
 msgstr "Körperschaftend durchsuchen"
 
-#: models/corporation.py:143 models/person.py:209 models/person.py:214
+#: models/corporation.py:144 models/person.py:209 models/person.py:214
 #: models/place.py:121 models/subjectterm.py:121 models/work.py:142
 msgid "without name"
 msgstr "ohne Name"
 
 #: models/period.py:14
+msgid "precise"
+msgstr "exakt"
+
+#: models/period.py:15
+msgid "imprecise"
+msgstr "unscharf"
+
+#: models/period.py:17
 msgid "span"
 msgstr "Zeitraum"
 
-#: models/period.py:15
+#: models/period.py:18
 msgid "point"
 msgstr "Zeitpunkt"
 
-#: models/period.py:17
+#: models/period.py:20
 msgid "not before"
 msgstr "nicht vor"
 
-#: models/period.py:18 models/period.py:21
+#: models/period.py:21 models/period.py:24
 msgid "exact"
 msgstr "exakt"
 
-#: models/period.py:20
+#: models/period.py:23
 msgid "not after"
 msgstr "nicht nach"
 
-#: models/period.py:26
+#: models/period.py:29
 msgid "start"
 msgstr "Start"
 
-#: models/period.py:31 models/period_calculation.py:360
+#: models/period.py:34 models/period_calculation.py:360
 msgid "end"
 msgstr "Ende"
 
-#: models/period.py:36
+#: models/period.py:39
 msgid "standardized date"
 msgstr "Datierung (standardisiert)"
 
-#: models/period.py:42
+#: models/period.py:45
 msgid "time mode"
 msgstr "Art der Datierung"
 
-#: models/period.py:48
+#: models/period.py:51
 msgid "not before mode"
 msgstr "Typ"
 
-#: models/period.py:56
+#: models/period.py:59
 msgid "not after mode"
 msgstr "Typ"
 
-#: models/period.py:106 models/period.py:107
+#: models/period.py:67
+msgid "imprecision"
+msgstr "Unschärfe"
+
+#: models/period.py:115 models/period.py:116
 msgid "and"
 msgstr "und"
 
-#: models/period.py:111
+#: models/period.py:120
 msgid "before"
 msgstr "vor"
 
-#: models/period.py:112
+#: models/period.py:121
 msgid "after"
 msgstr "nach"
 
-#: models/period.py:130
+#: models/period.py:139
 msgid "ies"
 msgstr "er"
 
-#: models/period.py:131
+#: models/period.py:140
 msgid "century"
 msgstr "Jahrhundert"
 
-#: models/period.py:149
+#: models/period.py:158
 msgid "without date"
 msgstr "o. D."
 
-#: models/period.py:149
+#: models/period.py:158
 msgid "without year"
 msgstr "o. J."
 

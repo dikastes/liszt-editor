@@ -10,9 +10,12 @@ from .base import DocumentationStatusMixin
 
 
 class Period(DocumentationStatusMixin):
+    class Imprecision(models.TextChoices):
+        IMPRECISE = 'I', _('imprecise')
+        PRECISE = 'P', _('precise')
     class TimeMode(models.TextChoices):
-        SPAN = 'S', _('span')
         POINT = 'P', _('point')
+        SPAN = 'S', _('span')
     class StartQualifier(models.TextChoices):
         NOT_BEFORE = 'N', _('not before')
         EXACT = 'E', _('exact')
@@ -56,6 +59,12 @@ class Period(DocumentationStatusMixin):
             verbose_name = _("not after mode"),
             null = True,
             blank = True
+        )
+    imprecision = models.CharField(
+            max_length = 1,
+            choices = Imprecision.choices,
+            default = Imprecision.IMPRECISE,
+            verbose_name = _("imprecision"),
         )
 
     def render_detailed(self):
