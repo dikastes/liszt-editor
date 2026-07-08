@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from liszt_util.models import Sortable
 
 
-class Item(Sortable, WemiBaseClass):
+class Item(Sortable, WemiBaseClass, TrackedModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -18,7 +18,7 @@ class Item(Sortable, WemiBaseClass):
                 name='unique_template_item_per_manifestation'
             )
         ]
-        ordering = ['manifestation', 'order_index']
+        ordering = ['-needs_review', 'manifestation', 'order_index']
         unique_together = ('manifestation', 'order_index')
 
     rism_id = models.CharField(

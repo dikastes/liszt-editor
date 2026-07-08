@@ -177,21 +177,14 @@ class ManifestationTitleForm(ModelForm):
 class ManifestationCommentForm(BaseTrackedModelForm, CommentForm):
     class Meta:
         model = Manifestation
-        fields = CommentForm.Meta.fields + ['taken_information', 'first_editor', 'editing_history', 'needs_review']
-        widgets = dict(CommentForm.Meta.widgets, **{
-                'taken_information': Textarea( attrs = {
+        fields = CommentForm.Meta.fields + BaseTrackedModelForm.Meta.fields + ['taken_information']
+        widgets = dict(
+                CommentForm.Meta.widgets,
+                **BaseTrackedModelForm.Meta.widgets,
+                taken_information = Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
                     }),
-                'first_editor': TextInput( attrs = {
-                        'class': SimpleFormMixin.text_input_classes
-                    }),
-                'editing_history': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
-                    }),
-                'needs_review': CheckboxInput( attrs = {
-                        'class': 'toggle'
-                    })
-            })
+            )
 
     first_save = forms.DateTimeField(
             label=_('first save') + '*',

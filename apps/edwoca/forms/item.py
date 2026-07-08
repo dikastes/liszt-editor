@@ -65,15 +65,59 @@ NewItemSignatureFormSet = inlineformset_factory(
     )
 
 
-class ItemCommentForm(CommentForm):
+class ItemCommentForm(BaseTrackedModelForm, CommentForm):
     class Meta:
         model = Item
-        fields = CommentForm.Meta.fields + ['taken_information']
-        widgets = dict(CommentForm.Meta.widgets, **{
-                'taken_information': Textarea( attrs = {
+        fields = CommentForm.Meta.fields + BaseTrackedModelForm.Meta.fields + ['taken_information']
+        widgets = dict(
+                CommentForm.Meta.widgets,
+                **BaseTrackedModelForm.Meta.widgets,
+                taken_information = Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
-                    })
-            })
+                    }),
+            )
+
+    first_save = forms.DateTimeField(
+            label=_('first save') + '*',
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black' })
+        )
+    last_save = forms.DateTimeField(
+            label=_('last save'),
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black'})
+        )
+
+    def as_daisy(self):
+        form = div()
+
+        private_comment_field = self['private_comment']
+        public_comment_field = self['public_comment']
+        first_editor_field = self['first_editor']
+        taken_information_field = self['taken_information']
+        first_save_field = self['first_save']
+        last_save_field = self['last_save']
+        editing_history_field = self['editing_history']
+        needs_review_field = self['needs_review']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(private_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(private_comment_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(public_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(public_comment_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(taken_information_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(taken_information_field))
+            self.get_editing_history_div()
+
+        return mark_safe(str(form))
 
 
 class ItemContributorForm(ContributorForm):

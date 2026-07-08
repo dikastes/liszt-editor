@@ -402,38 +402,6 @@ def item_provenance(request, pk):
         context['cp_stations'] = cp_stations
         context['form'] = provenance_comment_form
         return render(request, 'edwoca/provenance.html', context)
-    #q_bib = request.GET.get('bib-q')
-    #q_owner = request.GET.get('owner-q')
-
-    #if q_bib:
-        #bib_search_form = SearchForm(request.GET, prefix='bib')
-        #if bib_search_form.is_valid():
-            #context['query_bib'] = bib_search_form.cleaned_data.get('q')
-            #context['found_bibs'] = bib_search_form.search().models(ZotItem)
-    #else:
-        #bib_search_form = SearchForm(prefix='bib')
-
-    #if q_owner:
-        #owner_search_form = SearchForm(request.GET, prefix='owner')
-        #if owner_search_form.is_valid():
-            #context['query_owner'] = owner_search_form.cleaned_data.get('q')
-            #context['found_persons'] = owner_search_form.search().models(Person)
-            #context['found_corporations'] = owner_search_form.search().models(Corporation)
-    #else:
-        #owner_search_form = SearchForm(prefix='owner')
-
-    #context['bib_search_form'] = bib_search_form
-    #context['owner_search_form'] = owner_search_form
-
-    #q_letter = request.GET.get('letter-q')
-    #if q_letter:
-        #letter_search_form = SearchForm(request.GET, prefix='letter')
-        #if letter_search_form.is_valid():
-            #context['query_letter'] = letter_search_form.cleaned_data.get('q')
-            #context['found_letters'] = letter_search_form.search().models(Letter)
-    #else:
-        #letter_search_form = SearchForm(prefix='letter')
-    #context['letter_search_form'] = letter_search_form
 
     return render(request, 'edwoca/manifestation_provenance.html', context)
 

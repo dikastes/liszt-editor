@@ -15,7 +15,7 @@
             {% include 'edwoca/partials/navigation/item_navigation.html' %}
     {% endif %}
     </div>
-    {% if entity_type == 'manifestation' or entity_type == 'letter' %}
+    {% if entity_type == 'manifestation' or entity_type == 'letter' or entity_type == 'item' %}
         {% include 'edwoca/partials/tracked_model_display.html' %}
     {% endif %}
     <div class="flex-0">
