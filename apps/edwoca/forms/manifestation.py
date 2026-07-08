@@ -629,8 +629,8 @@ class ManifestationCreateForm(forms.Form):
     temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     source_title = forms.CharField(label=_('print title'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
-    source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))
+    #source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
+    #display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))
 
     publisher = forms.IntegerField(
         widget=forms.HiddenInput(),
@@ -713,29 +713,29 @@ class ManifestationCreateForm(forms.Form):
         form.add(plate_number_container)
 
         # Source Type
-        if not self.is_collection:
-            source_type_field = self['source_type']
-            source_type_container = label(cls='form-control w-full')
-            source_type_label = div(cls='label')
-            source_type_label.add(span(source_type_field.label, cls='label-text'))
-            source_type_container.add(source_type_label)
-            source_type_container.add(raw(str(source_type_field)))
-            if source_type_field.errors:
-                source_type_container.add(div(span(source_type_field.errors, cls='text-primary text-sm'), cls='label'))
-            form.add(source_type_container)
+        #if not self.is_collection:
+            #source_type_field = self['source_type']
+            #source_type_container = label(cls='form-control w-full')
+            #source_type_label = div(cls='label')
+            #source_type_label.add(span(source_type_field.label, cls='label-text'))
+            #source_type_container.add(source_type_label)
+            #source_type_container.add(raw(str(source_type_field)))
+            #if source_type_field.errors:
+                #source_type_container.add(div(span(source_type_field.errors, cls='text-primary text-sm'), cls='label'))
+            #form.add(source_type_container)
 
         # Date Fields
-        display_field = self['display']
+        #display_field = self['display']
 
-        display_container = label(cls='form-control w-full')
-        display_label = div(cls='label')
-        display_label.add(span(_('display'), cls='label-text'))
-        display_container.add(display_label)
-        display_container.add(raw(str(display_field)))
-        if display_field.errors:
-            display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
+        #display_container = label(cls='form-control w-full')
+        #display_label = div(cls='label')
+        #display_label.add(span(_('display'), cls='label-text'))
+        #display_container.add(display_label)
+        #display_container.add(raw(str(display_field)))
+        #if display_field.errors:
+            #display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
 
-        form.add(display_container)
+        #form.add(display_container)
 
         return mark_safe(str(form))
 
@@ -746,7 +746,7 @@ class SingletonCreateForm(forms.ModelForm):
         fields = [
                 'working_title',
                 'source_title',
-                'source_type',
+                #'source_type',
                 'library',
                 'signature'
             ]
@@ -763,12 +763,12 @@ class SingletonCreateForm(forms.ModelForm):
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
         )
-    source_type = forms.ChoiceField(
-            label = _('source type') + '*',
-            choices = Manifestation.SourceType.choices[:-1],
-            widget = Select(attrs={'class': SimpleFormMixin.select_classes}),
-            required = False
-        )
+    #source_type = forms.ChoiceField(
+            #label = _('source type') + '*',
+            #choices = Manifestation.SourceType.choices[:-1],
+            #widget = Select(attrs={'class': SimpleFormMixin.select_classes}),
+            #required = False
+        #)
     library = forms.ModelChoiceField(
             queryset = Library.objects.all(),
             label = _('holding institution') + '*',
@@ -790,7 +790,7 @@ class SingletonCreateForm(forms.ModelForm):
         root = div(cls="flex flex-col gap-5")
         source_title_field = self['source_title']
         working_title_field = self['working_title']
-        source_type_field = self['source_type']
+        #source_type_field = self['source_type']
         library_field = self['library']
         signature_field = self['signature']
 
@@ -804,11 +804,11 @@ class SingletonCreateForm(forms.ModelForm):
                     with div(cls=SimpleFormMixin.label_classes):
                         span(working_title_field.label, cls=SimpleFormMixin.label_text_classes)
                     raw(str(working_title_field))
-                if not self.is_collection:
-                    with label(cls=SimpleFormMixin.palette_form_control_classes):
-                        with div(cls=SimpleFormMixin.label_classes):
-                            span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
-                        raw(str(source_type_field))
+                #if not self.is_collection:
+                    #with label(cls=SimpleFormMixin.palette_form_control_classes):
+                        #with div(cls=SimpleFormMixin.label_classes):
+                            #span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
+                        #raw(str(source_type_field))
             with div(cls='flex w-full gap-10 my-5'):
                 with label(cls=SimpleFormMixin.palette_form_control_classes):
                     with div(cls=SimpleFormMixin.label_classes):
