@@ -380,6 +380,14 @@ class RelatedManifestationForm(ModelForm):
 
 
 class ManifestationClassificationForm(ModelForm):
+    is_incomplete = BooleanField(
+            label = _('is incomplete'),
+            widget = CheckboxInput( attrs = {
+                    'class': 'toggle'
+                }),
+            required = False
+        )
+
     class Meta:
         model = Manifestation
         fields = [
@@ -466,17 +474,32 @@ class ManifestationClassificationForm(ModelForm):
                     (Manifestation.SourceType.AUTOGRAPH.value, Manifestation.SourceType.AUTOGRAPH.label),
                     (Manifestation.SourceType.QUESTIONABLE_AUTOGRAPH.value, Manifestation.SourceType.QUESTIONABLE_AUTOGRAPH.label)
                 ]
+            self.initial.update({'is_incomplete': self.instance.get_single_item().is_incomplete})
         else:
             self.fields['source_type'].choices = [
                     (None, BLANK_CHOICE_DASH),
                     (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
                 ]
 
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+
+        if instance.is_singleton:
+            item = instance.get_single_item()
+            item.is_incomplete = self.cleaned_data['is_incomplete']
+
+        if commit:
+            instance.save()
+            item.save()
+        return instance
+
+
     def as_daisy(self):
         form = div(cls='mb-10')
 
         source_type_field = self['source_type']
         manifestation_form_field = self['manifestation_form']
+        incomplete_field = self['is_incomplete']
 
         # common source functions
         album_page_field = self['album_page']
@@ -518,6 +541,10 @@ class ManifestationClassificationForm(ModelForm):
                         with div(cls=SimpleFormMixin.label_classes):
                             span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
                         raw(str(manifestation_form_field))
+                    if instance.is_singleton:
+                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                            raw(str(incomplete_field))
+                            span(incomplete_field.label, cls=SimpleFormMixin.label_text_classes)
                 with div(cls='flex-1'):
                 # right palette with toggles
                     h1(_('edition type') + '*', cls='text-lg')

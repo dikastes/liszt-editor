@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-07 15:51+0200\n"
+"POT-Creation-Date: 2026-07-07 16:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: forms/base.py:262 forms/dedication.py:103 forms/dedication.py:195
 #: forms/dedication.py:286 forms/dedication.py:402 forms/item.py:119
 #: forms/item.py:219 forms/letter.py:29 forms/letter.py:108
-#: forms/manifestation.py:250 forms/manifestation.py:817
+#: forms/manifestation.py:250 forms/manifestation.py:844
 #: forms/modification.py:23
 msgid "imprecision"
 msgstr "Unschärfe"
@@ -28,7 +28,7 @@ msgstr "Unschärfe"
 #: forms/base.py:268 forms/dedication.py:112 forms/dedication.py:204
 #: forms/dedication.py:295 forms/dedication.py:411 forms/item.py:128
 #: forms/item.py:228 forms/letter.py:38 forms/letter.py:117
-#: forms/manifestation.py:259 forms/manifestation.py:826
+#: forms/manifestation.py:259 forms/manifestation.py:853
 #: forms/modification.py:32
 msgid "time mode"
 msgstr "Art der Datierung"
@@ -36,7 +36,7 @@ msgstr "Art der Datierung"
 #: forms/base.py:273 forms/dedication.py:120 forms/dedication.py:212
 #: forms/dedication.py:303 forms/dedication.py:419 forms/item.py:133
 #: forms/item.py:233 forms/letter.py:43 forms/letter.py:122
-#: forms/manifestation.py:264 forms/manifestation.py:834
+#: forms/manifestation.py:264 forms/manifestation.py:861
 #: forms/modification.py:37
 msgid "not before mode"
 msgstr "Typ"
@@ -44,7 +44,7 @@ msgstr "Typ"
 #: forms/base.py:279 forms/dedication.py:129 forms/dedication.py:221
 #: forms/dedication.py:312 forms/dedication.py:428 forms/item.py:139
 #: forms/item.py:239 forms/letter.py:49 forms/letter.py:128
-#: forms/manifestation.py:270 forms/manifestation.py:843
+#: forms/manifestation.py:270 forms/manifestation.py:870
 #: forms/modification.py:43
 msgid "not after mode"
 msgstr "Typ"
@@ -52,7 +52,7 @@ msgstr "Typ"
 #: forms/base.py:285 forms/dedication.py:138 forms/dedication.py:230
 #: forms/dedication.py:321 forms/dedication.py:437 forms/item.py:145
 #: forms/item.py:245 forms/letter.py:55 forms/letter.py:134
-#: forms/manifestation.py:276 forms/manifestation.py:852
+#: forms/manifestation.py:276 forms/manifestation.py:879
 #: forms/modification.py:49
 msgid "start"
 msgstr "Start"
@@ -60,7 +60,7 @@ msgstr "Start"
 #: forms/base.py:290 forms/dedication.py:143 forms/dedication.py:235
 #: forms/dedication.py:326 forms/dedication.py:442 forms/item.py:150
 #: forms/item.py:250 forms/letter.py:60 forms/letter.py:139
-#: forms/manifestation.py:281 forms/manifestation.py:857
+#: forms/manifestation.py:281 forms/manifestation.py:884
 #: forms/modification.py:54
 msgid "end"
 msgstr "Ende"
@@ -68,8 +68,8 @@ msgstr "Ende"
 #: forms/base.py:296 forms/dedication.py:28 forms/dedication.py:156
 #: forms/dedication.py:248 forms/dedication.py:339 forms/dedication.py:455
 #: forms/item.py:160 forms/item.py:260 forms/letter.py:70 forms/letter.py:149
-#: forms/manifestation.py:291 forms/manifestation.py:869
-#: forms/manifestation.py:1048 forms/manifestation.py:1104
+#: forms/manifestation.py:291 forms/manifestation.py:896
+#: forms/manifestation.py:1075 forms/manifestation.py:1131
 #: forms/modification.py:64
 msgid "based on source"
 msgstr "nach Vorlage"
@@ -77,8 +77,8 @@ msgstr "nach Vorlage"
 #: forms/base.py:296 forms/dedication.py:28 forms/dedication.py:156
 #: forms/dedication.py:248 forms/dedication.py:339 forms/dedication.py:455
 #: forms/item.py:160 forms/item.py:260 forms/letter.py:70 forms/letter.py:149
-#: forms/letter.py:324 forms/manifestation.py:291 forms/manifestation.py:869
-#: forms/manifestation.py:1048 forms/manifestation.py:1104
+#: forms/letter.py:324 forms/manifestation.py:291 forms/manifestation.py:896
+#: forms/manifestation.py:1075 forms/manifestation.py:1131
 #: forms/modification.py:64
 msgid "inferred"
 msgstr "ermittelt"
@@ -126,7 +126,7 @@ msgstr "Textart"
 #: forms/dedication.py:148 forms/dedication.py:240 forms/dedication.py:331
 #: forms/dedication.py:447 forms/item.py:155 forms/item.py:255
 #: forms/letter.py:65 forms/letter.py:144 forms/manifestation.py:286
-#: forms/manifestation.py:714 forms/modification.py:59
+#: forms/manifestation.py:741 forms/modification.py:59
 msgid "display"
 msgstr "Datierung (standardisiert)"
 
@@ -146,59 +146,63 @@ msgstr "unsicher"
 msgid "attributed"
 msgstr "zugeschrieben"
 
-#: forms/manifestation.py:504
+#: forms/manifestation.py:384
+msgid "is incomplete"
+msgstr "unvollständig erhalten"
+
+#: forms/manifestation.py:527
 msgid "Selecting 'Text' disables musical attributes and vice versa."
 msgstr ""
 "Die Auswahl von 'Text' verhindert die Auswahl musikalischer Attribute und "
 "umgekehrt."
 
-#: forms/manifestation.py:523
+#: forms/manifestation.py:550
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: forms/manifestation.py:547
+#: forms/manifestation.py:574
 msgid "function"
 msgstr "Funktion"
 
-#: forms/manifestation.py:611
+#: forms/manifestation.py:638
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
-#: forms/manifestation.py:612 forms/manifestation.py:743
+#: forms/manifestation.py:639 forms/manifestation.py:770
 msgid "source title"
 msgstr "Quellentitel"
 
-#: forms/manifestation.py:613
+#: forms/manifestation.py:640
 msgid "plate number"
 msgstr "Plattennummer"
 
-#: forms/manifestation.py:614 forms/manifestation.py:749
+#: forms/manifestation.py:641 forms/manifestation.py:776
 #: templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:6
 msgid "source type"
 msgstr "Typ"
 
-#: forms/manifestation.py:623 templates/edwoca/create_manifestation.html:16
+#: forms/manifestation.py:650 templates/edwoca/create_manifestation.html:16
 #: templates/edwoca/manifestation_print.html:21
 msgid "publisher"
 msgstr "Verlag"
 
-#: forms/manifestation.py:627 templates/edwoca/create_manifestation.html:18
+#: forms/manifestation.py:654 templates/edwoca/create_manifestation.html:18
 msgid "search publisher"
 msgstr "Verlag suchen"
 
-#: forms/manifestation.py:737
+#: forms/manifestation.py:764
 msgid "working title"
 msgstr "Arbeitstitel"
 
-#: forms/manifestation.py:756
+#: forms/manifestation.py:783
 msgid "holding institution"
 msgstr "Bestandeshaltende Institution"
 
-#: forms/manifestation.py:757
+#: forms/manifestation.py:784
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: forms/manifestation.py:761
+#: forms/manifestation.py:788
 msgid "Signature"
 msgstr "Signatur"
 

@@ -82,7 +82,7 @@ class Item(Sortable, WemiBaseClass):
         )
     is_incomplete = models.BooleanField(
             default = False,
-            verbose_name = 'is incomplete'
+            verbose_name = _('is incomplete')
         )
 
     _group_field_names = ['manifestation']

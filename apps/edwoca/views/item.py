@@ -714,29 +714,36 @@ def item_manuscript_update(request, pk):
     }
 
     if request.method == 'POST':
-        if 'save_changes' in request.POST:
-            form = ItemManuscriptForm(request.POST, instance=item)
-            text_type_form = ItemTextTypeForm(request.POST, instance=item)
+        form = ItemManuscriptForm(request.POST, instance=item)
+        completeness_form = ItemCompletenessForm(request.POST, instance=item)
+        text_type_form = ItemTextTypeForm(request.POST, instance=item)
 
-            if form.is_valid() and text_type_form.is_valid():
-                form.save()
-                text_type_form.save()
-            else:
-                context['form'] = form
-                context['text_type_form'] = text_type_form
-                return render(request, 'edwoca:item_manuscript.html', context)
+        all_forms = [
+                form,
+                completeness_form,
+                text_type_form
+            ]
 
-            for modification in item.modifications.all():
-                prefix = f'modification_{modification.id}'
-                modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
-                if modification_form.is_valid():
-                    modification_form.save()
+        if all(f.is_valid for f in all_forms):
+            for f in all_forms:
+                f.save()
+        else:
+            context['form'] = form
+            context['text_type_form'] = text_type_form
+            context['completeness_form'] = completeness_form
+            return render(request, 'edwoca:item_manuscript.html', context)
 
-                for handwriting in modification.handwritings.all():
-                    prefix = f'modification_handwriting_{handwriting.id}'
-                    handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
-                    if handwriting_form.is_valid():
-                        handwriting_form.save()
+        for modification in item.modifications.all():
+            prefix = f'modification_{modification.id}'
+            modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
+            if modification_form.is_valid():
+                modification_form.save()
+
+            for handwriting in modification.handwritings.all():
+                prefix = f'modification_handwriting_{handwriting.id}'
+                handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                if handwriting_form.is_valid():
+                    handwriting_form.save()
 
         if 'add_modification' in request.POST:
             ItemModification.objects.create(item=item)
@@ -752,6 +759,7 @@ def item_manuscript_update(request, pk):
     else:
         form = ItemManuscriptForm(instance=item)
         text_type_form = ItemTextTypeForm(instance=item)
+        completeness_form = ItemCompletenessForm(instance=item)
         modifications = []
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
@@ -771,6 +779,7 @@ def item_manuscript_update(request, pk):
 
     context['form'] = form
     context['text_type_form'] = text_type_form
+    context['completeness_form'] = completeness_form
     search_form = SearchForm(request.GET or None)
     context['search_form'] = search_form
 

@@ -562,3 +562,26 @@ class ItemTextTypeForm(BaseTextTypeForm):
         model = Item
         fields = BaseTextTypeForm.Meta.fields
         widgets = BaseTextTypeForm.Meta.widgets
+
+class ItemCompletenessForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = [ 'is_incomplete' ]
+        widgets = {
+                'is_incomplete': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+                }
+
+    def as_daisy(self):
+        form = div()
+
+        incomplete_field = self['is_incomplete']
+
+        with form:
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(incomplete_field))
+                span(incomplete_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))
