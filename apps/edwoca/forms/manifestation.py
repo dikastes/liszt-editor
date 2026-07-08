@@ -69,6 +69,12 @@ class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
                     })
             }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if not self.instance.is_singleton:
+            self.fields['source_title'].label = _('print title')
+
     def source_title_as_daisy(self):
         source_title_field = self['source_title']
 
@@ -628,7 +634,7 @@ class ManifestationCreateForm(forms.Form):
         }
     read_only_fields = ['publisher']
     temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
-    source_title = forms.CharField(label=_('source title'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
+    source_title = forms.CharField(label=_('print title'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
     display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}))

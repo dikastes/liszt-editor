@@ -410,7 +410,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 'performance_material',
                 'authorized_edition',
                 'first_edition',
-                'proof',
                 'part',
                 'further_edition',
                 'correction_sheet',
