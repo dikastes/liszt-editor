@@ -32,6 +32,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
 
     class ManifestationForm(models.TextChoices):
         SKETCHES = 'SK', _('Sketches'),
+        PROOF = 'PR', _('proof'),
 
         def parse(string):
             match string.lower():
@@ -277,10 +278,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     first_edition = models.BooleanField(
             default = False,
             verbose_name = _('first edition')
-        )
-    proof = models.BooleanField(
-            default = False,
-            verbose_name = _('proof')
         )
     part = models.BooleanField(
             default = False,

@@ -400,7 +400,6 @@ class ManifestationClassificationForm(ModelForm):
                 'part',
                 'further_edition',
                 'correction_sheet',
-                'proof',
                 'stitch_template',
                 'dedication_item',
                 'choir_score',
@@ -432,9 +431,6 @@ class ManifestationClassificationForm(ModelForm):
                         'class': 'toggle'
                     }),
                 'further_edition': CheckboxInput( attrs = {
-                        'class': 'toggle'
-                    }),
-                'proof': CheckboxInput( attrs = {
                         'class': 'toggle'
                     }),
                 'correction_sheet': CheckboxInput( attrs = {
@@ -508,7 +504,6 @@ class ManifestationClassificationForm(ModelForm):
         # print source functions
         authorized_edition_field = self['authorized_edition']
         first_edition_field = self['first_edition']
-        proof_field = self['proof']
         further_edition_field = self['further_edition']
 
         # manuscript source functions
@@ -595,9 +590,6 @@ class ManifestationClassificationForm(ModelForm):
                         with label(cls=SimpleFormMixin.toggle_inverted_classes):
                             raw(str(first_edition_field))
                             span(first_edition_field.label, cls=SimpleFormMixin.label_text_classes)
-                        with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                            raw(str(proof_field))
-                            span(proof_field.label, cls=SimpleFormMixin.label_text_classes)
                         with label(cls=SimpleFormMixin.toggle_inverted_classes):
                             raw(str(further_edition_field))
                             span(further_edition_field.label, cls=SimpleFormMixin.label_text_classes)
