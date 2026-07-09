@@ -193,7 +193,6 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         return old_manifestation
 
     def save(self, *args, **kwargs):
-    # 1. Singleton-Schutz
         if self.manifestation.is_singleton:
             other_items_exists = Item.objects.filter(
                 manifestation=self.manifestation
@@ -201,22 +200,6 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
             if other_items_exists:
                 raise ValidationError("Cannot add another item to a singleton manifestation.")
 
-        # 2. Index-Zuweisung für neue Items
-        # Wir prüfen auf pk is None (neues Objekt) 
-        # UND (Index ist None ODER Index ist der Default 0)
-        if self.pk is None and (self.order_index is None or self.order_index == 0):
-            max_index = Item.objects\
-                    .filter(manifestation=self.manifestation)\
-                    .aggregate(models.Max('order_index'))\
-                    ['order_index__max']
-
-            # Wenn bereits Items existieren, nimm max + 1, sonst bleib bei 0
-            if max_index is not None:
-                self.order_index = max_index + 1
-            else:
-                self.order_index = 0
-
-        # 3. Vererbungskette aufrufen (Sortable -> Models -> DB)
         super().save(*args, **kwargs)
 
 
