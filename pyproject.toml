@@ -1,6 +1,6 @@
 [project]
 name = "liszt-editor"
-version = "0.1.6"
+version = "0.2.1"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -43,4 +43,11 @@ dependencies = [
     "typing-extensions==4.14.1",
     "urllib3==2.5.0",
     "whoosh==2.7.4",
+]
+
+[dependency-groups]
+dev = [
+    "django-extensions>=4.1",
+    "pydotplus>=2.0.2",
+    "pyparsing>=3.2.3",
 ]

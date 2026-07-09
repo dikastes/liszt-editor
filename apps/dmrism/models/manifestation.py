@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
+from dmad_on_django.models.base import DocumentationStatusMixin
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
@@ -25,16 +26,13 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     class Meta:
         ordering = ['-needs_review', 'order_index']
 
-    class Completeness(models.TextChoices):
-        COMPLETE = 'c', _('complete')
-        INCOMPLETE = 'i', _('incomplete')
-
     class PartLabel(models.TextChoices):
         JOINED = 'j', _('joined')
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
         SKETCHES = 'SK', _('Sketches'),
+        PROOF = 'PR', _('proof'),
 
         def parse(string):
             match string.lower():
@@ -89,6 +87,12 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             verbose_name = _('source title'),
             default = ''
         )
+    title_page = models.TextField(
+            max_length = 200,
+            blank = True,
+            verbose_name = _('title page diplomatic'),
+            default = ''
+        )
     rism_id_unaligned = models.BooleanField(default=False)
     temporary = models.BooleanField(default=False)
     temporary_target = models.ForeignKey(
@@ -133,7 +137,8 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             choices = PrintType,
             default = None,
             null = True,
-            verbose_name = _('edition')
+            blank = True,
+            verbose_name = _('print type')
         )
     edition = models.CharField(
             max_length = 10,
@@ -248,15 +253,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             on_delete = models.SET_NULL,
             null = True,
         )
-    completeness = models.TextField(
-            max_length = 1,
-            choices = Completeness,
-            default = Completeness.COMPLETE,
-            verbose_name = _('completeness')
-        )
     specific_figure = models.BooleanField(
             default = False,
-            verbose_name = 'specific figure'
+            verbose_name = _('specific figure')
         )
     plate_number = models.CharField(
             max_length=20,
@@ -279,10 +278,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     first_edition = models.BooleanField(
             default = False,
             verbose_name = _('first edition')
-        )
-    proof = models.BooleanField(
-            default = False,
-            verbose_name = _('proof')
         )
     part = models.BooleanField(
             default = False,
@@ -344,6 +339,34 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             verbose_name = _('is text')
         )
     _group_field_names = ['part_of', 'component_of']
+    is_lyrics = models.BooleanField(
+            default = False,
+            verbose_name = _('is lyrics')
+        )
+    is_program = models.BooleanField(
+            default = False,
+            verbose_name = _('is program')
+        )
+    is_explanation = models.BooleanField(
+            default = False,
+            verbose_name = _('is explanation')
+        )
+    price = models.CharField(
+            max_length = 50,
+            verbose_name = _('price'),
+            null = True,
+            blank = True
+        )
+    edition_by_source = models.CharField(
+            max_length = 200,
+            null = True,
+            blank = True,
+            verbose_name = _('edition by source')
+        )
+    is_partial_edition = models.BooleanField(
+            default = False,
+            verbose_name = _('partial edition')
+        )
 
     @property
     def may_have_component(self):
@@ -387,7 +410,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 'performance_material',
                 'authorized_edition',
                 'first_edition',
-                'proof',
                 'part',
                 'further_edition',
                 'correction_sheet',
@@ -404,29 +426,34 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             return ', '.join(truthy_types)
         return False
 
-    def render_title(self, prefix):
-        if self.is_collection:
-            collection = _('coll')
-            title = self.source_title or _('empty')
-            return self.mark_needs_review(f'({collection}) {prefix} {title}')
+    def render_title_body(self):
+        return self.working_title or self.source_title or str(_('empty'))
 
-        title = self.working_title or _('empty')
-        source_typed_title = f'{prefix} {title} ({self.get_source_type_display()})'
+    def render_title(self):
+        return ' '.join([
+                self.render_title_prefix(),
+                self.render_title_body(),
+                self.render_title_suffix()
+            ])
 
-        if self.part_of:
-            part = _('pt')
-            return self.mark_needs_review(f'({part}) {source_typed_title}')
-        if self.component_of:
-            component = _('cmp')
-            return self.mark_needs_review(f'({component}) {source_typed_title}')
-
-        return self.mark_needs_review(source_typed_title)
+    def render_title_suffix(self):
+        return f'({self.get_source_type_display()})'
 
     def standardized_search_entry(self):
-        if self.items.count():
-            prefix = self.items.first().get_current_signature()
-            return self.render_title(prefix)
-        return '<Fehler: keine Items>'
+        return self.render_title()
+
+    def render_title_prefix(self):
+        signature = self.get_current_signature()
+        if self.is_collection:
+            collection = _('coll')
+            return self.mark_needs_review(f'({collection}) {signature}')
+        if self.part_of:
+            part = _('pt')
+            return self.mark_needs_review(f'({part}) {signature}')
+        if self.component_of:
+            component = _('cmp')
+            return self.mark_needs_review(f'({component}) {signature}')
+        return self.mark_needs_review(signature)
 
     def __str__(self):
         return self.standardized_search_entry()
@@ -675,18 +702,26 @@ class Publication(models.Model):
             null = True,
             on_delete = models.SET_NULL
         )
-    place = models.ManyToManyField(
+    places = models.ManyToManyField(
             'dmad.Place',
+            through = 'PublicationPlace',
             related_name = 'published_manifestations'
         )
-    inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
+
+
+class PublicationPlace(DocumentationStatusMixin, models.Model):
+    publication = models.ForeignKey(
+            'Publication',
+            on_delete = models.CASCADE,
+            related_name = 'place_relations'
         )
-    assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.SET_NULL,
+            related_name = 'publications',
+            null = True
         )
+
 
 
 class ManifestationPlace(models.Model):

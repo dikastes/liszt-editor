@@ -38,7 +38,7 @@ urlpatterns = [
     path('<int:referrer_pk>/removerelatedmanifestation/<int:pk>', views.RelatedManifestationRemoveView.as_view(), name = 'related_manifestation_remove'),
     path('removecollection/<int:pk>', views.collection_remove, name = 'collection_remove'),
     path('<int:pk>/history/', views.ManifestationHistoryUpdateView.as_view(), name='manifestation_history'),
-    path('<int:pk>/provenance/', views.ManifestationProvenanceView.as_view(), name='manifestation_provenance'),
+    path('<int:pk>/provenance/', views.manifestation_provenance, name='manifestation_provenance'),
     path('<int:pk>/item_create', views.manifestation_item_create, name = 'manifestation_item_create'),
     path('autocomplete/', views.manifestation_autocomplete, name = 'manifestation_autocomplete'),
     path('item/<int:pk>/move-modal', views.item_move_modal, name='item_move_modal'),
@@ -81,5 +81,6 @@ urlpatterns = [
     path('<int:pk>/delete', views.ManifestationDeleteView.as_view(), name = 'manifestation_delete'),
     path('<int:pk>/addplace/<int:place_id>', views.manifestation_add_place_view, name = 'manifestation_place_add'),
     path('<int:pk>/remove_place/<int:place_id>', views.manifestation_remove_place_view, name = 'manifestation_remove_place'),
+    path('publisher-search', views.publisher_search_view, name='publisher_search_view'),
     path('<int:pk>/swap_order/<int:parent_pk>/<str:direction>', views.collection_part_swap_view, name = 'collection_part_swap_order')
 ]

@@ -24,14 +24,56 @@ class LetterEditionPeriodForm(DateFormMixin, ModelForm):
                 'form': 'form'
             }
         }
-    not_before = DateField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateField(widget = SelectDateWidget(**kwargs), required = False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}), label=_('date according to edition (standardized)'))
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes , 'form': 'form'})
+        )
     inferred = TypedChoiceField(
-            choices = ((False, _('based on edition')), (True, _('inferred'))),
+            choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = {
+                        'class': 'radio', 'form': 'form',
+                        'form': 'form'
+                    }
                 ),
             required = False
         )
@@ -61,19 +103,60 @@ class LetterSourcePeriodForm(DateFormMixin, ModelForm):
                 'form': 'form'
             }
         }
-    not_before = DateField(widget = SelectDateWidget(**kwargs), required = False, disabled = True)
-    not_after = DateField(widget = SelectDateWidget(**kwargs), required = False, disabled = True)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}), label=_('date according to source (standardized)'), disabled = True)
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes , 'form': 'form'})
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = {
+                        'class': 'radio', 'form': 'form',
+                        'form': 'form'
+                    }
                 ),
-            required = False,
-            disabled = True
+            required = False
         )
-    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False, disabled = True)
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
     def __init__(self, *args, **kwargs):
         super().__init__(period_property = 'source_period', *args, **kwargs)

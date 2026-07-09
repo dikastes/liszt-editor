@@ -1,7 +1,7 @@
 from .base import *
 from django import forms
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField, DateField, ChoiceField
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period
 from ..models.base import ItemModification
@@ -13,15 +13,53 @@ from django.utils.safestring import mark_safe
 
 class ItemModificationForm(DateFormMixin, ModelForm):
     kwargs = {
-        'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
-        'attrs': {
-            'form': 'form'
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes
+            }
         }
-    }
-    not_before = DateTimeField(widget=SelectDateWidget(**kwargs), required=False)
-    not_after = DateTimeField(widget=SelectDateWidget(**kwargs), required=False)
-    #display = CharField(required=False, widget=TextInput(attrs={'class': 'grow flex-1', 'form': 'form'}))
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}))
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes })
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',

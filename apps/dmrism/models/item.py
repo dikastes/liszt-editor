@@ -9,7 +9,7 @@ from django.utils.translation import gettext_lazy as _
 from liszt_util.models import Sortable
 
 
-class Item(Sortable, WemiBaseClass):
+class Item(Sortable, WemiBaseClass, TrackedModel):
     class Meta:
         constraints = [
             models.UniqueConstraint(
@@ -18,7 +18,7 @@ class Item(Sortable, WemiBaseClass):
                 name='unique_template_item_per_manifestation'
             )
         ]
-        ordering = ['manifestation', 'order_index']
+        ordering = ['-needs_review', 'manifestation', 'order_index']
         unique_together = ('manifestation', 'order_index')
 
     rism_id = models.CharField(
@@ -80,6 +80,10 @@ class Item(Sortable, WemiBaseClass):
             default = False,
             verbose_name = _('is explanation')
         )
+    is_incomplete = models.BooleanField(
+            default = False,
+            verbose_name = _('is incomplete')
+        )
 
     _group_field_names = ['manifestation']
 
@@ -118,6 +122,18 @@ class Item(Sortable, WemiBaseClass):
     def __str__(self):
         if self.manifestation.is_singleton:
             return self.manifestation.__str__()
+        return self.get_current_signature()
+
+    @property
+    def title_suffix(self):
+        return self.manifestation.title_suffix
+
+    @property
+    def title_body(self):
+        return self.manifestation.title_body
+
+    @property
+    def title_prefix(self):
         return self.get_current_signature()
 
     def get_siblings(self):
@@ -314,8 +330,8 @@ class BaseProvenanceStation(models.Model):
     class PeriodStatus(models.TextChoices):
         ACQUISITION = 'acq', _('acquisition')
         DISPOSITION = 'dis', _('disposition')
-        OWNERSHIP_PERIOD = 'per', _('ownership period')
-        OWNERSHIP_DATE = 'dat', _('ownership date')
+        OWNERSHIP = 'own', _('ownership')
+
 
 class PersonProvenanceStation(models.Model):
     item = models.ForeignKey(
@@ -342,18 +358,20 @@ class PersonProvenanceStation(models.Model):
     period_status = models.CharField(
             max_length = 3,
             choices = BaseProvenanceStation.PeriodStatus,
-            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP_PERIOD,
-            verbose_name = _('period status')
+            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP,
+            verbose_name = _('period status'),
+            blank = True,
+            null = True
         )
 
     def __str__(self):
         if len(self.owner.all()) > 1:
-            owner_string = str(self.owner.first()) + ' et al.'
+            owner_string = str(self.owner.first()) + _(' et al.')
         elif len(self.owner.all()) == 1:
             owner_string = str(self.owner.first())
         else:
             return str(_('<< new provenance station >>'))
-        period_string = self.period or 'ohne Zeitraum'
+        period_string = self.period or _('no year')
         return f'{str(owner_string)} ({str(period_string)})'
 
 
@@ -384,8 +402,10 @@ class CorporationProvenanceStation(models.Model):
     period_status = models.CharField(
             max_length = 3,
             choices = BaseProvenanceStation.PeriodStatus,
-            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP_PERIOD,
-            verbose_name = _('period status')
+            default = BaseProvenanceStation.PeriodStatus.OWNERSHIP,
+            verbose_name = _('period status'),
+            blank = True,
+            null = True
         )
 
     def __str__(self):
@@ -474,7 +494,9 @@ class BaseProvenanceStationWebReference(models.Model):
         abstract = True
 
     url = models.URLField(
-            verbose_name = _('URL')
+            verbose_name = _('URL'),
+            blank = True,
+            null = True
         )
     comment = models.TextField(
             blank = True,

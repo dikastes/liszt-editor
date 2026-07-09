@@ -6,9 +6,6 @@
             <a
             href="{% url 'edwoca:manifestation_detail' object.id %}"
             {% if 'detail' in request.path %}class="active"{% endif %}
-            {% comment %}
-            class="text-sm xl:text-base"
-            {% endcomment %}
             >
             {% translate 'detail' %}
             </a>
@@ -111,9 +108,9 @@
             <a href="{% url 'edwoca:manifestation_delete' object.id %}"
             {% if 'delete' in request.path %}
                class="text-primary active"
-           {% else %}
+            {% else %}
                class="text-primary"
-           {% endif %}
+            {% endif %}
             >
                 {% translate 'delete' %}
             </a>

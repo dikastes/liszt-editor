@@ -3,7 +3,7 @@ from dominate.util import raw
 from .base import SimpleFormMixin, DateFormMixin
 from django import forms
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField, TypedChoiceField, RadioSelect
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField, TypedChoiceField, RadioSelect, ChoiceField, DateField
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
 from liszt_util.forms import SelectDateWidget
@@ -68,7 +68,7 @@ class WorkCorporationDedicationForm(forms.ModelForm):
         }
 
 
-class ManifestationBaseDedicationMixin:
+class BaseDedicationMixin:
     def as_daisy(self):
         form = tags.div()
 
@@ -91,27 +91,85 @@ class ManifestationBaseDedicationMixin:
         return mark_safe(str(form))
 
 
-class ManifestationPersonDedicationForm(DateFormMixin, ManifestationBaseDedicationMixin, forms.ModelForm):
+class ManifestationPersonDedicationForm(DateFormMixin, BaseDedicationMixin, forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'form': 'form',
-                'class': 'select select-bordered'
+                'class': SimpleFormMixin.select_classes
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': SimpleFormMixin.text_input_classes}))
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = {
+                'class': SimpleFormMixin.text_input_classes,
+                'form': 'form'
+                })
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = {
+                        'class': 'radio',
+                        'form': 'form'
+                        }
                 ),
             required = False
         )
-    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
-
+    assumed = BooleanField(
+            widget = CheckboxInput(attrs = {
+                'class': 'toggle',
+                'form': 'form'
+                }),
+            required = False
+        )
 
     class Meta:
         model = ManifestationPersonDedication
@@ -124,7 +182,7 @@ class ManifestationPersonDedicationForm(DateFormMixin, ManifestationBaseDedicati
         }
 
 
-class ManifestationCorporationDedicationForm(DateFormMixin, ManifestationBaseDedicationMixin, forms.ModelForm):
+class ManifestationCorporationDedicationForm(DateFormMixin, BaseDedicationMixin, forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
@@ -132,19 +190,78 @@ class ManifestationCorporationDedicationForm(DateFormMixin, ManifestationBaseDed
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'form': 'form', 'class': SimpleFormMixin.text_input_classes}))
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = {
+                'class': SimpleFormMixin.text_input_classes,
+                'form': 'form'
+                })
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = {
+                        'class': 'radio',
+                        'form': 'form'
+                        }
                 ),
             required = False
         )
-    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
-
+    assumed = BooleanField(
+            widget = CheckboxInput(attrs = {
+                'class': 'toggle',
+                'form': 'form'
+                }),
+            required = False
+        )
 
     class Meta:
         model = ManifestationCorporationDedication
@@ -157,16 +274,85 @@ class ManifestationCorporationDedicationForm(DateFormMixin, ManifestationBaseDed
         }
 
 
-class ItemPersonDedicationForm(forms.ModelForm):
+class ItemPersonDedicationForm(DateFormMixin, BaseDedicationMixin, forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = {
+                'class': SimpleFormMixin.text_input_classes,
+                'form': 'form'
+                })
+        )
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = {
+                        'class': 'radio',
+                        'form': 'form'
+                        }
+                ),
+            required = False
+        )
+    assumed = BooleanField(
+            widget = CheckboxInput(attrs = {
+                'class': 'toggle',
+                'form': 'form'
+                }),
+            required = False
+        )
 
     class Meta:
         model = ItemPersonDedication
@@ -204,16 +390,85 @@ class ItemPersonDedicationForm(forms.ModelForm):
         return dedication_instance
 
 
-class ItemCorporationDedicationForm(forms.ModelForm):
+class ItemCorporationDedicationForm(DateFormMixin, BaseDedicationMixin, forms.ModelForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
                 'class': 'select select-bordered'
             }
         }
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': 'grow'}))
-    not_before = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateTimeField(widget = SelectDateWidget(**kwargs), required = False)
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+                }),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = {
+                'class': SimpleFormMixin.text_input_classes,
+                'form': 'form'
+                })
+        )
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = {
+                        'class': 'radio',
+                        'form': 'form'
+                        }
+                ),
+            required = False
+        )
+    assumed = BooleanField(
+            widget = CheckboxInput(attrs = {
+                'class': 'toggle',
+                'form': 'form'
+                }),
+            required = False
+        )
 
     class Meta:
         model = ItemCorporationDedication

@@ -21,7 +21,8 @@ class ItemForm(ModelForm):
         fields = ['rism_id']
         widgets = {
                 'rism_id': TextInput( attrs = {
-                        'class': 'grow'
+                        'class': SimpleFormMixin.text_input_classes,
+                        'form': 'form'
                     })
             }
 
@@ -29,10 +30,12 @@ class ItemForm(ModelForm):
         form = div(cls='mb-10')
 
         rism_id_field = self['rism_id']
-        rism_id_field_label = label(rism_id_field.label, cls='input input-bordered flex flex-1 items-center gap-2 my-5')
-        rism_id_field_label.add(raw(str(rism_id_field)))
 
-        form.add(rism_id_field_label)
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(rism_id_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(rism_id_field))
 
         return mark_safe(str(form))
 
@@ -62,15 +65,59 @@ NewItemSignatureFormSet = inlineformset_factory(
     )
 
 
-class ItemCommentForm(CommentForm):
+class ItemCommentForm(BaseTrackedModelForm, CommentForm):
     class Meta:
         model = Item
-        fields = CommentForm.Meta.fields + ['taken_information']
-        widgets = dict(CommentForm.Meta.widgets, **{
-                'taken_information': Textarea( attrs = {
+        fields = CommentForm.Meta.fields + BaseTrackedModelForm.Meta.fields + ['taken_information']
+        widgets = dict(
+                CommentForm.Meta.widgets,
+                **BaseTrackedModelForm.Meta.widgets,
+                taken_information = Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes
-                    })
-            })
+                    }),
+            )
+
+    first_save = forms.DateTimeField(
+            label=_('first save') + '*',
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black' })
+        )
+    last_save = forms.DateTimeField(
+            label=_('last save'),
+            required = False,
+            disabled = True,
+            widget = SelectDateWidget( attrs = { 'class': SimpleFormMixin.select_classes + ' disabled:!bg-white disabled:!border-black disabled:!text-black'})
+        )
+
+    def as_daisy(self):
+        form = div()
+
+        private_comment_field = self['private_comment']
+        public_comment_field = self['public_comment']
+        first_editor_field = self['first_editor']
+        taken_information_field = self['taken_information']
+        first_save_field = self['first_save']
+        last_save_field = self['last_save']
+        editing_history_field = self['editing_history']
+        needs_review_field = self['needs_review']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(private_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(private_comment_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(public_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(public_comment_field))
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(taken_information_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(taken_information_field))
+            self.get_editing_history_div()
+
+        return mark_safe(str(form))
 
 
 class ItemContributorForm(ContributorForm):
@@ -105,20 +152,62 @@ class RelatedItemForm(ModelForm):
 
 class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
-        'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
-        'attrs': {
-            'class': 'select select-bordered border-black bg-white',
-            'form': 'form'
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+            }
         }
-    }
-    not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}), label=Period.display.field.verbose_name)
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes , 'form': 'form'})
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = {
+                        'class': 'radio', 'form': 'form',
+                        'form': 'form'
+                    }
                 ),
             required = False
         )
@@ -163,20 +252,62 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
 
 class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
-        'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2051),
-        'attrs': {
-            'class': 'select select-bordered border-black bg-white',
-            'form': 'form'
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+            }
         }
-    }
-    not_before = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    not_after = forms.DateField(widget=SelectDateWidget(**kwargs), required=False)
-    display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes, 'form': 'form'}), label=Period.display.field.verbose_name)
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes , 'form': 'form'})
+        )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
             widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
+                    attrs = {
+                        'class': 'radio', 'form': 'form',
+                        'form': 'form'
+                    }
                 ),
             required = False
         )
@@ -283,9 +414,13 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 'is_program',
                 'is_explanation',
                 'measure',
+                'is_incomplete',
                 'private_manuscript_comment'
             ]
         widgets = {
+                'is_incomplete': CheckboxInput( attrs = {
+                        'class': 'toggle'
+                    }),
                 'extent': Textarea( attrs = {
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
@@ -311,6 +446,15 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                         'form': 'form'
                     })
             }
+
+    def completeness_as_daisy(self):
+        form = div()
+        completeness_field = self['is_incomplete']
+        with form:
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(completeness_field))
+                span(completeness_field.label, cls=SimpleFormMixin.label_text_classes)
+        return mark_safe(str(form))
 
     def as_daisy(self):
         extent_field = self['extent']
@@ -457,42 +601,31 @@ CorporationProvenanceBibFormSet = inlineformset_factory(
 )
 
 
-class ItemTextTypeForm(ModelForm, SimpleFormMixin):
+class ItemTextTypeForm(BaseTextTypeForm):
     class Meta:
         model = Item
-        fields = ['is_lyrics', 'is_program', 'is_explanation']
+        fields = BaseTextTypeForm.Meta.fields
+        widgets = BaseTextTypeForm.Meta.widgets
+
+class ItemCompletenessForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = [ 'is_incomplete' ]
         widgets = {
-                'is_lyrics': CheckboxInput( attrs = {
-                        'class': 'toggle',
-                        'form': 'form'
-                    }),
-                'is_program': CheckboxInput( attrs = {
-                        'class': 'toggle',
-                        'form': 'form'
-                    }),
-                'is_explanation': CheckboxInput( attrs = {
+                'is_incomplete': CheckboxInput( attrs = {
                         'class': 'toggle',
                         'form': 'form'
                     })
-            }
+                }
 
     def as_daisy(self):
-        lyrics_field = self['is_lyrics']
-        program_field = self['is_program']
-        explanation_field = self['is_explanation']
-
         form = div()
 
+        incomplete_field = self['is_incomplete']
+
         with form:
-            h3(_('text type'), cls='text-lg my-5')
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(lyrics_field))
-                span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(program_field))
-                span(program_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(explanation_field))
-                span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(incomplete_field))
+                span(incomplete_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))

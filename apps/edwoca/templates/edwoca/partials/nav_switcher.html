@@ -1,6 +1,6 @@
 {% load i18n %}
 
-<div class="navigation flex flex-col h-full items-stretch overflow-auto pr-10">
+<div class="navigation flex flex-col h-full items-stretch overflow-auto md:pr-10">
     <div class="flex-1 mb-10">
     {% if entity_type == 'work' %}
         -- Navigation --
@@ -15,7 +15,7 @@
             {% include 'edwoca/partials/navigation/item_navigation.html' %}
     {% endif %}
     </div>
-    {% if entity_type == 'manifestation' or entity_type == 'letter' %}
+    {% if entity_type == 'manifestation' or entity_type == 'letter' or entity_type == 'item' %}
         {% include 'edwoca/partials/tracked_model_display.html' %}
     {% endif %}
     <div class="flex-0">

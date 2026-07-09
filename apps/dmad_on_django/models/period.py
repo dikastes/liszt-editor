@@ -10,28 +10,62 @@ from .base import DocumentationStatusMixin
 
 
 class Period(DocumentationStatusMixin):
+    class Imprecision(models.TextChoices):
+        IMPRECISE = 'I', _('imprecise')
+        PRECISE = 'P', _('precise')
+    class TimeMode(models.TextChoices):
+        POINT = 'P', _('point')
+        SPAN = 'S', _('span')
+    class StartQualifier(models.TextChoices):
+        NOT_BEFORE = 'N', _('not before')
+        EXACT = 'E', _('exact')
+    class EndQualifier(models.TextChoices):
+        NOT_AFTER = 'N', _('not after')
+        EXACT = 'E', _('exact')
+
     not_before = models.DateField(
             null=True,
             blank=True,
-            verbose_name = _("not before")
+            verbose_name = _("start")
         )
     not_after = models.DateField(
             null=True,
             blank=True,
-            verbose_name = _("not after")
+            verbose_name = _("end")
         )
     display = models.TextField(
             null=True,
             blank=True,
             verbose_name = _("standardized date")
         )
-    #status = models.TextField(
-            #choices = DocumentationStatus,
-            #max_length = 1,
-            #null = True,
-            #blank = True,
-            #verbose_name = _("status")
-        #)
+    time_mode = models.CharField(
+            max_length = 1,
+            choices = TimeMode.choices,
+            default = TimeMode.POINT,
+            verbose_name = _("time mode")
+        )
+    start_qualifier = models.CharField(
+            max_length = 1,
+            choices = StartQualifier.choices,
+            default = StartQualifier.NOT_BEFORE,
+            verbose_name = _("not before mode"),
+            null = True,
+            blank = True
+        )
+    end_qualifier = models.CharField(
+            max_length = 1,
+            choices = EndQualifier.choices,
+            default = EndQualifier.NOT_AFTER,
+            verbose_name = _("not after mode"),
+            null = True,
+            blank = True
+        )
+    imprecision = models.CharField(
+            max_length = 1,
+            choices = Imprecision.choices,
+            default = Imprecision.IMPRECISE,
+            verbose_name = _("imprecision"),
+        )
 
     def render_detailed(self):
         if self.not_before == self.not_after:
