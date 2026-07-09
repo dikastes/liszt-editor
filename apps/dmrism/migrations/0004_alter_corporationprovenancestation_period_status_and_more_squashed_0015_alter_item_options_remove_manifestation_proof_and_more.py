@@ -30,8 +30,6 @@ def migrate_text_types(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('dmrism', '0004_alter_corporationprovenancestation_period_status_and_more'), ('dmrism', '0005_alter_corporationprovenancestationwebreference_url_and_more'), ('dmrism', '0006_remove_publication_assumed_and_more'), ('dmrism', '0007_migrate_completeness'), ('dmrism', '0008_remove_manifestation_is_incomplete'), ('dmrism', '0009_publication_places_alter_publication_place'), ('dmrism', '0011_remove_publication_place'), ('dmrism', '0012_manifestation_is_explanation_manifestation_is_lyrics_and_more'), ('dmrism', '0013_migrate_text_types'), ('dmrism', '0014_manifestation_title_page'), ('dmrism', '0015_alter_item_options_remove_manifestation_proof_and_more')]
-
     dependencies = [
         ('dmad', '0005_alter_period_time_mode'),
         ('dmrism', '0003_alter_corporationprovenancestation_period_status_and_more'),
