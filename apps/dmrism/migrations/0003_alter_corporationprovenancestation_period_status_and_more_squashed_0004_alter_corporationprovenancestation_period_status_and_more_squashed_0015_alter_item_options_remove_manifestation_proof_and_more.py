@@ -14,10 +14,10 @@ def update_ownership(apps, schema_editor):
     Cps.objects.filter(period_status = 'per').update(period_status = 'own')
 
 def migrate_completeness(apps, schema_editor):
-    Manifestation = apps.get_model('edwoca', 'manifestation')
+    Manifestation = apps.get_model('dmrism', 'manifestation')
 
     for m in Manifestation.objects.filter(is_singleton = True, completeness = 'i'):
-        i = m.get_single_item()
+        i = m.items.first()
         i.is_incomplete = True
         i.save()
 
@@ -40,8 +40,6 @@ def migrate_text_types(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('dmrism', '0003_alter_corporationprovenancestation_period_status_and_more'), ('dmrism', '0004_alter_corporationprovenancestation_period_status_and_more_squashed_0015_alter_item_options_remove_manifestation_proof_and_more')]
-
     dependencies = [
         ('dmad', '0005_alter_period_time_mode'),
         ('dmrism', '0002_alter_library_options_alter_manifestation_options_and_more'),
@@ -57,6 +55,11 @@ class Migration(migrations.Migration):
             model_name='personprovenancestation',
             name='period_status',
             field=models.CharField(choices=[('acq', 'acquisition'), ('dis', 'disposition'), ('per', 'ownership period'), ('dat', 'ownership date'), ('own', 'ownership')], default='per', max_length=3, verbose_name='period status'),
+        ),
+        migrations.AddField(
+            model_name='item',
+            name='is_incomplete',
+            field=models.BooleanField(default=False, verbose_name='is incomplete'),
         ),
         migrations.RunPython(
             code=update_ownership,
@@ -117,11 +120,6 @@ class Migration(migrations.Migration):
         migrations.RemoveField(
             model_name='publication',
             name='inferred',
-        ),
-        migrations.AddField(
-            model_name='item',
-            name='is_incomplete',
-            field=models.BooleanField(default=False, verbose_name='is incomplete'),
         ),
         migrations.AddField(
             model_name='manifestation',
