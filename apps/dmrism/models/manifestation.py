@@ -614,7 +614,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             target_manifestation.set_collection(True)
             target_manifestation.save()
             self.part_of = target_manifestation
-            self.part_label = Manifestation.PartLabel.CONSTITUTING
+            self.part_label = Manifestation.PartLabel.JOINED
             #RelatedManifestation.objects.create(
                     #source_manifestation = self,
                     #target_manifestation = target_manifestation,
