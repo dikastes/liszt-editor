@@ -2362,10 +2362,6 @@ input.tab:checked + .tab-content,
     --btn-color: var(--fallback-p);
   }
 
-  .btn-secondary {
-    --btn-color: var(--fallback-s);
-  }
-
   .btn-error {
     --btn-color: var(--fallback-er);
   }
@@ -2429,19 +2425,9 @@ input.tab:checked + .tab-content,
     --btn-color: var(--p);
   }
 
-  .btn-secondary {
-    --btn-color: var(--s);
-  }
-
   .btn-error {
     --btn-color: var(--er);
   }
-}
-
-.btn-secondary {
-  --tw-text-opacity: 1;
-  color: var(--fallback-sc,oklch(var(--sc)/var(--tw-text-opacity)));
-  outline-color: var(--fallback-s,oklch(var(--s)/1));
 }
 
 .btn-error {
@@ -4068,14 +4054,6 @@ details.collapse summary::-webkit-details-marker {
   margin-left: 1.25rem;
 }
 
-.mr-0 {
-  margin-right: 0px;
-}
-
-.mr-10 {
-  margin-right: 2.5rem;
-}
-
 .mr-2 {
   margin-right: 0.5rem;
 }
@@ -4178,10 +4156,6 @@ details.collapse summary::-webkit-details-marker {
 
 .w-11\/12 {
   width: 91.666667%;
-}
-
-.w-12 {
-  width: 3rem;
 }
 
 .w-16 {
@@ -4476,6 +4450,10 @@ details.collapse summary::-webkit-details-marker {
   padding-bottom: 0.5rem;
 }
 
+.text-left {
+  text-align: left;
+}
+
 .text-center {
   text-align: center;
 }
@@ -4540,6 +4518,10 @@ details.collapse summary::-webkit-details-marker {
 .text-base-content {
   --tw-text-opacity: 1;
   color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity, 1)));
+}
+
+.text-base-content\/50 {
+  color: var(--fallback-bc,oklch(var(--bc)/0.5));
 }
 
 .text-black {
