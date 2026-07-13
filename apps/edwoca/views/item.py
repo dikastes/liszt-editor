@@ -689,6 +689,18 @@ def item_manuscript_update(request, pk):
     }
 
     if request.method == 'POST':
+        remove_modification_string = 'remove-modification'
+        if remove_modification_string in request.POST:
+            modification_id = request.POST.get(remove_modification_string)
+            modification = ItemModification.objects.get(pk = modification_id)
+            modification.delete()
+
+        remove_handwriting_string = 'remove-modificationhandwriting'
+        if remove_handwriting_string in request.POST:
+            handwriting_id = request.POST.get(remove_handwriting_string)
+            handwriting = ModificationHandwriting.objects.get(pk = handwriting_id)
+            handwriting.delete()
+
         form = ItemManuscriptForm(request.POST, instance=item)
         completeness_form = ItemCompletenessForm(request.POST, instance=item)
         text_type_form = ItemTextTypeForm(request.POST, instance=item)
@@ -720,11 +732,12 @@ def item_manuscript_update(request, pk):
                 if handwriting_form.is_valid():
                     handwriting_form.save()
 
-        if 'add_modification' in request.POST:
+        if 'add-modification' in request.POST:
             ItemModification.objects.create(item=item)
 
-        if 'add_modification_handwriting' in request.POST:
-            modification_id = request.POST.get('add_modification_handwriting')
+        add_handwriting_string = 'add-modification-handwriting'
+        if add_handwriting_string in request.POST:
+            modification_id = request.POST.get(add_handwriting_string)
             modification = get_object_or_404(ItemModification, pk=modification_id)
             ModificationHandwriting.objects.create(modification=modification)
             return redirect('edwoca:item_manuscript', pk=pk)

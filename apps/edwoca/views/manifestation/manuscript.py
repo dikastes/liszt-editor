@@ -34,6 +34,18 @@ def manifestation_manuscript_update(request, pk):
             return render(request, 'edwoca/manifestation_manuscript.html', context)
         context['form'] = form
 
+        remove_handwriting_string = 'remove-itemhandwriting'
+        if remove_handwriting_string in request.POST:
+            handwriting_id = request.POST.get(remove_handwriting_string)
+            handwriting = ItemHandwriting.objects.get(pk = handwriting_id)
+            handwriting.delete()
+
+        remove_modification_handwriting_string = 'remove-modificationhandwriting'
+        if remove_modification_handwriting_string in request.POST:
+            handwriting_id = request.POST.get(remove_modification_handwriting_string)
+            handwriting = ModificationHandwriting.objects.get(pk = handwriting_id)
+            handwriting.delete()
+
         if 'remove-itemhandwriting-writer' in request.POST:
             item_handwriting = get_object_or_404(ItemHandwriting, pk = request.POST.get('remove-itemhandwriting-writer'))
             item_handwriting.writer = None
@@ -116,10 +128,10 @@ def manifestation_manuscript_update(request, pk):
                     'handwriting_forms': []
                 })
 
-        if 'add_handwriting' in request.POST:
+        if 'add-handwriting' in request.POST:
             ItemHandwriting.objects.create(item=item)
 
-        if 'add_modification' in request.POST:
+        if 'add-modification' in request.POST:
             modification = ItemModification.objects.create(item=item)
             prefix = f'modification_{modification.id}'
 
@@ -130,8 +142,9 @@ def manifestation_manuscript_update(request, pk):
 
         context['modifications'] = modifications
 
-        if 'add_modification_handwriting' in request.POST:
-            modification_id = request.POST.get('add_modification_handwriting')
+        add_modification_handwriting_string = 'add-modification-handwriting'
+        if add_modification_handwriting_string in request.POST:
+            modification_id = request.POST.get(add_modification_handwriting_string)
             modification = get_object_or_404(ItemModification, pk=modification_id)
             ModificationHandwriting.objects.create(modification=modification)
 
