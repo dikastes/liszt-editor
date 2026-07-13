@@ -52,8 +52,8 @@
                     </button>
                 </div>
             {% else %}
-                <div id="search-container-publicationplace-{{ publication.publication.id}}-place">
-                    {% include 'edwoca/partials/htmx/search.html' with label='place' search_type='place' field_name='place' app='dmrism' model_name='publicationplace' target_app='dmad' target_model='place' target_id=publication.publication.id id=publication.publication.id placeholder='search places' %}
+                <div id="search-container-publicationplace-{{ publication_place_form.instance.id }}-place">
+                    {% include 'edwoca/partials/htmx/search.html' with label='place' search_type='place' field_name='place' app='dmrism' model_name='publicationplace' target_app='dmad' target_model='place' target_id=publication.publication.id id=publication_place_form.instance.id placeholder='search places' %}
                 </div>
             {% endif %}
             {{ publication_place_form.as_daisy }}
