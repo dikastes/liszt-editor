@@ -652,59 +652,9 @@ def manifestation_letter_remove(request, pk, letter_pk):
     return redirect('edwoca:manifestation_bibliography', pk=pk)
 
 
-class ManifestationBibliographyUpdateView(EntityMixin, UpdateView):
+class ManifestationBibliographyUpdateView(BaseBibliographyUpdateView):
     model = Manifestation
-    fields = []
-    property = 'bib'
-    template_name = 'edwoca/bib_update.html'
-
-    def get_success_url(self):
-        return reverse_lazy('edwoca:manifestation_bibliography', kwargs = {'pk': self.object.id})
-
-    def form_valid(self, form):
-        context = self.get_context_data()
-        manifestation_bib_forms = context['manifestation_bib_forms']
-
-        if not all(f.is_valid() for f in manifestation_bib_forms):
-            return self.form_invalid(form)
-
-        self.object = form.save()
-
-        for f in manifestation_bib_forms:
-            f.save()
-
-        return redirect(self.get_success_url())
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-
-        manifestation_bib_forms = []
-        for manifestation_bib in self.object.bib_set.all():
-            manifestation_bib_form = ManifestationBibForm(
-                    prefix = f'manifestation_bib_{manifestation_bib.pk}',
-                    instance = manifestation_bib,
-                    data = self.request.POST or None
-                )
-            manifestation_bib_forms.append(manifestation_bib_form)
-        context['manifestation_bib_forms'] = manifestation_bib_forms
-
-        zotitem_search_form = SearchForm(self.request.GET or None, prefix='zotitem')
-        context['zotitem_searchform'] = zotitem_search_form
-        context['show_zotitem_search_form'] = True
-
-        if zotitem_search_form.is_valid() and zotitem_search_form.cleaned_data.get('q'):
-            context['zotitem_query'] = zotitem_search_form.cleaned_data.get('q')
-            context['found_bibs'] = zotitem_search_form.search().models(ZotItem)
-
-        letter_search_form = SearchForm(self.request.GET or None, prefix='letter')
-        context['letter_searchform'] = letter_search_form
-        context['show_letter_search_form'] = True
-
-        if letter_search_form.is_valid() and letter_search_form.cleaned_data.get('q'):
-            context['letter_query'] = letter_search_form.cleaned_data.get('q')
-            context[f"found_letters"] = letter_search_form.search().models(Letter)
-
-        return context
+    form = ManifestationBibForm
 
 
 class ManifestationCommentUpdateView(SimpleFormView):
@@ -721,7 +671,7 @@ def manifestation_print_update(request, pk):
     }
 
     if request.method == 'POST':
-        if 'add_publication' in request.POST:
+        if 'add-publication' in request.POST:
             Publication.objects.create(manifestation=manifestation)
             return redirect('edwoca:manifestation_print', pk=pk)
 
@@ -796,7 +746,7 @@ def manifestation_print_update(request, pk):
         remove_publication_string = 'remove-publication'
         if remove_publication_string in request.POST:
             publication_id = request.POST.get(remove_publication_string)
-            Publication.objects.get(pk=publication_id).delete
+            Publication.objects.get(pk=publication_id).delete()
 
         return redirect('edwoca:manifestation_print', pk=pk)
 

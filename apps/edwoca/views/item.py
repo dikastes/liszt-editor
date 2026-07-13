@@ -56,12 +56,26 @@ def item_history(request, pk):
     pass
 
 
-# derive from future base class together with manifestation
-class ItemBibliographyUpdateView(EntityMixin, UpdateView):
-    model = Item
-    fields = []
-    property = 'bib'
-    template_name = 'edwoca/bib_update.html'
+def item_letter_add(request, pk, letter_pk):
+    item = get_object_or_404(EdwocaItem, pk=pk)
+    letter = get_object_or_404(Letter, pk=letter_pk)
+    letter.item.add(item)
+    return redirect('edwoca:item_bibliography', pk=pk)
+
+
+def item_letter_remove(request, pk, letter_pk):
+    item = get_object_or_404(EdwocaItem, pk=pk)
+    letter = get_object_or_404(Letter, pk=letter_pk)
+    letter.item.remove(item)
+    return redirect('edwoca:item_bibliography', pk=pk)
+
+
+class ItemBibliographyUpdateView(BaseBibliographyUpdateView):
+    model = EdwocaItem
+    form = ItemBibForm
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_bibliography', kwargs = {'pk': self.object.id})
 
 
 def item_update(request, pk):
@@ -414,11 +428,22 @@ def item_digital_copy(request, pk):
     }
 
     if request.method == 'POST':
+        add_copy_string = 'add-digital-copy'
+        if add_copy_string in request.POST:
+            ItemDigitalCopy.objects.create(item=item)
+
         for digital_copy in item.digital_copies.all():
             prefix = f'digital_copy_{digital_copy.id}'
             form = ItemDigitizedCopyForm(request.POST, instance=digital_copy, prefix=prefix)
             if form.is_valid():
                 form.save()
+
+        remove_copy_string = 'remove-digital-copy'
+        if remove_copy_string in request.POST:
+            copy_id = request.POST.get(remove_copy_string)
+            copy = get_object_or_404(ItemDigitalCopy, pk=copy_id)
+            copy.delete()
+
         return redirect('edwoca:item_digital_copy', pk=pk)
     else:
         forms = []
@@ -428,24 +453,6 @@ def item_digital_copy(request, pk):
         context['forms'] = forms
 
     return render(request, 'edwoca/manifestation_digital_copy.html', context)
-
-
-def item_digital_copy_add(request, item_id):
-    item = get_object_or_404(Item, pk=item_id)
-    ItemDigitalCopy.objects.create(item=item)
-    if item.manifestation.is_singleton:
-        return redirect('edwoca:manifestation_digital_copy', pk=item.manifestation.id)
-    return redirect('edwoca:item_digital_copy', pk=item_id)
-
-
-class ItemDigitalCopyDeleteView(DeleteView):
-    model = ItemDigitalCopy
-
-    def get_success_url(self):
-        item = self.object.item
-        if item.manifestation.is_singleton:
-            return reverse('edwoca:manifestation_digital_copy', kwargs={'pk': manifestation.id})
-        return reverse('edwoca:item_digital_copy', kwargs={'pk': manifestation.id})
 
 
 class ItemCommentUpdateView(SimpleFormView):
@@ -858,3 +865,22 @@ def modification_remove_handwriting_writer(request, handwriting_pk):
         return redirect('edwoca:manifestation_manuscript', pk=handwriting.modification.item.manifestation.id)
     else:
         return redirect('edwoca:manifestation_manuscript', pk=handwriting.modification.item.id)
+
+
+class ItemBibAddView(FormView):
+    def post(self, request, *args, **kwargs):
+        item_id = self.kwargs['pk']
+        zotitem_key = self.kwargs['zotitem_key']
+        item = Item.objects.get(pk=item_id)
+        zotitem = ZotItem.objects.get(zot_key=zotitem_key)
+        ItemBib.objects.get_or_create(item=item, bib=zotitem)
+        return redirect(reverse_lazy('edwoca:item_bibliography', kwargs={'pk': item_id}))
+
+
+class ItemBibDeleteView(DeleteView):
+    model = ItemBib
+
+    def get_success_url(self):
+        return reverse_lazy('edwoca:item_bibliography', kwargs={'pk': self.object.item.id})
+
+

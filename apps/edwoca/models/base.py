@@ -830,8 +830,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 )
 
     def render_title_prefix(self):
+        collection_prefix = super().render_title_prefix()
         if self.is_singleton:
-            return super().render_title_prefix()
+            return collection_prefix
 
         publisher_addition = self.period
         if self.plate_number:
@@ -841,7 +842,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.publications.first() and self.publications.first().publisher:
             publisher_string = self.publications.first().publisher.get_designator()
 
-        return f"{publisher_string} {publisher_addition}"
+        return f"{collection_prefix} {publisher_string} {publisher_addition}"
 
     #def render_title(self, prefix):
         #if self.is_singleton:
