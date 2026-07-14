@@ -495,7 +495,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         single_item.save()
 
-        if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY]:
+        if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY] and not PUBLISHER_KEY in raw_data:
             for gnd_id in raw_data[LOCATION_KEY].split('|'):
                 place = Place.fetch_or_get(gnd_id.strip())
                 ManifestationPlace.objects.create(
@@ -503,7 +503,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         manifestation = self
                     )
                 #self.places.add(place)
-        elif DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY]:
+        elif DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY] and not PUBLISHER_KEY in raw_data:
             for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
                 place = Place.fetch_or_get(gnd_id.strip())
                 ManifestationPlace.objects.create(
@@ -554,11 +554,25 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if PUBLISHER_KEY in raw_data:
             if raw_data[PUBLISHER_KEY]:
-                Publication.objects.create(
+                publication = Publication.objects.create(
                         manifestation = self,
                         publisher = Corporation.fetch_or_get(raw_data[PUBLISHER_KEY]),
                     )
                 self.plate_number = raw_data[PLATE_NUMBER_KEY]
+                if LOCATION_KEY in raw_data:
+                    for gnd_id in raw_data[LOCATION_KEY].split('|'):
+                        place = Place.fetch_or_get(gnd_id.strip())
+                        ManifestationPlace.objects.create(
+                                place = place,
+                                manifestation = self
+                            )
+                if DEDUCED_PLACE_ID_KEY in raw_data:
+                    for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
+                        place = Place.fetch_or_get(gnd_id.strip())
+                        PublicationPlace.objects.create(
+                                publication = publication,
+                                place = place
+                            )
         if STITCHER_KEY in raw_data and (stitcher := raw_data[STITCHER_KEY]):
             self.stitcher = Corporation.fetch_or_get(stitcher)
 

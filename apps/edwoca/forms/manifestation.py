@@ -204,12 +204,7 @@ class ManifestationCommentForm(BaseTrackedModelForm, CommentForm):
 
         private_comment_field = self['private_comment']
         public_comment_field = self['public_comment']
-        first_editor_field = self['first_editor']
         taken_information_field = self['taken_information']
-        first_save_field = self['first_save']
-        last_save_field = self['last_save']
-        editing_history_field = self['editing_history']
-        needs_review_field = self['needs_review']
 
         with form:
             with label(cls=SimpleFormMixin.form_control_classes):
