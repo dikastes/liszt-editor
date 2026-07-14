@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('bib', '0001_initial'),
-        ('dmrism', '0003_alter_corporationprovenancestation_period_status_and_more_squashed_0004_alter_corporationprovenancestation_period_status_and_more_squashed_0015_alter_item_options_remove_manifestation_proof_and_more'),
+        ('dmrism', '0003_alter_corporationprovenancestation_period_status_and_more_squashed'),
     ]
 
     operations = [
