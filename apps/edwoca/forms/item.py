@@ -629,3 +629,10 @@ class ItemCompletenessForm(ModelForm):
                 span(incomplete_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
+
+
+class ItemBibForm(BaseBibForm):
+    class Meta:
+        model = ItemBib
+        fields = BaseBibForm.Meta.fields
+        widgets = BaseBibForm.Meta.widgets

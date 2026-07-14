@@ -52,8 +52,8 @@
                     </button>
                 </div>
             {% else %}
-                <div id="search-container-publicationplace-{{ publication.publication.id}}-place">
-                    {% include 'edwoca/partials/htmx/search.html' with label='place' search_type='place' field_name='place' app='dmrism' model_name='publicationplace' target_app='dmad' target_model='place' target_id=publication.publication.id id=publication.publication.id placeholder='search places' %}
+                <div id="search-container-publicationplace-{{ publication_place_form.instance.id }}-place">
+                    {% include 'edwoca/partials/htmx/search.html' with label='place' search_type='place' field_name='place' app='dmrism' model_name='publicationplace' target_app='dmad' target_model='place' target_id=publication.publication.id id=publication_place_form.instance.id placeholder='search places' %}
                 </div>
             {% endif %}
             {{ publication_place_form.as_daisy }}
@@ -70,7 +70,7 @@
         </div>
         <div class="flex mt-5">
             <div class="flex-1"></div>
-            <button name="remove-publication" form="form" class="btn btn-outline btn-primary">
+            <button value="{{ publication.publication.id }}" name="remove-publication" form="form" class="btn btn-outline btn-primary">
                 {% translate 'remove publication' %}
             </button>
         </div>

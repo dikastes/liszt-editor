@@ -57,6 +57,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         AUTOGRAPH = 'AUT', _('autograph')
         QUESTIONABLE_AUTOGRAPH = 'QAU', _('questionable autograph')
         CORRECTED_PRINT = 'CPR', _('print with autograph entries')
+        PRINT = 'PRT', _('print')
 
         def parse_from_rism(rism_string):
             match rism_string:
@@ -76,19 +77,16 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         INCOMPLETE= 'INC', _('incomplete')
 
     working_title = models.TextField(
-            max_length = 200,
             blank = True,
             verbose_name = _('working title'),
             default = ''
         )
     source_title = models.TextField(
-            max_length = 200,
             blank = True,
             verbose_name = _('source title'),
             default = ''
         )
     title_page = models.TextField(
-            max_length = 200,
             blank = True,
             verbose_name = _('title page diplomatic'),
             default = ''
@@ -614,7 +612,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             target_manifestation.set_collection(True)
             target_manifestation.save()
             self.part_of = target_manifestation
-            self.part_label = Manifestation.PartLabel.CONSTITUTING
+            self.part_label = Manifestation.PartLabel.JOINED
             #RelatedManifestation.objects.create(
                     #source_manifestation = self,
                     #target_manifestation = target_manifestation,

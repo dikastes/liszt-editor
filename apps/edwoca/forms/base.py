@@ -564,7 +564,8 @@ class BaseDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
                     with div(cls=SimpleFormMixin.label_classes):
                         span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
                     raw(str(url_field))
-                a(_('open'), cls='flex-0 btn btn-outline', href=self.instance.url, target='_blank')
+                if self.instance.url:
+                    a(_('open'), cls='flex-0 btn btn-outline', href=self.instance.url, target='_blank')
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(link_type_field.label), cls=SimpleFormMixin.label_text_classes)

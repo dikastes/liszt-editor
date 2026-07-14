@@ -55,7 +55,7 @@
             </a>
         </li>
         <li>
-            <a href="{% url 'edwoca:item_bib' object.id %}"
+            <a href="{% url 'edwoca:item_bibliography' object.id %}"
                 {% if 'bib' in request.path %}class="active"{% endif %}
                 >
                 {% translate 'bibliography' %}

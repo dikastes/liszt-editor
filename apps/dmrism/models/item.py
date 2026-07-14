@@ -126,11 +126,11 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
 
     @property
     def title_suffix(self):
-        return self.manifestation.title_suffix
+        return self.manifestation.render_title_suffix()
 
     @property
     def title_body(self):
-        return self.manifestation.title_body
+        return self.manifestation.render_title_body()
 
     @property
     def title_prefix(self):
@@ -518,4 +518,12 @@ class CorporationProvenanceStationWebReference(BaseProvenanceStationWebReference
             'CorporationProvenanceStation',
             on_delete = models.CASCADE,
             related_name = 'web_references'
+        )
+
+
+class ItemBib(BaseBib):
+    item = models.ForeignKey(
+            'item',
+            on_delete = models.CASCADE,
+            related_name = 'bib_set'
         )

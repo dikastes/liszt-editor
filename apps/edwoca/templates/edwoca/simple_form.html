@@ -10,7 +10,7 @@
     {{ view_title }}
 </h2>
 
-<form method="post">
+<form id="form" method="post">
     {% csrf_token %}
     {{ form.as_daisy }}
 
