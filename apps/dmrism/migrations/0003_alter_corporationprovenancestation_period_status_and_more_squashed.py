@@ -38,11 +38,9 @@ def migrate_text_types(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('dmrism', '0003_alter_corporationprovenancestation_period_status_and_more_squashed'), ('dmrism', '0016_alter_manifestation_source_title_and_more')]
-
     dependencies = [
         ('bib', '0001_initial'),
-        ('dmad', '0005_alter_period_time_mode'),
+        ('dmad', '0003_period_end_qualifier_period_start_qualifier_and_more_squashed'),
         ('dmrism', '0002_alter_library_options_alter_manifestation_options_and_more'),
     ]
 
