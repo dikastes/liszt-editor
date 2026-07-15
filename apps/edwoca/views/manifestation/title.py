@@ -24,6 +24,12 @@ def manifestation_title_update(request, pk):
         if title_page_form.is_valid():
             title_page_form.save()
 
+        remove_handwriting_string = 'remove-manifestationtitlehandwriting'
+        if remove_handwriting_string in request.POST:
+            handwriting_id = request.POST.get(remove_handwriting_string)
+            handwriting = ManifestationTitleHandwriting.objects.get(pk = handwriting_id)
+            handwriting.delete()
+
         if 'remove-title' in request.POST:
             manifestation_title = get_object_or_404(ManifestationTitle, pk = request.POST.get('remove-title'))
             manifestation_title.delete()

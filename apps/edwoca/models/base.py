@@ -495,7 +495,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         single_item.save()
 
-        if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY]:
+        if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY] and not PUBLISHER_KEY in raw_data:
             for gnd_id in raw_data[LOCATION_KEY].split('|'):
                 place = Place.fetch_or_get(gnd_id.strip())
                 ManifestationPlace.objects.create(
@@ -503,7 +503,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         manifestation = self
                     )
                 #self.places.add(place)
-        elif DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY]:
+        elif DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY] and not PUBLISHER_KEY in raw_data:
             for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
                 place = Place.fetch_or_get(gnd_id.strip())
                 ManifestationPlace.objects.create(
@@ -554,11 +554,25 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if PUBLISHER_KEY in raw_data:
             if raw_data[PUBLISHER_KEY]:
-                Publication.objects.create(
+                publication = Publication.objects.create(
                         manifestation = self,
                         publisher = Corporation.fetch_or_get(raw_data[PUBLISHER_KEY]),
                     )
                 self.plate_number = raw_data[PLATE_NUMBER_KEY]
+                if LOCATION_KEY in raw_data:
+                    for gnd_id in raw_data[LOCATION_KEY].split('|'):
+                        place = Place.fetch_or_get(gnd_id.strip())
+                        ManifestationPlace.objects.create(
+                                place = place,
+                                manifestation = self
+                            )
+                if DEDUCED_PLACE_ID_KEY in raw_data:
+                    for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
+                        place = Place.fetch_or_get(gnd_id.strip())
+                        PublicationPlace.objects.create(
+                                publication = publication,
+                                place = place
+                            )
         if STITCHER_KEY in raw_data and (stitcher := raw_data[STITCHER_KEY]):
             self.stitcher = Corporation.fetch_or_get(stitcher)
 
@@ -830,8 +844,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 )
 
     def render_title_prefix(self):
+        collection_prefix = super().render_title_prefix()
         if self.is_singleton:
-            return super().render_title_prefix()
+            return collection_prefix
 
         publisher_addition = self.period
         if self.plate_number:
@@ -841,7 +856,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.publications.first() and self.publications.first().publisher:
             publisher_string = self.publications.first().publisher.get_designator()
 
-        return f"{publisher_string} {publisher_addition}"
+        return f"{collection_prefix} {publisher_string} {publisher_addition}"
 
     #def render_title(self, prefix):
         #if self.is_singleton:

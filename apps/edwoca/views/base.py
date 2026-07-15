@@ -373,3 +373,52 @@ class ContributorAddView(EntityMixin, FormView):
         return super().form_valid(form)
 
 
+class BaseBibliographyUpdateView(EntityMixin, UpdateView):
+    fields = []
+    property = 'bib'
+    template_name = 'edwoca/bib_update.html'
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        bib_forms = context['bib_forms']
+
+        if not all(f.is_valid() for f in bib_forms):
+            return self.form_invalid(form)
+
+        self.object = form.save()
+
+        for f in bib_forms:
+            f.save()
+
+        return redirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        bib_forms = []
+        for bib in self.object.bib_set.all():
+            bib_form = self.form(
+                    prefix = f'bib_{bib.pk}',
+                    instance = bib,
+                    data = self.request.POST or None
+                )
+            bib_forms.append(bib_form)
+        context['bib_forms'] = bib_forms
+
+        zotitem_search_form = SearchForm(self.request.GET or None, prefix='zotitem')
+        context['zotitem_searchform'] = zotitem_search_form
+        context['show_zotitem_search_form'] = True
+
+        if zotitem_search_form.is_valid() and zotitem_search_form.cleaned_data.get('q'):
+            context['zotitem_query'] = zotitem_search_form.cleaned_data.get('q')
+            context['found_bibs'] = zotitem_search_form.search().models(ZotItem)
+
+        letter_search_form = SearchForm(self.request.GET or None, prefix='letter')
+        context['letter_searchform'] = letter_search_form
+        context['show_letter_search_form'] = True
+
+        if letter_search_form.is_valid() and letter_search_form.cleaned_data.get('q'):
+            context['letter_query'] = letter_search_form.cleaned_data.get('q')
+            context[f"found_letters"] = letter_search_form.search().models(Letter)
+
+        return context
