@@ -43,6 +43,7 @@ class Migration(migrations.Migration):
     dependencies = [
         ('dmad', '0005_alter_period_time_mode'),
         ('dmrism', '0002_alter_library_options_alter_manifestation_options_and_more'),
+        ('edwoca', '0001_initial'),
     ]
 
     operations = [
