@@ -92,11 +92,7 @@ def singleton_collection_create(request):
 
         forms_valid = True
         if form.is_valid():
-            manifestation = EdwocaManifestation.objects.create(
-                is_singleton=True,
-                is_collection=True,
-                source_title = form.cleaned_data['source_title']
-            )
+            manifestation = EdwocaManifestation.objects.create()
 
             item = Item.objects.create(manifestation=manifestation)
 
@@ -106,6 +102,11 @@ def singleton_collection_create(request):
                 signature=form.cleaned_data['signature']
             )
             item.signatures.add(signature)
+
+            manifestation.is_singleton=True
+            manifestation.source_tpe=form.cleaned_data.get('source_type')
+            manifestation.working_title = form.cleaned_data.get('working_title')
+            manifestation.save()
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
     else:
@@ -120,11 +121,7 @@ def singleton_create(request):
     if request.method == 'POST':
         form = SingletonCreateForm(request.POST)
         if form.is_valid():
-            manifestation = EdwocaManifestation.objects.create(
-                is_singleton=True,
-                source_type=form.cleaned_data.get('source_type'),
-                working_title = form.cleaned_data['working_title']
-            )
+            manifestation = EdwocaManifestation.objects.create()
 
             item = Item.objects.create(manifestation=manifestation)
 
@@ -134,6 +131,11 @@ def singleton_create(request):
                 signature=form.cleaned_data['signature']
             )
             item.signatures.add(signature)
+
+            manifestation.is_singleton=True
+            manifestation.source_tpe=form.cleaned_data.get('source_type')
+            manifestation.working_title = form.cleaned_data.get('working_title')
+            manifestation.save()
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
     else:
@@ -400,7 +402,7 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         manuscript_search_form = ManifestationSearchForm(self.request.GET or None, prefix='manuscript', placeholder=_('search manuscripts'))
-        collection_search_form = ManifestationSearchForm(self.request.GET or None, prefix='collection', placeholder = _('search manifestations'))
+        collection_search_form = ManifestationSearchForm(self.request.GET or None, prefix='collection', placeholder = _('search collections'))
         print_search_form = ManifestationSearchForm(self.request.GET or None, prefix='print', placeholder=_('search prints'))
         context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
         context['manuscript_search_form'] = manuscript_search_form
