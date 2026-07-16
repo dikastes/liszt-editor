@@ -410,6 +410,7 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
         model = Item
         fields = [
                 'source_type',
+                'item_stage',
                 'extent',
                 'is_lyrics',
                 'is_program',
@@ -446,6 +447,10 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
+                'item_stage': Select( attrs = {
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
+                    }),
                 'source_type': Select( attrs = {
                         'class': SimpleFormMixin.select_classes,
                         'form': 'form'
@@ -463,6 +468,7 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
 
     def as_daisy(self):
         source_type_field = self['source_type']
+        stage_field = self['item_stage']
         extent_field = self['extent']
         lyrics_field = self['is_lyrics']
         explanation_field = self['is_explanation']
@@ -475,6 +481,10 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(source_type_field.label)+'*', cls=SimpleFormMixin.label_text_classes)
                 raw(str(source_type_field))
+            with label():
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_(stage_field.label), cls=SimpleFormMixin.label_text_classes)
+                raw(str(stage_field))
             with label():
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)

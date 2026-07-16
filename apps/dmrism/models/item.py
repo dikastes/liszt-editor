@@ -21,11 +21,22 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         ordering = ['-needs_review', 'manifestation', 'order_index']
         unique_together = ('manifestation', 'order_index')
 
+    class ItemStage(models.TextChoices):
+        PROOF = 'PR', _('proof')
+
     class SourceType(models.TextChoices):
         PROOF_COPY = 'PRC', _('proof copy')
         ANNOTATED_PROOF_COPY = 'APC', _('annotated proof copy')
         MODIFIED_PRINT = 'MPR', _('modified print')
 
+    item_stage = models.CharField(
+            max_length = 2,
+            choices = ItemStage,
+            default = None,
+            null = True,
+            blank = True,
+            verbose_name = _('item stage')
+        )
     source_type = models.CharField(
             max_length = 3,
             choices = SourceType,
