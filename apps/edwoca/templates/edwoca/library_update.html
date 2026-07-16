@@ -17,7 +17,7 @@
 
 {% if object.corporation %}
     <div class="flex gap-5 items-end">
-        <label class="form-control">
+        <label class="flex-1 form-control">
             <div class="label">
                 <span class="label-text">
                     {% translate 'corporation' %}
@@ -27,7 +27,7 @@
                 {{ object.corporation }}
             </div>
         </label>
-        <button type="submit" form="form" name="delete-corporation" class="btn btn-primary btn-outline">
+        <button type="submit" form="form" name="delete-corporation" class="flex-0 btn btn-primary btn-outline">
             {% translate 'remove' %}
         </button>
     </div>

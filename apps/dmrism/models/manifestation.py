@@ -31,12 +31,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        SKETCHES = 'SK', _('Sketches'),
         PROOF = 'PR', _('proof'),
-
-        def parse(string):
-            match string.lower():
-                case 'sketch' | 'sketches': return Manifestation.ManifestationForm.SKETCHES
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
@@ -56,7 +51,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         CORRECTED_TRANSCRIPT = 'CTS', _('transcript with autograph entries')
         AUTOGRAPH = 'AUT', _('autograph')
         QUESTIONABLE_AUTOGRAPH = 'QAU', _('questionable autograph')
-        CORRECTED_PRINT = 'CPR', _('print with autograph entries')
+        MODIFIED_PRINT = 'MPR', _('modified print')
         PRINT = 'PRT', _('print')
 
         def parse_from_rism(rism_string):
