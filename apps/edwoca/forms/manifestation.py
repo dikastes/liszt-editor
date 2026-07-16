@@ -1002,6 +1002,7 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
 
     def print_characteristics_as_daisy(self):
         form = div()
+        partial_field = self['is_partial_edition']
         type_field = self['print_type']
         edition_by_source_field = self['edition_by_source']
         extent_field = self['extent']
@@ -1016,6 +1017,9 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
                 with div(cls='label'):
                     span(edition_by_source_field.label, cls='label-text')
                 raw(str(edition_by_source_field))
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(partial_field))
+                span(partial_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls='flex-1 form-control w-full'):
                 with div(cls='label'):
                     span(edition_field.label, cls='label-text')
