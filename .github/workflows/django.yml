@@ -13,7 +13,7 @@ jobs:
     - name: checkout code
       uses: actions/checkout@v4
     - name: set up uv
-      uses: actions/setup-uv@v5
+      uses: astral-sh/setup-uv@v5
       with:
         enable-cache: true
         cache-dependency-glob: 'uv.lock'
