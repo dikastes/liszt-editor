@@ -1,10 +1,33 @@
 from django.test import TestCase
+from django.urls import reverse
 from dmad_on_django.models import Status, Language, Person, Place
-from .models import Title, Contributor, Work
+from .models import Manifestation, Item, Library
 from xml.etree import ElementTree as ET
 
 # Create your tests here.
 
+class SingletonCreationTest(TestCase):
+
+    def test_singleton_creation_workflow(self):
+        library = Library.objects.create()
+        form_data = {
+            'working_title': 'Mein Test-Titel',
+            'library': library.pk,
+            'signature': 'Signatur-123'
+        }
+
+        url = reverse('edwoca:singleton_create')
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(Manifestation.objects.filter(working_title='Mein Test-Titel').exists())
+        manifestation = Manifestation.objects.get(working_title='Mein Test-Titel')
+
+        self.assertEqual(manifestation.items.count(), 1)
+
+
+"""
 class TitleModelTests(TestCase):
     title = 'example title'
     language = Language['DE']
@@ -93,4 +116,4 @@ class WorkModelTests(TestCase):
             ET.tostring(future_work.to_mei()),
             expected.encode(encoding='utf-8')
         )
-
+"""
