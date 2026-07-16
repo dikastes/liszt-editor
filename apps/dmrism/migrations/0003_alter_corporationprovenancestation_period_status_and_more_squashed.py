@@ -40,6 +40,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('bib', '0001_initial'),
+        ('edwoca', '0001_initial'),
         ('dmad', '0003_period_end_qualifier_period_start_qualifier_and_more_squashed'),
         ('dmrism', '0002_alter_library_options_alter_manifestation_options_and_more'),
     ]
