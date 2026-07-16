@@ -26,9 +26,9 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 dotenv_file = os.path.join(BASE_DIR, '.env')
 if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
-else:
-    print("Could not find .env file")
-    exit(1)
+#else:
+    #print("Could not find .env file")
+    #exit(1)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -262,3 +262,9 @@ GLOBAL_NAVIGATION = {
 
 USE_TZ = True
 TIME_ZONE = 'Europe/Berlin'
+
+STORAGES = {
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+        }
+    }
