@@ -21,6 +21,19 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         ordering = ['-needs_review', 'manifestation', 'order_index']
         unique_together = ('manifestation', 'order_index')
 
+    class SourceType(models.TextChoices):
+        PROOF_COPY = 'PRC', _('proof copy')
+        ANNOTATED_PROOF_COPY = 'APC', _('annotated proof copy')
+        MODIFIED_PRINT = 'MPR', _('modified print')
+
+    source_type = models.CharField(
+            max_length = 3,
+            choices = SourceType,
+            default = None,
+            null = True,
+            blank = True,
+            verbose_name = _('source type')
+        )
     rism_id = models.CharField(
             max_length=20,
             null = True,

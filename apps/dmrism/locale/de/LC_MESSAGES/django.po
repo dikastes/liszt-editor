@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 17:03+0200\n"
+"POT-Creation-Date: 2026-07-16 13:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,535 +18,552 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/dmrism/models/base.py:15
+#: models/base.py:15
 msgid "public comment"
 msgstr "öffentlicher Kommentar"
 
-#: apps/dmrism/models/base.py:21
+#: models/base.py:21
 msgid "private comment"
 msgstr "interner Kommentar"
 
-#: apps/dmrism/models/base.py:34
+#: models/base.py:34
 msgid "Composer"
 msgstr "Komponist"
 
-#: apps/dmrism/models/base.py:35
+#: models/base.py:35
 msgid "Writer"
 msgstr "Schreiber"
 
-#: apps/dmrism/models/base.py:36
+#: models/base.py:36
 msgid "Translator"
 msgstr "Übersetzer"
 
-#: apps/dmrism/models/base.py:37
+#: models/base.py:37
 msgid "Poet"
 msgstr "Dichter"
 
-#: apps/dmrism/models/base.py:38
+#: models/base.py:38
 msgid "Dedicatee"
 msgstr "Widmungsträger"
 
-#: apps/dmrism/models/base.py:49
+#: models/base.py:49
 msgid "role"
 msgstr "Rolle"
 
-#: apps/dmrism/models/base.py:70
+#: models/base.py:70
 msgid "page"
 msgstr "Seite"
 
-#: apps/dmrism/models/base.py:71
+#: models/base.py:71
 msgid "column"
 msgstr "Spalte"
 
-#: apps/dmrism/models/base.py:72
+#: models/base.py:72
 msgid "lot"
 msgstr "Los"
 
-#: apps/dmrism/models/base.py:82
+#: models/base.py:82
 msgid "bib location"
 msgstr "Fundstelle"
 
-#: apps/dmrism/models/base.py:88
+#: models/base.py:88
 msgid "bib location type"
 msgstr "Typ"
 
-#: apps/dmrism/models/base.py:97
+#: models/base.py:97
 msgid "Parent"
 msgstr "teil von"
 
-#: apps/dmrism/models/base.py:98
+#: models/base.py:98
 msgid "Related"
 msgstr "bezogen"
 
-#: apps/dmrism/models/base.py:103
+#: models/base.py:103
 msgid "comment"
 msgstr "Kommentar"
 
-#: apps/dmrism/models/base.py:109 apps/dmrism/models/manifestation.py:812
+#: models/base.py:109 models/manifestation.py:810
 msgid "label"
 msgstr "Relation"
 
-#: apps/dmrism/models/base.py:180
+#: models/base.py:180
 msgid "medium"
 msgstr "Schreibstoff"
 
-#: apps/dmrism/models/base.py:184
+#: models/base.py:184
 msgid "dubious writer"
 msgstr "Schreiber unsicher"
 
-#: apps/dmrism/models/base.py:222
+#: models/base.py:222
 msgid "dedication text"
 msgstr "Widmungstext (diplomatisch)"
 
-#: apps/dmrism/models/base.py:226
+#: models/base.py:226
 msgid "<< new dedication >>"
 msgstr "<< neue Widmung >>"
 
-#: apps/dmrism/models/base.py:297
+#: models/base.py:297
 msgid "first save"
 msgstr "Datum"
 
-#: apps/dmrism/models/base.py:302
+#: models/base.py:302
 msgid "last save"
 msgstr "letzte Bearbeitung"
 
-#: apps/dmrism/models/base.py:308
+#: models/base.py:308
 msgid "first editor"
 msgstr "Erstbearbeiter*in"
 
-#: apps/dmrism/models/base.py:313
+#: models/base.py:313
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
-#: apps/dmrism/models/base.py:318
+#: models/base.py:318
 msgid "needs review"
 msgstr "zu überarbeiten"
 
-#: apps/dmrism/models/item.py:28 apps/dmrism/models/manifestation.py:198
+#: models/item.py:25
+msgid "proof copy"
+msgstr "Nachweisexemplar"
+
+#: models/item.py:26
+msgid "annotated proof copy"
+msgstr "annotiertes Nachweisexemplar"
+
+#: models/item.py:27 models/manifestation.py:59
+msgid "modified print"
+msgstr "modifizierter Druck"
+
+#: models/item.py:35 models/manifestation.py:131
+msgid "source type"
+msgstr "Typ"
+
+#: models/item.py:41 models/manifestation.py:196
 msgid "RISM id"
 msgstr "RISM ID Nr."
 
-#: apps/dmrism/models/item.py:38 apps/dmrism/models/manifestation.py:237
+#: models/item.py:51 models/manifestation.py:235
 msgid "private dedication comment"
 msgstr "interner Kommentar"
 
-#: apps/dmrism/models/item.py:43
+#: models/item.py:56
 msgid "private provenance comment"
 msgstr "interner Kommentar"
 
-#: apps/dmrism/models/item.py:48
+#: models/item.py:61
 msgid "public provenance comment"
 msgstr "öffentlicher Kommentar"
 
-#: apps/dmrism/models/item.py:54 apps/dmrism/models/manifestation.py:157
+#: models/item.py:67 models/manifestation.py:155
 msgid "extent"
 msgstr "Umfang"
 
-#: apps/dmrism/models/item.py:59
+#: models/item.py:72
 msgid "measure"
 msgstr "Format"
 
-#: apps/dmrism/models/item.py:64
+#: models/item.py:77
 msgid "private manuscript comment"
 msgstr "interner Kommentar"
 
-#: apps/dmrism/models/item.py:69 apps/dmrism/models/manifestation.py:247
+#: models/item.py:82 models/manifestation.py:245
 msgid "taken information"
 msgstr "übernommene Informationen"
 
-#: apps/dmrism/models/item.py:73 apps/dmrism/models/manifestation.py:344
+#: models/item.py:86 models/manifestation.py:342
 msgid "is lyrics"
 msgstr "Gesangstext"
 
-#: apps/dmrism/models/item.py:77 apps/dmrism/models/manifestation.py:348
+#: models/item.py:90 models/manifestation.py:346
 msgid "is program"
 msgstr "Programm"
 
-#: apps/dmrism/models/item.py:81 apps/dmrism/models/manifestation.py:352
+#: models/item.py:94 models/manifestation.py:350
 msgid "is explanation"
 msgstr "Erläuterung"
 
-#: apps/dmrism/models/item.py:85
+#: models/item.py:98
 #, fuzzy
 #| msgid "incomplete"
 msgid "is incomplete"
 msgstr "unvollständig erhalten"
 
-#: apps/dmrism/models/item.py:215
+#: models/item.py:228
 msgid "name"
 msgstr "Name"
 
-#: apps/dmrism/models/item.py:222
+#: models/item.py:235
 msgid "siglum"
 msgstr "Sigle"
 
-#: apps/dmrism/models/item.py:230
+#: models/item.py:243
 msgid "corporation"
 msgstr ""
 
-#: apps/dmrism/models/item.py:251
+#: models/item.py:264
 msgid "Current"
 msgstr "aktuell"
 
-#: apps/dmrism/models/item.py:252
+#: models/item.py:265
 msgid "Former"
 msgstr "vormalig"
 
-#: apps/dmrism/models/item.py:260
+#: models/item.py:273
 msgid "holding institution"
 msgstr "Bestandshaltende Institution"
 
-#: apps/dmrism/models/item.py:265
+#: models/item.py:278
 msgid "signature"
 msgstr "Signatur"
 
-#: apps/dmrism/models/item.py:272
+#: models/item.py:285
 msgid "status"
 msgstr "Status"
 
-#: apps/dmrism/models/item.py:276
+#: models/item.py:289
 msgid "without signature"
 msgstr " "
 
-#: apps/dmrism/models/item.py:283
+#: models/item.py:296
 msgid "<< institution >>"
 msgstr "<< Institution >>"
 
-#: apps/dmrism/models/item.py:331
+#: models/item.py:344
 msgid "acquisition"
 msgstr "Erwerb"
 
-#: apps/dmrism/models/item.py:332
+#: models/item.py:345
 msgid "disposition"
 msgstr "Abgabe"
 
-#: apps/dmrism/models/item.py:333
+#: models/item.py:346
 msgid "ownership"
 msgstr "Besitz"
 
-#: apps/dmrism/models/item.py:362 apps/dmrism/models/item.py:406
+#: models/item.py:375 models/item.py:419
 msgid "period status"
 msgstr "Datierungsereignis"
 
-#: apps/dmrism/models/item.py:369
+#: models/item.py:382
 msgid " et al."
 msgstr " et al."
 
-#: apps/dmrism/models/item.py:373 apps/dmrism/models/item.py:413
+#: models/item.py:386 models/item.py:426
 msgid "<< new provenance station >>"
 msgstr "<< neue Provenienz >>"
 
-#: apps/dmrism/models/item.py:374
+#: models/item.py:387
 msgid "no year"
 msgstr "o. J."
 
-#: apps/dmrism/models/item.py:439
+#: models/item.py:452
 msgid "Digitized"
 msgstr "Digitalisat"
 
-#: apps/dmrism/models/item.py:440
+#: models/item.py:453
 msgid "IIIF Manifest"
 msgstr "IIIF-Manifest"
 
-#: apps/dmrism/models/item.py:441
+#: models/item.py:454
 msgid "Private"
 msgstr "Privat"
 
-#: apps/dmrism/models/item.py:442
+#: models/item.py:455
 msgid "Working copy"
 msgstr "Arbeitsdigitalisat"
 
-#: apps/dmrism/models/item.py:451 apps/dmrism/models/item.py:497
+#: models/item.py:464 models/item.py:510
 msgid "URL"
 msgstr "URL"
 
-#: apps/dmrism/models/item.py:458
+#: models/item.py:471
 msgid "link type"
 msgstr "Linktyp"
 
-#: apps/dmrism/models/item.py:504
+#: models/item.py:517
 msgid "web reference comment"
 msgstr "Kommentar"
 
-#: apps/dmrism/models/manifestation.py:19
+#: models/manifestation.py:19
 msgid "Head Title"
 msgstr "Kopftitel"
 
-#: apps/dmrism/models/manifestation.py:20
+#: models/manifestation.py:20
 msgid "Title Page"
 msgstr "Titelseite"
 
-#: apps/dmrism/models/manifestation.py:21
+#: models/manifestation.py:21
 msgid "Envelope"
 msgstr "Umschlagstitel"
 
-#: apps/dmrism/models/manifestation.py:22
+#: models/manifestation.py:22
 msgid "Envelope or Title Page"
 msgstr "Umschlagstitel oder Titelseite"
 
-#: apps/dmrism/models/manifestation.py:30
+#: models/manifestation.py:30
 msgid "joined"
 msgstr "verbunden"
 
-#: apps/dmrism/models/manifestation.py:31
+#: models/manifestation.py:31
 msgid "separated"
 msgstr "separiert"
 
-#: apps/dmrism/models/manifestation.py:34
+#: models/manifestation.py:34
 msgid "Sketches"
 msgstr "Entwurf"
 
-#: apps/dmrism/models/manifestation.py:35
+#: models/manifestation.py:35
 msgid "proof"
 msgstr "Korrekturabzug"
 
-#: apps/dmrism/models/manifestation.py:42
+#: models/manifestation.py:42
 msgid "Plate Print"
 msgstr "Plattendruck"
 
-#: apps/dmrism/models/manifestation.py:43
+#: models/manifestation.py:43
 msgid "Lithograph"
 msgstr "Lithograph"
 
-#: apps/dmrism/models/manifestation.py:51
+#: models/manifestation.py:51
 msgid "first issue"
 msgstr "Erstauflage"
 
-#: apps/dmrism/models/manifestation.py:52
+#: models/manifestation.py:52
 msgid "following issue"
 msgstr "Folgeauflage"
 
-#: apps/dmrism/models/manifestation.py:55
+#: models/manifestation.py:55
 msgid "transcript"
 msgstr "Abschrift"
 
-#: apps/dmrism/models/manifestation.py:56
+#: models/manifestation.py:56
 msgid "transcript with autograph entries"
 msgstr "Abschrift mit autographen Eintragungen"
 
-#: apps/dmrism/models/manifestation.py:57
+#: models/manifestation.py:57
 msgid "autograph"
 msgstr "Autograph"
 
-#: apps/dmrism/models/manifestation.py:58
+#: models/manifestation.py:58
 msgid "questionable autograph"
 msgstr "Fragliches Autograph"
 
-#: apps/dmrism/models/manifestation.py:59
-msgid "print with autograph entries"
-msgstr "Druck mit autographen Eintragungen"
+#: models/manifestation.py:60
+#, fuzzy
+#| msgid "print type"
+msgid "print"
+msgstr "Drucktyp"
 
-#: apps/dmrism/models/manifestation.py:75
+#: models/manifestation.py:76
 msgid "complete"
 msgstr "vollständig erhalten"
 
-#: apps/dmrism/models/manifestation.py:76
+#: models/manifestation.py:77
 msgid "incomplete"
 msgstr "unvollständig erhalten"
 
-#: apps/dmrism/models/manifestation.py:81
+#: models/manifestation.py:81
 msgid "working title"
 msgstr "Arbeitstitel"
 
-#: apps/dmrism/models/manifestation.py:87
+#: models/manifestation.py:86
 msgid "source title"
 msgstr "Quellentitel"
 
-#: apps/dmrism/models/manifestation.py:93
+#: models/manifestation.py:91
 msgid "title page diplomatic"
 msgstr "Titelblatt (diplomatische Umschrift)"
 
-#: apps/dmrism/models/manifestation.py:125
+#: models/manifestation.py:123
 msgid "manifestation form"
 msgstr "Stadium"
 
-#: apps/dmrism/models/manifestation.py:133
-msgid "source type"
-msgstr "Typ"
-
-#: apps/dmrism/models/manifestation.py:141
+#: models/manifestation.py:139
 msgid "print type"
 msgstr "Drucktyp"
 
-#: apps/dmrism/models/manifestation.py:147
+#: models/manifestation.py:145
 msgid "edition"
 msgstr "Auflage"
 
-#: apps/dmrism/models/manifestation.py:153
+#: models/manifestation.py:151
 msgid "state"
 msgstr "Status"
 
-#: apps/dmrism/models/manifestation.py:162
+#: models/manifestation.py:160
 msgid "history"
 msgstr "Geschichte"
 
-#: apps/dmrism/models/manifestation.py:174
+#: models/manifestation.py:172
 msgid "language"
 msgstr "Sprache"
 
-#: apps/dmrism/models/manifestation.py:179
+#: models/manifestation.py:177
 msgid "watermark"
 msgstr "Wasserzeichen"
 
-#: apps/dmrism/models/manifestation.py:184
+#: models/manifestation.py:182
 msgid "watermark url"
 msgstr "Wasserzeichen URL"
 
-#: apps/dmrism/models/manifestation.py:207
+#: models/manifestation.py:205
 msgid "diplomatic date"
 msgstr "Datierung (diplomatisch)"
 
-#: apps/dmrism/models/manifestation.py:212
+#: models/manifestation.py:210
 msgid "print extent"
 msgstr "Druckumfang"
 
-#: apps/dmrism/models/manifestation.py:217
+#: models/manifestation.py:215
 msgid "private head comment"
 msgstr "interner Kommentar (Werkbezüge)"
 
-#: apps/dmrism/models/manifestation.py:222
+#: models/manifestation.py:220
 msgid "private relations comment"
 msgstr "interner Kommentar"
 
-#: apps/dmrism/models/manifestation.py:227
+#: models/manifestation.py:225
 msgid "private title comment"
 msgstr "interner Kommentar zur Titelei"
 
-#: apps/dmrism/models/manifestation.py:232
+#: models/manifestation.py:230
 msgid "private history comment"
 msgstr "interner Kommentar"
 
-#: apps/dmrism/models/manifestation.py:242
+#: models/manifestation.py:240
 msgid "private print comment"
 msgstr "interner Kommentar"
 
-#: apps/dmrism/models/manifestation.py:258
+#: models/manifestation.py:256
 msgid "specific figure"
 msgstr "Figurative Titelseite"
 
-#: apps/dmrism/models/manifestation.py:263
+#: models/manifestation.py:261
 msgid "plate number"
 msgstr "Plattennummer"
 
-#: apps/dmrism/models/manifestation.py:268
+#: models/manifestation.py:266
 msgid "album page"
 msgstr "Albumblatt"
 
-#: apps/dmrism/models/manifestation.py:272
+#: models/manifestation.py:270
 msgid "performance material"
 msgstr "Aufführungsmaterial"
 
-#: apps/dmrism/models/manifestation.py:276
+#: models/manifestation.py:274
 msgid "authorized edition"
 msgstr "autorisierte Ausgabe"
 
-#: apps/dmrism/models/manifestation.py:280
+#: models/manifestation.py:278
 msgid "first edition"
 msgstr "Erstausgabe"
 
-#: apps/dmrism/models/manifestation.py:284
+#: models/manifestation.py:282
 msgid "part"
 msgstr "Stimme"
 
-#: apps/dmrism/models/manifestation.py:288
+#: models/manifestation.py:286
 msgid "further edition"
 msgstr "weitere Ausgabe"
 
-#: apps/dmrism/models/manifestation.py:292
+#: models/manifestation.py:290
 msgid "correction sheet"
 msgstr "Korrekturblatt"
 
-#: apps/dmrism/models/manifestation.py:296
+#: models/manifestation.py:294
 msgid "stitch template"
 msgstr "Stichvorlage"
 
-#: apps/dmrism/models/manifestation.py:300
+#: models/manifestation.py:298
 msgid "dedication item"
 msgstr "Widmungsexemplar"
 
-#: apps/dmrism/models/manifestation.py:304
+#: models/manifestation.py:302
 msgid "choir score"
 msgstr "Chorpartitur"
 
-#: apps/dmrism/models/manifestation.py:308
+#: models/manifestation.py:306
 msgid "piano reduction"
 msgstr "Klavierauszug"
 
-#: apps/dmrism/models/manifestation.py:312
+#: models/manifestation.py:310
 msgid "particell"
 msgstr "Particell"
 
-#: apps/dmrism/models/manifestation.py:316
+#: models/manifestation.py:314
 msgid "score"
 msgstr "Partitur"
 
-#: apps/dmrism/models/manifestation.py:329
+#: models/manifestation.py:327
 msgid "part label"
 msgstr "Qualifikation des Sammlungsbezugs"
 
-#: apps/dmrism/models/manifestation.py:339
+#: models/manifestation.py:337
 msgid "is text"
 msgstr "Text"
 
-#: apps/dmrism/models/manifestation.py:356
+#: models/manifestation.py:354
 msgid "price"
 msgstr "Preisangabe"
 
-#: apps/dmrism/models/manifestation.py:364
+#: models/manifestation.py:362
 msgid "edition by source"
 msgstr "Ausgabe/Auflage (nach Quelle)"
 
-#: apps/dmrism/models/manifestation.py:368
+#: models/manifestation.py:366
 msgid "partial edition"
 msgstr "Teilausgabe"
 
-#: apps/dmrism/models/manifestation.py:430
+#: models/manifestation.py:428
 msgid "empty"
 msgstr "[leer]"
 
-#: apps/dmrism/models/manifestation.py:448
+#: models/manifestation.py:446
 msgid "coll"
 msgstr "SMLG"
 
-#: apps/dmrism/models/manifestation.py:451
+#: models/manifestation.py:449
 msgid "pt"
 msgstr "TEIL"
 
-#: apps/dmrism/models/manifestation.py:454
+#: models/manifestation.py:452
 msgid "cmp"
 msgstr "KOMP"
 
-#: apps/dmrism/models/manifestation.py:738
+#: models/manifestation.py:736
 msgid "inferred"
 msgstr "ermittelt"
 
-#: apps/dmrism/models/manifestation.py:742
+#: models/manifestation.py:740
 msgid "assumed"
 msgstr "unsicher"
 
-#: apps/dmrism/models/manifestation.py:750
+#: models/manifestation.py:748
 msgid "diplomatic title"
 msgstr "diplomatischer Titel"
 
-#: apps/dmrism/models/manifestation.py:758
+#: models/manifestation.py:756
 msgid "title type"
 msgstr "Titelposition"
 
-#: apps/dmrism/models/manifestation.py:780
+#: models/manifestation.py:778
 msgid "<< new title >>"
 msgstr "<< neuer Titel >>"
 
-#: apps/dmrism/models/manifestation.py:795
+#: models/manifestation.py:793
 msgid "is stitch template (as documented)"
 msgstr "ist Stichvorlage (nach Vorlage)"
 
-#: apps/dmrism/models/manifestation.py:796
+#: models/manifestation.py:794
 msgid "is stitch template (inferred)"
 msgstr "ist Stichvorlage (angenommen)"
 
-#: apps/dmrism/models/manifestation.py:797
+#: models/manifestation.py:795
 msgid "is related to"
 msgstr "hat Bezug zu"
+
+#~ msgid "print with autograph entries"
+#~ msgstr "Druck mit autographen Eintragungen"
 
 #~ msgid "ownership period"
 #~ msgstr "Besitzzeitraum"

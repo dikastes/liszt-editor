@@ -469,7 +469,7 @@ class ManifestationClassificationForm(ModelForm):
             self.fields['source_type'].choices = [
                     (None, BLANK_CHOICE_DASH),
                     (Manifestation.SourceType.PRINT.value, Manifestation.SourceType.PRINT.label),
-                    (Manifestation.SourceType.CORRECTED_PRINT.value, Manifestation.SourceType.CORRECTED_PRINT.label)
+                    (Manifestation.SourceType.MODIFIED_PRINT.value, Manifestation.SourceType.MODIFIED_PRINT.label)
                 ]
 
     def save(self, commit=True):
