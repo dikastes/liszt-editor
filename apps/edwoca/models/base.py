@@ -103,7 +103,10 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     not_before = self.period.not_before,
                     not_after = self.period.not_after,
                     display = self.period.display,
-                    status = self.period.status
+                    time_mode = self.period.time_mode,
+                    start_qualifier = self.period.start_qualifier,
+                    end_qualifier = self.period.end_qualifier,
+                    imprecision = self.period.imprecision
                 )
 
         copy_of = _('copy of')

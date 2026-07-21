@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Place
 from .models import Manifestation, Item, Library
 from xml.etree import ElementTree as ET
@@ -25,6 +26,18 @@ class SingletonCreationTest(TestCase):
         manifestation = Manifestation.objects.get(working_title='Mein Test-Titel')
 
         self.assertEqual(manifestation.items.count(), 1)
+
+    def test_manifestation_copy_workflow(self):
+        copy_title = 'test_copy_workflow_title'
+        copied_title = f'{_("copy of")} {copy_title}'
+        m = Manifestation.objects.create(working_title=copy_title)
+
+        url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
 
 
 """
