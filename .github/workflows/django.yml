@@ -21,5 +21,7 @@ jobs:
       run: uv python install
     - name: install deps
       run: uv sync
-    - name: run test
+    - name: run edwoca tests
       run: uv run manage.py test edwoca
+    - name: run dmad tests
+      run: uv run manage.py test dmad_on_django

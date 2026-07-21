@@ -27,6 +27,9 @@ class SingletonCreationTest(TestCase):
 
         self.assertEqual(manifestation.items.count(), 1)
 
+
+class ManifestationCopyTest(TestCase):
+
     def test_manifestation_copy_workflow(self):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
