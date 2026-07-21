@@ -26,9 +26,9 @@ sys.path.insert(0, os.path.join(BASE_DIR, 'apps'))
 dotenv_file = os.path.join(BASE_DIR, '.env')
 if os.path.isfile(dotenv_file):
     dotenv.load_dotenv(dotenv_file)
-else:
-    print("Could not find .env file")
-    exit(1)
+#else:
+    #print("Could not find .env file")
+    #exit(1)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -41,7 +41,7 @@ with open(BASE_DIR / 'pyproject.toml', 'rb') as f:
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = 'django-insecure-g562zyg%dply65c+z#rb4_eg=wr(=3u3m5=f(vp9a%lr=9%1eh'
 if 'SECRET_KEY' in os.environ:
-    SECRET_KEY = os.environ['SECRET_KEY']
+    SECRET_KEY = os.environ.get('SECRET_KEY', '')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -50,13 +50,13 @@ ALLOWED_HOSTS = []
 CSRF_TRUSTED_ORIGINS = []
 
 if not DEBUG and 'DOMAIN_NAME' in os.environ:
-    ALLOWED_HOSTS.append(os.environ['DOMAIN_NAME'])
-    CSRF_TRUSTED_ORIGINS.append('https://' + os.environ['DOMAIN_NAME'])
+    ALLOWED_HOSTS.append(os.environ.get('DOMAIN_NAME',''))
+    CSRF_TRUSTED_ORIGINS.append('https://' + os.environ.get('DOMAIN_NAME',''))
 
 # Celery
 
-CELERY_BROKER_URL = os.environ['CELERY_BROKER_URL']
-CELERY_RESULT_BACKEND = os.environ['CELERY_RESULT_BACKEND']
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL','')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND','')
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
@@ -194,9 +194,9 @@ INTERNAL_IPS = [
 
 Z_ID = "5080468"
 Z_LIBRARY_TYPE = 'group'
-Z_API_KEY = os.environ['ZOTERO_API_KEY']
+Z_API_KEY = os.environ.get('ZOTERO_API_KEY', '')
 
-RISM_API_KEY = os.environ['RISM_API_KEY']
+RISM_API_KEY = os.environ.get('RISM_API_KEY', '')
 
 EDWOCA_FIXED_PERSONS = {
         'Liszt': '118573527',
@@ -262,3 +262,9 @@ GLOBAL_NAVIGATION = {
 
 USE_TZ = True
 TIME_ZONE = 'Europe/Berlin'
+
+STORAGES = {
+        'staticfiles': {
+            'BACKEND': 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+        }
+    }

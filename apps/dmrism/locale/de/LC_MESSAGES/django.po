@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-16 15:37+0200\n"
+"POT-Creation-Date: 2026-07-21 17:29+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,7 +82,7 @@ msgstr "bezogen"
 msgid "comment"
 msgstr "Kommentar"
 
-#: models/base.py:109 models/manifestation.py:805
+#: models/base.py:109 models/manifestation.py:806
 msgid "label"
 msgstr "Relation"
 
@@ -122,8 +122,8 @@ msgstr "Bearbeitungshistorie"
 msgid "needs review"
 msgstr "zu überarbeiten"
 
-#: models/item.py:25 models/manifestation.py:34
-msgid "proof"
+#: models/item.py:25
+msgid "print proof"
 msgstr "Korrekturabzug"
 
 #: models/item.py:28
@@ -191,8 +191,6 @@ msgid "is explanation"
 msgstr "Erläuterung"
 
 #: models/item.py:109
-#, fuzzy
-#| msgid "incomplete"
 msgid "is incomplete"
 msgstr "unvollständig erhalten"
 
@@ -316,6 +314,10 @@ msgstr "verbunden"
 msgid "separated"
 msgstr "separiert"
 
+#: models/manifestation.py:34
+msgid "manuscript proof"
+msgstr "Entwurf"
+
 #: models/manifestation.py:37
 msgid "Plate Print"
 msgstr "Plattendruck"
@@ -349,10 +351,8 @@ msgid "questionable autograph"
 msgstr "Fragliches Autograph"
 
 #: models/manifestation.py:55
-#, fuzzy
-#| msgid "print type"
 msgid "print"
-msgstr "Drucktyp"
+msgstr "Druck"
 
 #: models/manifestation.py:71
 msgid "complete"
@@ -530,37 +530,40 @@ msgstr "TEIL"
 msgid "cmp"
 msgstr "KOMP"
 
-#: models/manifestation.py:731
+#: models/manifestation.py:732
 msgid "inferred"
 msgstr "ermittelt"
 
-#: models/manifestation.py:735
+#: models/manifestation.py:736
 msgid "assumed"
 msgstr "unsicher"
 
-#: models/manifestation.py:743
+#: models/manifestation.py:744
 msgid "diplomatic title"
 msgstr "diplomatischer Titel"
 
-#: models/manifestation.py:751
+#: models/manifestation.py:752
 msgid "title type"
 msgstr "Titelposition"
 
-#: models/manifestation.py:773
+#: models/manifestation.py:774
 msgid "<< new title >>"
 msgstr "<< neuer Titel >>"
 
-#: models/manifestation.py:788
+#: models/manifestation.py:789
 msgid "is stitch template (as documented)"
 msgstr "ist Stichvorlage (nach Vorlage)"
 
-#: models/manifestation.py:789
+#: models/manifestation.py:790
 msgid "is stitch template (inferred)"
 msgstr "ist Stichvorlage (angenommen)"
 
-#: models/manifestation.py:790
+#: models/manifestation.py:791
 msgid "is related to"
 msgstr "hat Bezug zu"
+
+#~ msgid "proof"
+#~ msgstr "Korrekturabzug"
 
 #~ msgid "Sketches"
 #~ msgstr "Entwurf"

@@ -863,7 +863,7 @@ def manifestation_provenance(request, pk):
             form = getattr(edwoca_forms, f'{ps_class.capitalize()}ProvenanceStationForm')(post, instance=obj, prefix=prefix)
             bib_forms = []
             for bib in obj.bib_set.all():
-                prefix = f'{ps_class}_ps_bib_{bib.bib.zot_key}'
+                prefix = f'{ps_class}_ps_bib_{bib.id}'
                 bib_form = getattr(edwoca_forms, f'{ps_class.capitalize()}ProvenanceStationBibForm')(post, instance=bib, prefix=prefix)
                 bib_forms += [ bib_form ]
             webref_forms = []

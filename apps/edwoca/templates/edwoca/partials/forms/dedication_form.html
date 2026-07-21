@@ -15,7 +15,7 @@
                     </div>
                     <div class="flex gap-5">
                         <input type="text" class="flex-1 grow pseudo-input border border-black bg-white" disabled value="{{ dedicatee }}" />
-                        <a class="btn btn-outline btn-primary" href="{% url 'edwoca:manifestation_'|add:dedicatee_class|add:'_dedication_remove_dedicatee' object.id dedication_form.instance.id dedicatee.id %}">
+                        <a class="btn btn-outline btn-primary" href="{% url 'edwoca:'|add:entity_type|add:'_'|add:dedicatee_class|add:'_dedication_remove_dedicatee' object.id dedication_form.instance.id dedicatee.id %}">
                             {% translate 'remove' %}
                         </a>
                     </div>
@@ -23,11 +23,11 @@
             </div>
         {% empty %}
         {% endfor %}
-        <div id="search-container-manifestation{{ dedicatee_class }}dedication-{{dedication_form.instance.id }}-dedicatee">
+        <div id="search-container-{{ entity_type }}{{ dedicatee_class }}dedication-{{dedication_form.instance.id }}-dedicatee">
         </div>
         <div class="my-5">
             <div>
-                {% include 'edwoca/partials/htmx/search.html' with label='dedicatee' search_type=dedicatee_class|add:'_dedicatee' field_name='dedicatee' app='dmrism' model_name='manifestation'|add:dedicatee_class|add:'dedication' target_app='dmad' target_model=dedicatee_class target_id=dedication_form.instance.id|stringformat:"s"|add:"-pers" id=dedication_form.instance.id placeholder='search '|add:dedicatee_class|add:'s' multiplicity='multiple' %}
+                {% include 'edwoca/partials/htmx/search.html' with label='dedicatee' search_type=dedicatee_class|add:'_dedicatee' field_name='dedicatee' app='dmrism' model_name=entity_type|add:dedicatee_class|add:'dedication' target_app='dmad' target_model=dedicatee_class target_id=dedication_form.instance.id|stringformat:"s"|add:"-pers" id=dedication_form.instance.id placeholder='search '|add:dedicatee_class|add:'s' multiplicity='multiple' %}
             </div>
         </div>
 
@@ -39,15 +39,15 @@
                     </div>
                     <div class="flex gap-5">
                         <input type="text" class="flex-1 grow pseudo-input flex-1 border border-black bg-white" disabled value="{{ dedication_form.instance.place }}" />
-                        <a class="btn btn-outline btn-primary flex-0" href="{% url 'edwoca:manifestation_'|add:dedicatee_class|add:'_dedication_remove_place' object.id dedication_form.instance.id %}">
+                        <a class="btn btn-outline btn-primary flex-0" href="{% url 'edwoca:'|add:entity_type|add:'_'|add:dedicatee_class|add:'_dedication_remove_place' object.id dedication_form.instance.id %}">
                             {% translate 'remove' %}
                         </a>
                     </div>
                 </label>
             </div>
         {% else %}
-            <div id="search-container-manifestation{{ dedicatee_class }}dedication-{{ dedication_form.instance.id }}-place">
-                {% include 'edwoca/partials/htmx/search.html' with label='place' search_type='place' field_name='place' app='dmrism' model_name='manifestation'|add:dedicatee_class|add:'dedication' target_app='dmad' target_model='place' target_id=dedication_form.instance.id|stringformat:"s"|add:"-place" id=dedication_form.instance.id placeholder='search places' %}
+            <div id="search-container-{{ entity_type }}{{ dedicatee_class }}dedication-{{ dedication_form.instance.id }}-place">
+                {% include 'edwoca/partials/htmx/search.html' with label='place' search_type='place' field_name='place' app='dmrism' model_name=entity_type|add:dedicatee_class|add:'dedication' target_app='dmad' target_model='place' target_id=dedication_form.instance.id|stringformat:"s"|add:"-place" id=dedication_form.instance.id placeholder='search places' %}
             </div>
         {% endif %}
 

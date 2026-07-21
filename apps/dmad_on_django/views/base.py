@@ -148,7 +148,8 @@ class LinkView(DmadBaseViewMixin, UpdateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
-            form=AsDaisyModelForm,
+            #form=AsDaisyModelForm,
+            form=DmadCreateForm,
             fields=self.fields,
             widgets=formWidgets
         )

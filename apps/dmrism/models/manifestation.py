@@ -31,7 +31,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        PROOF = 'PR', _('proof'),
+        PROOF = 'PR', _('manuscript proof'),
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
@@ -667,9 +667,10 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         raise Exception('You are trying to retrieve a single item from a non singleton manifestation.')
 
     def get_current_signature(self):
-        if self.is_singleton and self.get_single_item():
+        try:
             return self.get_single_item().get_current_signature()
-        return ''
+        except:
+            return ''
 
     def get_current_signature_normalized(self):
         try:

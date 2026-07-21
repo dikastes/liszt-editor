@@ -22,7 +22,7 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         unique_together = ('manifestation', 'order_index')
 
     class ItemStage(models.TextChoices):
-        PROOF = 'PR', _('proof')
+        PROOF = 'PR', _('print proof')
 
     class SourceType(models.TextChoices):
         PROOF_COPY = 'PRC', _('proof copy')
