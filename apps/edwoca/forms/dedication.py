@@ -39,7 +39,8 @@ class WorkPersonDedicationForm(DateFormMixin, forms.ModelForm):
         fields = ['diplomatic_dedication']
         widgets = {
             'diplomatic_dedication': Textarea(attrs={
-                'class': SimpleFormMixin.text_area_classes
+                'class': SimpleFormMixin.text_area_classes,
+                'form': 'form'
             }),
         }
 
@@ -278,7 +279,8 @@ class ItemPersonDedicationForm(DateFormMixin, BaseDedicationMixin, forms.ModelFo
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'class': 'select select-bordered'
+                'class': 'select select-bordered',
+                'form': 'form'
             }
         }
     imprecision = ChoiceField(
@@ -359,7 +361,8 @@ class ItemPersonDedicationForm(DateFormMixin, BaseDedicationMixin, forms.ModelFo
         fields = ['diplomatic_dedication']
         widgets = {
             'diplomatic_dedication': Textarea(attrs={
-                'class': SimpleFormMixin.text_area_classes
+                'class': SimpleFormMixin.text_area_classes,
+                'form': 'form'
             }),
         }
 
@@ -394,7 +397,8 @@ class ItemCorporationDedicationForm(DateFormMixin, BaseDedicationMixin, forms.Mo
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'class': 'select select-bordered'
+                'class': 'select select-bordered',
+                'form': 'form'
             }
         }
     imprecision = ChoiceField(
@@ -475,7 +479,8 @@ class ItemCorporationDedicationForm(DateFormMixin, BaseDedicationMixin, forms.Mo
         fields = ['diplomatic_dedication']
         widgets = {
             'diplomatic_dedication': Textarea(attrs={
-                'class': SimpleFormMixin.text_area_classes
+                'class': SimpleFormMixin.text_area_classes,
+                'form': 'form'
             }),
         }
 

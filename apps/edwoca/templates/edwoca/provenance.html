@@ -4,7 +4,12 @@
 
 {% block content %}
 
-{% include 'edwoca/partials/manifestation/preview-divs/provenance_prolog.html' %}
+{% if entity_type == 'manifestation' %}
+    {% include 'edwoca/partials/manifestation/preview-divs/provenance_prolog.html' %}
+{% endif %}
+{% if entity_type == 'item' %}
+    {% include 'edwoca/partials/item/preview-divs/provenance_prolog.html' %}
+{% endif %}
 
 <form method="post" id="form" class="hidden">
     {% csrf_token %}
@@ -61,6 +66,11 @@
 
 {{ form.as_daisy }}
 
-{% include 'edwoca/partials/manifestation/preview-divs/provenance_epilog.html' %}
+{% if entity_type == 'manifestation' %}
+    {% include 'edwoca/partials/manifestation/preview-divs/provenance_epilog.html' %}
+{% endif %}
+{% if entity_type == 'item' %}
+    {% include 'edwoca/partials/item/preview-divs/provenance_epilog.html' %}
+{% endif %}
 
 {% endblock %}

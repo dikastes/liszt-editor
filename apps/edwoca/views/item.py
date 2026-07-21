@@ -590,9 +590,10 @@ def item_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
     return redirect('edwoca:item_dedication', pk=pk)
 
 
-def item_person_dedication_remove_dedicatee(request, pk, dedication_id):
+def item_person_dedication_remove_dedicatee(request, pk, dedication_id, person_id):
     dedication = get_object_or_404(ItemPersonDedication, pk=dedication_id)
-    dedication.dedicatee = None
+    person = get_object_or_404(Person, pk=person_id)
+    dedication.dedicatee.remove(person)
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
 
@@ -605,9 +606,10 @@ def item_corporation_dedication_add_dedicatee(request, pk, dedication_id, corpor
     return redirect('edwoca:item_dedication', pk=pk)
 
 
-def item_corporation_dedication_remove_dedicatee(request, pk, dedication_id):
+def item_corporation_dedication_remove_dedicatee(request, pk, dedication_id, corporation_id):
     dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
-    dedication.dedicatee = None
+    corporation = get_object_or_404(Corporation, pk=corporation_id)
+    dedication.dedicatee.remove(corporation)
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
 
@@ -625,13 +627,15 @@ def item_dedication_add_place(request, pk, dedication_id, place_id):
     return redirect('edwoca:item_dedication', pk=pk)
 
 
-def item_dedication_remove_place(request, pk, dedication_id):
-    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
-    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
-    try:
-        dedication = ItemPersonDedication.objects.get(pk=dedication_id)
-    except ItemPersonDedication.DoesNotExist:
-        dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
+def item_person_dedication_remove_place(request, pk, dedication_id):
+    dedication = ItemPersonDedication.objects.get(pk=dedication_id)
+    dedication.place = None
+    dedication.save()
+    return redirect('edwoca:item_dedication', pk=pk)
+
+
+def item_corporation_dedication_remove_place(request, pk, dedication_id):
+    dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
     dedication.place = None
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)

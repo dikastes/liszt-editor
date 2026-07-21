@@ -48,7 +48,7 @@ msgstr "(RD)"
 
 #: apps/dmad_on_django/models/corporation.py:71
 msgid "search corporations"
-msgstr "Körperschaftend durchsuchen"
+msgstr "Körperschaften durchsuchen"
 
 #: apps/dmad_on_django/models/corporation.py:144
 #: apps/dmad_on_django/models/person.py:209

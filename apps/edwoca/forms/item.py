@@ -477,14 +477,15 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
         form = div()
 
         with form:
-            with label():
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(source_type_field.label)+'*', cls=SimpleFormMixin.label_text_classes)
-                raw(str(source_type_field))
-            with label():
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(stage_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(stage_field))
+            if not self.instance.manifestation.is_singleton:
+                with label():
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(source_type_field.label)+'*', cls=SimpleFormMixin.label_text_classes)
+                    raw(str(source_type_field))
+                with label():
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(stage_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(stage_field))
             with label():
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
