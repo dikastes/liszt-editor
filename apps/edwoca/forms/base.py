@@ -338,6 +338,26 @@ class DateFormMixin:
                 'imprecision': period.imprecision
             })
 
+    def clean(self):
+        cleaned_data = super().clean()
+
+        time_mode = cleaned_data.get('time_mode')
+        imprecision = cleaned_data.get('imprecision')
+        not_before = cleaned_data.get('not_before')
+
+        is_point_or_precise = (
+            time_mode == Period.TimeMode.POINT or 
+            imprecision == Period.Imprecision.PRECISE
+        )
+
+        if is_point_or_precise:
+            if 'not_after' in self._errors:
+                del self._errors['not_after']
+
+            cleaned_data['not_after'] = not_before
+
+        return cleaned_data
+
     def save(self, commit=True):
         instance = super().save(commit=False)
 
