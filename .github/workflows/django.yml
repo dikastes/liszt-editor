@@ -21,6 +21,11 @@ jobs:
       run: uv python install
     - name: install deps
       run: uv sync
+    - name: collect static files
+      env:
+        SECRET_KEY: 'ci-secret-key'
+        DJANGO_SETTINGS_MODULE: 'liszteditor.settings'
+      run: uv run manage.py collectstatic --noinput
     - name: run edwoca tests
       run: uv run manage.py test edwoca
     - name: run dmad tests
