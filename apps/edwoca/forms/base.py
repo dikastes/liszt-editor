@@ -345,15 +345,13 @@ class DateFormMixin:
         imprecision = cleaned_data.get('imprecision')
         not_before = cleaned_data.get('not_before')
 
-        is_point_or_precise = (
-            time_mode == Period.TimeMode.POINT or 
+        is_point_and_precise = (
+            time_mode == Period.TimeMode.POINT and
             imprecision == Period.Imprecision.PRECISE
         )
 
-        if is_point_or_precise:
-            if 'not_after' in self._errors:
-                del self._errors['not_after']
-
+        if is_point_and_precise and 'not_after' in self._errors:
+            del self._errors['not_after']
             cleaned_data['not_after'] = not_before
 
         return cleaned_data
@@ -368,11 +366,7 @@ class DateFormMixin:
         self.period_instance.not_before = self.cleaned_data['not_before']
         self.period_instance.time_mode = self.cleaned_data['time_mode']
         self.period_instance.imprecision = self.cleaned_data['imprecision']
-
-        if self.period_instance.time_mode == Period.TimeMode.POINT:
-            self.period_instance.not_after = self.cleaned_data['not_before']
-        else:
-            self.period_instance.not_after = self.cleaned_data['not_after']
+        self.period_instance.not_after = self.cleaned_data['not_after']
 
         if self.period_instance.imprecision == Period.Imprecision.PRECISE:
             self.period_instance.start_qualifier = Period.StartQualifier.EXACT
@@ -438,10 +432,10 @@ class DateFormMixin:
             with tags.div(cls='flex flex-col lg:flex-row lg:gap-5 mb-5'):
                 with tags.label(cls='form-control flex-none date-container'):
                     with tags.div(cls=SimpleFormMixin.label_classes):
-                        if self.period_instance.time_mode == Period.TimeMode.SPAN:
-                            tags.span(not_before_field.label, cls=SimpleFormMixin.label_text_classes)
-                        else:
+                        if self.period_instance.time_mode == Period.TimeMode.POINT and self.period_instance.imprecision == Period.Imprecision.PRECISE:
                             tags.span(_('point in time'), cls=SimpleFormMixin.label_text_classes)
+                        else:
+                            tags.span(not_before_field.label, cls=SimpleFormMixin.label_text_classes)
                     with tags.div(cls='flex'):
                         raw(str(not_before_field))
                     if not_before_field.errors:
