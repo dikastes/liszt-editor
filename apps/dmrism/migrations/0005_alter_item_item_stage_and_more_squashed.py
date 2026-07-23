@@ -36,8 +36,6 @@ def migrate_function(apps, schema_editor):
 
 class Migration(migrations.Migration):
 
-    replaces = [('dmrism', '0005_alter_item_item_stage_and_more'), ('dmrism', '0006_item_album_page_item_correction_sheet_and_more'), ('dmrism', '0007_migrate_function'), ('dmrism', '0008_remove_manifestation_album_page_and_more')]
-
     dependencies = [
         ('dmrism', '0004_item_source_type_alter_manifestation_source_type_squashed'),
     ]
