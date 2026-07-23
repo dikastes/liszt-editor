@@ -4515,6 +4515,11 @@ details.collapse summary::-webkit-details-marker {
   line-height: 1.25;
 }
 
+.text-base-300 {
+  --tw-text-opacity: 1;
+  color: var(--fallback-b3,oklch(var(--b3)/var(--tw-text-opacity, 1)));
+}
+
 .text-base-content {
   --tw-text-opacity: 1;
   color: var(--fallback-bc,oklch(var(--bc)/var(--tw-text-opacity, 1)));

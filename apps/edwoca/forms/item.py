@@ -15,6 +15,80 @@ from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
 
 
+class FunctionForm(ModelForm):
+    class Meta:
+        model = Item
+        fields = [
+                'album_page',
+                'performance_material',
+                'stitch_template',
+                'dedication_item',
+                'correction_sheet',
+                'hand_copy',
+            ]
+        widgets = {
+                'album_page': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'performance_material': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'stitch_template': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'dedication_item': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'correction_sheet': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'hand_copy': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        # manuscript source functions
+        album_page_field = self['album_page']
+        performance_material_field = self['performance_material']
+        correction_sheet_field = self['correction_sheet']
+        stitch_template_field = self['stitch_template']
+        dedication_item_field = self['dedication_item']
+        hand_copy_field = self['hand_copy']
+
+        with form:
+            h3(_('function'), cls='text-lg mt-5 mb-2')
+            if self.instance.manifestation.is_singleton:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(album_page_field))
+                    span(album_page_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(correction_sheet_field))
+                    span(correction_sheet_field.label, cls=SimpleFormMixin.label_text_classes)
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(stitch_template_field))
+                    span(stitch_template_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(performance_material_field))
+                span(performance_material_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(dedication_item_field))
+                span(dedication_item_field.label, cls=SimpleFormMixin.label_text_classes)
+            if not self.instance.manifestation.is_singleton:
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(hand_copy_field))
+                    span(hand_copy_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))
+
 class ItemForm(ModelForm):
     class Meta:
         model = Item
@@ -466,27 +540,35 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 span(completeness_field.label, cls=SimpleFormMixin.label_text_classes)
         return mark_safe(str(form))
 
-    def as_daisy(self):
+    def type_stage_as_daisy(self):
         source_type_field = self['source_type']
         stage_field = self['item_stage']
+
+        form = div()
+
+        with form:
+            with label():
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_(source_type_field.label)+'*', cls=SimpleFormMixin.label_text_classes)
+                raw(str(source_type_field))
+            with label():
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_(stage_field.label), cls=SimpleFormMixin.label_text_classes)
+                raw(str(stage_field))
+
+        return mark_safe(str(form))
+
+    def as_daisy(self):
         extent_field = self['extent']
         lyrics_field = self['is_lyrics']
         explanation_field = self['is_explanation']
         program_field = self['is_program']
         measure_field = self['measure']
+
         form = div()
 
         with form:
-            if not self.instance.manifestation.is_singleton:
-                with label():
-                    with div(cls=SimpleFormMixin.label_classes):
-                        span(_(source_type_field.label)+'*', cls=SimpleFormMixin.label_text_classes)
-                    raw(str(source_type_field))
-                with label():
-                    with div(cls=SimpleFormMixin.label_classes):
-                        span(_(stage_field.label), cls=SimpleFormMixin.label_text_classes)
-                    raw(str(stage_field))
-            with label():
+            with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
                 raw(str(extent_field))

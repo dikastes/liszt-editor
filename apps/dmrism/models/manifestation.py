@@ -256,14 +256,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             verbose_name = _('plate number'),
             default = ''
         )
-    album_page = models.BooleanField(
-            default = False,
-            verbose_name = _('album page')
-        )
-    performance_material = models.BooleanField(
-            default = False,
-            verbose_name = _('performance material')
-        )
     authorized_edition = models.BooleanField(
             default = False,
             verbose_name = _('authorized edition')
@@ -279,18 +271,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     further_edition = models.BooleanField(
             default = False,
             verbose_name = _('further edition')
-        )
-    correction_sheet = models.BooleanField(
-            default = False,
-            verbose_name = _('correction sheet')
-        )
-    stitch_template = models.BooleanField(
-            default = False,
-            verbose_name = _('stitch template')
-        )
-    dedication_item = models.BooleanField(
-            default = False,
-            verbose_name = _('dedication item')
         )
     choir_score = models.BooleanField(
             default = False,
@@ -398,19 +378,19 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return self._render_types(potential_edition_types)
 
     def get_source_type(self):
-        potential_edition_types = [
-                'album_page',
-                'performance_material',
+        potential_source_types = [
+                #'album_page',
+                #'performance_material',
                 'authorized_edition',
                 'first_edition',
                 'part',
                 'further_edition',
-                'correction_sheet',
-                'stitch_template',
-                'dedication_item'
+                #'correction_sheet',
+                #'stitch_template',
+                #'dedication_item'
             ]
 
-        return self._render_types(potential_edition_types)
+        return self._render_types(potential_source_types)
 
     def _render_types(self, types):
         truthy_types = [ str(getattr(Manifestation, t).field.verbose_name) for t in types if getattr(self, t) ]

@@ -89,7 +89,22 @@ class GNDSubjectCategory(models.Model):
         return self.label
 
 
-class DisplayableModel(RenderRawJSONMixin, models.Model):
+class TimestampedModel(models.Model):
+    class Meta:
+        abstract = True
+    first_save = models.DateTimeField(
+            auto_now_add = True,
+            verbose_name = _('first save'),
+            null = True
+        )
+    last_save = models.DateTimeField(
+            auto_now = True,
+            verbose_name = _('last save'),
+            null = True
+        )
+
+
+class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
     class Meta:
         abstract = True
 
@@ -158,3 +173,5 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
 
     class Meta:
         abstract = True
+
+

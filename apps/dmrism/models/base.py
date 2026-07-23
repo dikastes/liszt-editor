@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
+from dmad_on_django.models.base import TimestampedModel
 
 
 class WemiBaseClass(models.Model):
@@ -288,20 +289,10 @@ class BaseCorporationDedication(BaseDedication):
         return f'{super_str} ({dedicatee_str})'
 
 
-class TrackedModel(models.Model):
+class TrackedModel(TimestampedModel):
     class Meta:
         abstract = True
 
-    first_save = models.DateTimeField(
-            auto_now_add = True,
-            verbose_name = _('first save'),
-            null = True
-        )
-    last_save = models.DateTimeField(
-            auto_now = True,
-            verbose_name = _('last save'),
-            null = True
-        )
     first_editor = models.CharField(
             max_length = 50,
             blank = True,

@@ -28,12 +28,25 @@ class SingletonCreationTest(TestCase):
         self.assertEqual(manifestation.items.count(), 1)
 
 
+class CollectionRelationsTest(TestCase):
+
+    def test_collection_relations_view(self):
+        m = Manifestation.objects.create(is_collection=True)
+
+        url = reverse('edwoca:manifestation_relations', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+
 class ManifestationCopyTest(TestCase):
 
     def test_manifestation_copy_workflow(self):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
-        m = Manifestation.objects.create(working_title=copy_title)
+        m = Manifestation.objects.create(is_singleton = True, working_title = copy_title)
+        i = Item.objects.create(manifestation = m)
 
         url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
 
@@ -41,6 +54,7 @@ class ManifestationCopyTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
+        self.assertEqual(Manifestation.objects.get(working_title=copied_title).items.count(), 1)
 
 
 """
