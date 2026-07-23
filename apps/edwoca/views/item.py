@@ -706,11 +706,13 @@ def item_manuscript_update(request, pk):
             handwriting.delete()
 
         form = ItemManuscriptForm(request.POST, instance=item)
+        function_form = FunctionForm(request.POST, instance=item)
         completeness_form = ItemCompletenessForm(request.POST, instance=item)
         text_type_form = ItemTextTypeForm(request.POST, instance=item)
 
         all_forms = [
                 form,
+                function_form,
                 completeness_form,
                 text_type_form
             ]
@@ -720,6 +722,7 @@ def item_manuscript_update(request, pk):
                 f.save()
         else:
             context['form'] = form
+            context['function_form'] = function_form
             context['text_type_form'] = text_type_form
             context['completeness_form'] = completeness_form
             return render(request, 'edwoca:item_manuscript.html', context)
@@ -750,6 +753,7 @@ def item_manuscript_update(request, pk):
 
     else:
         form = ItemManuscriptForm(instance=item)
+        function_form = FunctionForm(instance=item)
         text_type_form = ItemTextTypeForm(instance=item)
         completeness_form = ItemCompletenessForm(instance=item)
         modifications = []
@@ -770,6 +774,7 @@ def item_manuscript_update(request, pk):
         context['modifications'] = modifications
 
     context['form'] = form
+    context['function_form'] = function_form
     context['text_type_form'] = text_type_form
     context['completeness_form'] = completeness_form
     search_form = SearchForm(request.GET or None)

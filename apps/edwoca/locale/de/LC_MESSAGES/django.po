@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 17:05+0200\n"
+"POT-Creation-Date: 2026-07-23 13:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,1100 +17,1080 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: apps/edwoca/forms/base.py:262 apps/edwoca/forms/dedication.py:103
-#: apps/edwoca/forms/dedication.py:195 apps/edwoca/forms/dedication.py:286
-#: apps/edwoca/forms/dedication.py:402 apps/edwoca/forms/item.py:163
-#: apps/edwoca/forms/item.py:263 apps/edwoca/forms/letter.py:29
-#: apps/edwoca/forms/letter.py:108 apps/edwoca/forms/manifestation.py:249
-#: apps/edwoca/forms/manifestation.py:835 apps/edwoca/forms/modification.py:23
+#: forms/base.py:262 forms/dedication.py:104 forms/dedication.py:196
+#: forms/dedication.py:288 forms/dedication.py:406 forms/item.py:231
+#: forms/item.py:331 forms/letter.py:29 forms/letter.py:108
+#: forms/manifestation.py:244 forms/manifestation.py:796
+#: forms/modification.py:23
 msgid "imprecision"
 msgstr "Unschärfe"
 
-#: apps/edwoca/forms/base.py:268 apps/edwoca/forms/dedication.py:112
-#: apps/edwoca/forms/dedication.py:204 apps/edwoca/forms/dedication.py:295
-#: apps/edwoca/forms/dedication.py:411 apps/edwoca/forms/item.py:172
-#: apps/edwoca/forms/item.py:272 apps/edwoca/forms/letter.py:38
-#: apps/edwoca/forms/letter.py:117 apps/edwoca/forms/manifestation.py:258
-#: apps/edwoca/forms/manifestation.py:844 apps/edwoca/forms/modification.py:32
+#: forms/base.py:268 forms/dedication.py:113 forms/dedication.py:205
+#: forms/dedication.py:297 forms/dedication.py:415 forms/item.py:240
+#: forms/item.py:340 forms/letter.py:38 forms/letter.py:117
+#: forms/manifestation.py:253 forms/manifestation.py:805
+#: forms/modification.py:32
 msgid "time mode"
 msgstr "Art der Datierung"
 
-#: apps/edwoca/forms/base.py:273 apps/edwoca/forms/dedication.py:120
-#: apps/edwoca/forms/dedication.py:212 apps/edwoca/forms/dedication.py:303
-#: apps/edwoca/forms/dedication.py:419 apps/edwoca/forms/item.py:177
-#: apps/edwoca/forms/item.py:277 apps/edwoca/forms/letter.py:43
-#: apps/edwoca/forms/letter.py:122 apps/edwoca/forms/manifestation.py:263
-#: apps/edwoca/forms/manifestation.py:852 apps/edwoca/forms/modification.py:37
+#: forms/base.py:273 forms/dedication.py:121 forms/dedication.py:213
+#: forms/dedication.py:305 forms/dedication.py:423 forms/item.py:245
+#: forms/item.py:345 forms/letter.py:43 forms/letter.py:122
+#: forms/manifestation.py:258 forms/manifestation.py:813
+#: forms/modification.py:37
 msgid "not before mode"
 msgstr "Typ"
 
-#: apps/edwoca/forms/base.py:279 apps/edwoca/forms/dedication.py:129
-#: apps/edwoca/forms/dedication.py:221 apps/edwoca/forms/dedication.py:312
-#: apps/edwoca/forms/dedication.py:428 apps/edwoca/forms/item.py:183
-#: apps/edwoca/forms/item.py:283 apps/edwoca/forms/letter.py:49
-#: apps/edwoca/forms/letter.py:128 apps/edwoca/forms/manifestation.py:269
-#: apps/edwoca/forms/manifestation.py:861 apps/edwoca/forms/modification.py:43
+#: forms/base.py:279 forms/dedication.py:130 forms/dedication.py:222
+#: forms/dedication.py:314 forms/dedication.py:432 forms/item.py:251
+#: forms/item.py:351 forms/letter.py:49 forms/letter.py:128
+#: forms/manifestation.py:264 forms/manifestation.py:822
+#: forms/modification.py:43
 msgid "not after mode"
 msgstr "Typ"
 
-#: apps/edwoca/forms/base.py:285 apps/edwoca/forms/dedication.py:138
-#: apps/edwoca/forms/dedication.py:230 apps/edwoca/forms/dedication.py:321
-#: apps/edwoca/forms/dedication.py:437 apps/edwoca/forms/item.py:189
-#: apps/edwoca/forms/item.py:289 apps/edwoca/forms/letter.py:55
-#: apps/edwoca/forms/letter.py:134 apps/edwoca/forms/manifestation.py:275
-#: apps/edwoca/forms/manifestation.py:870 apps/edwoca/forms/modification.py:49
+#: forms/base.py:285 forms/dedication.py:139 forms/dedication.py:231
+#: forms/dedication.py:323 forms/dedication.py:441 forms/item.py:257
+#: forms/item.py:357 forms/letter.py:55 forms/letter.py:134
+#: forms/manifestation.py:270 forms/manifestation.py:831
+#: forms/modification.py:49
 msgid "start"
 msgstr "Start"
 
-#: apps/edwoca/forms/base.py:290 apps/edwoca/forms/dedication.py:143
-#: apps/edwoca/forms/dedication.py:235 apps/edwoca/forms/dedication.py:326
-#: apps/edwoca/forms/dedication.py:442 apps/edwoca/forms/item.py:194
-#: apps/edwoca/forms/item.py:294 apps/edwoca/forms/letter.py:60
-#: apps/edwoca/forms/letter.py:139 apps/edwoca/forms/manifestation.py:280
-#: apps/edwoca/forms/manifestation.py:875 apps/edwoca/forms/modification.py:54
+#: forms/base.py:290 forms/dedication.py:144 forms/dedication.py:236
+#: forms/dedication.py:328 forms/dedication.py:446 forms/item.py:262
+#: forms/item.py:362 forms/letter.py:60 forms/letter.py:139
+#: forms/manifestation.py:275 forms/manifestation.py:836
+#: forms/modification.py:54
 msgid "end"
 msgstr "Ende"
 
-#: apps/edwoca/forms/base.py:296 apps/edwoca/forms/dedication.py:28
-#: apps/edwoca/forms/dedication.py:156 apps/edwoca/forms/dedication.py:248
-#: apps/edwoca/forms/dedication.py:339 apps/edwoca/forms/dedication.py:455
-#: apps/edwoca/forms/item.py:204 apps/edwoca/forms/item.py:304
-#: apps/edwoca/forms/letter.py:70 apps/edwoca/forms/letter.py:149
-#: apps/edwoca/forms/manifestation.py:290
-#: apps/edwoca/forms/manifestation.py:887
-#: apps/edwoca/forms/manifestation.py:1066
-#: apps/edwoca/forms/manifestation.py:1122 apps/edwoca/forms/modification.py:64
+#: forms/base.py:296 forms/dedication.py:28 forms/dedication.py:157
+#: forms/dedication.py:249 forms/dedication.py:341 forms/dedication.py:459
+#: forms/item.py:272 forms/item.py:372 forms/letter.py:70 forms/letter.py:149
+#: forms/manifestation.py:285 forms/manifestation.py:848
+#: forms/manifestation.py:1064 forms/manifestation.py:1120
+#: forms/modification.py:64
 msgid "based on source"
 msgstr "nach Vorlage"
 
-#: apps/edwoca/forms/base.py:296 apps/edwoca/forms/dedication.py:28
-#: apps/edwoca/forms/dedication.py:156 apps/edwoca/forms/dedication.py:248
-#: apps/edwoca/forms/dedication.py:339 apps/edwoca/forms/dedication.py:455
-#: apps/edwoca/forms/item.py:204 apps/edwoca/forms/item.py:304
-#: apps/edwoca/forms/letter.py:70 apps/edwoca/forms/letter.py:149
-#: apps/edwoca/forms/letter.py:324 apps/edwoca/forms/manifestation.py:290
-#: apps/edwoca/forms/manifestation.py:887
-#: apps/edwoca/forms/manifestation.py:1066
-#: apps/edwoca/forms/manifestation.py:1122 apps/edwoca/forms/modification.py:64
+#: forms/base.py:296 forms/dedication.py:28 forms/dedication.py:157
+#: forms/dedication.py:249 forms/dedication.py:341 forms/dedication.py:459
+#: forms/item.py:272 forms/item.py:372 forms/letter.py:70 forms/letter.py:149
+#: forms/letter.py:324 forms/manifestation.py:285 forms/manifestation.py:848
+#: forms/manifestation.py:1064 forms/manifestation.py:1120
+#: forms/modification.py:64
 msgid "inferred"
 msgstr "ermittelt"
 
-#: apps/edwoca/forms/base.py:415
+#: forms/base.py:429
 msgid "calculate"
 msgstr "Datierung berechnen"
 
-#: apps/edwoca/forms/base.py:416
+#: forms/base.py:430
 msgid "clear"
 msgstr "Datierung leeren"
 
-#: apps/edwoca/forms/base.py:424
+#: forms/base.py:436
 msgid "point in time"
 msgstr "Zeitpunkt"
 
-#: apps/edwoca/forms/base.py:567
+#: forms/base.py:582
 msgid "open"
 msgstr "öffnen"
 
-#: apps/edwoca/forms/base.py:600 apps/edwoca/forms/item.py:81
-#: apps/edwoca/forms/letter.py:198 apps/edwoca/forms/manifestation.py:190
+#: forms/base.py:615 forms/item.py:149 forms/letter.py:198
+#: forms/manifestation.py:190
 msgid "first save"
 msgstr "Datum"
 
-#: apps/edwoca/forms/base.py:606 apps/edwoca/forms/item.py:87
-#: apps/edwoca/forms/letter.py:204 apps/edwoca/forms/manifestation.py:196
+#: forms/base.py:621 forms/item.py:155 forms/letter.py:204
+#: forms/manifestation.py:196
 msgid "last save"
 msgstr "letzte Bearbeitung"
 
-#: apps/edwoca/forms/base.py:630
+#: forms/base.py:645
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
-#: apps/edwoca/forms/base.py:631
+#: forms/base.py:646
 msgid "initial recording"
 msgstr "Ersterfassung"
 
-#: apps/edwoca/forms/base.py:643
+#: forms/base.py:658
 msgid "further recording"
 msgstr "Weitere Bearbeitung"
 
-#: apps/edwoca/forms/base.py:690 apps/edwoca/forms/item.py:473
+#: forms/base.py:705 forms/item.py:570
 msgid "text type"
 msgstr "Textart"
 
-#: apps/edwoca/forms/dedication.py:148 apps/edwoca/forms/dedication.py:240
-#: apps/edwoca/forms/dedication.py:331 apps/edwoca/forms/dedication.py:447
-#: apps/edwoca/forms/item.py:199 apps/edwoca/forms/item.py:299
-#: apps/edwoca/forms/letter.py:65 apps/edwoca/forms/letter.py:144
-#: apps/edwoca/forms/manifestation.py:285 apps/edwoca/forms/modification.py:59
+#: forms/dedication.py:149 forms/dedication.py:241 forms/dedication.py:333
+#: forms/dedication.py:451 forms/item.py:267 forms/item.py:367
+#: forms/letter.py:65 forms/letter.py:144 forms/manifestation.py:280
+#: forms/modification.py:59
 msgid "display"
 msgstr "Datierung (standardisiert)"
 
-#: apps/edwoca/forms/letter.py:310
+#: forms/item.py:62
+msgid "function"
+msgstr "Funktion"
+
+#: forms/letter.py:310
 msgid "source name"
 msgstr "Name (nach Originalquelle)"
 
-#: apps/edwoca/forms/letter.py:315
+#: forms/letter.py:315
 msgid "edtion name"
 msgstr "Name (nach Edition)"
 
-#: apps/edwoca/forms/letter.py:333 apps/edwoca/forms/letter.py:349
+#: forms/letter.py:333 forms/letter.py:349
 msgid "assumed"
 msgstr "unsicher"
 
-#: apps/edwoca/forms/letter.py:341
+#: forms/letter.py:341
 msgid "attributed"
 msgstr "zugeschrieben"
 
-#: apps/edwoca/forms/manifestation.py:76 apps/edwoca/forms/manifestation.py:630
+#: forms/manifestation.py:76 forms/manifestation.py:591
 msgid "print title"
 msgstr "Drucktitel"
 
-#: apps/edwoca/forms/manifestation.py:383
+#: forms/manifestation.py:387
 msgid "is incomplete"
 msgstr "unvollständig erhalten"
 
-#: apps/edwoca/forms/manifestation.py:521
+#: forms/manifestation.py:487
 msgid "Selecting 'Text' disables musical attributes and vice versa."
 msgstr ""
 "Die Auswahl von 'Text' verhindert die Auswahl musikalischer Attribute und "
 "umgekehrt."
 
-#: apps/edwoca/forms/manifestation.py:544
+#: forms/manifestation.py:492
 msgid "edition type"
 msgstr "Ausgabeform"
 
-#: apps/edwoca/forms/manifestation.py:568
-msgid "function"
-msgstr "Funktion"
-
-#: apps/edwoca/forms/manifestation.py:629
+#: forms/manifestation.py:590
 msgid "Temporary"
 msgstr "Arbeitstitel"
 
-#: apps/edwoca/forms/manifestation.py:631
+#: forms/manifestation.py:592
 msgid "plate number"
 msgstr "Plattennummer"
 
-#: apps/edwoca/forms/manifestation.py:641
-#: apps/edwoca/templates/edwoca/create_manifestation.html:16
-#: apps/edwoca/templates/edwoca/manifestation_print.html:21
+#: forms/manifestation.py:602 templates/edwoca/create_manifestation.html:16
+#: templates/edwoca/manifestation_print.html:21
 msgid "publisher"
 msgstr "Verlag"
 
-#: apps/edwoca/forms/manifestation.py:645
-#: apps/edwoca/templates/edwoca/create_manifestation.html:18
+#: forms/manifestation.py:606 templates/edwoca/create_manifestation.html:18
 msgid "search publisher"
 msgstr "Verlag suchen"
 
-#: apps/edwoca/forms/manifestation.py:755
+#: forms/manifestation.py:716
 msgid "working title"
 msgstr "Arbeitstitel"
 
-#: apps/edwoca/forms/manifestation.py:761
+#: forms/manifestation.py:722
 msgid "source title"
 msgstr "Quellentitel"
 
-#: apps/edwoca/forms/manifestation.py:774
+#: forms/manifestation.py:735
 msgid "holding institution"
 msgstr "Bestandeshaltende Institution"
 
-#: apps/edwoca/forms/manifestation.py:775
+#: forms/manifestation.py:736
 msgid "choose library"
 msgstr "Bibliothek auswählen"
 
-#: apps/edwoca/forms/manifestation.py:779
+#: forms/manifestation.py:740
 msgid "Signature"
 msgstr "Signatur"
 
-#: apps/edwoca/models/base.py:109
+#: models/base.py:112
 msgid "copy of"
 msgstr "Kopie von"
 
-#: apps/edwoca/models/base.py:840
+#: models/base.py:853
 msgid "<< publisher >>"
 msgstr "<< Verlag >>"
 
-#: apps/edwoca/models/base.py:940
+#: models/base.py:953
 msgid "Composer"
 msgstr "Komponist"
 
-#: apps/edwoca/models/base.py:941
+#: models/base.py:954
 msgid "Writer"
 msgstr "Schreiber"
 
-#: apps/edwoca/models/base.py:942
+#: models/base.py:955
 msgid "Translator"
 msgstr "Übersetzer"
 
-#: apps/edwoca/models/base.py:943
+#: models/base.py:956
 msgid "Poet"
 msgstr "Dichter"
 
-#: apps/edwoca/models/base.py:944
+#: models/base.py:957
 msgid "Dedicatee"
 msgstr "Widmungsträger"
 
-#: apps/edwoca/models/base.py:964 apps/edwoca/models/expression.py:165
-#: apps/edwoca/templates/edwoca/bib_update.html:23
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:95
+#: models/base.py:977 models/expression.py:165
+#: templates/edwoca/bib_update.html:29
+#: templates/edwoca/partials/forms/provenance_station_form.html:95
 msgid "title"
 msgstr "Titel"
 
-#: apps/edwoca/models/base.py:970
-#: apps/edwoca/templates/edwoca/manifestation_update.html:145
+#: models/base.py:983 templates/edwoca/manifestation_update.html:145
 msgid "status"
 msgstr "Status"
 
-#: apps/edwoca/models/base.py:976
+#: models/base.py:989
 msgid "language"
 msgstr "Sprache"
 
-#: apps/edwoca/models/base.py:993
+#: models/base.py:1006
 msgid "Published"
 msgstr "veröffentlicht"
 
-#: apps/edwoca/models/base.py:1045 apps/edwoca/models/expression.py:247
+#: models/base.py:1058 models/expression.py:247
 msgid "note"
 msgstr "Note"
 
-#: apps/edwoca/models/composite.py:72 apps/edwoca/models/work.py:44
+#: models/composite.py:72 models/work.py:44
 msgid "private head comment"
 msgstr "Kommentar"
 
-#: apps/edwoca/models/expression.py:16
+#: models/expression.py:16
 msgid "work catalog number"
 msgstr "Werkverzeichnisnummer"
 
-#: apps/edwoca/models/expression.py:19
+#: models/expression.py:19
 msgid "incipit music"
 msgstr "musikalisches Incipit"
 
-#: apps/edwoca/models/expression.py:22
+#: models/expression.py:22
 msgid "incipit text"
 msgstr "Textincipit"
 
-#: apps/edwoca/models/expression.py:32
+#: models/expression.py:32
 msgid "period comment"
 msgstr "Kommentar zur Datierung"
 
-#: apps/edwoca/models/expression.py:35
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:58
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:37
+#: models/expression.py:35
+#: templates/edwoca/partials/expression/expression_menu.html:58
+#: templates/edwoca/partials/work/work_menu.html:37
 msgid "history"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:92
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:139
+#: models/expression.py:92 templates/edwoca/manifestation_relations.html:139
 msgid "is component of"
 msgstr "ist Komponente von"
 
-#: apps/edwoca/models/expression.py:93 apps/edwoca/models/work.py:99
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:125
+#: models/expression.py:93 models/work.py:99
+#: templates/edwoca/manifestation_relations.html:125
 msgid "is part of"
 msgstr "ist Teil von"
 
-#: apps/edwoca/models/expression.py:94 apps/edwoca/models/work.py:100
+#: models/expression.py:94 models/work.py:100
 msgid "is derivative of"
 msgstr "ist abgeleitet von"
 
-#: apps/edwoca/models/expression.py:95
+#: models/expression.py:95
 msgid "is incorporated in"
 msgstr "ist inkorporiert in"
 
-#: apps/edwoca/models/expression.py:96
+#: models/expression.py:96
 msgid "has alternative"
 msgstr "hat Alternative"
 
-#: apps/edwoca/models/expression.py:102
+#: models/expression.py:102
 msgid "label"
 msgstr ""
 
-#: apps/edwoca/models/expression.py:126
+#: models/expression.py:126
 msgid "1/8"
 msgstr "1/8"
 
-#: apps/edwoca/models/expression.py:127
+#: models/expression.py:127
 msgid "1/4"
 msgstr "1/4"
 
-#: apps/edwoca/models/expression.py:128
+#: models/expression.py:128
 msgid "1/4."
 msgstr "1/4."
 
-#: apps/edwoca/models/expression.py:129
+#: models/expression.py:129
 msgid "1/2"
 msgstr "1/2"
 
-#: apps/edwoca/models/expression.py:130
+#: models/expression.py:130
 msgid "1/2."
 msgstr "1/2."
 
-#: apps/edwoca/models/expression.py:143
+#: models/expression.py:143
 msgid "reference value"
 msgstr "Referenzwert"
 
-#: apps/edwoca/models/expression.py:148
+#: models/expression.py:148
 msgid "bpm"
 msgstr "bpm"
 
-#: apps/edwoca/models/expression.py:172
+#: models/expression.py:172
 msgid "tempo"
 msgstr "Tempo"
 
-#: apps/edwoca/models/expression.py:179
+#: models/expression.py:179
 msgid "meter"
 msgstr "Metrum"
 
-#: apps/edwoca/models/expression.py:185
+#: models/expression.py:185
 msgid "Raabe"
 msgstr "Raabe"
 
-#: apps/edwoca/models/expression.py:186
+#: models/expression.py:186
 msgid "Müller/Eckhardt"
 msgstr "Müller/Eckhardt"
 
-#: apps/edwoca/models/expression.py:187
+#: models/expression.py:187
 msgid "Searle"
 msgstr "Searle"
 
-#: apps/edwoca/models/expression.py:188
+#: models/expression.py:188
 msgid "Chiappari"
 msgstr "Chiappari"
 
-#: apps/edwoca/models/expression.py:189
+#: models/expression.py:189
 msgid "LQWV"
 msgstr "LQWV"
 
-#: apps/edwoca/models/expression.py:202
+#: models/expression.py:202
 msgid "index"
 msgstr "Verzeichnis"
 
-#: apps/edwoca/models/expression.py:208
+#: models/expression.py:208
 msgid "number"
 msgstr "Nummer"
 
-#: apps/edwoca/models/expression.py:217
+#: models/expression.py:217
 msgid "Major"
 msgstr "Dur"
 
-#: apps/edwoca/models/expression.py:218
+#: models/expression.py:218
 msgid "Minor"
 msgstr "Moll"
 
-#: apps/edwoca/models/expression.py:221
+#: models/expression.py:221
 msgid "A"
 msgstr "A"
 
-#: apps/edwoca/models/expression.py:222
+#: models/expression.py:222
 msgid "B"
 msgstr "H"
 
-#: apps/edwoca/models/expression.py:223
+#: models/expression.py:223
 msgid "C"
 msgstr "C"
 
-#: apps/edwoca/models/expression.py:224
+#: models/expression.py:224
 msgid "D"
 msgstr "D"
 
-#: apps/edwoca/models/expression.py:225
+#: models/expression.py:225
 msgid "e"
 msgstr "E"
 
-#: apps/edwoca/models/expression.py:226
+#: models/expression.py:226
 msgid "F"
 msgstr "F"
 
-#: apps/edwoca/models/expression.py:227
+#: models/expression.py:227
 msgid "G"
 msgstr "G"
 
-#: apps/edwoca/models/expression.py:231
+#: models/expression.py:231
 msgid "#"
 msgstr "#"
 
-#: apps/edwoca/models/expression.py:232
+#: models/expression.py:232
 msgid "##"
 msgstr "##"
 
-#: apps/edwoca/models/expression.py:233
+#: models/expression.py:233
 msgid "b"
 msgstr "b"
 
-#: apps/edwoca/models/expression.py:234
+#: models/expression.py:234
 msgid "bb"
 msgstr "bb"
 
-#: apps/edwoca/models/expression.py:253
+#: models/expression.py:253
 msgid "accidental"
 msgstr "Vorzeichen"
 
-#: apps/edwoca/models/expression.py:259
+#: models/expression.py:259
 msgid "mode"
 msgstr "Modus"
 
-#: apps/edwoca/models/letter.py:34
+#: models/letter.py:34
 msgid "Sketch"
 msgstr "Skizze"
 
-#: apps/edwoca/models/letter.py:35
+#: models/letter.py:35
 msgid "Letter"
 msgstr "Brief"
 
-#: apps/edwoca/models/letter.py:36
+#: models/letter.py:36
 msgid "Postcard"
 msgstr "Postkarte"
 
-#: apps/edwoca/models/letter.py:37
+#: models/letter.py:37
 msgid "Copy"
 msgstr "Abschrift"
 
-#: apps/edwoca/models/letter.py:46
+#: models/letter.py:46
 msgid "receiver person"
 msgstr "Empfänger (Person)"
 
-#: apps/edwoca/models/letter.py:52
+#: models/letter.py:52
 msgid "sender person"
 msgstr "Absender (Person)"
 
-#: apps/edwoca/models/letter.py:58
+#: models/letter.py:58
 msgid "receiver corporation"
 msgstr "Empfänger (Körperschaft)"
 
-#: apps/edwoca/models/letter.py:64
+#: models/letter.py:64
 msgid "sender corporation"
 msgstr "Absender (Körperschaft)"
 
-#: apps/edwoca/models/letter.py:70
+#: models/letter.py:70
 msgid "receiver place"
 msgstr "Empfangsort"
 
-#: apps/edwoca/models/letter.py:76
+#: models/letter.py:76
 msgid "sender place"
 msgstr "Absendeort"
 
-#: apps/edwoca/models/letter.py:94
+#: models/letter.py:94
 msgid "category"
 msgstr "Kategorie"
 
-#: apps/edwoca/models/letter.py:99 apps/edwoca/models/letter.py:104
-#: apps/edwoca/templates/edwoca/item_comment.html:10
-#: apps/edwoca/templates/edwoca/letter_update.html:225
-#: apps/edwoca/templates/edwoca/manifestation_history.html:85
-#: apps/edwoca/templates/edwoca/manifestation_manuscript.html:60
-#: apps/edwoca/templates/edwoca/manifestation_print.html:135
-#: apps/edwoca/templates/edwoca/manifestation_title.html:122
-#: apps/edwoca/templates/edwoca/manifestation_update.html:112
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:70
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:76
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:96
-#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:27
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:56
-#: apps/edwoca/templates/edwoca/provenance.html:59
-#: apps/edwoca/views/manifestation/common.py:713
+#: models/letter.py:99 models/letter.py:104
+#: templates/edwoca/item_comment.html:10
+#: templates/edwoca/letter_update.html:225
+#: templates/edwoca/manifestation_history.html:85
+#: templates/edwoca/manifestation_manuscript.html:60
+#: templates/edwoca/manifestation_print.html:135
+#: templates/edwoca/manifestation_title.html:122
+#: templates/edwoca/manifestation_update.html:112
+#: templates/edwoca/partials/expression/expression_menu.html:70
+#: templates/edwoca/partials/item/item_menu.html:76
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:96
+#: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:27
+#: templates/edwoca/partials/work/work_menu.html:56
+#: templates/edwoca/provenance.html:64 views/manifestation/common.py:665
 msgid "comment"
 msgstr "Kommentar"
 
-#: apps/edwoca/models/letter.py:109
+#: models/letter.py:109
 msgid "work mentionings"
 msgstr "Werkerwähnungen"
 
-#: apps/edwoca/models/letter.py:134
+#: models/letter.py:138
 msgid "diplomatic date on source"
 msgstr "Datierung diplomatisch (nach Originalquelle)"
 
-#: apps/edwoca/models/letter.py:144
+#: models/letter.py:148
 msgid "sender corporation name according to edition"
 msgstr "Name der Körperschaft (nach Edition)"
 
-#: apps/edwoca/models/letter.py:149
+#: models/letter.py:153
 msgid "sender corporation name according to source"
 msgstr "Name der Körperschaft (nach Originalquelle)"
 
-#: apps/edwoca/models/letter.py:155
+#: models/letter.py:159
 msgid "no proof"
 msgstr "ohne Nachweis"
 
-#: apps/edwoca/models/letter.py:162
+#: models/letter.py:166
 msgid "unknown"
 msgstr "unbekannt"
 
-#: apps/edwoca/models/letter.py:163
+#: models/letter.py:167
 msgid "writing to"
 msgstr "an"
 
-#: apps/edwoca/models/letter.py:164
+#: models/letter.py:168
 msgid "et al."
 msgstr "u. a."
 
-#: apps/edwoca/models/letter.py:205
+#: models/letter.py:209
 msgid "letter number"
 msgstr "Briefnummer"
 
-#: apps/edwoca/models/work.py:101
+#: models/work.py:101
 msgid "is successor of"
 msgstr "ist Nachfolger von"
 
-#: apps/edwoca/models/work.py:102
+#: models/work.py:102
 msgid "is inspired by"
 msgstr "ist inspiriert durch"
 
-#: apps/edwoca/models/work.py:103
+#: models/work.py:103
 msgid "uses expression of"
 msgstr "nutzt Expression von"
 
-#: apps/edwoca/models/work.py:104
+#: models/work.py:104
 msgid "accompanies or complements"
 msgstr "begleitet oder ergänzt"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:14
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:62
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:80
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:49
+#: templates/edwoca/bib_update.html:20
+#: templates/edwoca/partials/item/item_menu.html:62
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:80
+#: templates/edwoca/partials/work/work_menu.html:49
 msgid "bibliography"
 msgstr "Literatur"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:34
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:107
+#: templates/edwoca/bib_update.html:40
+#: templates/edwoca/partials/forms/provenance_station_form.html:107
 msgid "remove reference"
 msgstr "Nachweis entfernen"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:42
+#: templates/edwoca/bib_update.html:48
 msgid "no bibliographic datasets have been linked"
 msgstr "keine verknüpften Literatureinträge"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:52
+#: templates/edwoca/bib_update.html:58
 msgid "search bibliography"
 msgstr "Literatur durchsuchen"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:54
-#: apps/edwoca/templates/edwoca/bib_update.html:109
-#: apps/edwoca/templates/edwoca/create_manifestation.html:20
-#: apps/edwoca/templates/edwoca/letter_update.html:150
-#: apps/edwoca/templates/edwoca/manifestation_history.html:62
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:97
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:326
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:435
-#: apps/edwoca/templates/edwoca/manifestation_update.html:90
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:64
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:103
-#: apps/edwoca/templates/edwoca/partials/search_form_switcher.html:12
+#: templates/edwoca/bib_update.html:60 templates/edwoca/bib_update.html:115
+#: templates/edwoca/create_manifestation.html:20
+#: templates/edwoca/letter_update.html:150
+#: templates/edwoca/manifestation_history.html:62
+#: templates/edwoca/manifestation_relations.html:97
+#: templates/edwoca/manifestation_relations.html:344
+#: templates/edwoca/manifestation_relations.html:453
+#: templates/edwoca/manifestation_update.html:90
+#: templates/edwoca/partials/forms/_modification_form.html:64
+#: templates/edwoca/partials/forms/_modification_form.html:103
+#: templates/edwoca/partials/search_form_switcher.html:12
 msgid "search"
 msgstr "suchen"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:69
-#: apps/edwoca/templates/edwoca/bib_update.html:124
-#: apps/edwoca/templates/edwoca/letter_update.html:161
-#: apps/edwoca/templates/edwoca/manifestation_history.html:77
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:148
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:376
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:485
-#: apps/edwoca/templates/edwoca/manifestation_update.html:104
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:72
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:115
-#: apps/edwoca/templates/edwoca/partials/forms/handwriting_form.html:60
-#: apps/edwoca/templates/edwoca/partials/htmx/display_results.html:27
-#: apps/edwoca/views/base.py:62
+#: templates/edwoca/bib_update.html:75 templates/edwoca/bib_update.html:130
+#: templates/edwoca/letter_update.html:161
+#: templates/edwoca/manifestation_history.html:77
+#: templates/edwoca/manifestation_relations.html:148
+#: templates/edwoca/manifestation_relations.html:394
+#: templates/edwoca/manifestation_relations.html:503
+#: templates/edwoca/manifestation_update.html:104
+#: templates/edwoca/partials/forms/_modification_form.html:72
+#: templates/edwoca/partials/forms/_modification_form.html:115
+#: templates/edwoca/partials/forms/handwriting_form.html:60
+#: templates/edwoca/partials/htmx/display_results.html:27 views/base.py:62
 msgid "no search results"
 msgstr "keine Suchergebnisse"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:79
-#: apps/edwoca/templates/edwoca/list.html:86
+#: templates/edwoca/bib_update.html:85 templates/edwoca/list.html:86
 msgid "letters"
 msgstr "Briefe"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:91
-#: apps/edwoca/templates/edwoca/library_update.html:31
-#: apps/edwoca/templates/edwoca/manifestation_history.html:43
-#: apps/edwoca/templates/edwoca/manifestation_print.html:29
-#: apps/edwoca/templates/edwoca/manifestation_print.html:51
-#: apps/edwoca/templates/edwoca/manifestation_print.html:108
-#: apps/edwoca/templates/edwoca/manifestation_update.html:81
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:47
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:86
-#: apps/edwoca/templates/edwoca/partials/forms/dedication_form.html:19
-#: apps/edwoca/templates/edwoca/partials/forms/dedication_form.html:43
-#: apps/edwoca/templates/edwoca/partials/forms/handwriting_form.html:18
-#: apps/edwoca/templates/edwoca/partials/forms/handwriting_form.html:72
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:27
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:53
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:135
-#: apps/edwoca/templates/edwoca/partials/letter/contributor_form.html:19
+#: templates/edwoca/bib_update.html:97 templates/edwoca/library_update.html:31
+#: templates/edwoca/manifestation_history.html:43
+#: templates/edwoca/manifestation_print.html:29
+#: templates/edwoca/manifestation_print.html:51
+#: templates/edwoca/manifestation_print.html:108
+#: templates/edwoca/manifestation_update.html:81
+#: templates/edwoca/partials/forms/_modification_form.html:47
+#: templates/edwoca/partials/forms/_modification_form.html:86
+#: templates/edwoca/partials/forms/dedication_form.html:19
+#: templates/edwoca/partials/forms/dedication_form.html:43
+#: templates/edwoca/partials/forms/handwriting_form.html:18
+#: templates/edwoca/partials/forms/handwriting_form.html:72
+#: templates/edwoca/partials/forms/provenance_station_form.html:27
+#: templates/edwoca/partials/forms/provenance_station_form.html:53
+#: templates/edwoca/partials/forms/provenance_station_form.html:135
+#: templates/edwoca/partials/letter/contributor_form.html:19
 msgid "remove"
 msgstr "entfernen"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:98
+#: templates/edwoca/bib_update.html:104
 msgid "no letters have been linked"
 msgstr "keine verknüpften Briefe"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:107
+#: templates/edwoca/bib_update.html:113
 msgid "search letters"
 msgstr "Briefe durchsuchen"
 
-#: apps/edwoca/templates/edwoca/delete.html:8
+#: templates/edwoca/delete.html:8
 #, python-format
 msgid "Please confirm you want to delete %(object)s."
 msgstr "Bitte bestätigen Sie, dass Sie %(object)s löschen möchten."
 
-#: apps/edwoca/templates/edwoca/delete.html:23
+#: templates/edwoca/delete.html:23
 msgid "confirm"
 msgstr "bestätigen"
 
-#: apps/edwoca/templates/edwoca/item_dedication.html:10
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:37
+#: templates/edwoca/item_dedication.html:10
+#: templates/edwoca/partials/item/item_menu.html:37
 msgid "dedication"
 msgstr "Widmung"
 
-#: apps/edwoca/templates/edwoca/item_dedication.html:19
-#: apps/edwoca/templates/edwoca/manifestation_title.html:84
+#: templates/edwoca/item_dedication.html:19
+#: templates/edwoca/manifestation_title.html:84
 msgid "person dedications"
 msgstr "Personenwidmungen"
 
-#: apps/edwoca/templates/edwoca/item_dedication.html:25
-#: apps/edwoca/templates/edwoca/manifestation_title.html:89
+#: templates/edwoca/item_dedication.html:25
+#: templates/edwoca/manifestation_title.html:89
 msgid "no person dedications"
 msgstr "keine Personenwidmungen"
 
-#: apps/edwoca/templates/edwoca/item_dedication.html:30
-#: apps/edwoca/templates/edwoca/manifestation_title.html:95
+#: templates/edwoca/item_dedication.html:30
+#: templates/edwoca/manifestation_title.html:95
 msgid "create person dedication"
 msgstr "Personenwidmung anlegen"
 
-#: apps/edwoca/templates/edwoca/item_dedication.html:35
-#: apps/edwoca/templates/edwoca/manifestation_title.html:99
+#: templates/edwoca/item_dedication.html:35
+#: templates/edwoca/manifestation_title.html:99
 msgid "corporation dedications"
 msgstr "Körperschaftswidmungen"
 
-#: apps/edwoca/templates/edwoca/item_dedication.html:41
-#: apps/edwoca/templates/edwoca/manifestation_title.html:103
+#: templates/edwoca/item_dedication.html:41
+#: templates/edwoca/manifestation_title.html:103
 msgid "no corporation dedications"
 msgstr "keine Körperschaftswidmungen"
 
-#: apps/edwoca/templates/edwoca/item_dedication.html:47
-#: apps/edwoca/templates/edwoca/manifestation_title.html:109
+#: templates/edwoca/item_dedication.html:47
+#: templates/edwoca/manifestation_title.html:109
 msgid "create corporation dedication"
 msgstr "Körperschaftswidmung anlegen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:16
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:30
+#: templates/edwoca/item_manuscript.html:16
+#: templates/edwoca/partials/item/item_menu.html:30
 msgid "item characteristics"
 msgstr "Exemplarspezifika"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:30
-#: apps/edwoca/templates/edwoca/manifestation_manuscript.html:39
+#: templates/edwoca/item_manuscript.html:34
+#: templates/edwoca/manifestation_manuscript.html:39
 msgid "modifications"
 msgstr "Modifikationen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:37
-#: apps/edwoca/templates/edwoca/manifestation_manuscript.html:45
+#: templates/edwoca/item_manuscript.html:41
+#: templates/edwoca/manifestation_manuscript.html:45
 msgid "no modifications"
 msgstr "keine Modifikationen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:43
-#: apps/edwoca/templates/edwoca/manifestation_manuscript.html:52
+#: templates/edwoca/item_manuscript.html:47
+#: templates/edwoca/manifestation_manuscript.html:52
 msgid "create modification"
 msgstr "Modifikation anlegen"
 
-#: apps/edwoca/templates/edwoca/item_relations.html:10
-#: apps/edwoca/templatetags/entity_labels.py:16
+#: templates/edwoca/item_relations.html:10 templatetags/entity_labels.py:16
 msgid "manifestation"
 msgstr "Druck"
 
-#: apps/edwoca/templates/edwoca/item_relations.html:16
-#: apps/edwoca/templates/edwoca/list.html:66
+#: templates/edwoca/item_relations.html:16 templates/edwoca/list.html:66
 msgid "composites"
 msgstr "Konvolute"
 
-#: apps/edwoca/templates/edwoca/item_update.html:7
-#: apps/edwoca/templatetags/entity_labels.py:17
+#: templates/edwoca/item_update.html:7 templatetags/entity_labels.py:17
 msgid "item"
 msgstr "Druckexemplar"
 
-#: apps/edwoca/templates/edwoca/item_update.html:18
-#: apps/edwoca/templates/edwoca/manifestation_update.html:34
+#: templates/edwoca/item_update.html:18
+#: templates/edwoca/manifestation_update.html:34
 msgid "locations"
 msgstr "Standorte"
 
-#: apps/edwoca/templates/edwoca/item_update.html:28
-#: apps/edwoca/templates/edwoca/manifestation_update.html:44
+#: templates/edwoca/item_update.html:28
+#: templates/edwoca/manifestation_update.html:44
 msgid "remove signature"
 msgstr "Standort entfernen"
 
-#: apps/edwoca/templates/edwoca/item_update.html:36
-#: apps/edwoca/templates/edwoca/manifestation_update.html:52
+#: templates/edwoca/item_update.html:36
+#: templates/edwoca/manifestation_update.html:52
 msgid "create location"
 msgstr "Standort anlegen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:7
-#: apps/edwoca/templates/edwoca/manifestation_history.html:10
-#: apps/edwoca/templates/edwoca/manifestation_print.html:122
+#: templates/edwoca/letter_update.html:7
+#: templates/edwoca/manifestation_history.html:10
+#: templates/edwoca/manifestation_print.html:122
 msgid "date"
 msgstr "Datierung"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:23
+#: templates/edwoca/letter_update.html:23
 msgid "sender"
 msgstr "Absender"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:27
+#: templates/edwoca/letter_update.html:27
 msgid "remove sender person"
 msgstr "Absender (Person) entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:35
+#: templates/edwoca/letter_update.html:35
 msgid "add sender person"
 msgstr "Absender (Person) hinzufügen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:41
+#: templates/edwoca/letter_update.html:41
 msgid "remove sender corporation"
 msgstr "Absender (Körperschaft) entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:49
+#: templates/edwoca/letter_update.html:49
 msgid "add sender corporation"
 msgstr "Absender (Körperschaft) hinzufügen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:55
+#: templates/edwoca/letter_update.html:55
 msgid "receiver"
 msgstr "Empfänger"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:59
+#: templates/edwoca/letter_update.html:59
 msgid "remove receiver person"
 msgstr "Empfänger (Person) entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:67
+#: templates/edwoca/letter_update.html:67
 msgid "add receiver person"
 msgstr "Empfänger (Person) hinzufügen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:73
+#: templates/edwoca/letter_update.html:73
 msgid "remove receiver corporation"
 msgstr "Empfänger (Körperschaft) entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:81
+#: templates/edwoca/letter_update.html:81
 msgid "add receiver corporation"
 msgstr "Empfänger (Körperschaft) hinzufügen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:87
-#: apps/edwoca/templates/edwoca/manifestation_history.html:20
+#: templates/edwoca/letter_update.html:87
+#: templates/edwoca/manifestation_history.html:20
 msgid "places"
 msgstr "Orte"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:91
+#: templates/edwoca/letter_update.html:91
 msgid "remove receiver place"
 msgstr "Empfangsort entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:99
+#: templates/edwoca/letter_update.html:99
 msgid "add receiver place"
 msgstr "Empfangsort hinzufügen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:105
+#: templates/edwoca/letter_update.html:105
 msgid "remove sender place"
 msgstr "Absendeort entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:113
+#: templates/edwoca/letter_update.html:113
 msgid "add sender place"
 msgstr "Absendeort hinzufügen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:119
+#: templates/edwoca/letter_update.html:119
 msgid "editions"
 msgstr "Editionen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:128
+#: templates/edwoca/letter_update.html:128
 msgid "letter edition"
 msgstr "Titel"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:138
+#: templates/edwoca/letter_update.html:138
 msgid "remove bib"
 msgstr "Edition entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:148
+#: templates/edwoca/letter_update.html:148
 msgid "search editions"
 msgstr "Editionen durchsuchen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:169
+#: templates/edwoca/letter_update.html:169
 msgid "letter proof"
 msgstr "Quellennachweis"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:179
+#: templates/edwoca/letter_update.html:179
 msgid "remove letter signature"
 msgstr "Signatur entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:190
+#: templates/edwoca/letter_update.html:190
 msgid "add letter signature"
 msgstr "Signatur anlegen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:202
-#: apps/edwoca/templates/edwoca/manifestation_digital_copy.html:28
+#: templates/edwoca/letter_update.html:202
+#: templates/edwoca/manifestation_digital_copy.html:28
 msgid "remove digital copy"
 msgstr "Digitalisat entfernen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:213
+#: templates/edwoca/letter_update.html:213
 msgid "add letter digital copy"
 msgstr "Digitalisat hinzufügen"
 
-#: apps/edwoca/templates/edwoca/letter_update.html:219
+#: templates/edwoca/letter_update.html:219
 msgid "work relations"
 msgstr "Werkbezüge"
 
-#: apps/edwoca/templates/edwoca/library_update.html:8
-#: apps/edwoca/templates/edwoca/list.html:166
-#: apps/edwoca/templates/edwoca/manifestation_update.html:141
-#: apps/edwoca/templatetags/entity_labels.py:18
+#: templates/edwoca/library_update.html:8 templates/edwoca/list.html:166
+#: templates/edwoca/manifestation_update.html:141
+#: templatetags/entity_labels.py:18
 msgid "library"
 msgstr "Bibliothek"
 
-#: apps/edwoca/templates/edwoca/library_update.html:23
+#: templates/edwoca/library_update.html:23
 msgid "corporation"
 msgstr "Körperschaft"
 
-#: apps/edwoca/templates/edwoca/list.html:12
+#: templates/edwoca/list.html:12
 msgid "works"
 msgstr "Werke"
 
-#: apps/edwoca/templates/edwoca/list.html:22
+#: templates/edwoca/list.html:22
 msgid "expressions"
 msgstr "Fassungen"
 
-#: apps/edwoca/templates/edwoca/list.html:32
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:321
+#: templates/edwoca/list.html:32
+#: templates/edwoca/manifestation_relations.html:339
 msgid "manuscripts"
 msgstr "Handschriften"
 
-#: apps/edwoca/templates/edwoca/list.html:42
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:430
+#: templates/edwoca/list.html:42
+#: templates/edwoca/manifestation_relations.html:448
 msgid "prints"
 msgstr "Drucke"
 
-#: apps/edwoca/templates/edwoca/list.html:52
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:505
+#: templates/edwoca/list.html:52
+#: templates/edwoca/manifestation_relations.html:523
 msgid "items"
 msgstr "Druckexemplare"
 
-#: apps/edwoca/templates/edwoca/list.html:76
+#: templates/edwoca/list.html:76
 msgid "libraries"
 msgstr "Bibliotheken"
 
-#: apps/edwoca/templates/edwoca/list.html:106
+#: templates/edwoca/list.html:106
 msgid "page"
 msgstr "Seite"
 
-#: apps/edwoca/templates/edwoca/list.html:106
-#: apps/edwoca/templates/edwoca/list.html:128
+#: templates/edwoca/list.html:106 templates/edwoca/list.html:128
 msgid "of"
 msgstr "von"
 
-#: apps/edwoca/templates/edwoca/list.html:124
+#: templates/edwoca/list.html:124
 msgid "result"
 msgstr "Ergebnis"
 
-#: apps/edwoca/templates/edwoca/list.html:126
+#: templates/edwoca/list.html:126
 msgid "to"
 msgstr "bis"
 
-#: apps/edwoca/templates/edwoca/list.html:131
+#: templates/edwoca/list.html:131
 msgid "for query"
 msgstr "für Suche nach"
 
-#: apps/edwoca/templates/edwoca/list.html:143
+#: templates/edwoca/list.html:143
 msgid "create"
 msgstr "neu"
 
-#: apps/edwoca/templates/edwoca/list.html:148
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:43
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:61
-#: apps/edwoca/templatetags/entity_labels.py:13
+#: templates/edwoca/list.html:148
+#: templates/edwoca/partials/forms/_modification_form.html:43
+#: templates/edwoca/partials/forms/_modification_form.html:61
+#: templatetags/entity_labels.py:13
 msgid "work"
 msgstr "Werk"
 
-#: apps/edwoca/templates/edwoca/list.html:151
-#: apps/edwoca/templates/edwoca/manifestation_update.html:15
+#: templates/edwoca/list.html:151 templates/edwoca/manifestation_update.html:15
 msgid "manuscript"
 msgstr "Handschrift"
 
-#: apps/edwoca/templates/edwoca/list.html:154
+#: templates/edwoca/list.html:154
 msgid "manuscript collection"
 msgstr "Handschrift (Sammlung)"
 
-#: apps/edwoca/templates/edwoca/list.html:157
-#: apps/edwoca/templates/edwoca/manifestation_update.html:127
+#: templates/edwoca/list.html:157
+#: templates/edwoca/manifestation_update.html:127
 msgid "print"
 msgstr "Druck"
 
-#: apps/edwoca/templates/edwoca/list.html:160
+#: templates/edwoca/list.html:160
 msgid "print collection"
 msgstr "Druck (Sammlung)"
 
-#: apps/edwoca/templates/edwoca/list.html:163
+#: templates/edwoca/list.html:163
 msgid "composite"
 msgstr "Konvolut"
 
-#: apps/edwoca/templates/edwoca/list.html:169
-#: apps/edwoca/templatetags/entity_labels.py:19
+#: templates/edwoca/list.html:169 templatetags/entity_labels.py:19
 msgid "letter"
 msgstr "Brief"
 
-#: apps/edwoca/templates/edwoca/manifestation_digital_copy.html:13
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:69
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:88
+#: templates/edwoca/manifestation_digital_copy.html:13
+#: templates/edwoca/partials/item/item_menu.html:69
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:88
 msgid "digital copies"
 msgstr "Digitalisate"
 
-#: apps/edwoca/templates/edwoca/manifestation_digital_copy.html:36
+#: templates/edwoca/manifestation_digital_copy.html:36
 msgid "no digital copies"
 msgstr "keine Digitalisate vorhanden"
 
-#: apps/edwoca/templates/edwoca/manifestation_digital_copy.html:43
+#: templates/edwoca/manifestation_digital_copy.html:43
 msgid "add digital copy"
 msgstr "Digitalisat hinzufügen"
 
-#: apps/edwoca/templates/edwoca/manifestation_history.html:48
+#: templates/edwoca/manifestation_history.html:48
 msgid "no linked place"
 msgstr "kein Ort verknüpft"
 
-#: apps/edwoca/templates/edwoca/manifestation_history.html:57
-#: apps/edwoca/templates/edwoca/manifestation_print.html:43
-#: apps/edwoca/templates/edwoca/partials/forms/dedication_form.html:38
+#: templates/edwoca/manifestation_history.html:57
+#: templates/edwoca/manifestation_print.html:43
+#: templates/edwoca/partials/forms/dedication_form.html:38
 msgid "place"
 msgstr "Ort"
 
-#: apps/edwoca/templates/edwoca/manifestation_history.html:60
+#: templates/edwoca/manifestation_history.html:60
 msgid "search places"
 msgstr "Orte durchsuchen"
 
-#: apps/edwoca/templates/edwoca/manifestation_manuscript.html:16
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:65
-#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:5
+#: templates/edwoca/manifestation_manuscript.html:16
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:65
+#: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:5
 msgid "manuscript characteristics"
 msgstr "Manuskriptspezifika"
 
-#: apps/edwoca/templates/edwoca/manifestation_manuscript.html:23
+#: templates/edwoca/manifestation_manuscript.html:23
 msgid "writers / hands"
 msgstr "Schreiber"
 
-#: apps/edwoca/templates/edwoca/manifestation_manuscript.html:31
+#: templates/edwoca/manifestation_manuscript.html:31
 msgid "create writer"
 msgstr "Schreiber hinzufügen"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:8
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:56
+#: templates/edwoca/manifestation_print.html:8
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:56
 msgid "publisher and print characteristics"
 msgstr "Verlag und Druckspezifika"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:10
+#: templates/edwoca/manifestation_print.html:10
 msgid "publication"
 msgstr "Veröffentlichung"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:62
+#: templates/edwoca/manifestation_print.html:62
 msgid "remove place"
 msgstr "Ort entfernen"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:68
+#: templates/edwoca/manifestation_print.html:68
 msgid "add place"
 msgstr "Ort hinzufügen"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:74
+#: templates/edwoca/manifestation_print.html:74
 msgid "remove publication"
 msgstr "Veröffentlichung entfernen"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:83
+#: templates/edwoca/manifestation_print.html:83
 msgid "add publication"
 msgstr "Veröffentlichung hinzufügen"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:88
+#: templates/edwoca/manifestation_print.html:88
 msgid "more information"
 msgstr "Weitere Angaben"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:100
+#: templates/edwoca/manifestation_print.html:100
 msgid "stitcher"
 msgstr "Stecher"
 
-#: apps/edwoca/templates/edwoca/manifestation_print.html:128
+#: templates/edwoca/manifestation_print.html:128
 msgid "print characteristics"
 msgstr "Druckspezifika"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:14
+#: templates/edwoca/manifestation_relations.html:14
 msgid "set collection status"
 msgstr "Sammlungsstatus setzen"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:20
+#: templates/edwoca/manifestation_relations.html:20
 msgid "parent references"
 msgstr "Übergeordnete Bezüge"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:25
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:92
+#: templates/edwoca/manifestation_relations.html:25
+#: templates/edwoca/manifestation_relations.html:92
 msgid "collection"
 msgstr "Sammlung"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:32
+#: templates/edwoca/manifestation_relations.html:32
 msgid "this object is part of"
 msgstr "Dieses Objekt ist Teil von"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:35
+#: templates/edwoca/manifestation_relations.html:35
 msgid "this object is part of (separated)"
 msgstr "Dieses Objekt ist Teil von (separiert)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:45
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:60
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:82
+#: templates/edwoca/manifestation_relations.html:45
+#: templates/edwoca/manifestation_relations.html:60
+#: templates/edwoca/manifestation_relations.html:82
 msgid "remove collection"
 msgstr "Aus Sammlung entfernen"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:51
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:73
+#: templates/edwoca/manifestation_relations.html:51
+#: templates/edwoca/manifestation_relations.html:73
 msgid "this object is component of"
 msgstr "Dieses Objekt ist Komponente von"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:69
+#: templates/edwoca/manifestation_relations.html:69
 msgid "component of part"
 msgstr "Teil"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:101
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:330
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:439
+#: templates/edwoca/manifestation_relations.html:101
+#: templates/edwoca/manifestation_relations.html:348
+#: templates/edwoca/manifestation_relations.html:457
 msgid ""
 "short hand search without spaces and special characters is possible, e. g."
 msgstr "Abkürzungssuche ohne Leer- und Sonderzeichen verfügbar, bspw."
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:131
+#: templates/edwoca/manifestation_relations.html:131
 msgid "is part (separated) of"
 msgstr "ist Teil von (separiert)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:158
+#: templates/edwoca/manifestation_relations.html:158
 msgid "compound"
 msgstr "Konvolute"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:168
+#: templates/edwoca/manifestation_relations.html:168
 msgid "child references"
 msgstr "Untergeordnete Bezüge"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:174
+#: templates/edwoca/manifestation_relations.html:174
 msgid "collection parts and components"
 msgstr "Sammlungsteile und -komponenten"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:185
+#: templates/edwoca/manifestation_relations.html:185
 msgid "create new"
 msgstr "neu anlegen"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:190
+#: templates/edwoca/manifestation_relations.html:191
 msgid "manuscript part"
 msgstr "Handschrift (Teil)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:195
+#: templates/edwoca/manifestation_relations.html:196
 msgid "manuscript part (separated)"
 msgstr "Handschrift (separierter Teil)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:200
+#: templates/edwoca/manifestation_relations.html:201
 msgid "manuscript component"
 msgstr "Handschrift (Komponente)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:210
-#, fuzzy
-#| msgid "is component of"
+#: templates/edwoca/manifestation_relations.html:207
+msgid "print part"
+msgstr "Druck (Teil)"
+
+#: templates/edwoca/manifestation_relations.html:212
+msgid "print part (separated)"
+msgstr "Druck (separierter Teil)"
+
+#: templates/edwoca/manifestation_relations.html:217
+msgid "print component"
+msgstr "Druck (Komponente)"
+
+#: templates/edwoca/manifestation_relations.html:228
 msgid "components"
-msgstr "ist Komponente von"
+msgstr "Komponenten"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:236
+#: templates/edwoca/manifestation_relations.html:254
 msgid "create manuscript component"
-msgstr "Handschrift (Komponente) anlegen"
+msgstr "Handschrift (Komponente)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:244
+#: templates/edwoca/manifestation_relations.html:262
 msgid ""
 "In order to remove the collection status, please delete all parts and "
 "components of this object."
@@ -1118,7 +1098,7 @@ msgstr ""
 "Um den Sammlungsstatus entfernen zu können, bitte zunächst bei allen Teilen "
 "und Komponenten den Bezug zur Sammlung entfernen."
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:249
+#: templates/edwoca/manifestation_relations.html:267
 msgid ""
 "In order to remove the collection status, please delete all modifications of "
 "this object."
@@ -1126,520 +1106,520 @@ msgstr ""
 "Um den Sammlungsstatus entfernen zu können, bitte alle Modifikationen "
 "löschen."
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:254
+#: templates/edwoca/manifestation_relations.html:272
 msgid ""
 "In order to remove the collection status, please delete all items of this "
 "object."
 msgstr ""
 "Um den Sammlungsstatus entfernen zu können, bitte alle Exemplare löschen."
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:261
+#: templates/edwoca/manifestation_relations.html:279
 msgid "remove collection status"
 msgstr "Sammlungsstatus entfernen"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:271
+#: templates/edwoca/manifestation_relations.html:289
 msgid "sibling references"
 msgstr "Gleichrangige Bezüge"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:277
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:295
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:387
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:411
+#: templates/edwoca/manifestation_relations.html:295
+#: templates/edwoca/manifestation_relations.html:313
+#: templates/edwoca/manifestation_relations.html:405
+#: templates/edwoca/manifestation_relations.html:429
 msgid "this object is related to"
 msgstr "Dieses Objekt hat Bezug zu"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:286
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:311
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:403
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:420
+#: templates/edwoca/manifestation_relations.html:304
+#: templates/edwoca/manifestation_relations.html:329
+#: templates/edwoca/manifestation_relations.html:421
+#: templates/edwoca/manifestation_relations.html:438
 msgid "remove relation"
 msgstr "Bezug entfernen"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:298
+#: templates/edwoca/manifestation_relations.html:316
 msgid "this object has as stitch template (as documented)"
 msgstr "Dieses Objekt hat als Stichvorlage (nach Vorlage)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:301
+#: templates/edwoca/manifestation_relations.html:319
 msgid "this object has as stitch template (inferred)"
 msgstr "Dieses Objekt hat als Stichvorlage (ermittelt)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:354
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:463
+#: templates/edwoca/manifestation_relations.html:372
+#: templates/edwoca/manifestation_relations.html:481
 msgid "is related to"
 msgstr "hat Bezug zu"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:361
+#: templates/edwoca/manifestation_relations.html:379
 msgid "has as stitch template (as documented)"
 msgstr "hat als Stichvorlage (nach Vorlage)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:367
+#: templates/edwoca/manifestation_relations.html:385
 msgid "has as stitch template (inferred)"
 msgstr "hat als Stichvorlage (angenommen)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:390
+#: templates/edwoca/manifestation_relations.html:408
 msgid "this object is stitch template (as documented) of"
 msgstr "Dieses Objekt ist Stichvorlage (nach Vorlage)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:393
+#: templates/edwoca/manifestation_relations.html:411
 msgid "this object is stitch template (inferred) of"
 msgstr "Dieses Objekt ist Stichvorlage (angenommen)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:470
+#: templates/edwoca/manifestation_relations.html:488
 msgid "is stitch template (as documented)"
 msgstr "ist Stichvorlage von (nach Vorlage)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:476
+#: templates/edwoca/manifestation_relations.html:494
 msgid "is stitch template (inferred)"
 msgstr "ist Stichvorlage von (angenommen)"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:494
+#: templates/edwoca/manifestation_relations.html:512
 msgid "relations comment"
 msgstr "Kommentar"
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:509
+#: templates/edwoca/manifestation_relations.html:527
 msgid "all items of this print are lost"
 msgstr ""
 
-#: apps/edwoca/templates/edwoca/manifestation_relations.html:518
+#: templates/edwoca/manifestation_relations.html:536
 msgid "create item"
 msgstr "Exemplar anlegen"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:10
+#: templates/edwoca/manifestation_title.html:10
 msgid "front matter"
 msgstr "Titelei"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:18
+#: templates/edwoca/manifestation_title.html:18
 msgid "title setting"
 msgstr "Titelansetzung"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:22
+#: templates/edwoca/manifestation_title.html:22
 msgid "diplomatic titles"
 msgstr "Diplomatische Titel"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:37
+#: templates/edwoca/manifestation_title.html:37
 msgid "writers/hands"
 msgstr "Schreiber"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:48
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:31
+#: templates/edwoca/manifestation_title.html:48
+#: templates/edwoca/partials/forms/_modification_form.html:31
 msgid "create handwriting"
 msgstr "Schreiber hinzufügen"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:57
+#: templates/edwoca/manifestation_title.html:57
 msgid "remove title"
 msgstr "Titel entfernen"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:63
+#: templates/edwoca/manifestation_title.html:63
 msgid "no titles"
 msgstr "keine Titel"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:70
+#: templates/edwoca/manifestation_title.html:70
 msgid "create title"
 msgstr "Titel anlegen"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:76
+#: templates/edwoca/manifestation_title.html:76
 msgid "title page"
 msgstr "Titelblatt"
 
-#: apps/edwoca/templates/edwoca/manifestation_title.html:82
+#: templates/edwoca/manifestation_title.html:82
 msgid "dedications"
 msgstr "Widmungen"
 
-#: apps/edwoca/templates/edwoca/manifestation_update.html:58
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:23
+#: templates/edwoca/manifestation_update.html:58
+#: templates/edwoca/partials/expression/expression_menu.html:23
 msgid "identification"
 msgstr "Identifizierung"
 
-#: apps/edwoca/templates/edwoca/manifestation_update.html:70
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:82
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:100
-#: apps/edwoca/templatetags/entity_labels.py:14
+#: templates/edwoca/manifestation_update.html:70
+#: templates/edwoca/partials/forms/_modification_form.html:82
+#: templates/edwoca/partials/forms/_modification_form.html:100
+#: templatetags/entity_labels.py:14
 msgid "expression"
 msgstr "Fassung"
 
-#: apps/edwoca/templates/edwoca/manifestation_update.html:133
+#: templates/edwoca/manifestation_update.html:133
 msgid "template copy"
 msgstr "Vorlageexemplar"
 
-#: apps/edwoca/templates/edwoca/manifestation_update.html:158
+#: templates/edwoca/manifestation_update.html:158
 msgid "no template item"
 msgstr "kein Vorlageexemplar"
 
-#: apps/edwoca/templates/edwoca/manifestation_update.html:162
-#: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:71
-#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/head.html:9
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:480
+#: templates/edwoca/manifestation_update.html:162
+#: templates/edwoca/partials/manifestation/item_list.html:71
+#: templates/edwoca/partials/manifestation/preview-paragraphs/head.html:9
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:480
 msgid "no items"
 msgstr "keine Exemplare"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:9
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:9
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:10
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:9
+#: templates/edwoca/partials/expression/expression_menu.html:9
+#: templates/edwoca/partials/item/item_menu.html:9
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:10
+#: templates/edwoca/partials/work/work_menu.html:9
 msgid "detail"
 msgstr "Ansicht"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:16
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:39
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:16
+#: templates/edwoca/partials/expression/expression_menu.html:16
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:39
+#: templates/edwoca/partials/work/work_menu.html:16
 msgid "title and dedication"
 msgstr "Titelei und Widmung"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:30
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:38
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:23
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:32
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:23
+#: templates/edwoca/partials/expression/expression_menu.html:30
+#: templates/edwoca/partials/forms/_modification_form.html:38
+#: templates/edwoca/partials/item/item_menu.html:23
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:32
+#: templates/edwoca/partials/work/work_menu.html:23
 msgid "relations"
 msgstr "Bezüge"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:37
+#: templates/edwoca/partials/expression/expression_menu.html:37
 msgid "categorisation"
 msgstr "Kategorisierung"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:44
+#: templates/edwoca/partials/expression/expression_menu.html:44
 msgid "medium of performance"
 msgstr "Besetzung"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:51
+#: templates/edwoca/partials/expression/expression_menu.html:51
 msgid "movements"
 msgstr "Sätze"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:63
+#: templates/edwoca/partials/expression/expression_menu.html:63
 msgid "performance"
 msgstr "Aufführungen"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:79
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:89
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:115
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:65
+#: templates/edwoca/partials/expression/expression_menu.html:79
+#: templates/edwoca/partials/item/item_menu.html:89
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:115
+#: templates/edwoca/partials/work/work_menu.html:65
 msgid "delete"
 msgstr "löschen"
 
-#: apps/edwoca/templates/edwoca/partials/expression/expression_menu.html:84
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:94
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:121
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:127
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:70
+#: templates/edwoca/partials/expression/expression_menu.html:84
+#: templates/edwoca/partials/item/item_menu.html:94
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:121
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:127
+#: templates/edwoca/partials/work/work_menu.html:70
 msgid "back"
 msgstr "zurück"
 
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:21
+#: templates/edwoca/partials/forms/_modification_form.html:21
 msgid "modification writers / hands"
 msgstr "Schreiber Modifikation"
 
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:54
+#: templates/edwoca/partials/forms/_modification_form.html:54
 msgid "go to work"
 msgstr "zum Werk"
 
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:93
+#: templates/edwoca/partials/forms/_modification_form.html:93
 msgid "go to expression"
 msgstr "zur Fassung"
 
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:124
+#: templates/edwoca/partials/forms/_modification_form.html:124
 msgid "remove modification"
 msgstr "Modifikation entfernen"
 
-#: apps/edwoca/templates/edwoca/partials/forms/dedication_form.html:14
+#: templates/edwoca/partials/forms/dedication_form.html:14
 msgid "dedicatee"
 msgstr "Widmungsträger"
 
-#: apps/edwoca/templates/edwoca/partials/forms/dedication_form.html:58
+#: templates/edwoca/partials/forms/dedication_form.html:58
 msgid "remove dedication"
 msgstr "Widmung entfernen"
 
-#: apps/edwoca/templates/edwoca/partials/forms/handwriting_form.html:8
+#: templates/edwoca/partials/forms/handwriting_form.html:8
 msgid "writer"
 msgstr "Schreiber"
 
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:19
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:45
+#: templates/edwoca/partials/forms/provenance_station_form.html:19
+#: templates/edwoca/partials/forms/provenance_station_form.html:45
 msgid "owner"
 msgstr "Vorbesitzer*in"
 
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:87
+#: templates/edwoca/partials/forms/provenance_station_form.html:87
 msgid "provenance proof (bibliography)"
 msgstr "Provenienzbeleg (Literatur)"
 
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:124
+#: templates/edwoca/partials/forms/provenance_station_form.html:124
 msgid "provenance proof (letter)"
 msgstr "Provenienzbeleg (Brief)"
 
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:152
+#: templates/edwoca/partials/forms/provenance_station_form.html:152
 msgid "provenance proof (web)"
 msgstr "Provenienzbeleg (Web)"
 
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:161
+#: templates/edwoca/partials/forms/provenance_station_form.html:161
 msgid "remove web reference"
 msgstr "Nachweis entfernen"
 
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:169
+#: templates/edwoca/partials/forms/provenance_station_form.html:169
 msgid "add web reference"
 msgstr "Webnachweis hinzufügen"
 
-#: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:176
+#: templates/edwoca/partials/forms/provenance_station_form.html:176
 msgid "remove provenance station"
 msgstr "Provenienz entfernen"
 
-#: apps/edwoca/templates/edwoca/partials/htmx/selected.html:10
+#: templates/edwoca/partials/htmx/selected.html:10
 msgid "Saved (Reload to edit)"
 msgstr ""
 
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:16
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:18
+#: templates/edwoca/partials/item/item_menu.html:16
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:18
 msgid "head"
 msgstr "Kopf"
 
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:48
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:47
+#: templates/edwoca/partials/item/item_menu.html:48
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:47
 msgid "date and place"
 msgstr "Datierung und Ort"
 
-#: apps/edwoca/templates/edwoca/partials/item/item_menu.html:55
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:72
+#: templates/edwoca/partials/item/item_menu.html:55
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:72
 msgid "provenance"
 msgstr "Provenienz"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/collection_part_list.html:17
-#: apps/edwoca/templates/edwoca/partials/manifestation/collection_part_list.html:51
-#: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:24
+#: templates/edwoca/partials/manifestation/collection_part_list.html:17
+#: templates/edwoca/partials/manifestation/collection_part_list.html:51
+#: templates/edwoca/partials/manifestation/item_list.html:24
 msgid "move up"
 msgstr "nach oben bewegen"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/collection_part_list.html:29
-#: apps/edwoca/templates/edwoca/partials/manifestation/collection_part_list.html:63
-#: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:36
+#: templates/edwoca/partials/manifestation/collection_part_list.html:29
+#: templates/edwoca/partials/manifestation/collection_part_list.html:63
+#: templates/edwoca/partials/manifestation/item_list.html:36
 msgid "move down"
 msgstr "nach unten bewegen"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:26
+#: templates/edwoca/partials/manifestation/item_list.html:26
 msgid "up"
 msgstr "nach oben"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:38
+#: templates/edwoca/partials/manifestation/item_list.html:38
 msgid "down"
 msgstr "nach unten"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:48
-#: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:56
+#: templates/edwoca/partials/manifestation/item_list.html:48
+#: templates/edwoca/partials/manifestation/item_list.html:56
 msgid "template"
 msgstr "Vorlageexemplar"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:66
+#: templates/edwoca/partials/manifestation/item_list.html:66
 msgid "move"
 msgstr "verschieben"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:25
-#: apps/edwoca/views/manifestation/common.py:895
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:25
 msgid "source category"
 msgstr "Quellenart"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/manifestation_menu.html:104
+#: templates/edwoca/partials/manifestation/manifestation_menu.html:104
 msgid "copy"
 msgstr "kopieren"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/head.html:14
+#: templates/edwoca/partials/manifestation/preview-paragraphs/head.html:14
 msgid "no working title"
 msgstr "kein Arbeitstitel"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:13
+#: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:13
 msgid "extent not specified"
 msgstr "keine Formatangaben"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:21
+#: templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:21
 msgid "measure not specified"
 msgstr "keine Umfangangaben"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:6
+#: templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:6
 msgid "source type"
 msgstr "Typ"
 
-#: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:15
+#: templates/edwoca/partials/manifestation/preview-paragraphs/source_type.html:15
 msgid "no edition type"
 msgstr "keine Ausgabeform"
 
-#: apps/edwoca/templates/edwoca/partials/nav_switcher.html:22
+#: templates/edwoca/partials/nav_switcher.html:22
 msgid "save"
 msgstr "speichern"
 
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:13
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:22
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:117
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:119
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:130
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:229
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:231
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:241
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:337
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:339
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:349
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:15
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:17
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:27
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:123
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:125
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:135
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:233
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:235
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:245
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:343
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:345
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:355
+#: templates/edwoca/partials/navigation/item_navigation.html:13
+#: templates/edwoca/partials/navigation/item_navigation.html:22
+#: templates/edwoca/partials/navigation/item_navigation.html:117
+#: templates/edwoca/partials/navigation/item_navigation.html:119
+#: templates/edwoca/partials/navigation/item_navigation.html:130
+#: templates/edwoca/partials/navigation/item_navigation.html:229
+#: templates/edwoca/partials/navigation/item_navigation.html:231
+#: templates/edwoca/partials/navigation/item_navigation.html:241
+#: templates/edwoca/partials/navigation/item_navigation.html:337
+#: templates/edwoca/partials/navigation/item_navigation.html:339
+#: templates/edwoca/partials/navigation/item_navigation.html:349
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:15
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:17
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:27
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:123
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:125
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:135
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:233
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:235
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:245
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:343
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:345
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:355
 msgid "coll"
 msgstr ""
 
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:34
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:36
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:46
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:143
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:145
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:156
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:254
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:256
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:266
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:362
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:364
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:374
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:40
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:42
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:52
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:149
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:151
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:161
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:258
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:260
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:270
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:368
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:370
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:380
+#: templates/edwoca/partials/navigation/item_navigation.html:34
+#: templates/edwoca/partials/navigation/item_navigation.html:36
+#: templates/edwoca/partials/navigation/item_navigation.html:46
+#: templates/edwoca/partials/navigation/item_navigation.html:143
+#: templates/edwoca/partials/navigation/item_navigation.html:145
+#: templates/edwoca/partials/navigation/item_navigation.html:156
+#: templates/edwoca/partials/navigation/item_navigation.html:254
+#: templates/edwoca/partials/navigation/item_navigation.html:256
+#: templates/edwoca/partials/navigation/item_navigation.html:266
+#: templates/edwoca/partials/navigation/item_navigation.html:362
+#: templates/edwoca/partials/navigation/item_navigation.html:364
+#: templates/edwoca/partials/navigation/item_navigation.html:374
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:40
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:42
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:52
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:149
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:151
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:161
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:258
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:260
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:270
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:368
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:370
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:380
 msgid "pt"
 msgstr ""
 
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:60
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:62
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:72
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:90
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:92
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:102
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:170
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:172
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:182
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:200
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:202
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:213
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:280
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:282
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:293
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:311
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:313
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:323
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:388
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:390
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:400
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:418
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:420
-#: apps/edwoca/templates/edwoca/partials/navigation/item_navigation.html:431
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:66
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:68
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:78
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:96
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:98
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:108
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:175
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:177
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:187
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:205
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:207
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:217
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:285
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:287
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:297
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:317
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:319
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:329
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:394
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:396
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:406
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:426
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:428
-#: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:438
+#: templates/edwoca/partials/navigation/item_navigation.html:60
+#: templates/edwoca/partials/navigation/item_navigation.html:62
+#: templates/edwoca/partials/navigation/item_navigation.html:72
+#: templates/edwoca/partials/navigation/item_navigation.html:90
+#: templates/edwoca/partials/navigation/item_navigation.html:92
+#: templates/edwoca/partials/navigation/item_navigation.html:102
+#: templates/edwoca/partials/navigation/item_navigation.html:170
+#: templates/edwoca/partials/navigation/item_navigation.html:172
+#: templates/edwoca/partials/navigation/item_navigation.html:182
+#: templates/edwoca/partials/navigation/item_navigation.html:200
+#: templates/edwoca/partials/navigation/item_navigation.html:202
+#: templates/edwoca/partials/navigation/item_navigation.html:213
+#: templates/edwoca/partials/navigation/item_navigation.html:280
+#: templates/edwoca/partials/navigation/item_navigation.html:282
+#: templates/edwoca/partials/navigation/item_navigation.html:293
+#: templates/edwoca/partials/navigation/item_navigation.html:311
+#: templates/edwoca/partials/navigation/item_navigation.html:313
+#: templates/edwoca/partials/navigation/item_navigation.html:323
+#: templates/edwoca/partials/navigation/item_navigation.html:388
+#: templates/edwoca/partials/navigation/item_navigation.html:390
+#: templates/edwoca/partials/navigation/item_navigation.html:400
+#: templates/edwoca/partials/navigation/item_navigation.html:418
+#: templates/edwoca/partials/navigation/item_navigation.html:420
+#: templates/edwoca/partials/navigation/item_navigation.html:431
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:66
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:68
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:78
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:96
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:98
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:108
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:175
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:177
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:187
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:205
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:207
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:217
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:285
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:287
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:297
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:317
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:319
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:329
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:394
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:396
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:406
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:426
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:428
+#: templates/edwoca/partials/navigation/manifestation_navigation.html:438
 msgid "cmp"
 msgstr ""
 
-#: apps/edwoca/templates/edwoca/partials/search_form_switcher.html:8
+#: templates/edwoca/partials/search_form_switcher.html:8
 #, python-format
 msgid "search %(type)s"
 msgstr "%(type)s suchen"
 
-#: apps/edwoca/templates/edwoca/partials/tracked_model_display.html:5
+#: templates/edwoca/partials/tracked_model_display.html:5
 msgid "created"
 msgstr "angelegt"
 
-#: apps/edwoca/templates/edwoca/partials/tracked_model_display.html:12
+#: templates/edwoca/partials/tracked_model_display.html:12
 msgid "by"
 msgstr "von"
 
-#: apps/edwoca/templates/edwoca/partials/tracked_model_display.html:17
+#: templates/edwoca/partials/tracked_model_display.html:17
 msgid "missing first editor"
 msgstr "kein*e Erstbearbeiter*in"
 
-#: apps/edwoca/templates/edwoca/partials/tracked_model_display.html:23
+#: templates/edwoca/partials/tracked_model_display.html:23
 msgid "last update"
 msgstr "letzte Bearbeitung"
 
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:30
+#: templates/edwoca/partials/work/work_menu.html:30
 msgid "reference"
 msgstr "Referenzen"
 
-#: apps/edwoca/templates/edwoca/partials/work/work_menu.html:42
+#: templates/edwoca/partials/work/work_menu.html:42
 msgid "first performance"
 msgstr "Uraufführung"
 
-#: apps/edwoca/templates/edwoca/provenance.html:15
+#: templates/edwoca/provenance.html:20
 msgid "provenance persons"
 msgstr "Vorbesitzende Person"
 
-#: apps/edwoca/templates/edwoca/provenance.html:25
-#: apps/edwoca/templates/edwoca/provenance.html:47
+#: templates/edwoca/provenance.html:30 templates/edwoca/provenance.html:52
 msgid "no provenance entries"
 msgstr "keine Provenienzeinträge"
 
-#: apps/edwoca/templates/edwoca/provenance.html:32
+#: templates/edwoca/provenance.html:37
 msgid "add person provenance station"
 msgstr "Provenienz anlegen"
 
-#: apps/edwoca/templates/edwoca/provenance.html:37
+#: templates/edwoca/provenance.html:42
 msgid "provenance corporations"
 msgstr "Vorbesitzende Körperschaft"
 
-#: apps/edwoca/templates/edwoca/provenance.html:54
+#: templates/edwoca/provenance.html:59
 msgid "add corporation provenance station"
 msgstr "Provenienz anlegen"
 
-#: apps/edwoca/templatetags/entity_labels.py:15
+#: templatetags/entity_labels.py:15
 msgid "singleton"
 msgstr "Handschrift"
 
-#: apps/edwoca/views/manifestation/common.py:303
-#: apps/edwoca/views/manifestation/update.py:66
+#: views/manifestation/common.py:305 views/manifestation/update.py:66
 msgid "search expressions"
 msgstr "Fassungen durchsuchen"
 
-#: apps/edwoca/views/manifestation/common.py:402
+#: views/manifestation/common.py:404
 msgid "search manuscripts"
 msgstr "Handschriften durchsuchen"
 
-#: apps/edwoca/views/manifestation/common.py:403
-msgid "search manifestations"
-msgstr "Handschriften durchsuchen"
+#: views/manifestation/common.py:405
+msgid "search collections"
+msgstr "Sammlungen durchsuchen"
 
-#: apps/edwoca/views/manifestation/common.py:404
+#: views/manifestation/common.py:406
 msgid "search prints"
 msgstr "Drucke durchsuchen"
 
-#: apps/edwoca/views/manifestation/title.py:185
+#: views/manifestation/title.py:191
 msgid "search persons"
 msgstr "Personen durchsuchen"
+
+#~ msgid "search manifestations"
+#~ msgstr "Handschriften durchsuchen"
 
 #~ msgid "link item"
 #~ msgstr "Exemplar verknüpfen"
@@ -1829,15 +1809,6 @@ msgstr "Personen durchsuchen"
 
 #~ msgid "no dedicatees"
 #~ msgstr "keine Widmungsträger"
-
-#~ msgid "create print part"
-#~ msgstr "Druck (Teil) anlegen"
-
-#~ msgid "create print component"
-#~ msgstr "Druck (Komponente) anlegen"
-
-#~ msgid "search collections"
-#~ msgstr "Sammlungen durchsuchen"
 
 #~ msgid "logically and physically associated"
 #~ msgstr "logisch und physisch zusammengehörig"

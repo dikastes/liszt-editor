@@ -185,36 +185,39 @@
                 {% translate 'create new' %}
             </summary>
             <ul class="menu dropdown-content bg-white shadow">
-                <li>
-                    <a href="{% url 'edwoca:singleton_part_create' object.id 'joined' %}">
-                        {% translate 'manuscript part' %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'edwoca:singleton_part_create' object.id 'separated' %}">
-                        {% translate 'manuscript part (separated)' %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'edwoca:singleton_component_create' object.id %}">
-                        {% translate 'manuscript component' %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'edwoca:manifestation_part_create' object.id 'joined' %}">
-                        {% translate 'print part' %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'edwoca:manifestation_part_create' object.id 'separated' %}">
-                        {% translate 'print part (separated)' %}
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url 'edwoca:manifestation_component_create' object.id %}">
-                        {% translate 'print component' %}
-                    </a>
-                </li>
+                {% if object.is_singleton %}
+                    <li>
+                        <a href="{% url 'edwoca:singleton_part_create' object.id 'joined' %}">
+                            {% translate 'manuscript part' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'edwoca:singleton_part_create' object.id 'separated' %}">
+                            {% translate 'manuscript part (separated)' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'edwoca:singleton_component_create' object.id %}">
+                            {% translate 'manuscript component' %}
+                        </a>
+                    </li>
+                {% else %}
+                    <li>
+                        <a href="{% url 'edwoca:part_create' object.id 'joined' %}">
+                            {% translate 'print part' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'edwoca:part_create' object.id 'separated' %}">
+                            {% translate 'print part (separated)' %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'edwoca:component_create' object.id %}">
+                            {% translate 'print component' %}
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </details>
     </div>

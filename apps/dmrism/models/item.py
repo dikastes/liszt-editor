@@ -108,6 +108,31 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
             default = False,
             verbose_name = _('is incomplete')
         )
+    # function
+    album_page = models.BooleanField(
+            default = False,
+            verbose_name = _('album page')
+        )
+    performance_material = models.BooleanField(
+            default = False,
+            verbose_name = _('performance material')
+        )
+    correction_sheet = models.BooleanField(
+            default = False,
+            verbose_name = _('correction sheet')
+        )
+    stitch_template = models.BooleanField(
+            default = False,
+            verbose_name = _('stitch template')
+        )
+    dedication_item = models.BooleanField(
+            default = False,
+            verbose_name = _('dedication item')
+        )
+    hand_copy = models.BooleanField(
+            default = False,
+            verbose_name = _('hand copy')
+        )
 
     _group_field_names = ['manifestation']
 
@@ -122,7 +147,12 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
                 public_provenance_comment = self.public_provenance_comment,
                 private_manuscript_comment = self.private_manuscript_comment,
                 private_dedication_comment = self.private_dedication_comment,
-                private_provenance_comment = self.private_provenance_comment
+                private_provenance_comment = self.private_provenance_comment,
+                album_page = self.album_page,
+                performance_material = self.performance_material,
+                correction_sheet = self.correction_sheet,
+                stitch_template = self.stitch_template,
+                dedication_item = self.dedication_item,
             )
         for signature in self.signatures.all():
             ItemSignature.objects.create(
