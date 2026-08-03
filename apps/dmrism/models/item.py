@@ -180,7 +180,7 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
 
     @property
     def title_suffix(self):
-        return self.manifestation.render_title_suffix()
+        return f'({self.get_source_type_display()})'
 
     @property
     def title_body(self):
