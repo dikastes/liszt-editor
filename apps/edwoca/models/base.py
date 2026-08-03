@@ -915,11 +915,11 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     def get_manifestation_url(self):
         return reverse(f'edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
 
-    def __str__(self):
-        manifestation = self.manifestation
-        if (title := self.manifestation.working_title):
-            return f'{super().__str__()} {title}'
-        return super().__str__()
+    #def __str__(self):
+        #manifestation = self.manifestation
+        ##if (title := self.manifestation.working_title):
+            #return f'{super().__str__()} {title}'
+        #return super().__str__()
 
 
 class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):

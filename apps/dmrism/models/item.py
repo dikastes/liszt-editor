@@ -176,7 +176,7 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
     def __str__(self):
         if self.manifestation.is_singleton:
             return self.manifestation.__str__()
-        return self.get_current_signature()
+        return self.render_title()
 
     @property
     def title_suffix(self):
@@ -189,6 +189,13 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
     @property
     def title_prefix(self):
         return self.get_current_signature()
+
+    def render_title(self):
+        return ' '.join([
+                self.title_prefix,
+                self.title_body,
+                self.title_suffix
+            ])
 
     def get_siblings(self):
         return self.manifestation.items.exclude(id = self.id)
