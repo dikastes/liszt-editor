@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import FilteredRelation, Q
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
@@ -94,6 +95,14 @@ class Person(DisplayableModel):
     activity_places = models.ManyToManyField(Place)
 
     professions = models.ManyToManyField(SubjectTerm)
+
+    ordering_fields = ['primary_name__last_name', 'primary_name__first_name']
+
+    @classmethod
+    def get_ordering_annotations(cls):
+        return {
+            'primary_name': FilteredRelation('names', condition=Q(names__status=Status.PRIMARY))
+        }
 
     def get_search_placeholder():
         return _('search persons')
