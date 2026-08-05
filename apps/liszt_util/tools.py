@@ -1,8 +1,17 @@
 from json import dumps, loads
 from django.db import transaction
-from django.db.models import Max
+from django.db.models import Max, Q, FilteredRelation, QuerySet
 from django.utils.safestring import mark_safe
 from .models import Sortable
+
+class DisplayableQuerySet(QuerySet):
+    def order_by_primary_name(self):
+        return self.annotate(
+            primary_name=FilteredRelation(
+                'names',
+                condition=Q(names__status='P')
+            )
+        ).order_by('primary_name__last_name', 'primary_name__first_name')
 
 
 class RenderRawJSONMixin:

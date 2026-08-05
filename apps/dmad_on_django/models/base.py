@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import QuerySet
 from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -6,7 +7,7 @@ from dominate.tags import div, table, tr, td
 from dominate.util import raw
 from iso639 import data as iso639_data
 from json import loads
-from liszt_util.tools import RenderRawJSONMixin
+from liszt_util.tools import RenderRawJSONMixin, DisplayableQuerySet
 
 
 languages = { iso_data['iso639_1'].upper(): iso_data['name'] for iso_data in iso639_data }
@@ -107,6 +108,8 @@ class TimestampedModel(models.Model):
 class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
     class Meta:
         abstract = True
+
+    objects = DisplayableQuerySet.as_manager()
 
     raw_data = models.TextField(null=True)
     rework_in_gnd = models.BooleanField(default=False)
