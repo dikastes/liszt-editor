@@ -226,7 +226,7 @@ class RelatedItemForm(ModelForm):
 
 class PersonProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
-            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2200),
             'attrs': {
                 'class': SimpleFormMixin.select_classes,
                 'form': 'form'
@@ -326,7 +326,7 @@ class PersonProvenanceStationForm(DateFormMixin, ModelForm):
 
 class CorporationProvenanceStationForm(DateFormMixin, ModelForm):
     kwargs = {
-            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 2200),
             'attrs': {
                 'class': SimpleFormMixin.select_classes,
                 'form': 'form'

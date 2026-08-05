@@ -1,4 +1,5 @@
 from .period_calculation import MONTHS, PERIOD_CODES, resolve_month, resolve_period
+from dateutil.relativedelta import relativedelta
 from calendar import monthrange
 from django.utils.translation import gettext_lazy as _
 from django.db import models
@@ -78,6 +79,10 @@ class Period(DocumentationStatusMixin):
     def parse_display(self):
         self.initialize_patterns()
 
+        if self.imprecision == Period.Imprecision.IMPRECISE:
+            self.start_qualifier = Period.StartQualifier.NOT_BEFORE
+            self.end_qualifier = Period.EndQualifier.NOT_AFTER
+
         ASSUMED_TOKEN = '[?]'
         display_value = self.display or ''
         INFERRED_TOKEN = ']'
@@ -119,8 +124,23 @@ class Period(DocumentationStatusMixin):
 
         before_string = _('before')
         after_string = _('after')
+        circa_string1 = _('circa')
+        circa_string2 = _('around')
 
-        if str(before_string) in dates[0]:
+        if str(circa_string1) in dates[0] or str(circa_string2) in dates[0]:
+            raw_date = dates[0].replace(str(circa_string1), '').replace(str(circa_string2), '')
+            self.not_before = self._parse_date(raw_date, 'lower')
+            self.not_after = self._parse_date(raw_date, 'upper')
+            if len(raw_date.split('.')) == 3:
+                self.not_before = self.not_before - timedelta(days=5)
+                self.not_after = self.not_after + timedelta(days=5)
+            if len(raw_date.split('.')) == 2:
+                self.not_before = self.not_before - relativedelta(months=1)
+                self.not_after = self.not_after + relativedelta(months=1)
+            if len(raw_date.split('.')) == 1:
+                self.not_before = self.not_before - relativedelta(years=5)
+                self.not_after = self.not_after + relativedelta(years=5)
+        elif str(before_string) in dates[0]:
             self.not_before = self.earliest
             self.not_after = self._parse_date(dates[0].replace(str(before_string), ''), 'lower') - timedelta(days=1)
         elif str(after_string) in dates[0]:
@@ -137,12 +157,13 @@ class Period(DocumentationStatusMixin):
         prefix_pipe_string = '|'.join(str(_(prefix)) for prefix in PERIOD_CODES)
         month_pipe_string = '|'.join(str(_(month)) for month in MONTHS)
         decade_suffix = _('ies')
-        century_suffix = _('century')
+        century_suffix = '|'.join([str(_('century')) + '.?', str(_('ct')) + '.?'])
 
+        self.unknown_decade_pattern = re.compile(rf'^\d{{0,2}}.?\d{{0,2}}.?\d{{2}}\?\?$', re.IGNORECASE)
         self.month_pattern = re.compile(rf'^({prefix_pipe_string})\s+({month_pipe_string})\s+(\d{{4}})$', re.IGNORECASE)
         self.year_pattern = re.compile(rf'^({prefix_pipe_string})\s+(\d{{4}})(/\d{{2}})?$', re.IGNORECASE)
         self.decade_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{3}}0){decade_suffix}$', re.IGNORECASE)
-        self.century_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{2}}).?\s*{century_suffix}.?$', re.IGNORECASE)
+        self.century_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{2}}).?\s*({century_suffix})$', re.IGNORECASE)
 
         self.earliest = date(
                 settings.EDWOCA_FIXED_DATES['birth']['year'],
@@ -197,6 +218,13 @@ class Period(DocumentationStatusMixin):
                     day = monthrange(year, month)[1]
             return date(year, month, day)
 
+        unknown_decade_match = self.unknown_decade_pattern.match(date_string)
+
+        if unknown_decade_match:
+            if bound == 'upper':
+                return self.latest
+            return self.earliest
+
         decade_match = self.decade_pattern.match(date_string)
 
         if decade_match:
@@ -225,7 +253,7 @@ class Period(DocumentationStatusMixin):
         century_match = self.century_pattern.match(date_string)
 
         if century_match:
-            year -= 100
+            year = int(century_match.group(2)) * 100 - 100
             if century_match.group(1):
                 prefix = resolve_period(century_match.group(1))
                 if bound=='lower':
