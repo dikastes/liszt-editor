@@ -434,6 +434,10 @@ class ManifestationClassificationForm(ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.instance.is_singleton:
+            self.fields['manifestation_form'].choices = [
+                    (None, BLANK_CHOICE_DASH),
+                    (Manifestation.ManifestationForm.SKETCH.value, Manifestation.ManifestationForm.SKETCH.label)
+                ]
             self.fields['source_type'].choices = [
                     (None, BLANK_CHOICE_DASH),
                     (Manifestation.SourceType.TRANSCRIPT.value, Manifestation.SourceType.TRANSCRIPT.label),
@@ -443,6 +447,10 @@ class ManifestationClassificationForm(ModelForm):
                 ]
             self.initial.update({'is_incomplete': self.instance.get_single_item().is_incomplete})
         else:
+            self.fields['manifestation_form'].choices = [
+                    (None, BLANK_CHOICE_DASH),
+                    (Manifestation.ManifestationForm.PROOF.value, Manifestation.ManifestationForm.PROOF.label)
+                ]
             self.fields['source_type'].choices = [
                     (None, BLANK_CHOICE_DASH),
                     (Manifestation.SourceType.PRINT.value, Manifestation.SourceType.PRINT.label),
@@ -597,27 +605,15 @@ class ManifestationCreateForm(forms.Form):
     def as_daisy(self):
         form = div(cls='mb-10')
 
-        # Temporary Title
-        if self.is_collection:
-            source_title_field = self['source_title']
-            source_title_container = label(cls='form-control w-full')
-            source_title_label = div(cls='label')
-            source_title_label.add(span(source_title_field.label + '*', cls='label-text'))
-            source_title_container.add(source_title_label)
-            source_title_container.add(raw(str(source_title_field)))
-            if source_title_field.errors:
-                source_title_container.add(div(span(source_title_field.errors, cls='text-primary text-sm'), cls='label'))
-            form.add(source_title_container)
-        else:
-            temporary_title_field = self['temporary_title']
-            temporary_title_container = label(cls='form-control w-full')
-            temporary_title_label = div(cls='label')
-            temporary_title_label.add(span(temporary_title_field.label + '*', cls='label-text'))
-            temporary_title_container.add(temporary_title_label)
-            temporary_title_container.add(raw(str(temporary_title_field)))
-            if temporary_title_field.errors:
-                temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
-            form.add(temporary_title_container)
+        temporary_title_field = self['temporary_title']
+        temporary_title_container = label(cls='form-control w-full')
+        temporary_title_label = div(cls='label')
+        temporary_title_label.add(span(temporary_title_field.label + '*', cls='label-text'))
+        temporary_title_container.add(temporary_title_label)
+        temporary_title_container.add(raw(str(temporary_title_field)))
+        if temporary_title_field.errors:
+            temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
+        form.add(temporary_title_container)
 
         publisher_wrapper = div(cls='w-full relative')
         publisher_wrapper.add(raw(str(self['publisher'])))

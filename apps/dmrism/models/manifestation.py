@@ -31,7 +31,8 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        PROOF = 'PR', _('manuscript proof'),
+        PROOF = 'PR', _('proof'),
+        SKETCH = 'SK', _('sketch')
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
