@@ -608,7 +608,7 @@ class ManifestationCreateForm(forms.Form):
         temporary_title_field = self['temporary_title']
         temporary_title_container = label(cls='form-control w-full')
         temporary_title_label = div(cls='label')
-        temporary_title_label.add(span(temporary_title_field.label + '*', cls='label-text'))
+        temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
         temporary_title_container.add(temporary_title_label)
         temporary_title_container.add(raw(str(temporary_title_field)))
         if temporary_title_field.errors:
@@ -682,13 +682,13 @@ class SingletonCreateForm(forms.ModelForm):
             ]
 
     working_title = forms.CharField(
-            label = _('working title') + '*',
+            label = _('working title'),
             max_length = 255,
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
         )
     source_title = forms.CharField(
-            label = _('source title') + '*',
+            label = _('source title'),
             max_length = 255,
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
@@ -701,7 +701,7 @@ class SingletonCreateForm(forms.ModelForm):
         #)
     library = forms.ModelChoiceField(
             queryset = Library.objects.all(),
-            label = _('holding institution') + '*',
+            label = _('holding institution'),
             empty_label = _('choose library'),
             widget = Select(attrs={'class': SimpleFormMixin.select_classes})
         )

@@ -310,7 +310,7 @@ class TrackedModel(TimestampedModel):
         )
 
     def mark_needs_review(self, title):
-        needs_review_string = '!'
+        needs_review_string = '! '
         if self.needs_review:
             return needs_review_string + title
         return title
