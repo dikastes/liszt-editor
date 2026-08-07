@@ -434,6 +434,7 @@ class ManifestationClassificationForm(ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.instance.is_singleton:
+            self.initial.update({'is_incomplete': self.instance.items.first().is_incomplete})
             self.fields['manifestation_form'].choices = [
                     (None, BLANK_CHOICE_DASH),
                     (Manifestation.ManifestationForm.SKETCH.value, Manifestation.ManifestationForm.SKETCH.label)
