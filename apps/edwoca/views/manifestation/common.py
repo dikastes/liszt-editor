@@ -427,7 +427,10 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
             found_collections = (collection_search_form
                     .search()
                     .models(Manifestation)
-                    .filter(may_have_component = True)
+                    .filter(
+                            may_have_component = True,
+                            is_singleton = self.object.is_singleton
+                        )
                 )
             if self.object.is_collection:
                 found_collections = found_collections.filter(is_collection = True)
