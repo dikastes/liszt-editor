@@ -853,12 +853,13 @@ def manifestation_classification(request, pk):
 
     if request.method == 'POST':
         forms = []
-        manifestation_form = ManifestationClassificationForm(request.POST, instance = manifestation)
-        forms += [manifestation_form]
 
         if manifestation.is_singleton:
             item_form = FunctionForm(request.POST, instance = item)
             forms += [item_form]
+
+        manifestation_form = ManifestationClassificationForm(request.POST, instance = manifestation)
+        forms += [manifestation_form]
 
         if all(f.is_valid() for f in forms):
             for f in forms:

@@ -344,7 +344,7 @@ msgstr "Plattendruck"
 
 #: models/manifestation.py:39
 msgid "Lithograph"
-msgstr "Lithograph"
+msgstr "Lithographie"
 
 #: models/manifestation.py:47
 msgid "first issue"

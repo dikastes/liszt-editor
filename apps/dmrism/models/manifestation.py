@@ -411,7 +411,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             ])
 
     def render_title_suffix(self):
-        return f'({self.get_source_type_display()})'
+        if self.source_type:
+            return f'({self.get_source_type_display()})'
+        return ''
 
     def standardized_search_entry(self):
         return self.render_title()

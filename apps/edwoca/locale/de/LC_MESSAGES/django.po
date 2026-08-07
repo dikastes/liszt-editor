@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-03 16:21+0200\n"
+"POT-Creation-Date: 2026-08-07 11:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -823,7 +823,28 @@ msgstr "Digitalisat hinzufügen"
 msgid "work relations"
 msgstr "Werkbezüge"
 
-#: templates/edwoca/library_update.html:8 templates/edwoca/list.html:166
+#: templates/edwoca/library_list.html:16 templates/edwoca/list.html:105
+msgid "page"
+msgstr "Seite"
+
+#: templates/edwoca/library_list.html:16 templates/edwoca/library_list.html:38
+#: templates/edwoca/list.html:105 templates/edwoca/list.html:127
+msgid "of"
+msgstr "von"
+
+#: templates/edwoca/library_list.html:34 templates/edwoca/list.html:123
+msgid "result"
+msgstr "Ergebnis"
+
+#: templates/edwoca/library_list.html:36 templates/edwoca/list.html:125
+msgid "to"
+msgstr "bis"
+
+#: templates/edwoca/library_list.html:41 templates/edwoca/list.html:130
+msgid "for query"
+msgstr "für Suche nach"
+
+#: templates/edwoca/library_update.html:8 templates/edwoca/list.html:164
 #: templates/edwoca/manifestation_update.html:141
 #: templatetags/entity_labels.py:18
 msgid "library"
@@ -843,11 +864,13 @@ msgstr "Fassungen"
 
 #: templates/edwoca/list.html:32
 #: templates/edwoca/manifestation_relations.html:339
+#: templates/edwoca/partials/library/library_menu.html:17
 msgid "manuscripts"
 msgstr "Handschriften"
 
 #: templates/edwoca/list.html:42
 #: templates/edwoca/manifestation_relations.html:448
+#: templates/edwoca/partials/library/library_menu.html:25
 msgid "prints"
 msgstr "Drucke"
 
@@ -860,59 +883,39 @@ msgstr "Druckexemplare"
 msgid "libraries"
 msgstr "Bibliotheken"
 
-#: templates/edwoca/list.html:106
-msgid "page"
-msgstr "Seite"
-
-#: templates/edwoca/list.html:106 templates/edwoca/list.html:128
-msgid "of"
-msgstr "von"
-
-#: templates/edwoca/list.html:124
-msgid "result"
-msgstr "Ergebnis"
-
-#: templates/edwoca/list.html:126
-msgid "to"
-msgstr "bis"
-
-#: templates/edwoca/list.html:131
-msgid "for query"
-msgstr "für Suche nach"
-
-#: templates/edwoca/list.html:143
+#: templates/edwoca/list.html:141
 msgid "create"
 msgstr "neu"
 
-#: templates/edwoca/list.html:148
+#: templates/edwoca/list.html:146
 #: templates/edwoca/partials/forms/_modification_form.html:43
 #: templates/edwoca/partials/forms/_modification_form.html:61
 #: templatetags/entity_labels.py:13
 msgid "work"
 msgstr "Werk"
 
-#: templates/edwoca/list.html:151 templates/edwoca/manifestation_update.html:15
+#: templates/edwoca/list.html:149 templates/edwoca/manifestation_update.html:15
 msgid "manuscript"
 msgstr "Handschrift"
 
-#: templates/edwoca/list.html:154
+#: templates/edwoca/list.html:152
 msgid "manuscript collection"
 msgstr "Handschrift (Sammlung)"
 
-#: templates/edwoca/list.html:157
+#: templates/edwoca/list.html:155
 #: templates/edwoca/manifestation_update.html:127
 msgid "print"
 msgstr "Druck"
 
-#: templates/edwoca/list.html:160
+#: templates/edwoca/list.html:158
 msgid "print collection"
 msgstr "Druck (Sammlung)"
 
-#: templates/edwoca/list.html:163
+#: templates/edwoca/list.html:161
 msgid "composite"
 msgstr "Konvolut"
 
-#: templates/edwoca/list.html:169 templatetags/entity_labels.py:19
+#: templates/edwoca/list.html:167 templatetags/entity_labels.py:19
 msgid "letter"
 msgstr "Brief"
 
@@ -1291,6 +1294,7 @@ msgstr "Aufführungen"
 
 #: templates/edwoca/partials/expression/expression_menu.html:79
 #: templates/edwoca/partials/item/item_menu.html:89
+#: templates/edwoca/partials/library/library_menu.html:35
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:115
 #: templates/edwoca/partials/work/work_menu.html:65
 msgid "delete"
@@ -1298,6 +1302,7 @@ msgstr "löschen"
 
 #: templates/edwoca/partials/expression/expression_menu.html:84
 #: templates/edwoca/partials/item/item_menu.html:94
+#: templates/edwoca/partials/library/library_menu.html:40
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:121
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:127
 #: templates/edwoca/partials/work/work_menu.html:70
@@ -1379,6 +1384,10 @@ msgstr "Datierung und Ort"
 #: templates/edwoca/partials/manifestation/manifestation_menu.html:72
 msgid "provenance"
 msgstr "Provenienz"
+
+#: templates/edwoca/partials/library/library_menu.html:9
+msgid "data"
+msgstr "Daten"
 
 #: templates/edwoca/partials/manifestation/collection_part_list.html:17
 #: templates/edwoca/partials/manifestation/collection_part_list.html:51

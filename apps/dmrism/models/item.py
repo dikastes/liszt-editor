@@ -188,7 +188,7 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
 
     @property
     def title_prefix(self):
-        return self.get_current_signature()
+        return self.mark_needs_review(self.get_current_signature())
 
     def render_title(self):
         return ' '.join([
@@ -290,6 +290,10 @@ class Library(models.Model):
             blank = True,
             verbose_name = _('corporation')
         )
+
+    @property
+    def title_body(self):
+        return self.name
 
     def get_absolute_url(self):
         return reverse('edwoca:library_update', kwargs = {'pk' : self.id})
