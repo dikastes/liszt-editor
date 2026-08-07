@@ -653,6 +653,44 @@ class LibraryListView(EdwocaListView):
     model = Library
 
 
+class LibraryManuscriptsView(EdwocaListView):
+    model = Manifestation
+    template_name = 'edwoca/library_list.html'
+
+    def get_queryset(self):
+        self.library = get_object_or_404(Library, pk=self.kwargs['pk'])
+
+        return Manifestation.objects.filter(
+                is_singleton = True,
+                items__signatures__library = self.library
+            ).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = self.library
+        context['entity_type'] = 'library'
+        return context
+
+
+class LibraryPrintsView(EdwocaListView):
+    model = Item
+    template_name = 'edwoca/library_list.html'
+
+    def get_queryset(self):
+        self.library = get_object_or_404(Library, pk=self.kwargs['pk'])
+
+        return Manifestation.objects.filter(
+                is_singleton = False,
+                items__signatures__library = self.library
+            ).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = self.library
+        context['entity_type'] = 'library'
+        return context
+
+
 class LibrarySearchView(EdwocaSearchView):
     model = Library
 

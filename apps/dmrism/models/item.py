@@ -291,6 +291,10 @@ class Library(models.Model):
             verbose_name = _('corporation')
         )
 
+    @property
+    def title_body(self):
+        return self.name
+
     def get_absolute_url(self):
         return reverse('edwoca:library_update', kwargs = {'pk' : self.id})
 
