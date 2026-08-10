@@ -475,7 +475,7 @@
     {% endif %}
 </ul>
 
-{% if not object.items.count %}
+{% if not object.items.count and not object.is_collection %}
     <span class="text-xs xl:text-sm text-primary">
         {% translate 'no items' %}
     </span>

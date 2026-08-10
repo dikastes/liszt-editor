@@ -163,6 +163,10 @@ class Letter(TrackedModel):
         return reverse('edwoca:letter_update', kwargs={'pk': self.id})
 
     def __str__(self):
+        return self.title_body
+
+    @property
+    def title_body(self):
         unknown = _('unknown')
         to = _('writing to')
         etal = ' ' + _('et al.')

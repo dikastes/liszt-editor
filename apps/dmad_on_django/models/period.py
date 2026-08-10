@@ -117,6 +117,10 @@ class Period(DocumentationStatusMixin):
             dates = [ date.strip() for date in display_value.split('-') ]
             if len(dates[1]) == 2:
                 dates[1] = dates[0][:2] + dates[1]
+        elif '–' in display_value:
+            dates = [ date.strip() for date in display_value.split('–') ]
+            if len(dates[1]) == 2:
+                dates[1] = dates[0][:2] + dates[1]
         elif str(_('and')) in display_value:
             dates = [ date.strip() for date in display_value.split(str(_('and'))) ]
         else:
