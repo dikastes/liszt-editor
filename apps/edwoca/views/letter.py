@@ -9,6 +9,11 @@ from ..forms.letter import *
 class LetterListView(EdwocaListView):
     model = Letter
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('letters')
+        return context
+
 
 class LetterSearchView(EdwocaSearchView):
     model = Letter

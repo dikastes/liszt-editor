@@ -43,6 +43,11 @@ class ManifestationListView(EdwocaListView):
     def get_queryset(self):
         return super().get_queryset().filter(is_singleton = False)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('prints')
+        return context
+
 
 class ManifestationSearchView(EdwocaSearchView):
     model = EdwocaManifestation
@@ -61,6 +66,7 @@ class SingletonListView(EdwocaListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list_entity_type'] = 'singleton'
+        context['page_title'] = _('manuscripts')
         return context
 
 

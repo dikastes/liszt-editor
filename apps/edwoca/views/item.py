@@ -6,6 +6,7 @@ from ..forms.dedication import ItemPersonDedicationForm, ItemCorporationDedicati
 from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy, reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
@@ -43,6 +44,11 @@ class ItemListView(EdwocaListView):
 
     def get_queryset(self):
         return super().get_queryset().filter(manifestation__is_singleton = False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('items')
+        return context
 
 
 class ItemSearchView(EdwocaSearchView):
@@ -651,6 +657,11 @@ class ItemDeleteView(EntityMixin, DeleteView):
 
 class LibraryListView(EdwocaListView):
     model = Library
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('libraries')
+        return context
 
 
 class LibraryManuscriptsView(EdwocaListView):

@@ -1,32 +1,36 @@
 {% extends 'liszt_util/base.html' %}
 
+{% block page_title %}
+    DMRism
+{% endblock %}
+
 {% block menu %}
 {% endblock %}
 
 {% block content %}
 
     <div class="bg-white border border-base-300 p-5">
-	<h2 class="card-title mt-0"> {{ view_title }} </h2>
+        <h2 class="card-title mt-0"> {{ view_title }} </h2>
 
-	<form method="post">
-	    {% csrf_token %}
-	    {{ form.as_daisy }}
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_daisy }}
 
-	    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
-	</form>
+            <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+        </form>
     </div>
 
     {% if show_preview %}
-	<div class="border border-base-300 bg-base-200 p-5 w-full mb-5">
-	    {% include 'rism/partials/preview.html' %}
-	</div>
+        <div class="border border-base-300 bg-base-200 p-5 w-full mb-5">
+            {% include 'rism/partials/preview.html' %}
+        </div>
     {% endif %}
 
 {% endblock %}
 
 {% block navbar_extras %}
     {% if object %}
-	<div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">M-{{ object.id }}</div>
+        <div class="badge badge-primary min-h-inherit p-5 rounded-none border-r-0 text-xl font-bold">M-{{ object.id }}</div>
     {% endif %}
 {% endblock %}
 
@@ -36,10 +40,10 @@
 
 {% block nav %}
 <div class="flex flex-col h-full">
-	<div class="flex-1">
-	</div>
-	<div class="flex-0">
-	    <label for="submit-form" class="btn btn-primary"> speichern </label>
-	</div>
+        <div class="flex-1">
+        </div>
+        <div class="flex-0">
+            <label for="submit-form" class="btn btn-primary"> speichern </label>
+        </div>
 </div>
 {% endblock %}
