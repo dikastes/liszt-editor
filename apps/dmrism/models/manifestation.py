@@ -772,6 +772,7 @@ class RelatedManifestation(RelatedEntity):
         STITCH_TEMPLATE = 'SD', _('is stitch template (as documented)')
         STITCH_TEMPLATE_INFERRED = 'SI', _('is stitch template (inferred)')
         RELATED = 'R', _('is related to')
+        REVISION = 'RV', _('is revision of')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',

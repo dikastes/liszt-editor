@@ -296,6 +296,9 @@
                 {% if manifestation_relation.label == 'R' %}
                     {% translate 'this object is related to' %}
                 {% endif %}
+                {% if manifestation_relation.label == 'RV' %}
+                    {% translate 'this object has as revision' %}
+                {% endif %}
                 {% if manifestation_relation.label == 'SD' %}
                     {% translate 'this object has as stitch template (as documented)' %}
                 {% endif %}
@@ -388,6 +391,9 @@
                 {% if manifestation_relation.label == 'R' %}
                     {% translate 'this object is related to' %}
                 {% endif %}
+                {% if manifestation_relation.label == 'RV' %}
+                    {% translate 'this object is revision of' %}
+                {% endif %}
                 {% if manifestation_relation.label == 'SD' %}
                     {% translate 'this object is stitch template (as documented) of' %}
                 {% endif %}
@@ -476,6 +482,19 @@
                                     <input type="hidden" name="manifestation-link-type" value="stitch_template_inferred" />
                                     <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
                                     <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is stitch template (inferred)' %}" />
+                                </form>
+                            {% else %}
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="manifestation-link-type" value="revision" />
+                                    <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is revision of' %}" />
+                                </form>
+                                <form method="post" class="flex-0">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="manifestation-link-type" value="revision" />
+                                    <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'has as revision' %}" />
                                 </form>
                             {% endif %}
                         </div>
