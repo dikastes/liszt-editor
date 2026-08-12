@@ -16,6 +16,7 @@ from liszt_util.models import Sortable
 
 
 class TitleTypes(models.TextChoices):
+    ELSE = 'EL', _('other title position')
     HEAD_TITLE = 'HT', _('Head Title')
     TITLE_PAGE = 'TP', _('Title Page')
     ENVELOPE = 'EN', _('Envelope')
