@@ -139,7 +139,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             max_length = 10,
             choices = Edition,
             default = Edition.FOLLOWING_EDITION,
-            verbose_name = _('edition')
+            verbose_name = _('edition'),
+            null = True,
+            blank = True
         )
     state = models.CharField(
             max_length = 10,
