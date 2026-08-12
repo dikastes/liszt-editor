@@ -20,7 +20,7 @@
     {% translate 'parent references' %}
 </h2>
 
-{% if object.part_of or object.is_collection or object.component_of and object.component_of.is_collection %}
+{% if object.is_collection %}
     <h3 class="my-5">
         {% translate 'collection' %}
     </h3>
@@ -65,10 +65,6 @@
 {% endif %}
 
 {% if object.component_of and not object.component_of.is_collection %}
-    <h3 class="my-5">
-        {% translate 'component of part' %}
-    </h3>
-
     <p>
         {% translate 'this object is component of' %}
         <a class="font-bold" href="{% url 'edwoca:manifestation_relations' object.component_of.id %}">
@@ -210,9 +206,6 @@
 {% endif %}
 
 {% if object.part_of %}
-    <h3 class="my-5">
-        {% translate 'components' %}
-    </h3>
 
     {% comment %} hier eigenes feld part_components? {% endcomment %}
     {% if object.collection_components.all %}

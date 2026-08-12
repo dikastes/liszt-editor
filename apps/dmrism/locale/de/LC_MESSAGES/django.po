@@ -88,7 +88,7 @@ msgstr "Relation"
 
 #: models/base.py:181
 msgid "medium"
-msgstr "Schreibstoff"
+msgstr "Schreibmittel"
 
 #: models/base.py:185
 msgid "dubious writer"

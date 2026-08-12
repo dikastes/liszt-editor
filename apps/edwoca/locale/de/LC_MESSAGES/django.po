@@ -1061,7 +1061,7 @@ msgstr "Dieses Objekt ist Teil von (separiert)"
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:60
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:82
 msgid "remove collection"
-msgstr "Aus Sammlung entfernen"
+msgstr "Aus Überordnung entfernen"
 
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:51
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:73
