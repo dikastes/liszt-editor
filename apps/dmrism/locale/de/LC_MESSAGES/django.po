@@ -520,7 +520,7 @@ msgstr "Teilausgabe"
 
 #: models/manifestation.py:405
 msgid "empty"
-msgstr "[leer]"
+msgstr "[ohne Titel]"
 
 #: models/manifestation.py:425
 msgid "coll"
