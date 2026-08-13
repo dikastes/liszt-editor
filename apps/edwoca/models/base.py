@@ -215,6 +215,14 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             dubious_writer = handwriting.dubious_writer
                         )
 
+            for handwriting in self.get_single_item().handwritings.all():
+                ItemHandwriting.objects.create(
+                        item = single_item_copy,
+                        writer = handwriting.writer,
+                        medium = handwriting.medium,
+                        dubious_writer = handwriting.dubious_writer
+                )
+
         for title in self.titles.all():
             title_copy = ManifestationTitle.objects.create(
                     title = title.title,
@@ -228,14 +236,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         medium = handwriting.medium,
                         dubious_writer = handwriting.dubious_writer
                     )
-
-            for handwriting in self.get_single_item().handwritings.all():
-                ItemHandwriting.objects.create(
-                        item = single_item_copy,
-                        writer = handwriting.writer,
-                        medium = handwriting.medium,
-                        dubious_writer = handwriting.dubious_writer
-                )
 
         for related_manifestation in self.target_manifestation_of.all():
             RelatedManifestation.objects.create(

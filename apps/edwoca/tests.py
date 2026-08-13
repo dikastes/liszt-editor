@@ -40,9 +40,24 @@ class CollectionRelationsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class ManifestationCopyTest(TestCase):
+class PrintCopyTest(TestCase):
 
-    def test_manifestation_copy_workflow(self):
+    def test_print_copy_workflow(self):
+        copy_title = 'test_copy_workflow_title'
+        copied_title = f'{_("copy of")} {copy_title}'
+        m = Manifestation.objects.create(working_title = copy_title)
+
+        url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
+
+
+class ManuscriptCopyTest(TestCase):
+
+    def test_manuscript_copy_workflow(self):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
         m = Manifestation.objects.create(is_singleton = True, working_title = copy_title)
