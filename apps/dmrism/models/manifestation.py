@@ -703,7 +703,6 @@ class PublicationPlace(DocumentationStatusMixin, models.Model):
         )
 
 
-
 class ManifestationPlace(models.Model):
     manifestation = models.ForeignKey(
             'Manifestation',
