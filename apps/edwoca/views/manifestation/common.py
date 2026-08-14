@@ -20,6 +20,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
+from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
@@ -937,17 +938,22 @@ def manifestation_provenance(request, pk):
         pp_stations = construct_ps_set('person', request.POST)
         cp_stations = construct_ps_set('corporation', request.POST)
 
+        open_ps_params = {}
         for ps_class in ['person', 'corporation']:
             ps_key = f'add-{ps_class}-provenance-station'
             if ps_key in request.POST:
                 period = Period.objects.create()
-                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item, period = period)
+                new_station = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item, period = period)
+                open_ps_params['open_ps_type'] = ps_class
+                open_ps_params['open_ps'] = new_station.pk
             webref_key = f'add-{ps_class}-provenance-webref'
             if webref_key in request.POST:
                 station_id = request.POST.get(webref_key)
                 station = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = station_id)
                 creation_kwargs = { f'{ps_class}_provenance_station': station }
                 getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStationWebReference').objects.create(**creation_kwargs)
+                open_ps_params['open_ps_type'] = ps_class
+                open_ps_params['open_ps'] = station.pk
 
         pps_forms = []
         pps_bib_forms = []
@@ -1051,7 +1057,10 @@ def manifestation_provenance(request, pk):
                 ps.period.not_after = None
                 ps.period.save()
 
-        return redirect('edwoca:manifestation_provenance', pk=pk)
+        base_url = reverse_lazy('edwoca:manifestation_provenance', pk=pk)
+        url_params = urlencode(open_ps_params)
+
+        return redirect(f'{base_url}?{url_params}')
     else:
         pp_stations = construct_ps_set('person')
         cp_stations = construct_ps_set('corporation')
@@ -1059,6 +1068,8 @@ def manifestation_provenance(request, pk):
 
         context['pp_stations'] = pp_stations
         context['cp_stations'] = cp_stations
+        context['open_ps'] = int(request.GET.get('open_ps', '-1'))
+        context['open_ps_type'] = request.GET.get('open_ps_type', '')
         context['form'] = provenance_comment_form
         return render(request, 'edwoca/provenance.html', context)
 
