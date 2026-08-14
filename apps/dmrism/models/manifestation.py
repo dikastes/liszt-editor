@@ -16,6 +16,7 @@ from liszt_util.models import Sortable
 
 
 class TitleTypes(models.TextChoices):
+    ELSE = 'EL', _('other title position')
     HEAD_TITLE = 'HT', _('Head Title')
     TITLE_PAGE = 'TP', _('Title Page')
     ENVELOPE = 'EN', _('Envelope')
@@ -138,7 +139,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             max_length = 10,
             choices = Edition,
             default = Edition.FOLLOWING_EDITION,
-            verbose_name = _('edition')
+            verbose_name = _('edition'),
+            null = True,
+            blank = True
         )
     state = models.CharField(
             max_length = 10,
@@ -700,7 +703,6 @@ class PublicationPlace(DocumentationStatusMixin, models.Model):
         )
 
 
-
 class ManifestationPlace(models.Model):
     manifestation = models.ForeignKey(
             'Manifestation',
@@ -772,6 +774,7 @@ class RelatedManifestation(RelatedEntity):
         STITCH_TEMPLATE = 'SD', _('is stitch template (as documented)')
         STITCH_TEMPLATE_INFERRED = 'SI', _('is stitch template (inferred)')
         RELATED = 'R', _('is related to')
+        REVISION = 'RV', _('is revision of')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',

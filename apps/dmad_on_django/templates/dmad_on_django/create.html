@@ -1,5 +1,12 @@
 {% extends 'liszt_util/base.html' %}
 {% load static %}
+{% load i18n %}
+
+{% block page_title %}
+    {% translate 'create dataset' %}
+    |
+    DMAd
+{% endblock %}
 
 {% block content %}
 
@@ -7,35 +14,35 @@
     <h2 class="prose"> {{ view_title }} </h2>
 
     <div class="bg-white p-5 border my-5 border-base-300">
-	<div class="prose">
-	    <h3>GND durchsuchen</h3>
-	    <input class="input input-bordered" id="gnd-search" />
-	    <ul class="list-disc h-64 text-sm" id="gnd-search-results">
-		<li> <em> bitte Suchbegriff eingeben </em> </li>
-	    </ul>
-	</div>
+        <div class="prose">
+            <h3>GND durchsuchen</h3>
+            <input class="input input-bordered" id="gnd-search" />
+            <ul class="list-disc h-64 text-sm" id="gnd-search-results">
+                <li> <em> bitte Suchbegriff eingeben </em> </li>
+            </ul>
+        </div>
     </div>
 
     <div class="bg-white p-5 border border-base-300">
-	<div class="prose">
-	    <h3> Informationen </h3>
-	    <form method="post">
-		{% csrf_token %}
-		{{ form.as_daisy }}
-		<input type="submit" id="submit-form" class="hidden" value="{{ button_label }}" class="btn btn-primary my-5">
-	    </form>
-	</div>
+        <div class="prose">
+            <h3> Informationen </h3>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_daisy }}
+                <input type="submit" id="submit-form" class="hidden" value="{{ button_label }}" class="btn btn-primary my-5">
+            </form>
+        </div>
     </div>
 </div>
 
 <script src="{% static 'dmad_on_django/search_gnd.js' %}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', _ => {
-	dmadOnDjangoSearchGnd.init({
-	    'target': 'gnd-search-results',
-	    'input': 'gnd-search',
-	    'entityType': '{{ entity_type }}'
-	});
+        dmadOnDjangoSearchGnd.init({
+            'target': 'gnd-search-results',
+            'input': 'gnd-search',
+            'entityType': '{{ entity_type }}'
+        });
     });
 </script>
 {% endblock %}
@@ -43,15 +50,14 @@
 <div class="flex-0 flex flex-col h-full">
     <div class="flex-1"></div>
     <ul class="menu gap-5 flex-0">
-	<li>
-	    <label class="btn btn-primary" for="submit-form"> speichern </label>
-	</li>
-	<li>
-		<a href="{% url 'dmad_on_django:'|add:entity_type|add:'_list' %}" class="btn btn-primary">
-			Abbrechen
-		</a>
-		
-	</li>
+        <li>
+            <label class="btn btn-primary" for="submit-form"> speichern </label>
+        </li>
+        <li>
+                <a href="{% url 'dmad_on_django:'|add:entity_type|add:'_list' %}" class="btn btn-primary">
+                        Abbrechen
+                </a>
+        </li>
     </ul>
 </div>
 {% endblock %}

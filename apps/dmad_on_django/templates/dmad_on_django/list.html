@@ -3,6 +3,26 @@
 {% load i18n %}
 {% load static %}
 
+{% block page_title %}
+    {% if active == 'person' %}
+        {% translate 'persons' %}
+    {% endif %}
+    {% if active == 'place' %}
+        {% translate 'places' %}
+    {% endif %}
+    {% if active == 'work' %}
+        {% translate 'works' %}
+    {% endif %}
+    {% if active == 'subject_term' %}
+        {% translate 'subject terms' %}
+    {% endif %}
+    {% if active == 'corporation' %}
+        {% translate 'corporations' %}
+    {% endif %}
+    |
+    DMAd
+{% endblock %}
+
 {% block content %}
 
 <div class="bg-white p-5 w-full overflow-auto">

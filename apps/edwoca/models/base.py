@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace, PublicationPlace
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -215,6 +215,27 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             dubious_writer = handwriting.dubious_writer
                         )
 
+            for handwriting in self.get_single_item().handwritings.all():
+                ItemHandwriting.objects.create(
+                        item = single_item_copy,
+                        writer = handwriting.writer,
+                        medium = handwriting.medium,
+                        dubious_writer = handwriting.dubious_writer
+                )
+
+        for publication in self.publications.all():
+            publication_copy = Publication.objects.create(
+                    manifestation = copy,
+                    publisher = publication.publisher
+                )
+            for publication_place in publication.place_relations.all():
+                PublicationPlace.objects.create(
+                        place = publication_place.place,
+                        publication = publication_copy,
+                        inferred = publication_place.inferred,
+                        assumed = publication_place.assumed
+                    )
+
         for title in self.titles.all():
             title_copy = ManifestationTitle.objects.create(
                     title = title.title,
@@ -228,14 +249,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         medium = handwriting.medium,
                         dubious_writer = handwriting.dubious_writer
                     )
-
-            for handwriting in self.get_single_item().handwritings.all():
-                ItemHandwriting.objects.create(
-                        item = single_item_copy,
-                        writer = handwriting.writer,
-                        medium = handwriting.medium,
-                        dubious_writer = handwriting.dubious_writer
-                )
 
         for related_manifestation in self.target_manifestation_of.all():
             RelatedManifestation.objects.create(

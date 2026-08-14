@@ -1,7 +1,8 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from dmad_on_django.models import Status, Language, Person, Place
+from dmad_on_django.models import Status, Language, Person, Place, Corporation
+from dmrism.models import Publication, PublicationPlace
 from .models import Manifestation, Item, Library
 from xml.etree import ElementTree as ET
 
@@ -40,9 +41,29 @@ class CollectionRelationsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class ManifestationCopyTest(TestCase):
+class PrintCopyTest(TestCase):
 
-    def test_manifestation_copy_workflow(self):
+    def test_print_copy_workflow(self):
+        copy_title = 'test_copy_workflow_title'
+        copied_title = f'{_("copy of")} {copy_title}'
+        publisher = Corporation.objects.create()
+        m = Manifestation.objects.create(working_title = copy_title)
+        publication = Publication.objects.create(manifestation = m, publisher = publisher)
+
+        url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
+
+        copied_publisher = Manifestation.objects.filter(working_title=copied_title).first().publications.first().publisher
+        self.assertEqual(publisher, copied_publisher)
+
+
+class ManuscriptCopyTest(TestCase):
+
+    def test_manuscript_copy_workflow(self):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
         m = Manifestation.objects.create(is_singleton = True, working_title = copy_title)

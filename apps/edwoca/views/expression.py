@@ -5,6 +5,7 @@ from ..forms.expression import *
 from django.forms.models import formset_factory
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DeleteView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
@@ -20,6 +21,11 @@ class ExpressionDetailView(EntityMixin, DetailView):
 
 class ExpressionListView(EdwocaListView):
     model = Expression
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('expressions')
+        return context
 
 
 class ExpressionSearchView(EdwocaSearchView):
