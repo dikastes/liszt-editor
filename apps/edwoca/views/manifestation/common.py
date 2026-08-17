@@ -1057,7 +1057,7 @@ def manifestation_provenance(request, pk):
                 ps.period.not_after = None
                 ps.period.save()
 
-        base_url = reverse_lazy('edwoca:manifestation_provenance', pk=pk)
+        base_url = reverse_lazy('edwoca:manifestation_provenance', kwargs={'pk':pk})
         url_params = urlencode(open_ps_params)
 
         return redirect(f'{base_url}?{url_params}')
