@@ -178,7 +178,8 @@ class EdwocaSearchView(SearchView):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        return qs.models(getattr(edwoca_models, self.get_model_name()))
+        return (qs.models(getattr(edwoca_models, self.get_model_name()))
+                .order_by('id'))
 
 
 class SimpleFormView(EntityMixin, UpdateView):
