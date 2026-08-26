@@ -212,6 +212,11 @@ class ReferenceSubjectTermRemoveView(DeleteView):
 class WorkSearchView(EdwocaSearchView):
     model = Work
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('works')
+        return context
+
 
 class WorkContributorsUpdateView(EntityMixin, ContributorsUpdateView):
     model = Work

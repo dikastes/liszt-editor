@@ -58,6 +58,11 @@ class ItemSearchView(EdwocaSearchView):
     def get_queryset(self):
         return super().get_queryset().filter(manifestation_is_singleton = False)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('items')
+        return context
+
 
 def item_history(request, pk):
     pass
@@ -715,6 +720,11 @@ class LibraryPrintsView(EdwocaListView):
 
 class LibrarySearchView(EdwocaSearchView):
     model = Library
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('libraries')
+        return context
 
 
 class LibraryCreateView(CreateView):
