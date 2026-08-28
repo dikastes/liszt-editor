@@ -769,6 +769,8 @@ def item_manuscript_update(request, pk):
     }
 
     if request.method == 'POST':
+        open_collapse = {}
+
         remove_annotation_string = 'remove-annotation'
         if remove_annotation_string in request.POST:
             annotation_id = request.POST.get(remove_annotation_string)
@@ -785,12 +787,20 @@ def item_manuscript_update(request, pk):
         if remove_handwriting_string in request.POST:
             handwriting_id = request.POST.get(remove_handwriting_string)
             handwriting = AnnotationHandwriting.objects.get(pk = handwriting_id)
+            open_collapse = {
+                    'open_collapse': handwriting.annotation.id,
+                    'collapse_type': 'annotation'
+                }
             handwriting.delete()
 
         remove_handwriting_string = 'remove-modificationhandwriting'
         if remove_handwriting_string in request.POST:
             handwriting_id = request.POST.get(remove_handwriting_string)
             handwriting = ModificationHandwriting.objects.get(pk = handwriting_id)
+            open_collapse = {
+                    'open_collapse': handwriting.modification.id,
+                    'collapse_type': 'modification'
+                }
             handwriting.delete()
 
         form = ItemManuscriptForm(request.POST, instance=item)
@@ -840,26 +850,43 @@ def item_manuscript_update(request, pk):
                     handwriting_form.save()
 
         if 'add-modification' in request.POST:
-            ItemModification.objects.create(item=item)
+            modification = ItemModification.objects.create(item=item)
+            open_collapse = {
+                    'open_collapse': modification.id,
+                    'collapse_type': 'modification'
+                }
 
         if 'add-annotation' in request.POST:
-            Annotation.objects.create(item=item)
+            annotation = Annotation.objects.create(item=item)
+            open_collapse = {
+                    'open_collapse': annotation.id,
+                    'collapse_type': 'annotation'
+                }
 
         add_handwriting_string = 'add-annotation-handwriting'
         if add_handwriting_string in request.POST:
             annotation_id = request.POST.get(add_handwriting_string)
             annotation = get_object_or_404(Annotation, pk=annotation_id)
             AnnotationHandwriting.objects.create(annotation=annotation)
-            return redirect('edwoca:item_manuscript', pk=pk)
+            open_collapse = {
+                    'open_collapse': annotation.id,
+                    'collapse_type': 'annotation'
+                }
 
         add_handwriting_string = 'add-modification-handwriting'
         if add_handwriting_string in request.POST:
             modification_id = request.POST.get(add_handwriting_string)
             modification = get_object_or_404(ItemModification, pk=modification_id)
             ModificationHandwriting.objects.create(modification=modification)
-            return redirect('edwoca:item_manuscript', pk=pk)
+            open_collapse = {
+                    'open_collapse': modification.id,
+                    'collapse_type': 'modification'
+                }
 
-        return redirect('edwoca:item_manuscript', pk=pk)
+        base_url = reverse_lazy('edwoca:item_manuscript', kwargs={'pk': pk})
+        url_params = urlencode(open_collapse)
+
+        return redirect(f'{base_url}?{url_params}')
 
     else:
         form = ItemManuscriptForm(instance=item)
@@ -884,6 +911,8 @@ def item_manuscript_update(request, pk):
             })
 
         context['modifications'] = modifications
+        context['open_collapse'] = int(request.GET.get('open_collapse', '-1'))
+        context['collapse_type'] = request.GET.get('collapse_type', '')
 
         for annotation in item.annotations.all():
             prefix = f'annotation_{annotation.id}'

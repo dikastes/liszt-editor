@@ -38,9 +38,7 @@
         <div class="collapse bg-base-100 collapse-arrow my-5">
             <input
                 type="checkbox"
-                name="collapse_annotation_{{ annotation.form.instance.id }}"
-                form="form"
-                {% if annotation.form.instance.id in open_annotations or annotation_id == annotation.form.instance.id %}
+                {% if open_collapse == annotation.form.instance.id and collapse_type == 'annotation' %}
                     checked
                 {% endif %}
             />
@@ -102,9 +100,7 @@
         <div class="collapse bg-base-100 collapse-arrow my-5">
             <input
                 type="checkbox"
-                name="collapse_modification_{{ modification.form.instance.id }}"
-                form="form"
-                {% if modification.form.instance.id in open_modifications or modification_id == modification.form.instance.id %}
+                {% if open_collapse == modification.form.instance.id and collapse_type == 'modification' %}
                     checked
                 {% endif %}
             />
