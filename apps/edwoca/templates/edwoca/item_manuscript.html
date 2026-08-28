@@ -78,6 +78,11 @@
                         </div>
                     </div>
                 </div>
+                <div class="flex justify-end">
+                    <button form="form" value="{{ annotation.form.instance.id }}" name="remove-annotation" class="btn btn-primary btn-outline mt-3">
+                        {% translate 'remove annotation' %}
+                    </button>
+                </div>
             </div>
         </div>
     {% empty %}
@@ -139,6 +144,11 @@
                             </button>
                         </div>
                     </div>
+                </div>
+                <div class="flex justify-end">
+                    <button form="form" value="{{ modification.form.instance.id }}" name="remove-modification" class="btn btn-primary btn-outline mt-3">
+                        {% translate 'remove modification' %}
+                    </button>
                 </div>
             </div>
         </div>

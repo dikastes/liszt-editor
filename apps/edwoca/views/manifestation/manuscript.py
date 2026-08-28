@@ -121,13 +121,6 @@ def manifestation_manuscript_update(request, pk):
                 'handwriting_forms': handwriting_forms
             })
 
-        if 'add-modification' in request.POST:
-            modification = ItemModification.objects.create(item = manifestation.get_single_item())
-            modifications.append({
-                    'form': ItemModificationForm(instance = modification),
-                    'handwriting_forms': []
-                })
-
         if 'add-handwriting' in request.POST:
             ItemHandwriting.objects.create(item=item)
 

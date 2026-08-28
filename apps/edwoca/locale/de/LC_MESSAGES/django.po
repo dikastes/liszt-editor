@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-28 10:19+0200\n"
+"POT-Creation-Date: 2026-08-28 16:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -203,8 +203,8 @@ msgid "search publisher"
 msgstr "Verlag suchen"
 
 #: apps/edwoca/forms/manifestation.py:686
-#: apps/edwoca/templates/edwoca/item_manuscript.html:57
-#: apps/edwoca/templates/edwoca/item_manuscript.html:121
+#: apps/edwoca/templates/edwoca/item_manuscript.html:55
+#: apps/edwoca/templates/edwoca/item_manuscript.html:122
 msgid "working title"
 msgstr "Arbeitstitel"
 
@@ -277,6 +277,18 @@ msgstr "Beschreibung der Modifikationen"
 #: apps/edwoca/models/base.py:1082 apps/edwoca/models/expression.py:247
 msgid "note"
 msgstr "Note"
+
+#: apps/edwoca/models/base.py:1098
+#, fuzzy
+#| msgid "writer"
+msgid "<writer>"
+msgstr "Schreiber"
+
+#: apps/edwoca/models/base.py:1099
+#, fuzzy
+#| msgid "create handwriting"
+msgid "<handwriting>"
+msgstr "Schreiber hinzufügen"
 
 #: apps/edwoca/models/composite.py:72 apps/edwoca/models/work.py:44
 msgid "private head comment"
@@ -500,7 +512,7 @@ msgstr "Kategorie"
 
 #: apps/edwoca/models/letter.py:99 apps/edwoca/models/letter.py:104
 #: apps/edwoca/templates/edwoca/item_comment.html:10
-#: apps/edwoca/templates/edwoca/item_manuscript.html:162
+#: apps/edwoca/templates/edwoca/item_manuscript.html:168
 #: apps/edwoca/templates/edwoca/letter_update.html:225
 #: apps/edwoca/templates/edwoca/manifestation_history.html:85
 #: apps/edwoca/templates/edwoca/manifestation_manuscript.html:60
@@ -707,41 +719,52 @@ msgstr "Exemplarspezifika"
 msgid "annotations"
 msgstr "Annotationen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:68
+#: apps/edwoca/templates/edwoca/item_manuscript.html:66
 msgid "annotation writers / hands"
 msgstr "Schreiber Annotationen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:78
-#: apps/edwoca/templates/edwoca/item_manuscript.html:142
+#: apps/edwoca/templates/edwoca/item_manuscript.html:76
+#: apps/edwoca/templates/edwoca/item_manuscript.html:143
 #: apps/edwoca/templates/edwoca/manifestation_title.html:48
 #: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:31
 msgid "create handwriting"
 msgstr "Schreiber hinzufügen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:87
+#: apps/edwoca/templates/edwoca/item_manuscript.html:83
+#, fuzzy
+#| msgid "create annotation"
+msgid "remove annotation"
+msgstr "Annotation anlegen"
+
+#: apps/edwoca/templates/edwoca/item_manuscript.html:90
 msgid "no annotations"
 msgstr "keine Annotationen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:92
+#: apps/edwoca/templates/edwoca/item_manuscript.html:95
 msgid "create annotation"
 msgstr "Annotation anlegen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:99
+#: apps/edwoca/templates/edwoca/item_manuscript.html:102
 #: apps/edwoca/templates/edwoca/manifestation_manuscript.html:39
 msgid "modifications"
 msgstr "Modifikationen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:132
+#: apps/edwoca/templates/edwoca/item_manuscript.html:133
 #: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:21
 msgid "modification writers / hands"
 msgstr "Schreiber Modifikation"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:151
+#: apps/edwoca/templates/edwoca/item_manuscript.html:150
+#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:124
+msgid "remove modification"
+msgstr "Modifikation entfernen"
+
+#: apps/edwoca/templates/edwoca/item_manuscript.html:157
 #: apps/edwoca/templates/edwoca/manifestation_manuscript.html:45
 msgid "no modifications"
 msgstr "keine Modifikationen"
 
-#: apps/edwoca/templates/edwoca/item_manuscript.html:156
+#: apps/edwoca/templates/edwoca/item_manuscript.html:162
 #: apps/edwoca/templates/edwoca/manifestation_manuscript.html:52
 msgid "create modification"
 msgstr "Modifikation anlegen"
@@ -1389,10 +1412,6 @@ msgstr "zum Werk"
 #: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:93
 msgid "go to expression"
 msgstr "zur Fassung"
-
-#: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:124
-msgid "remove modification"
-msgstr "Modifikation entfernen"
 
 #: apps/edwoca/templates/edwoca/partials/forms/dedication_form.html:14
 msgid "dedicatee"
