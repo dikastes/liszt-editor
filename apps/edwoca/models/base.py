@@ -1042,6 +1042,17 @@ class Event(models.Model):
 
 
 class ItemModification(models.Model):
+    collection_component = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.SET_NULL,
+            null = True,
+            related_name = 'modifications'
+        )
+    modification_description = models.TextField(
+            null = True,
+            blank = True,
+            verbose_name = _('description of modification')
+        )
     item = models.ForeignKey(
             'dmrism.Item',
             related_name = 'modifications',
@@ -1071,13 +1082,27 @@ class ItemModification(models.Model):
             verbose_name = _('note')
         )
 
-    def __str__(self):
+    def render_writer(self):
         if handwriting := self.handwritings.first():
-            if handwriting.dubious_writer:
-                return f"{self.period} [{handwriting.writer.__str__()}] ({handwriting.medium})"
-            return f"{self.period} ({handwriting.writer.__str__()}, {handwriting.medium})"
+            if writer := handwriting.writer:
+                writer_string = str(writer)
+                if handwriting.dubious_writer:
+                    if handwriting.medium:
+                        return f'[{writer_string}] ({handwriting.medium})'
+                    else:
+                        return f'[{writer_string}]'
+                if handwriting.medium:
+                    return f'({writer_string}, {handwriting.medium})'
+                else:
+                    return f'({writer_string})'
+            return _('<writer>')
+        return _('<handwriting>')
+
+    def __str__(self):
+        if self.period:
+            return f'{self.period} {str(self.render_writer())}'
         else:
-            return f"{self.period} <Handschrift>"
+            return str(self.render_writer())
 
     def ensure_period(self):
         if self.period is None:

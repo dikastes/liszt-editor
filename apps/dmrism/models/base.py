@@ -196,9 +196,11 @@ class BaseHandwriting(models.Model):
             return f'{self.writer.__str__()} ({self.medium})'
 
     def __str__(self):
-        if self.dubious_writer:
-            return f"[{self.writer.__str__()}] ({self.medium})"
-        return f"{self.writer.__str__()} ({self.medium})"
+        if self.writer:
+            if self.dubious_writer:
+                return f"[{self.writer.__str__()}] ({self.medium})"
+            return f"{self.writer.__str__()} ({self.medium})"
+        return _('<writer>')
 
 
 class BaseDedication(models.Model):

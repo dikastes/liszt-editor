@@ -4,7 +4,7 @@ from django.conf import settings
 from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, DateTimeField, CharField, BooleanField, DateField, ChoiceField
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Period
-from ..models.base import ItemModification
+from ..models.base import ItemModification, Manifestation
 from ..models.base import ModificationHandwriting
 from liszt_util.forms.base import SelectDateWidget
 from dominate.tags import div, label, span
@@ -72,27 +72,57 @@ class ItemModificationForm(DateFormMixin, ModelForm):
 
     class Meta:
         model = ItemModification
-        fields = ['note']
+        fields = ['note', 'collection_component', 'modification_description']
         widgets = {
-            'note': Textarea(attrs={'class': 'border-black bg-white textarea textarea-bordered w-full', 'form': 'form'}),
+            'note': Textarea(attrs={'class': SimpleFormMixin.text_area_classes, 'form': 'form'}),
+            'modification_description': Textarea(attrs={'class': SimpleFormMixin.text_area_classes, 'form': 'form'}),
+            'collection_component': Select(attrs={'class': SimpleFormMixin.select_classes, 'form': 'form'}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.fields['collection_component'].queryset = Manifestation.objects.filter(component_of = self.instance.item.manifestation.id)
+
+    def collection_component_as_daisy(self):
+        form = div()
+
+        collection_component_field = self['collection_component']
+
+        with form:
+            with label(cls='form-control'):
+                with div(cls='label'):
+                    span(collection_component_field.label, cls='label-text')
+                raw(str(collection_component_field))
+
+        return mark_safe(str(form))
+
+    def description_as_daisy(self):
+        form = div()
+
+        description_field = self['modification_description']
+
+        with form:
+            with label(cls='form-control'):
+                with div(cls='label'):
+                    span(description_field.label, cls='label-text')
+                raw(str(description_field))
+
+        return mark_safe(str(form))
+
     def as_daisy(self):
-        form_container = div()
-        date_div = self.get_date_div()
+        form = div()
 
-        # Note Field
         note_field = self['note']
-        note_container = div(cls='form-control')
-        note_label = label(cls='label')
-        note_label.add(span(note_field.label, cls='label-text'))
-        note_container.add(note_label)
-        note_container.add(raw(str(note_field)))
 
-        form_container.add(date_div)
-        form_container.add(note_container)
+        with form:
+            self.get_date_div()
+            with label(cls='form-control'):
+                with div(cls='label'):
+                    span(note_field.label, cls='label-text')
+                raw(str(note_field))
 
-        return mark_safe(str(form_container))
+        return mark_safe(str(form))
 
 
 class ModificationHandwritingForm(HandwritingForm):

@@ -213,8 +213,8 @@ class HandwritingForm(ModelForm):
                     })
             }
 
-    def as_daisy(self):
-        form = tags.div(cls='flex gap-5 items-end')
+    def get_core_form(self):
+        form = tags.div(cls='my-5')
 
         medium_field = self['medium']
         dubious_writer_field = self['dubious_writer']
@@ -225,27 +225,19 @@ class HandwritingForm(ModelForm):
         })
 
         with form:
-            with tags.label(cls='flex-1'):
-                with tags.div(cls=SimpleFormMixin.label_classes):
-                    tags.span(_(medium_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(medium_field))
-            with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0 mb-1 gap-2'):
-                tags.span(_(dubious_writer_field.label))
-                raw(str(dubious_writer_field))
+            with div(cls='flex gap-5 items-end'):
+                with tags.label(cls='flex-1'):
+                    with tags.div(cls=SimpleFormMixin.label_classes):
+                        tags.span(_(medium_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(medium_field))
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0 mb-1 gap-2'):
+                    tags.span(_(dubious_writer_field.label))
+                    raw(str(dubious_writer_field))
 
-        #medium_label = tags.label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 flex-1')
-        #medium_label.add(raw(str(medium_field)))
-        #form.add(medium_label)
+        return form
 
-        # Dubious writer toggle
-        #dubious_writer_label = tags.label(cls='label cursor-pointer flex items-center gap-2')
-        #dubious_writer_label.add(tags.span(dubious_writer_field.label, cls='label-text'))
-
-        #dubious_writer_label.add(raw(str(dubious_writer_field)))
-
-        #form.add(dubious_writer_label)
-
-        return mark_safe(str(form))
+    def as_daisy(self):
+        return mark_safe(str(self.get_core_form()))
 
 
 class DateFormMixin:
