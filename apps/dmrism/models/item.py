@@ -592,3 +592,91 @@ class ItemBib(BaseBib):
             on_delete = models.CASCADE,
             related_name = 'bib_set'
         )
+
+
+class Annotation(models.Model):
+    collection_component = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.SET_NULL,
+            null = True,
+            related_name = 'annotations'
+        )
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE,
+            related_name = 'annotations'
+        )
+    is_ownership_note = models.BooleanField(
+            default = False,
+            verbose_name = _('ownership note')
+        )
+    is_date_note = models.BooleanField(
+            default = False,
+            verbose_name = _('date note')
+        )
+    is_correction = models.BooleanField(
+            default = False,
+            verbose_name = _('correction')
+        )
+    is_addition = models.BooleanField(
+            default = False,
+            verbose_name = _('addition')
+        )
+    is_note = models.BooleanField(
+            default = False,
+            verbose_name = _('note')
+        )
+    is_title = models.BooleanField(
+            default = False,
+            verbose_name = _('title')
+        )
+    is_dedication = models.BooleanField(
+            default = False,
+            verbose_name = _('dedication')
+        )
+    description_title_correction = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('description of title correction')
+        )
+
+    def get_annotation_type(self):
+        return ', '.join(
+                str(getattr(Annotation, field).field.verbose_name)
+                for field
+                in [
+                    'is_ownership_note',
+                    'is_date_note',
+                    'is_correction',
+                    'is_addition',
+                    'is_note',
+                    'is_title',
+                    'is_dedication'
+                ]
+                if getattr(self, field)
+            )
+
+    def render_annotation_type(self):
+        if comma_sep_type := self.get_annotation_type():
+            return f' ({comma_sep_type})'
+        return ''
+
+    def render_handwriting(self):
+        if handwriting := self.handwritings.first():
+            if handwriting.writer:
+                if handwriting.dubious_writer:
+                    return f'[{handwriting.writer.__str__()}]'
+                return handwriting.writer.__str__()
+            return _('<writer>')
+        return _('<handwriting>')
+
+    def __str__(self):
+        return self.render_handwriting() + self.render_annotation_type()
+
+
+class AnnotationHandwriting(BaseHandwriting):
+    annotation = models.ForeignKey(
+            'Annotation',
+            on_delete = models.CASCADE,
+            related_name = 'handwritings'
+        )

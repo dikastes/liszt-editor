@@ -18,6 +18,11 @@ class LetterListView(EdwocaListView):
 class LetterSearchView(EdwocaSearchView):
     model = Letter
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('letters')
+        return context
+
 
 def letter_create(request):
     letter = Letter.objects.create()
