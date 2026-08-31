@@ -279,16 +279,12 @@ msgid "note"
 msgstr "Note"
 
 #: apps/edwoca/models/base.py:1098
-#, fuzzy
-#| msgid "writer"
 msgid "<writer>"
-msgstr "Schreiber"
+msgstr "<Schreiber>"
 
 #: apps/edwoca/models/base.py:1099
-#, fuzzy
-#| msgid "create handwriting"
 msgid "<handwriting>"
-msgstr "Schreiber hinzufügen"
+msgstr "<Handschrift>"
 
 #: apps/edwoca/models/composite.py:72 apps/edwoca/models/work.py:44
 msgid "private head comment"
@@ -731,10 +727,8 @@ msgid "create handwriting"
 msgstr "Schreiber hinzufügen"
 
 #: apps/edwoca/templates/edwoca/item_manuscript.html:83
-#, fuzzy
-#| msgid "create annotation"
 msgid "remove annotation"
-msgstr "Annotation anlegen"
+msgstr "Annotation entfernen"
 
 #: apps/edwoca/templates/edwoca/item_manuscript.html:90
 msgid "no annotations"
