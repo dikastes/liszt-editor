@@ -95,7 +95,7 @@ class SingletonSearchView(EdwocaSearchView):
 
 def singleton_collection_create(request):
     if request.method == 'POST':
-        form = SingletonCreateForm(request.POST)
+        form = SingletonCreateForm(request.POST, show_source_title = True)
 
         forms_valid = True
         if form.is_valid():
@@ -111,13 +111,14 @@ def singleton_collection_create(request):
             item.signatures.add(signature)
 
             manifestation.is_singleton=True
-            manifestation.source_type=form.cleaned_data.get('source_type')
             manifestation.working_title = form.cleaned_data.get('working_title')
+            manifestation.source_title = form.cleaned_data.get('source_title')
             manifestation.save()
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
+        return render(request, 'edwoca/create_singleton.html', {'form': form})
     else:
-        form = SingletonCreateForm(is_collection = True)
+        form = SingletonCreateForm(show_source_title = True)
 
     return render(request, 'edwoca/create_singleton.html', {
         'form': form,
@@ -1303,11 +1304,11 @@ def singleton_part_create(request, pk, part_label):
     existing_manifestation = get_object_or_404(Manifestation, pk = pk)
 
     if request.method == 'POST':
-        form = SingletonCreateForm(request.POST)
+        form = SingletonCreateForm(request.POST, show_source_title = True)
         if form.is_valid():
             manifestation = EdwocaManifestation.objects.create(
                 is_singleton=True,
-                source_type = form.cleaned_data.get('source_type'),
+                source_title = form.cleaned_data.get('source_title'),
                 working_title = form.cleaned_data.get('working_title'),
                 part_of = existing_manifestation,
                 part_label = getattr(EdwocaManifestation.PartLabel, part_label.upper())
@@ -1322,8 +1323,9 @@ def singleton_part_create(request, pk, part_label):
             )
             item.signatures.add(signature)
             return redirect('edwoca:manifestation_update', pk = manifestation.id)
+        return render(request, 'edwoca/create_singleton.html', {'form': form})
     else:
-        form = SingletonCreateForm()
+        form = SingletonCreateForm(show_source_title = True)
 
     return render(request, 'edwoca/create_singleton.html', {'form': form})
 

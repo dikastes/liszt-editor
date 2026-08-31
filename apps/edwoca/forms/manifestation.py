@@ -653,7 +653,6 @@ class SingletonCreateForm(forms.ModelForm):
         fields = [
                 'working_title',
                 'source_title',
-                #'source_type',
                 'library',
                 'signature'
             ]
@@ -670,12 +669,6 @@ class SingletonCreateForm(forms.ModelForm):
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
         )
-    #source_type = forms.ChoiceField(
-            #label = _('source type') + '*',
-            #choices = Manifestation.SourceType.choices[:-1],
-            #widget = Select(attrs={'class': SimpleFormMixin.select_classes}),
-            #required = False
-        #)
     library = forms.ModelChoiceField(
             queryset = Library.objects.all(),
             label = _('holding institution'),
@@ -690,32 +683,26 @@ class SingletonCreateForm(forms.ModelForm):
         )
 
     def __init__(self, *args, **kwargs):
-        self.is_collection = kwargs.pop('is_collection', False)
+        self.show_source_title = kwargs.pop('show_source_title', False)
         super().__init__(*args, **kwargs)
 
     def as_daisy(self):
         root = div(cls="flex flex-col gap-5")
         source_title_field = self['source_title']
         working_title_field = self['working_title']
-        #source_type_field = self['source_type']
         library_field = self['library']
         signature_field = self['signature']
 
         with root:
             with div(cls='flex w-full gap-10 my-5'):
                 with label(cls=SimpleFormMixin.palette_form_control_classes):
-                    if self.is_collection:
+                    if self.show_source_title:
                         with div(cls=SimpleFormMixin.label_classes):
                             span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
                         raw(str(source_title_field))
                     with div(cls=SimpleFormMixin.label_classes):
                         span(working_title_field.label, cls=SimpleFormMixin.label_text_classes)
                     raw(str(working_title_field))
-                #if not self.is_collection:
-                    #with label(cls=SimpleFormMixin.palette_form_control_classes):
-                        #with div(cls=SimpleFormMixin.label_classes):
-                            #span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
-                        #raw(str(source_type_field))
             with div(cls='flex w-full gap-10 my-5'):
                 with label(cls=SimpleFormMixin.palette_form_control_classes):
                     with div(cls=SimpleFormMixin.label_classes):
