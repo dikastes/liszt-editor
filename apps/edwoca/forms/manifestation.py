@@ -607,66 +607,42 @@ class ManifestationCreateForm(forms.Form):
         form = div(cls='mb-10')
 
         temporary_title_field = self['temporary_title']
-        temporary_title_container = label(cls='form-control w-full')
-        temporary_title_label = div(cls='label')
-        temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
-        temporary_title_container.add(temporary_title_label)
-        temporary_title_container.add(raw(str(temporary_title_field)))
-        if temporary_title_field.errors:
-            temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(temporary_title_container)
-
-        publisher_wrapper = div(cls='w-full relative')
-        publisher_wrapper.add(raw(str(self['publisher'])))
-
-        publisher_container = label(cls='form-control w-full')
-        publisher_label = div(cls='label')
-        publisher_label.add(span(self['publisher_search'].label, cls='label-text'))
-        publisher_container.add(publisher_label)
-        publisher_container.add(raw(str(self['publisher_search'])))
-        if self['publisher'].errors:
-            publisher_container.add(div(span(self['publisher'].errors, cls='text-primary text-sm'), cls='label'))
-
-        publisher_wrapper.add(publisher_container)
-        publisher_wrapper.add(
-            div(id='publisher-results', cls='absolute z-50 w-full top-[85px] bg-base-100 rounded-box shadow-lg'))
-        form.add(publisher_wrapper)
-
-        # Plate Number
+        source_title_field = self['source_title']
+        publisher_search_field = self['publisher_search']
+        publisher_field = self['publisher']
         plate_number_field = self['plate_number']
-        plate_number_container = label(cls='form-control w-full')
-        plate_number_label = div(cls='label')
-        plate_number_label.add(span(plate_number_field.label, cls='label-text'))
-        plate_number_container.add(plate_number_label)
-        plate_number_container.add(raw(str(plate_number_field)))
-        if plate_number_field.errors:
-            plate_number_container.add(div(span(plate_number_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(plate_number_container)
 
-        # Source Type
-        #if not self.is_collection:
-            #source_type_field = self['source_type']
-            #source_type_container = label(cls='form-control w-full')
-            #source_type_label = div(cls='label')
-            #source_type_label.add(span(source_type_field.label, cls='label-text'))
-            #source_type_container.add(source_type_label)
-            #source_type_container.add(raw(str(source_type_field)))
-            #if source_type_field.errors:
-                #source_type_container.add(div(span(source_type_field.errors, cls='text-primary text-sm'), cls='label'))
-            #form.add(source_type_container)
-
-        # Date Fields
-        #display_field = self['display']
-
-        #display_container = label(cls='form-control w-full')
-        #display_label = div(cls='label')
-        #display_label.add(span(_('display'), cls='label-text'))
-        #display_container.add(display_label)
-        #display_container.add(raw(str(display_field)))
-        #if display_field.errors:
-            #display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        #form.add(display_container)
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(temporary_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(temporary_title_field))
+                if temporary_title_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(temporary_title_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(source_title_field))
+                if source_title_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(source_title_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+            with label(cls=SimpleFormMixin.form_control_classes + 'w-full relative'):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(publisher_search_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(publisher_search_field))
+                raw(str(publisher_field))
+                div(id='publisher-results', cls='absolute z-50 w-full top-[85px] bg-base-100 rounded-box shadow-lg')
+                if publisher_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(publisher_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(plate_number_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(plate_number_field))
+                if plate_number_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(plate_number_field.errors, cls=SimpleFormMixin.error_label_text_classes)
 
         return mark_safe(str(form))
 
