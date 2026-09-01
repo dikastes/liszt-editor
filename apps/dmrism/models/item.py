@@ -56,6 +56,16 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
             on_delete = models.CASCADE,
             related_name = 'items',
         )
+    date_diplomatic = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('diplomatic date')
+        )
+    private_history_comment = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('private dedication comment')
+        )
     private_dedication_comment = models.TextField(
             blank = True,
             null = True,
@@ -132,6 +142,16 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
     hand_copy = models.BooleanField(
             default = False,
             verbose_name = _('hand copy')
+        )
+    period = models.OneToOneField(
+            'dmad.Period',
+            on_delete = models.SET_NULL,
+            null = True,
+            blank = True,
+        )
+    places = models.ManyToManyField(
+            'dmad.Place',
+            through = 'ItemPlace'
         )
 
     _group_field_names = ['manifestation']
@@ -262,6 +282,13 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
                 raise ValidationError("Cannot add another item to a singleton manifestation.")
 
         super().save(*args, **kwargs)
+
+
+class ItemPlace(BasePlaceRelation):
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE
+        )
 
 
 class Library(models.Model):

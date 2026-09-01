@@ -839,3 +839,103 @@ class AnnotationForm(ModelForm):
                 raw(str(description_field))
 
         return mark_safe(str(form))
+
+
+class ItemHistoryForm(BaseHistoryForm):
+    kwargs = {
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+            }
+        }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = {
+                    'class': SimpleFormMixin.text_input_classes,
+                    'form': 'form'
+                }),
+        )
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect( attrs = {
+                    'class': 'radio',
+                    'form': 'form'
+                }),
+            required = False
+        )
+    assumed = BooleanField(
+            widget = CheckboxInput(attrs = {
+                    'class': 'toggle',
+                    'form': 'form'
+                }),
+            required = False
+        )
+
+    class Meta(BaseHistoryForm.Meta):
+        model = Item
+        fields = BaseHistoryForm.Meta.fields
+        widgets = BaseHistoryForm.Meta.widgets
+
+
+class ItemPlaceForm(BaseHistoryPlaceForm):
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
+    class Meta(BaseHistoryPlaceForm.Meta):
+        model = ItemPlace

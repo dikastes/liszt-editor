@@ -706,3 +706,190 @@ class BaseTextTypeForm(ModelForm, SimpleFormMixin):
                 tags.span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
+
+
+class BaseHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
+    kwargs = {
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+            }
+        }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = {
+                    'class': SimpleFormMixin.text_input_classes,
+                    'form': 'form'
+                }),
+        )
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect( attrs = {
+                    'class': 'radio',
+                    'form': 'form'
+                }),
+            required = False
+        )
+    assumed = BooleanField(
+            widget = CheckboxInput(attrs = {
+                    'class': 'toggle',
+                    'form': 'form'
+                }),
+            required = False
+        )
+
+    class Meta:
+        fields = [
+            'date_diplomatic',
+            'private_history_comment',
+            'not_before',
+            'not_after',
+            'display',
+            'inferred',
+            'assumed',
+        ]
+        widgets = {
+                'history': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+                'date_diplomatic': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+                'private_history_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        date_diplomatic_field = self['date_diplomatic']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(date_diplomatic_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(date_diplomatic_field))
+            self.get_date_div()
+
+        return mark_safe(str(form))
+
+    def comment_as_daisy(self):
+        form = div(cls='mb-10')
+
+        private_history_comment_field = self['private_history_comment']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(private_history_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(private_history_comment_field))
+
+        return mark_safe(str(form))
+
+
+class BaseHistoryPlaceForm(ModelForm, SimpleFormMixin):
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
+    class Meta:
+        fields = [
+            'inferred',
+            'assumed'
+        ]
+        widgets = {
+                'inferred': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    }),
+                'assumed': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        palette = div(cls='flex gap-10 items-center')
+
+        place_assumed_field = self['assumed']
+        place_inferred_field = self['inferred']
+
+        with palette:
+            div(cls='flex-1')
+            with div(cls='form-control flex-0'):
+                with label(cls='cursor-pointer label flex gap-5'):
+                    span(_(place_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(place_assumed_field))
+            for sw in place_inferred_field.subwidgets:
+                with tags.div(cls=SimpleFormMixin.form_control_classes):
+                    with tags.label(cls='label cursor-pointer gap-5'):
+                        tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
+                        tags.input_(
+                                type='radio',
+                                name=sw.data.get('name'),
+                                value=str(sw.data.get('value')),
+                                cls='radio',
+                                checked = sw.data.get('selected', False),
+                                form='form'
+                            )
+
+        return mark_safe(str(palette))

@@ -532,63 +532,12 @@ def manifestation_expression_remove(request, pk, expression_pk):
     return redirect('edwoca:manifestation_update', pk=pk)
 
 
-class ManifestationHistoryUpdateView(SimpleFormView):
+class ManifestationHistoryUpdateView(BaseHistoryUpdateView):
     model = Manifestation
-    property = 'history'
-    template_name = 'edwoca/manifestation_history.html'
     form_class = ManifestationHistoryForm
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-
-        if not form.is_valid():
-            return self.form_invalid(form)
-
-        place_forms = []
-        for manifestation_place in self.object.manifestationplace_set.all():
-            place_form = ManifestationPlaceForm(request.POST, instance = manifestation_place, prefix=f'manifestation-place-{manifestation_place.id}')
-            if not place_form.is_valid():
-                return self.form_invalid(form)
-            place_forms.append(place_form)
-
-        for place_form in place_forms:
-            place_form.save()
-
-        self.object = form.save()
-        period = self.object.period
-
-        if 'calculate-machine-readable-date' in request.POST:
-            period.parse_display()
-            period.save()
-        elif 'clear-machine-readable-date' in request.POST:
-            period.not_before = None
-            period.not_after = None
-            period.assumed = False
-            period.inferred = False
-            period.save()
-
-        return redirect('edwoca:manifestation_history', pk = self.object.id)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        search_form = SearchForm(self.request.GET or None)
-        context['searchform'] = search_form
-        context['show_search_form'] = True
-
-        context['place_forms'] = []
-        for manifestation_place in self.object.manifestationplace_set.all():
-            place_form = ManifestationPlaceForm(instance = manifestation_place, prefix=f'manifestation-place-{manifestation_place.id}')
-            context['place_forms'].append(place_form)
-
-        if search_form.is_valid() and search_form.cleaned_data.get('q'):
-            context['query'] = search_form.cleaned_data.get('q')
-            context[f"found_places"] = search_form.search().models(Place)
-
-        return context
-
-    def get_model(self):
-        return self.model.__name__
+    place_form = ManifestationPlaceForm
+    place_set_property = 'manifestationplace_set'
+    view_name = 'edwoca:manifestation_history'
 
 
 def manifestation_add_place_view(request, pk, place_id):

@@ -316,3 +316,21 @@ class TrackedModel(TimestampedModel):
         if self.needs_review:
             return needs_review_string + title
         return title
+
+
+class BasePlaceRelation(models.Model):
+    class Meta:
+        abstract = True
+
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.CASCADE
+        )
+    inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
+        )

@@ -1063,3 +1063,9 @@ class ItemBibDeleteView(DeleteView):
         return reverse_lazy('edwoca:item_bibliography', kwargs={'pk': self.object.item.id})
 
 
+class ItemHistoryUpdateView(BaseHistoryUpdateView):
+    model = Item
+    form_class = ItemHistoryForm
+    place_form = ItemPlaceForm
+    place_set_property = 'itemplace_set'
+    view_name = 'edwoca:item_history'

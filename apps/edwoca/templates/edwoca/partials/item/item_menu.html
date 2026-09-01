@@ -38,13 +38,10 @@
             </a>
         </li>
         <li>
-            {% comment %}
             <a href="{% url 'edwoca:item_history' object.id %}"
                 {% if 'history' in request.path %}class="active"{% endif %}
                 >
-            {% endcomment %}
-            <a href="#">
-                🚧 {% translate 'date and place' %} 🚧
+                {% translate 'date and place' %}
             </a>
         </li>
         <li>
