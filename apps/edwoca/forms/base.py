@@ -27,6 +27,7 @@ class SimpleFormMixin:
     toggle_label_classes = 'cursor-pointer label flex gap-2'
     toggle_inverted_classes = 'cursor-pointer label justify-start gap-5'
     label_text_classes = 'label-text'
+    error_label_text_classes = 'label-text-alt text-primary'
 
     def as_daisy(self):
         form = tags.div()
