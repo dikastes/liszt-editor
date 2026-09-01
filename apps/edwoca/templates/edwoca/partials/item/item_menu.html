@@ -30,20 +30,22 @@
                 {% translate 'item characteristics' %}
             </a>
         </li>
-        <li>
-            <a href="{% url 'edwoca:item_dedication' object.id %}"
-                {% if 'dedication' in request.path %}class="active"{% endif %}
-                >
-                {% translate 'dedication' %}
-            </a>
-        </li>
-        <li>
-            <a href="{% url 'edwoca:item_history' object.id %}"
-                {% if 'history' in request.path %}class="active"{% endif %}
-                >
-                {% translate 'date and place' %}
-            </a>
-        </li>
+        {% if object.source_type == 'APC' %}
+            <li>
+                <a href="{% url 'edwoca:item_dedication' object.id %}"
+                    {% if 'dedication' in request.path %}class="active"{% endif %}
+                    >
+                    {% translate 'dedication' %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'edwoca:item_history' object.id %}"
+                    {% if 'history' in request.path %}class="active"{% endif %}
+                    >
+                    {% translate 'date and place' %}
+                </a>
+            </li>
+        {% endif %}
         <li>
             <a href="{% url 'edwoca:item_provenance' object.id %}"
                 {% if 'provenance' in request.path %}class="active"{% endif %}
