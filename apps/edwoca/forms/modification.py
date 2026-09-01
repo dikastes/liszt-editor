@@ -92,7 +92,7 @@ class ItemModificationForm(DateFormMixin, ModelForm):
         with form:
             with label(cls='form-control'):
                 with div(cls='label'):
-                    span(collection_component_field.label, cls='label-text')
+                    span(_('work relation (working title)'), cls='label-text')
                 raw(str(collection_component_field))
 
         return mark_safe(str(form))

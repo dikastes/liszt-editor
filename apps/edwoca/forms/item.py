@@ -794,7 +794,7 @@ class AnnotationForm(ModelForm):
         with form:
             with label(cls='form-control'):
                 with div(cls='label'):
-                    span(collection_component_field.label, cls='label-text')
+                    span(_('work relation (working title)'), cls='label-text')
                 raw(str(collection_component_field))
 
         return mark_safe(str(form))
@@ -819,11 +819,11 @@ class AnnotationForm(ModelForm):
                 raw(str(is_date_note_field))
                 span(is_date_note_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(is_correction_field))
-                span(is_correction_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(is_addition_field))
                 span(is_addition_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(is_correction_field))
+                span(is_correction_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(is_note_field))
                 span(is_note_field.label, cls=SimpleFormMixin.label_text_classes)
