@@ -120,7 +120,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             source_type = self.source_type,
             print_type = self.print_type,
             state = self.state,
-            history = self.history,
             language = self.language,
             watermark = self.watermark,
             watermark_url = self.watermark_url,
