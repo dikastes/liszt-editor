@@ -50,3 +50,11 @@ class WorkUnlinkView(UnlinkView):
 
 class WorkPullView(PullView):
     model = Work
+
+
+class WorkRawDataView(BaseRawDataView):
+    model = Work
+
+
+class WorkAuthorityDataView(BaseAuthorityDataView):
+    model = Work

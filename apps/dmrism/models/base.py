@@ -295,12 +295,6 @@ class TrackedModel(TimestampedModel):
     class Meta:
         abstract = True
 
-    first_editor = models.CharField(
-            max_length = 50,
-            blank = True,
-            verbose_name = _('first editor'),
-            default = ''
-        )
     editing_history = models.TextField(
             blank = True,
             verbose_name = _('editing history'),

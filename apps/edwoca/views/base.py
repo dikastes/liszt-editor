@@ -3,7 +3,7 @@ from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, FormView, CreateView, DeleteView
 from django.db.models import Case, When
 from liszt_util.forms import FramedSearchForm, SearchForm

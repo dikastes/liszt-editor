@@ -1,0 +1,28 @@
+{% extends 'liszt_util/base.html' %}
+
+{% load i18n %}
+
+{% block page_title %}
+    {{ object }}
+    |
+    DMAd
+{% endblock %}
+
+{% block content %}
+
+<div class="flex-1 min-w-0">
+    <pre class="whitespace-pre text-sm leading-snug"><code class="language-json">{{ object.render_raw | escape }}</code></pre>
+</div>
+{% endblock %}
+
+{% block nav %}
+    {% include 'dmad_on_django/partials/detail_sidebar.html' %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'dmad_on_django/partials/detail_navbar.html' %}
+{% endblock %}
+
+{% block navbar_title %}
+    {% include 'dmad_on_django/partials/navbar_title.html' %}
+{% endblock %}

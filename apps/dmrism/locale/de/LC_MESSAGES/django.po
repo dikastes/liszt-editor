@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 14:48+0200\n"
+"POT-Creation-Date: 2026-09-10 16:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -106,23 +106,19 @@ msgstr "Widmungstext (diplomatisch)"
 msgid "<< new dedication >>"
 msgstr "<< neue Widmung >>"
 
-#: apps/dmrism/models/base.py:301
-msgid "first editor"
-msgstr "Erstbearbeiter*in"
-
-#: apps/dmrism/models/base.py:306
+#: apps/dmrism/models/base.py:300
 msgid "editing history"
 msgstr "Bearbeitungshistorie"
 
-#: apps/dmrism/models/base.py:311
+#: apps/dmrism/models/base.py:305
 msgid "needs review"
 msgstr "zu überarbeiten"
 
-#: apps/dmrism/models/base.py:331
+#: apps/dmrism/models/base.py:325
 msgid "inferred"
 msgstr "ermittelt"
 
-#: apps/dmrism/models/base.py:335
+#: apps/dmrism/models/base.py:329
 msgid "assumed"
 msgstr "unsicher"
 
@@ -606,6 +602,9 @@ msgstr "hat Bezug zu"
 #: apps/dmrism/models/manifestation.py:760
 msgid "is revision of"
 msgstr "ist Ableitung von"
+
+#~ msgid "first editor"
+#~ msgstr "Erstbearbeiter*in"
 
 #~ msgid "history"
 #~ msgstr "Geschichte"
