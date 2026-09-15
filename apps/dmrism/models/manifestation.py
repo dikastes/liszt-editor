@@ -67,7 +67,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 case 'copy': return Manifestation.SourceType.TRANSCRIPT
                 case 'correctedcopy': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
                 case 'print': return Manifestation.SourceType.PRINT
-                case 'correctedprint': return Manifestation.SourceType.CORRECTED_PRINT
+                case 'correctedprint': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
