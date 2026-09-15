@@ -154,11 +154,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             verbose_name = _('extent'),
             default = ''
         )
-    history = models.TextField(
-            blank = True,
-            verbose_name = _('history'),
-            default = ''
-        )
     bib = models.ManyToManyField(
             'bib.ZotItem',
             through = 'ManifestationBib'
@@ -703,22 +698,10 @@ class PublicationPlace(DocumentationStatusMixin, models.Model):
         )
 
 
-class ManifestationPlace(models.Model):
+class ManifestationPlace(BasePlaceRelation):
     manifestation = models.ForeignKey(
             'Manifestation',
             on_delete = models.CASCADE
-        )
-    place = models.ForeignKey(
-            'dmad.Place',
-            on_delete = models.CASCADE
-        )
-    inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
-        )
-    assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
         )
 
 

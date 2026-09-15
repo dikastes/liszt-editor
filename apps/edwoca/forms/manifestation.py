@@ -232,11 +232,12 @@ class ManifestationBibForm(BaseBibForm):
         widgets = BaseBibForm.Meta.widgets
 
 
-class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
+class ManifestationHistoryForm(BaseHistoryForm):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
             'attrs': {
-                'class': SimpleFormMixin.select_classes
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
             }
         }
     imprecision = ChoiceField(
@@ -251,19 +252,28 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
     time_mode = ChoiceField(
             choices = Period.TimeMode,
             label = _('time mode'),
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
             required = False
         )
     start_qualifier = ChoiceField(
             label = _('not before mode'),
             choices = Period.StartQualifier,
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
             required = False
         )
     end_qualifier = ChoiceField(
             label = _('not after mode'),
             choices = Period.EndQualifier,
-            widget = Select(attrs = {'class': SimpleFormMixin.select_classes}),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
             required = False
         )
     not_before = DateField(
@@ -279,75 +289,32 @@ class ManifestationHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
     display = CharField(
             label = _('display'),
             required=False,
-            widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes })
+            widget = TextInput( attrs = {
+                    'class': SimpleFormMixin.text_input_classes,
+                    'form': 'form'
+                }),
         )
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
-            widget = RadioSelect(
-                    attrs = { 'class': 'radio', 'form': 'form'}
-                ),
+            widget = RadioSelect( attrs = {
+                    'class': 'radio',
+                    'form': 'form'
+                }),
             required = False
         )
-    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    assumed = BooleanField(
+            widget = CheckboxInput(attrs = {
+                    'class': 'toggle',
+                    'form': 'form'
+                }),
+            required = False
+        )
 
-    class Meta:
+    class Meta(BaseHistoryForm.Meta):
         model = Manifestation
-        fields = [
-            'history',
-            'id',
-            'date_diplomatic',
-            'private_history_comment',
-            'not_before',
-            'not_after',
-            'display',
-            'inferred',
-            'assumed',
-        ]
-        widgets = {
-                'history': Textarea( attrs = {
-
-                        'class': SimpleFormMixin.text_area_classes
-                    }),
-                'date_diplomatic': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes
-                    }),
-                'private_history_comment': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes,
-                        'form': 'form'
-                    })
-            }
-
-    def as_daisy(self):
-        form = div(cls='mb-10')
-        date_div = self.get_date_div()
-
-        date_diplomatic_field = self['date_diplomatic']
-        date_diplomatic_wrap = label(cls='form-control')
-        date_diplomatic_label = div(cls='label')
-        date_diplomatic_span = span(date_diplomatic_field.label, cls='label-text')
-        date_diplomatic_label.add(date_diplomatic_span)
-        date_diplomatic_wrap.add(date_diplomatic_label)
-        date_diplomatic_wrap.add(raw(str(date_diplomatic_field)))
-
-        form.add(date_diplomatic_wrap)
-        form.add(date_div)
-
-        return mark_safe(str(form))
-
-    def comment_as_daisy(self):
-        form = div(cls='mb-10')
-
-        private_history_comment_field = self['private_history_comment']
-        private_history_comment_wrap = label(cls='form-control')
-        private_history_comment_label = div(cls='label')
-        private_history_comment_span = span(private_history_comment_field.label, cls='label-text')
-        private_history_comment_label.add(private_history_comment_span)
-        private_history_comment_wrap.add(private_history_comment_label)
-        private_history_comment_wrap.add(raw(str(private_history_comment_field)))
-
-        form.add(private_history_comment_wrap)
-        return mark_safe(str(form))
+        fields = BaseHistoryForm.Meta.fields
+        widgets = BaseHistoryForm.Meta.widgets
 
 
 class RelatedManifestationForm(ModelForm):
@@ -607,66 +574,42 @@ class ManifestationCreateForm(forms.Form):
         form = div(cls='mb-10')
 
         temporary_title_field = self['temporary_title']
-        temporary_title_container = label(cls='form-control w-full')
-        temporary_title_label = div(cls='label')
-        temporary_title_label.add(span(temporary_title_field.label, cls='label-text'))
-        temporary_title_container.add(temporary_title_label)
-        temporary_title_container.add(raw(str(temporary_title_field)))
-        if temporary_title_field.errors:
-            temporary_title_container.add(div(span(temporary_title_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(temporary_title_container)
-
-        publisher_wrapper = div(cls='w-full relative')
-        publisher_wrapper.add(raw(str(self['publisher'])))
-
-        publisher_container = label(cls='form-control w-full')
-        publisher_label = div(cls='label')
-        publisher_label.add(span(self['publisher_search'].label, cls='label-text'))
-        publisher_container.add(publisher_label)
-        publisher_container.add(raw(str(self['publisher_search'])))
-        if self['publisher'].errors:
-            publisher_container.add(div(span(self['publisher'].errors, cls='text-primary text-sm'), cls='label'))
-
-        publisher_wrapper.add(publisher_container)
-        publisher_wrapper.add(
-            div(id='publisher-results', cls='absolute z-50 w-full top-[85px] bg-base-100 rounded-box shadow-lg'))
-        form.add(publisher_wrapper)
-
-        # Plate Number
+        source_title_field = self['source_title']
+        publisher_search_field = self['publisher_search']
+        publisher_field = self['publisher']
         plate_number_field = self['plate_number']
-        plate_number_container = label(cls='form-control w-full')
-        plate_number_label = div(cls='label')
-        plate_number_label.add(span(plate_number_field.label, cls='label-text'))
-        plate_number_container.add(plate_number_label)
-        plate_number_container.add(raw(str(plate_number_field)))
-        if plate_number_field.errors:
-            plate_number_container.add(div(span(plate_number_field.errors, cls='text-primary text-sm'), cls='label'))
-        form.add(plate_number_container)
 
-        # Source Type
-        #if not self.is_collection:
-            #source_type_field = self['source_type']
-            #source_type_container = label(cls='form-control w-full')
-            #source_type_label = div(cls='label')
-            #source_type_label.add(span(source_type_field.label, cls='label-text'))
-            #source_type_container.add(source_type_label)
-            #source_type_container.add(raw(str(source_type_field)))
-            #if source_type_field.errors:
-                #source_type_container.add(div(span(source_type_field.errors, cls='text-primary text-sm'), cls='label'))
-            #form.add(source_type_container)
-
-        # Date Fields
-        #display_field = self['display']
-
-        #display_container = label(cls='form-control w-full')
-        #display_label = div(cls='label')
-        #display_label.add(span(_('display'), cls='label-text'))
-        #display_container.add(display_label)
-        #display_container.add(raw(str(display_field)))
-        #if display_field.errors:
-            #display_container.add(div(span(display_field.errors, cls='text-primary text-sm'), cls='label'))
-
-        #form.add(display_container)
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(temporary_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(temporary_title_field))
+                if temporary_title_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(temporary_title_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(source_title_field))
+                if source_title_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(source_title_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+            with label(cls=SimpleFormMixin.form_control_classes + 'w-full relative'):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(publisher_search_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(publisher_search_field))
+                raw(str(publisher_field))
+                div(id='publisher-results', cls='absolute z-50 w-full top-[85px] bg-base-100 rounded-box shadow-lg')
+                if publisher_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(publisher_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(plate_number_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(plate_number_field))
+                if plate_number_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(plate_number_field.errors, cls=SimpleFormMixin.error_label_text_classes)
 
         return mark_safe(str(form))
 
@@ -677,7 +620,6 @@ class SingletonCreateForm(forms.ModelForm):
         fields = [
                 'working_title',
                 'source_title',
-                #'source_type',
                 'library',
                 'signature'
             ]
@@ -694,12 +636,6 @@ class SingletonCreateForm(forms.ModelForm):
             required = False,
             widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes})
         )
-    #source_type = forms.ChoiceField(
-            #label = _('source type') + '*',
-            #choices = Manifestation.SourceType.choices[:-1],
-            #widget = Select(attrs={'class': SimpleFormMixin.select_classes}),
-            #required = False
-        #)
     library = forms.ModelChoiceField(
             queryset = Library.objects.all(),
             label = _('holding institution'),
@@ -714,32 +650,26 @@ class SingletonCreateForm(forms.ModelForm):
         )
 
     def __init__(self, *args, **kwargs):
-        self.is_collection = kwargs.pop('is_collection', False)
+        self.show_source_title = kwargs.pop('show_source_title', False)
         super().__init__(*args, **kwargs)
 
     def as_daisy(self):
         root = div(cls="flex flex-col gap-5")
         source_title_field = self['source_title']
         working_title_field = self['working_title']
-        #source_type_field = self['source_type']
         library_field = self['library']
         signature_field = self['signature']
 
         with root:
             with div(cls='flex w-full gap-10 my-5'):
                 with label(cls=SimpleFormMixin.palette_form_control_classes):
-                    if self.is_collection:
+                    if self.show_source_title:
                         with div(cls=SimpleFormMixin.label_classes):
                             span(source_title_field.label, cls=SimpleFormMixin.label_text_classes)
                         raw(str(source_title_field))
                     with div(cls=SimpleFormMixin.label_classes):
                         span(working_title_field.label, cls=SimpleFormMixin.label_text_classes)
                     raw(str(working_title_field))
-                #if not self.is_collection:
-                    #with label(cls=SimpleFormMixin.palette_form_control_classes):
-                        #with div(cls=SimpleFormMixin.label_classes):
-                            #span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
-                        #raw(str(source_type_field))
             with div(cls='flex w-full gap-10 my-5'):
                 with label(cls=SimpleFormMixin.palette_form_control_classes):
                     with div(cls=SimpleFormMixin.label_classes):
@@ -1085,7 +1015,7 @@ class PublicationPlaceForm(ModelForm, SimpleFormMixin):
         return mark_safe(str(palette))
 
 
-class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
+class ManifestationPlaceForm(BaseHistoryPlaceForm):
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
             coerce = lambda x: x == 'True',
@@ -1096,49 +1026,8 @@ class ManifestationPlaceForm(ModelForm, SimpleFormMixin):
         )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
 
-    class Meta:
+    class Meta(BaseHistoryPlaceForm.Meta):
         model = ManifestationPlace
-        fields = [
-            'inferred',
-            'assumed'
-        ]
-        widgets = {
-                'inferred': CheckboxInput( attrs = {
-                        'class': SimpleFormMixin.toggle_classes,
-                        'form': 'form'
-                    }),
-                'assumed': CheckboxInput( attrs = {
-                        'class': SimpleFormMixin.toggle_classes,
-                        'form': 'form'
-                    })
-            }
-
-    def as_daisy(self):
-        palette = div(cls='flex gap-10 items-center')
-
-        place_assumed_field = self['assumed']
-        place_inferred_field = self['inferred']
-
-        with palette:
-            div(cls='flex-1')
-            with div(cls='form-control flex-0'):
-                with label(cls='cursor-pointer label flex gap-5'):
-                    span(_(place_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
-                    raw(str(place_assumed_field))
-            for sw in place_inferred_field.subwidgets:
-                with tags.div(cls=SimpleFormMixin.form_control_classes):
-                    with tags.label(cls='label cursor-pointer gap-5'):
-                        tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
-                        tags.input_(
-                                type='radio',
-                                name=sw.data.get('name'),
-                                value=str(sw.data.get('value')),
-                                cls='radio',
-                                checked = sw.data.get('selected', False),
-                                form='form'
-                            )
-
-        return mark_safe(str(palette))
 
 
 class ManifestationTextTypeForm(BaseTextTypeForm):

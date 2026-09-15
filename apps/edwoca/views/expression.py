@@ -31,6 +31,11 @@ class ExpressionListView(EdwocaListView):
 class ExpressionSearchView(EdwocaSearchView):
     model = Expression
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('expressions')
+        return context
+
 
 class ExpressionCreateView(EntityMixin, CreateView):
     model = Expression

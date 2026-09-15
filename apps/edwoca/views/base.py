@@ -3,7 +3,7 @@ from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, FormView, CreateView, DeleteView
 from django.db.models import Case, When
 from liszt_util.forms import FramedSearchForm, SearchForm
@@ -178,7 +178,8 @@ class EdwocaSearchView(SearchView):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        return qs.models(getattr(edwoca_models, self.get_model_name()))
+        return (qs.models(getattr(edwoca_models, self.get_model_name()))
+                .order_by('id'))
 
 
 class SimpleFormView(EntityMixin, UpdateView):
@@ -422,3 +423,60 @@ class BaseBibliographyUpdateView(EntityMixin, UpdateView):
             context[f"found_letters"] = letter_search_form.search().models(Letter)
 
         return context
+
+
+class BaseHistoryUpdateView(SimpleFormView):
+    property = 'history'
+    template_name = 'edwoca/history.html'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+
+        if not form.is_valid():
+            return self.form_invalid(form)
+
+        place_forms = []
+        for place in getattr(self.object, self.place_set_property).all():
+            place_form = self.place_form(request.POST, instance = place, prefix=f'place-{place.id}')
+            if not place_form.is_valid():
+                return self.form_invalid(form)
+            place_forms.append(place_form)
+
+        for place_form in place_forms:
+            place_form.save()
+
+        self.object = form.save()
+        period = self.object.period
+
+        if 'calculate-machine-readable-date' in request.POST:
+            period.parse_display()
+            period.save()
+        elif 'clear-machine-readable-date' in request.POST:
+            period.not_before = None
+            period.not_after = None
+            period.assumed = False
+            period.inferred = False
+            period.save()
+
+        return redirect(self.view_name, pk = self.object.id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_form = SearchForm(self.request.GET or None)
+        context['searchform'] = search_form
+        context['show_search_form'] = True
+
+        context['place_forms'] = []
+        for place in getattr(self.object, self.place_set_property).all():
+            place_form = self.place_form(instance = place, prefix=f'place-{place.id}')
+            context['place_forms'].append(place_form)
+
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_places"] = search_form.search().models(Place)
+
+        return context
+
+    def get_model(self):
+        return self.model.__name__

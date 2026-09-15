@@ -11,7 +11,6 @@
 
 {% include 'edwoca/partials/item/preview-divs/manuscript_prolog.html' %}
 
-{# probably the view should use a generic template for item and manifestation manuscript characteristics #}
 <h2 class="card-title mt-0 mb-5">
     {% translate 'item characteristics' %}
 </h2>
@@ -21,33 +20,167 @@
     <input type="submit" id="submit-form">
 </form>
 
-{{ form.type_stage_as_daisy }}
-
-{{ function_form.as_daisy }}
-
-{{ form.as_daisy }}
+{{ form.type_as_daisy }}
 
 {{ completeness_form.as_daisy }}
 
-<div class="mt-5">
-    <h3 class="text-lg font-bold mb-5 prose">
-        {% translate 'modifications' %}
-    </h3>
-    {% for modification in modifications %}
+{{ form.stage_as_daisy }}
+
+{% if not object.source_type == 'PRC' %}
+
+    {{ function_form.as_daisy }}
+
+    {{ form.as_daisy }}
+
+{% endif %}
+
+{% if object.source_type == 'APC' %}
+
+    <div class="mt-5">
+        <h3 class="text-lg font-bold mb-5 prose">
+            {% translate 'annotations' %}
+        </h3>
+        {% for annotation in annotations %}
+            <div class="collapse bg-base-100 collapse-arrow my-5">
+                <input
+                    type="checkbox"
+                    {% if open_collapse == annotation.form.instance.id and collapse_type == 'annotation' %}
+                        checked
+                    {% endif %}
+                />
+                <div class="collapse-title truncate">
+                    {{ annotation.form.instance }}
+                </div>
+                <div class="collapse-content mt-5">
+                    {% if has_components %}
+                        {{ annotation.form.collection_component_as_daisy }}
+                    {% else %}
+                        <label class="form-control">
+                            <div class="label">
+                                <span class="label-text">
+                                    {% translate 'work relation (working title)' %}
+                                </span>
+                            </div>
+                            <div class="flex pseudo-input bg-white border border-black p-2 items-center">
+                                {{ object.manifestation.working_title }}
+                            </div>
+                        </label>
+                    {% endif %}
+                    {{ annotation.form.as_daisy }}
+                    <div class="mt-5">
+                        <h3>
+                            {% translate 'annotation writers / hands' %}
+                        </h3>
+                        {% for form in annotation.handwriting_forms %}
+                            {% include 'edwoca/partials/forms/handwriting_form.html' with model='annotationhandwriting' app='dmrism' %}
+                        {% endfor %}
+
+                        <div class="flex">
+                            <div class="flex-1"></div>
+                            <div class="flex-0">
+                                <button form="form" type="submit" name="add-annotation-handwriting" value="{{ annotation.form.instance.id }}" class="btn btn-outline mt-3">
+                                    {% translate 'create handwriting' %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button form="form" value="{{ annotation.form.instance.id }}" name="remove-annotation" class="btn btn-primary btn-outline mt-3">
+                            {% translate 'remove annotation' %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <p class="note">
+                {% translate 'no annotations' %}
+            </p>
+        {% endfor %}
+        <div class="flex justify-end">
+            <button form="form" name="add-annotation" class="btn btn-outline mt-3">
+                {% translate 'create annotation' %}
+            </button>
+        </div>
+    </div>
+
+{% endif %}
+
+{% if object.source_type == 'MPR' %}
+
+    <div class="mt-5">
+        <h3 class="text-lg font-bold mb-5 prose">
+            {% translate 'modifications' %}
+        </h3>
         {% for modification in modifications %}
-            {% include 'edwoca/partials/forms/_modification_form.html' with modification=modification %}
+            <div class="collapse bg-base-100 collapse-arrow my-5">
+                <input
+                    type="checkbox"
+                    {% if open_collapse == modification.form.instance.id and collapse_type == 'modification' %}
+                        checked
+                    {% endif %}
+                />
+                <div class="collapse-title truncate">
+                    {{ modification.form.instance }}
+                </div>
+                <div class="collapse-content mt-5">
+                    {% if has_components %}
+                        {{ modification.form.collection_component_as_daisy }}
+                    {% else %}
+                        <label class="form-control">
+                            <div class="label">
+                                <span class="label-text">
+                                    {% translate 'work relation (working title)' %}
+                                </span>
+                            </div>
+                            <div class="flex pseudo-input bg-white border border-black p-2 items-center">
+                                {{ object.manifestation.working_title }}
+                            </div>
+                        </label>
+                    {% endif %}
+                    {{ modification.form.description_as_daisy }}
+                    <div class="mt-5">
+                        <h3>
+                            {% translate 'modification writers / hands' %}
+                        </h3>
+                        {% for form in modification.handwriting_forms %}
+                            {% include 'edwoca/partials/forms/handwriting_form.html' with model='modificationhandwriting' app='edwoca' %}
+                        {% endfor %}
+
+                        <div class="flex">
+                            <div class="flex-1"></div>
+                            <div class="flex-0">
+                                <button form="form" type="submit" name="add-modification-handwriting" value="{{ modification.form.instance.id }}" class="btn btn-outline mt-3">
+                                    {% translate 'create handwriting' %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-end">
+                        <button form="form" value="{{ modification.form.instance.id }}" name="remove-modification" class="btn btn-primary btn-outline mt-3">
+                            {% translate 'remove modification' %}
+                        </button>
+                    </div>
+                </div>
+            </div>
         {% empty %}
             <p class="note">
                 {% translate 'no modifications' %}
             </p>
         {% endfor %}
-    {% endfor %}
-    <div class="flex justify-end">
-        <button form="form" name="add-modification" class="btn btn-outline mt-3">
-            {% translate 'create modification' %}
-        </button>
+        <div class="flex justify-end">
+            <button form="form" name="add-modification" class="btn btn-outline mt-3">
+                {% translate 'create modification' %}
+            </button>
+        </div>
     </div>
-</div>
+
+{% endif %}
+
+<h3 class="my-5">
+    {% translate 'comment' %}
+</h3>
+
+{{ form.comment_as_daisy }}
 
 {% include 'edwoca/partials/item/preview-divs/manuscript_epilog.html' %}
 

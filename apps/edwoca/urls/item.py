@@ -46,5 +46,6 @@ urlpatterns = [
     path('<int:pk>/bibliography/addbib/<str:zotitem_key>', views.ItemBibAddView.as_view(), name = 'item_bib_add'),
     path('removebib/<int:pk>', views.ItemBibDeleteView.as_view(), name = 'item_bib_remove'),
     path('<int:pk>/letteradd/<int:letter_pk>', views.item_letter_add, name = 'item_letter_add'),
-    path('<int:pk>/letterremove/<int:letter_pk>', views.item_letter_remove, name = 'item_letter_remove')
+    path('<int:pk>/letterremove/<int:letter_pk>', views.item_letter_remove, name = 'item_letter_remove'),
+    path('<int:pk>/history/', views.ItemHistoryUpdateView.as_view(), name='item_history'),
 ]

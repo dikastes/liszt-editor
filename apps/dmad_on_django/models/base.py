@@ -102,22 +102,48 @@ class TimestampedModel(models.Model):
             verbose_name = _('last save'),
             null = True
         )
+    first_editor = models.CharField(
+            max_length = 50,
+            blank = True,
+            verbose_name = _('first editor'),
+            default = ''
+        )
 
 
 class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
     class Meta:
         abstract = True
 
-    raw_data = models.TextField(null=True)
-    rework_in_gnd = models.BooleanField(default=False)
-    gnd_id = models.CharField(max_length=20, null=True, blank=True, unique=True)
-    comment = models.TextField(null=True, blank=True)
+    raw_data = models.TextField(
+            null = True,
+            verbose_name = _('raw data')
+        )
+    rework_in_gnd = models.BooleanField(
+            default = False,
+            verbose_name = _('rework in GND')
+        )
+    gnd_id = models.CharField(
+            max_length = 20,
+            null = True,
+            blank = True,
+            unique = True,
+            verbose_name = _('GND ID')
+        )
+    comment = models.TextField(
+            null = True,
+            blank = True,
+            verbose_name = _('comment')
+        )
     interim_designator = models.CharField(
-        max_length=150,
-        null=True,
-        blank=True
+        max_length = 150,
+        null = True,
+        blank = True,
+        verbose_name = _('interim designator')
     )
     gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
+
+    def get_index_title(self):
+        return ' '.join(str(name) for name in list(self.names.all()) + [ self.interim_designator ])
 
     @property
     def name(self):

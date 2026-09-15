@@ -1,0 +1,39 @@
+{% load i18n %}
+
+<div class="flex flex-col h-full">
+    {% if object.gnd_id %}
+        <ul class="menu flex-0">
+            <li>
+                <a href="{% url 'dmad_on_django:'|add:entity_type|add:'_update' object.pk %}"
+                    class="{% if view == 'update' %}active{% endif %}">
+                    {% translate 'update' %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'dmad_on_django:'|add:entity_type|add:'_authority_data' object.pk %}"
+                    class="{% if view == 'authority_data' %}active{% endif %}">
+                    {% translate 'authority data' %}
+                </a>
+            </li>
+            <li>
+                <a href="{% url 'dmad_on_django:'|add:entity_type|add:'_raw_data' object.pk %}"
+                    class="{% if view == 'raw_data' %}active{% endif %}">
+                    {% translate 'raw data' %}
+                </a>
+            </li>
+        </ul>
+    {% endif %}
+    <div class="flex-1"></div>
+    <ul class="menu flex-0">
+        <li>
+            <a href="{% url 'dmad_on_django:'|add:entity_type|add:'_list' %}">
+                {% translate 'back' %}
+            </a>
+        </li>
+        <li>
+            <a href="#" class="text-primary">
+                {% translate 'delete' %}
+            </a>
+        </li>
+    </ul>
+</div>

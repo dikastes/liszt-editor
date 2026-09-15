@@ -196,9 +196,11 @@ class BaseHandwriting(models.Model):
             return f'{self.writer.__str__()} ({self.medium})'
 
     def __str__(self):
-        if self.dubious_writer:
-            return f"[{self.writer.__str__()}] ({self.medium})"
-        return f"{self.writer.__str__()} ({self.medium})"
+        if self.writer:
+            if self.dubious_writer:
+                return f"[{self.writer.__str__()}] ({self.medium})"
+            return f"{self.writer.__str__()} ({self.medium})"
+        return _('<writer>')
 
 
 class BaseDedication(models.Model):
@@ -293,12 +295,6 @@ class TrackedModel(TimestampedModel):
     class Meta:
         abstract = True
 
-    first_editor = models.CharField(
-            max_length = 50,
-            blank = True,
-            verbose_name = _('first editor'),
-            default = ''
-        )
     editing_history = models.TextField(
             blank = True,
             verbose_name = _('editing history'),
@@ -314,3 +310,21 @@ class TrackedModel(TimestampedModel):
         if self.needs_review:
             return needs_review_string + title
         return title
+
+
+class BasePlaceRelation(models.Model):
+    class Meta:
+        abstract = True
+
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.CASCADE
+        )
+    inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
+        )

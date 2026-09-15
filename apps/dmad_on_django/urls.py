@@ -12,9 +12,11 @@ entities = [
         'subject_term',
         'corporation'
     ]
-id_bearing_actions = [ 
-        'update', 
-        'link', 
+id_bearing_actions = [
+        'update',
+        'authority_data',
+        'raw_data',
+        'link',
         'unlink',
         'pull'
     ]
@@ -64,7 +66,7 @@ for entity in entities:
         urlpatterns.append(
             path(
                 f"{entity}s/{action}/<int:pk>",
-                getattr(views, f"{snake_to_camel_case(entity)}{action.capitalize()}View").as_view(),
+                getattr(views, f"{snake_to_camel_case(entity)}{snake_to_camel_case(action)}View").as_view(),
                 name = f"{entity}_{action}"
                 )
             )

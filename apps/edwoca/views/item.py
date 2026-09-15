@@ -58,6 +58,11 @@ class ItemSearchView(EdwocaSearchView):
     def get_queryset(self):
         return super().get_queryset().filter(manifestation_is_singleton = False)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('items')
+        return context
+
 
 def item_history(request, pk):
     pass
@@ -716,6 +721,11 @@ class LibraryPrintsView(EdwocaListView):
 class LibrarySearchView(EdwocaSearchView):
     model = Library
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('libraries')
+        return context
+
 
 class LibraryCreateView(CreateView):
     model = Library
@@ -747,22 +757,50 @@ class LibraryDeleteView(DeleteView):
 
 def item_manuscript_update(request, pk):
     item = get_object_or_404(EdwocaItem, pk=pk)
+
+    has_components = False
+    if Manifestation.objects.filter(component_of = item.manifestation.id).count():
+        has_components = True
+
     context = {
         'object': item,
-        'entity_type': 'item'
+        'entity_type': 'item',
+        'has_components': has_components
     }
 
     if request.method == 'POST':
+        open_collapse = {}
+
+        remove_annotation_string = 'remove-annotation'
+        if remove_annotation_string in request.POST:
+            annotation_id = request.POST.get(remove_annotation_string)
+            annotation = Annotation.objects.get(pk = annotation_id)
+            annotation.delete()
+
         remove_modification_string = 'remove-modification'
         if remove_modification_string in request.POST:
             modification_id = request.POST.get(remove_modification_string)
             modification = ItemModification.objects.get(pk = modification_id)
             modification.delete()
 
+        remove_handwriting_string = 'remove-annotationhandwriting'
+        if remove_handwriting_string in request.POST:
+            handwriting_id = request.POST.get(remove_handwriting_string)
+            handwriting = AnnotationHandwriting.objects.get(pk = handwriting_id)
+            open_collapse = {
+                    'open_collapse': handwriting.annotation.id,
+                    'collapse_type': 'annotation'
+                }
+            handwriting.delete()
+
         remove_handwriting_string = 'remove-modificationhandwriting'
         if remove_handwriting_string in request.POST:
             handwriting_id = request.POST.get(remove_handwriting_string)
             handwriting = ModificationHandwriting.objects.get(pk = handwriting_id)
+            open_collapse = {
+                    'open_collapse': handwriting.modification.id,
+                    'collapse_type': 'modification'
+                }
             handwriting.delete()
 
         form = ItemManuscriptForm(request.POST, instance=item)
@@ -787,6 +825,18 @@ def item_manuscript_update(request, pk):
             context['completeness_form'] = completeness_form
             return render(request, 'edwoca:item_manuscript.html', context)
 
+        for annotation in item.annotations.all():
+            prefix = f'annotation_{annotation.id}'
+            annotation_form = AnnotationForm(request.POST, instance=annotation, prefix=prefix)
+            if annotation_form.is_valid():
+                annotation_form.save()
+
+            for handwriting in annotation.handwritings.all():
+                prefix = f'annotation_handwriting_{handwriting.id}'
+                handwriting_form = AnnotationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                if handwriting_form.is_valid():
+                    handwriting_form.save()
+
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
             modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
@@ -800,16 +850,43 @@ def item_manuscript_update(request, pk):
                     handwriting_form.save()
 
         if 'add-modification' in request.POST:
-            ItemModification.objects.create(item=item)
+            modification = ItemModification.objects.create(item=item)
+            open_collapse = {
+                    'open_collapse': modification.id,
+                    'collapse_type': 'modification'
+                }
+
+        if 'add-annotation' in request.POST:
+            annotation = Annotation.objects.create(item=item)
+            open_collapse = {
+                    'open_collapse': annotation.id,
+                    'collapse_type': 'annotation'
+                }
+
+        add_handwriting_string = 'add-annotation-handwriting'
+        if add_handwriting_string in request.POST:
+            annotation_id = request.POST.get(add_handwriting_string)
+            annotation = get_object_or_404(Annotation, pk=annotation_id)
+            AnnotationHandwriting.objects.create(annotation=annotation)
+            open_collapse = {
+                    'open_collapse': annotation.id,
+                    'collapse_type': 'annotation'
+                }
 
         add_handwriting_string = 'add-modification-handwriting'
         if add_handwriting_string in request.POST:
             modification_id = request.POST.get(add_handwriting_string)
             modification = get_object_or_404(ItemModification, pk=modification_id)
             ModificationHandwriting.objects.create(modification=modification)
-            return redirect('edwoca:item_manuscript', pk=pk)
+            open_collapse = {
+                    'open_collapse': modification.id,
+                    'collapse_type': 'modification'
+                }
 
-        return redirect('edwoca:item_manuscript', pk=pk)
+        base_url = reverse_lazy('edwoca:item_manuscript', kwargs={'pk': pk})
+        url_params = urlencode(open_collapse)
+
+        return redirect(f'{base_url}?{url_params}')
 
     else:
         form = ItemManuscriptForm(instance=item)
@@ -817,6 +894,8 @@ def item_manuscript_update(request, pk):
         text_type_form = ItemTextTypeForm(instance=item)
         completeness_form = ItemCompletenessForm(instance=item)
         modifications = []
+        annotations = []
+
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
             modification_form = ItemModificationForm(instance=modification, prefix=prefix)
@@ -832,6 +911,24 @@ def item_manuscript_update(request, pk):
             })
 
         context['modifications'] = modifications
+        context['open_collapse'] = int(request.GET.get('open_collapse', '-1'))
+        context['collapse_type'] = request.GET.get('collapse_type', '')
+
+        for annotation in item.annotations.all():
+            prefix = f'annotation_{annotation.id}'
+            annotation_form = AnnotationForm(instance=annotation, prefix=prefix)
+
+            handwriting_forms = []
+            for handwriting in annotation.handwritings.all():
+                prefix = f'annotation_handwriting_{handwriting.id}'
+                handwriting_forms.append(AnnotationHandwritingForm(instance=handwriting, prefix=prefix))
+
+            annotations.append({
+                'form': annotation_form,
+                'handwriting_forms': handwriting_forms
+            })
+
+        context['annotations'] = annotations
 
     context['form'] = form
     context['function_form'] = function_form
@@ -966,3 +1063,9 @@ class ItemBibDeleteView(DeleteView):
         return reverse_lazy('edwoca:item_bibliography', kwargs={'pk': self.object.item.id})
 
 
+class ItemHistoryUpdateView(BaseHistoryUpdateView):
+    model = Item
+    form_class = ItemHistoryForm
+    place_form = ItemPlaceForm
+    place_set_property = 'itemplace_set'
+    view_name = 'edwoca:item_history'
