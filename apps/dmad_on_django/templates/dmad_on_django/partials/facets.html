@@ -93,7 +93,8 @@
                            hx-target="#search-results-container"
                            hx-swap="outerHTML"
                            hx-push-url="true">
-                            {{ sort_meta.1 }} (A–Z)
+                            {{ sort_meta.1 }} ({{ sort_meta.2|default:_('aufsteigend') }})
+                    </a>
                         </a>
                     </li>
                     <li>
@@ -105,7 +106,7 @@
                            hx-target="#search-results-container"
                            hx-swap="outerHTML"
                            hx-push-url="true">
-                            {{ sort_meta.1 }} (Z–A)
+                            {{ sort_meta.1 }} ({{ sort_meta.3|default:_('absteigend') }})
                         </a>
                     </li>
                 {% endfor %}

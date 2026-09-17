@@ -33,11 +33,6 @@ class PersonIndex(indexes.SearchIndex, indexes.Indexable):
             faceted=True,
             indexed=True
         )
-    name = indexes.CharField(
-        model_attr='ordering_fields',
-        faceted=True,
-        indexed=True
-    )
 
     def get_model(self):
         return Person

@@ -98,7 +98,8 @@ class Person(DisplayableModel):
     professions = models.ManyToManyField(SubjectTerm)
 
     ordering_fields = {
-        'name': (['sort_name'], _('Name')),
+        'name': (['sort_name'], _('Name'), _('A-Z'), _('Z-A')),
+        'modified': (['last_save'], _('Letzte Bearbeitung'), _('älteste zuerst'), _('neuste zuerst')),
     }
 
     @classmethod

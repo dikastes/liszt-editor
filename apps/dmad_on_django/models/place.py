@@ -65,6 +65,10 @@ class Place(DisplayableModel):
 
     description = models.TextField(null=True)
 
+    ordering_fields = {
+        'modified': (['last_save'], _('Letzte Bearbeitung'), _('älteste zuerst'), _('neuste zuerst')),
+    }
+
     def get_search_placeholder():
         return _('search places')
 

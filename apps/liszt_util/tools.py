@@ -12,7 +12,6 @@ class DisplayableQuerySet(QuerySet):
         if hasattr(self.model, 'get_ordering_annotations'):
             annotations = self.model.get_ordering_annotations()
             if annotations:
-                # 1. Zuerst alle FilteredRelation-Annotationen registrieren
                 relations = {
                     k: v for k, v in annotations.items()
                     if isinstance(v, FilteredRelation)
@@ -20,7 +19,6 @@ class DisplayableQuerySet(QuerySet):
                 if relations:
                     queryset = queryset.annotate(**relations)
 
-                # 2. Danach alle berechneten Ausdrücke annotieren
                 expressions = {
                     k: v for k, v in annotations.items()
                     if not isinstance(v, FilteredRelation)
