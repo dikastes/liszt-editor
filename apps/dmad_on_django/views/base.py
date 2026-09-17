@@ -8,7 +8,6 @@ from liszt_util.forms import FramedSearchForm
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm, Corporation
 from haystack.generic_views import SearchView
-from haystack.query import SearchQuerySet
 from json import dumps
 from dmad_on_django.forms import formWidgets, DmadCreateForm, DmadUpdateForm
 from liszt_util.tools import camel_to_snake_case, snake_to_camel_case
@@ -202,8 +201,10 @@ class ListContextMixin(NavbarContextMixin):
         context.update({
             'active': camel_to_snake_case(self.model.__name__),
             'type': self.kwargs.get('type'),
-            'search_url': f'dmad_on_django:{self.get_model_name()}_search'
+            'search_url': f'dmad_on_django:{self.get_model_name()}_search',
+            'available_sorts': getattr(self.model, 'ordering_fields', {}),
         })
+
         if hasattr(self, 'sqs'):
             context.update({
                 'rework_count': self.sqs.filter(rework_in_gnd=True).count(),
@@ -214,7 +215,6 @@ class ListContextMixin(NavbarContextMixin):
                 'rework_count': self.model.objects.filter(rework_in_gnd=True).count(),
                 'stub_count': self.model.objects.filter(gnd_id__isnull=True).count(),
             })
-
 
         return context
 
@@ -245,6 +245,11 @@ class DmadListView(ListContextMixin, ListView):
         if type_ == 'stub':
             qs = qs.filter(gnd_id__isnull = True)
 
+        sort_param = self.request.GET.get('sort')
+        descending = self.request.GET.get('dir') == 'desc'
+
+        if hasattr(qs, 'order_by_fields'):
+            return qs.order_by_fields(sort_key=sort_param, descending=descending)
         return qs
 
     def get(self, *args, **kwargs):

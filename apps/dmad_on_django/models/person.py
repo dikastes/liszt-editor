@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import FilteredRelation, Q
+from django.db.models import FilteredRelation, Q, Value
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
@@ -12,6 +12,7 @@ from .place import Place
 from .geographicareacodes import PersonGeographicAreaCode
 from .subjectterm import SubjectTerm
 from slub_pylobid.pylobid import PyLobidPerson, GNDAPIError
+from django.db.models.functions import Coalesce, Lower, NullIf
 
 
 class PersonName(models.Model):
@@ -96,12 +97,24 @@ class Person(DisplayableModel):
 
     professions = models.ManyToManyField(SubjectTerm)
 
-    ordering_fields = ['primary_name__last_name', 'primary_name__first_name']
+    ordering_fields = {
+        'name': (['sort_name'], _('Name')),
+    }
 
     @classmethod
     def get_ordering_annotations(cls):
         return {
-            'primary_name': FilteredRelation('names', condition=Q(names__status=Status.PRIMARY))
+            'primary_name': FilteredRelation(
+                'names',
+                condition=Q(names__status=Status.PRIMARY)
+            ),
+            'sort_name': Lower(
+                Coalesce(
+                    NullIf('primary_name__last_name', Value('')),
+                    NullIf('interim_designator', Value('')),
+                    Value('zzz')
+                )
+            ),
         }
 
     def get_search_placeholder():

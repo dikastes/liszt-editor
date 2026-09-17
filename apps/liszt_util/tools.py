@@ -1,31 +1,65 @@
 from json import dumps, loads
 
 from django.db import transaction
-from django.db.models import Max, Q, FilteredRelation, QuerySet
+from django.db.models import Max, QuerySet, F, FilteredRelation
 from django.utils.safestring import mark_safe
 from .models import Sortable
 
 class DisplayableQuerySet(QuerySet):
-    def order_by_name(self, descending=False):
+    def order_by_fields(self, sort_key=None, descending=False):
         queryset = self
-        annotation = self.model.get_ordering_annotations()
 
-        if not annotation:
+        if hasattr(self.model, 'get_ordering_annotations'):
+            annotations = self.model.get_ordering_annotations()
+            if annotations:
+                # 1. Zuerst alle FilteredRelation-Annotationen registrieren
+                relations = {
+                    k: v for k, v in annotations.items()
+                    if isinstance(v, FilteredRelation)
+                }
+                if relations:
+                    queryset = queryset.annotate(**relations)
+
+                # 2. Danach alle berechneten Ausdrücke annotieren
+                expressions = {
+                    k: v for k, v in annotations.items()
+                    if not isinstance(v, FilteredRelation)
+                }
+                if expressions:
+                    queryset = queryset.annotate(**expressions)
+
+        sort_map = getattr(self.model, 'ordering_fields', {})
+        if not sort_map:
             return queryset
 
-        queryset = queryset.annotate(**annotation)
-
-        fields = getattr(self.model, 'ordering_fields', [])
+        fields = None
+        if isinstance(sort_map, dict):
+            if sort_key in sort_map:
+                item = sort_map[sort_key]
+                fields = item[0] if isinstance(item, (tuple, list)) else item
+            else:
+                first_item = next(iter(sort_map.values()))
+                fields = first_item[0] if isinstance(first_item, (tuple, list)) else first_item
+        elif isinstance(sort_map, (list, tuple)):
+            fields = sort_map
+        elif isinstance(sort_map, str):
+            fields = [sort_map]
 
         if not fields:
             return queryset
 
-        if descending:
-            fields = [f'-{f}' for f in fields]
+        if isinstance(fields, str):
+            fields = [fields]
 
-        return queryset.order_by(*fields)
+        order_exprs = []
+        for field in fields:
+            clean_field = field.lstrip('-')
+            if descending:
+                order_exprs.append(F(clean_field).desc(nulls_last=True))
+            else:
+                order_exprs.append(F(clean_field).asc(nulls_last=True))
 
-
+        return queryset.order_by(*order_exprs)
 
 
 class RenderRawJSONMixin:
