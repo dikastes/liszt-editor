@@ -16,6 +16,7 @@ from liszt_util.models import Sortable
 
 
 class TitleTypes(models.TextChoices):
+    ELSE = 'EL', _('other title position')
     HEAD_TITLE = 'HT', _('Head Title')
     TITLE_PAGE = 'TP', _('Title Page')
     ENVELOPE = 'EN', _('Envelope')
@@ -31,12 +32,8 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        SKETCHES = 'SK', _('Sketches'),
         PROOF = 'PR', _('proof'),
-
-        def parse(string):
-            match string.lower():
-                case 'sketch' | 'sketches': return Manifestation.ManifestationForm.SKETCHES
+        SKETCH = 'SK', _('sketch')
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
@@ -56,7 +53,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         CORRECTED_TRANSCRIPT = 'CTS', _('transcript with autograph entries')
         AUTOGRAPH = 'AUT', _('autograph')
         QUESTIONABLE_AUTOGRAPH = 'QAU', _('questionable autograph')
-        CORRECTED_PRINT = 'CPR', _('print with autograph entries')
+        MODIFIED_PRINT = 'MPR', _('modified print')
         PRINT = 'PRT', _('print')
 
         def parse_from_rism(rism_string):
@@ -70,7 +67,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 case 'copy': return Manifestation.SourceType.TRANSCRIPT
                 case 'correctedcopy': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
                 case 'print': return Manifestation.SourceType.PRINT
-                case 'correctedprint': return Manifestation.SourceType.CORRECTED_PRINT
+                case 'correctedprint': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
@@ -142,7 +139,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             max_length = 10,
             choices = Edition,
             default = Edition.FOLLOWING_EDITION,
-            verbose_name = _('edition')
+            verbose_name = _('edition'),
+            null = True,
+            blank = True
         )
     state = models.CharField(
             max_length = 10,
@@ -153,11 +152,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     extent = models.TextField(
             blank = True,
             verbose_name = _('extent'),
-            default = ''
-        )
-    history = models.TextField(
-            blank = True,
-            verbose_name = _('history'),
             default = ''
         )
     bib = models.ManyToManyField(
@@ -261,14 +255,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             verbose_name = _('plate number'),
             default = ''
         )
-    album_page = models.BooleanField(
-            default = False,
-            verbose_name = _('album page')
-        )
-    performance_material = models.BooleanField(
-            default = False,
-            verbose_name = _('performance material')
-        )
     authorized_edition = models.BooleanField(
             default = False,
             verbose_name = _('authorized edition')
@@ -284,18 +270,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     further_edition = models.BooleanField(
             default = False,
             verbose_name = _('further edition')
-        )
-    correction_sheet = models.BooleanField(
-            default = False,
-            verbose_name = _('correction sheet')
-        )
-    stitch_template = models.BooleanField(
-            default = False,
-            verbose_name = _('stitch template')
-        )
-    dedication_item = models.BooleanField(
-            default = False,
-            verbose_name = _('dedication item')
         )
     choir_score = models.BooleanField(
             default = False,
@@ -403,19 +377,19 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return self._render_types(potential_edition_types)
 
     def get_source_type(self):
-        potential_edition_types = [
-                'album_page',
-                'performance_material',
+        potential_source_types = [
+                #'album_page',
+                #'performance_material',
                 'authorized_edition',
                 'first_edition',
                 'part',
                 'further_edition',
-                'correction_sheet',
-                'stitch_template',
-                'dedication_item'
+                #'correction_sheet',
+                #'stitch_template',
+                #'dedication_item'
             ]
 
-        return self._render_types(potential_edition_types)
+        return self._render_types(potential_source_types)
 
     def _render_types(self, types):
         truthy_types = [ str(getattr(Manifestation, t).field.verbose_name) for t in types if getattr(self, t) ]
@@ -435,7 +409,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             ])
 
     def render_title_suffix(self):
-        return f'({self.get_source_type_display()})'
+        if self.source_type:
+            return f'({self.get_source_type_display()})'
+        return ''
 
     def standardized_search_entry(self):
         return self.render_title()
@@ -672,9 +648,10 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         raise Exception('You are trying to retrieve a single item from a non singleton manifestation.')
 
     def get_current_signature(self):
-        if self.is_singleton and self.get_single_item():
+        try:
             return self.get_single_item().get_current_signature()
-        return ''
+        except:
+            return ''
 
     def get_current_signature_normalized(self):
         try:
@@ -721,23 +698,10 @@ class PublicationPlace(DocumentationStatusMixin, models.Model):
         )
 
 
-
-class ManifestationPlace(models.Model):
+class ManifestationPlace(BasePlaceRelation):
     manifestation = models.ForeignKey(
             'Manifestation',
             on_delete = models.CASCADE
-        )
-    place = models.ForeignKey(
-            'dmad.Place',
-            on_delete = models.CASCADE
-        )
-    inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
-        )
-    assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
         )
 
 
@@ -793,6 +757,7 @@ class RelatedManifestation(RelatedEntity):
         STITCH_TEMPLATE = 'SD', _('is stitch template (as documented)')
         STITCH_TEMPLATE_INFERRED = 'SI', _('is stitch template (inferred)')
         RELATED = 'R', _('is related to')
+        REVISION = 'RV', _('is revision of')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',

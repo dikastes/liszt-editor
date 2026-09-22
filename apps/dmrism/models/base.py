@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.utils.safestring import mark_safe
+from dmad_on_django.models.base import TimestampedModel
 
 
 class WemiBaseClass(models.Model):
@@ -195,9 +196,11 @@ class BaseHandwriting(models.Model):
             return f'{self.writer.__str__()} ({self.medium})'
 
     def __str__(self):
-        if self.dubious_writer:
-            return f"[{self.writer.__str__()}] ({self.medium})"
-        return f"{self.writer.__str__()} ({self.medium})"
+        if self.writer:
+            if self.dubious_writer:
+                return f"[{self.writer.__str__()}] ({self.medium})"
+            return f"{self.writer.__str__()} ({self.medium})"
+        return _('<writer>')
 
 
 class BaseDedication(models.Model):
@@ -288,26 +291,10 @@ class BaseCorporationDedication(BaseDedication):
         return f'{super_str} ({dedicatee_str})'
 
 
-class TrackedModel(models.Model):
+class TrackedModel(TimestampedModel):
     class Meta:
         abstract = True
 
-    first_save = models.DateTimeField(
-            auto_now_add = True,
-            verbose_name = _('first save'),
-            null = True
-        )
-    last_save = models.DateTimeField(
-            auto_now = True,
-            verbose_name = _('last save'),
-            null = True
-        )
-    first_editor = models.CharField(
-            max_length = 50,
-            blank = True,
-            verbose_name = _('first editor'),
-            default = ''
-        )
     editing_history = models.TextField(
             blank = True,
             verbose_name = _('editing history'),
@@ -319,7 +306,25 @@ class TrackedModel(models.Model):
         )
 
     def mark_needs_review(self, title):
-        needs_review_string = '!'
+        needs_review_string = '! '
         if self.needs_review:
             return needs_review_string + title
         return title
+
+
+class BasePlaceRelation(models.Model):
+    class Meta:
+        abstract = True
+
+    place = models.ForeignKey(
+            'dmad.Place',
+            on_delete = models.CASCADE
+        )
+    inferred = models.BooleanField(
+            default=False,
+            verbose_name = _("inferred")
+        )
+    assumed = models.BooleanField(
+            default=False,
+            verbose_name = _("assumed")
+        )

@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace, PublicationPlace
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -103,7 +103,10 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     not_before = self.period.not_before,
                     not_after = self.period.not_after,
                     display = self.period.display,
-                    status = self.period.status
+                    time_mode = self.period.time_mode,
+                    start_qualifier = self.period.start_qualifier,
+                    end_qualifier = self.period.end_qualifier,
+                    imprecision = self.period.imprecision
                 )
 
         copy_of = _('copy of')
@@ -117,7 +120,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             source_type = self.source_type,
             print_type = self.print_type,
             state = self.state,
-            history = self.history,
             language = self.language,
             watermark = self.watermark,
             watermark_url = self.watermark_url,
@@ -127,11 +129,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             taken_information = self.taken_information,
             stitcher = self.stitcher,
             specific_figure = self.specific_figure,
-            album_page = self.album_page,
-            performance_material = self.performance_material,
-            correction_sheet = self.correction_sheet,
-            stitch_template = self.stitch_template,
-            dedication_item = self.dedication_item,
             choir_score = self.choir_score,
             piano_reduction = self.piano_reduction,
             particell = self.particell,
@@ -217,6 +214,27 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             dubious_writer = handwriting.dubious_writer
                         )
 
+            for handwriting in self.get_single_item().handwritings.all():
+                ItemHandwriting.objects.create(
+                        item = single_item_copy,
+                        writer = handwriting.writer,
+                        medium = handwriting.medium,
+                        dubious_writer = handwriting.dubious_writer
+                )
+
+        for publication in self.publications.all():
+            publication_copy = Publication.objects.create(
+                    manifestation = copy,
+                    publisher = publication.publisher
+                )
+            for publication_place in publication.place_relations.all():
+                PublicationPlace.objects.create(
+                        place = publication_place.place,
+                        publication = publication_copy,
+                        inferred = publication_place.inferred,
+                        assumed = publication_place.assumed
+                    )
+
         for title in self.titles.all():
             title_copy = ManifestationTitle.objects.create(
                     title = title.title,
@@ -230,14 +248,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         medium = handwriting.medium,
                         dubious_writer = handwriting.dubious_writer
                     )
-
-            for handwriting in self.get_single_item().handwritings.all():
-                ItemHandwriting.objects.create(
-                        item = single_item_copy,
-                        writer = handwriting.writer,
-                        medium = handwriting.medium,
-                        dubious_writer = handwriting.dubious_writer
-                )
 
         for related_manifestation in self.target_manifestation_of.all():
             RelatedManifestation.objects.create(
@@ -917,11 +927,11 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     def get_manifestation_url(self):
         return reverse(f'edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
 
-    def __str__(self):
-        manifestation = self.manifestation
-        if (title := self.manifestation.working_title):
-            return f'{super().__str__()} {title}'
-        return super().__str__()
+    #def __str__(self):
+        #manifestation = self.manifestation
+        ##if (title := self.manifestation.working_title):
+            #return f'{super().__str__()} {title}'
+        #return super().__str__()
 
 
 class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):
@@ -1031,6 +1041,17 @@ class Event(models.Model):
 
 
 class ItemModification(models.Model):
+    collection_component = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.SET_NULL,
+            null = True,
+            related_name = 'modifications'
+        )
+    modification_description = models.TextField(
+            null = True,
+            blank = True,
+            verbose_name = _('description of modification')
+        )
     item = models.ForeignKey(
             'dmrism.Item',
             related_name = 'modifications',
@@ -1060,13 +1081,27 @@ class ItemModification(models.Model):
             verbose_name = _('note')
         )
 
-    def __str__(self):
+    def render_writer(self):
         if handwriting := self.handwritings.first():
-            if handwriting.dubious_writer:
-                return f"{self.period} [{handwriting.writer.__str__()}] ({handwriting.medium})"
-            return f"{self.period} ({handwriting.writer.__str__()}, {handwriting.medium})"
+            if writer := handwriting.writer:
+                writer_string = str(writer)
+                if handwriting.dubious_writer:
+                    if handwriting.medium:
+                        return f'[{writer_string}] ({handwriting.medium})'
+                    else:
+                        return f'[{writer_string}]'
+                if handwriting.medium:
+                    return f'({writer_string}, {handwriting.medium})'
+                else:
+                    return f'({writer_string})'
+            return _('<writer>')
+        return _('<handwriting>')
+
+    def __str__(self):
+        if self.period:
+            return f'{self.period} {str(self.render_writer())}'
         else:
-            return f"{self.period} <Handschrift>"
+            return str(self.render_writer())
 
     def ensure_period(self):
         if self.period is None:

@@ -1,1 +1,1 @@
-{{ object.get_designator }}
+{{ object.get_index_title }}

@@ -1,0 +1,58 @@
+{% extends 'liszt_util/base.html' %}
+
+{% load i18n %}
+
+{% block page_title %}
+    {{ object }}
+    |
+    DMAd
+{% endblock %}
+
+{% block content %}
+
+<div class="flex-1 min-w-0">
+    <div class="collapse collapse-plus">
+        <input type="checkbox" />
+        <div class="collapse-title">
+            {% translate 'identification' %}
+        </div>
+        <div class="collapse-content">
+            <table class="table table-zebra">
+                <tr>
+                    <td> {% translate 'GND ID' %} </td>
+                    <td> {{ object.gnd_id }} </td>
+                </tr>
+                <tr>
+                    <td> {% translate 'preferred name' %} </td>
+                    <td> {{ object.get_default_name }} </td>
+                </tr>
+                {% for alt_name in object.get_alt_names %}
+                    <tr>
+                        <td> {% translate 'alternative name' %} </td>
+                        <td> {{ alt_name }} </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="collapse collapse-plus">
+        <input type="checkbox"/>
+        <div class="collapse-title">
+            {{ object.get_overview_title }}
+        </div>
+        {{ object.as_daisy }}
+    </div>
+</div>
+{% endblock %}
+
+{% block nav %}
+    {% include 'dmad_on_django/partials/detail_sidebar.html' %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'dmad_on_django/partials/detail_navbar.html' %}
+{% endblock %}
+
+{% block navbar_title %}
+    {% include 'dmad_on_django/partials/navbar_title.html' %}
+{% endblock %}

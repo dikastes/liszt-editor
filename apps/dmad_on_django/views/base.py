@@ -2,7 +2,7 @@ from django import forms
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.http import JsonResponse, HttpResponseRedirect
 from liszt_util.forms import FramedSearchForm
 import dmad_on_django.models as dmad_models
@@ -115,7 +115,7 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
         return response
 
 
-class DmadUpdateView(DmadBaseViewMixin, NavbarContextMixin, UpdateView):
+class DmadUpdateView(DmadBaseViewMixin, UpdateView):
     template_name = 'dmad_on_django/form_view.html'
 
     def get_form_class(self):
@@ -128,13 +128,13 @@ class DmadUpdateView(DmadBaseViewMixin, NavbarContextMixin, UpdateView):
 
     def get_form_fields(self):
         if not self.object.gnd_id:
-            return ['interim_designator', 'comment', 'rework_in_gnd']
+            return ['interim_designator', 'comment', 'first_editor', 'rework_in_gnd']
         return ['comment', 'rework_in_gnd']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # braucht man das?
         context['object'] = self.object
+        context['view'] = 'update'
         return context
 
     def get_model(self):
@@ -148,7 +148,8 @@ class LinkView(DmadBaseViewMixin, UpdateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
-            form=AsDaisyModelForm,
+            #form=AsDaisyModelForm,
+            form=DmadCreateForm,
             fields=self.fields,
             widgets=formWidgets
         )
@@ -315,3 +316,21 @@ class DmadSearchView(ListContextMixin, NavbarContextMixin, SearchView):
 
     def get_model(self):
         return self.model
+
+
+class BaseAuthorityDataView(DmadBaseViewMixin, DetailView):
+    template_name = 'dmad_on_django/authority_data_view.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+        context['view'] = 'authority_data'
+        return context
+
+
+class BaseRawDataView(DmadBaseViewMixin, DetailView):
+    template_name = 'dmad_on_django/raw_data_view.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+        context['view'] = 'raw_data'
+        return context

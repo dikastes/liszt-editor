@@ -6,6 +6,8 @@ from ..forms.dedication import ItemPersonDedicationForm, ItemCorporationDedicati
 from ..forms.modification import ItemModificationForm, ModificationHandwritingForm
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy, reverse
+from django.utils.translation import gettext_lazy as _
+from django.utils.http import urlencode
 from django.views.generic import DeleteView, ListView
 from django.views.generic.edit import CreateView, UpdateView
 from django.views.generic.detail import DetailView
@@ -44,12 +46,22 @@ class ItemListView(EdwocaListView):
     def get_queryset(self):
         return super().get_queryset().filter(manifestation__is_singleton = False)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('items')
+        return context
+
 
 class ItemSearchView(EdwocaSearchView):
     model = EdwocaItem
 
     def get_queryset(self):
         return super().get_queryset().filter(manifestation_is_singleton = False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('items')
+        return context
 
 
 def item_history(request, pk):
@@ -292,17 +304,22 @@ def item_provenance(request, pk):
         pp_stations = construct_ps_set('person', request.POST)
         cp_stations = construct_ps_set('corporation', request.POST)
 
+        open_ps_params = {}
         for ps_class in ['person', 'corporation']:
             ps_key = f'add-{ps_class}-provenance-station'
             if ps_key in request.POST:
                 period = Period.objects.create()
-                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item, period = period)
+                new_station = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item, period = period)
+                open_ps_params['open_ps_type'] = ps_class
+                open_ps_params['open_ps'] = new_station.pk
             webref_key = f'add-{ps_class}-provenance-webref'
             if webref_key in request.POST:
                 station_id = request.POST.get(webref_key)
                 station = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = station_id)
                 creation_kwargs = { f'{ps_class}_provenance_station': station }
                 getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStationWebReference').objects.create(**creation_kwargs)
+                open_ps_params['open_ps_type'] = ps_class
+                open_ps_params['open_ps'] = station.pk
 
         pps_forms = []
         pps_bib_forms = []
@@ -406,7 +423,10 @@ def item_provenance(request, pk):
                 ps.period.not_after = None
                 ps.period.save()
 
-        return redirect('edwoca:item_provenance', pk=pk)
+        base_url = reverse_lazy('edwoca:item_provenance', kwargs={'pk': pk})
+        url_params = urlencode(open_ps_params)
+
+        return redirect(f'{base_url}?{url_params}')
     else:
         pp_stations = construct_ps_set('person')
         cp_stations = construct_ps_set('corporation')
@@ -414,6 +434,8 @@ def item_provenance(request, pk):
 
         context['pp_stations'] = pp_stations
         context['cp_stations'] = cp_stations
+        context['open_ps'] = int(request.GET.get('open_ps', '-1'))
+        context['open_ps_type'] = request.GET.get('open_ps_type', '')
         context['form'] = provenance_comment_form
         return render(request, 'edwoca/provenance.html', context)
 
@@ -590,9 +612,10 @@ def item_person_dedication_add_dedicatee(request, pk, dedication_id, person_id):
     return redirect('edwoca:item_dedication', pk=pk)
 
 
-def item_person_dedication_remove_dedicatee(request, pk, dedication_id):
+def item_person_dedication_remove_dedicatee(request, pk, dedication_id, person_id):
     dedication = get_object_or_404(ItemPersonDedication, pk=dedication_id)
-    dedication.dedicatee = None
+    person = get_object_or_404(Person, pk=person_id)
+    dedication.dedicatee.remove(person)
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
 
@@ -605,9 +628,10 @@ def item_corporation_dedication_add_dedicatee(request, pk, dedication_id, corpor
     return redirect('edwoca:item_dedication', pk=pk)
 
 
-def item_corporation_dedication_remove_dedicatee(request, pk, dedication_id):
+def item_corporation_dedication_remove_dedicatee(request, pk, dedication_id, corporation_id):
     dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
-    dedication.dedicatee = None
+    corporation = get_object_or_404(Corporation, pk=corporation_id)
+    dedication.dedicatee.remove(corporation)
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
 
@@ -625,13 +649,15 @@ def item_dedication_add_place(request, pk, dedication_id, place_id):
     return redirect('edwoca:item_dedication', pk=pk)
 
 
-def item_dedication_remove_place(request, pk, dedication_id):
-    # This is a bit tricky, as we don't know if it's a person or corporation dedication.
-    # We will try to get the person dedication first, and if it fails, we get the corporation dedication.
-    try:
-        dedication = ItemPersonDedication.objects.get(pk=dedication_id)
-    except ItemPersonDedication.DoesNotExist:
-        dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
+def item_person_dedication_remove_place(request, pk, dedication_id):
+    dedication = ItemPersonDedication.objects.get(pk=dedication_id)
+    dedication.place = None
+    dedication.save()
+    return redirect('edwoca:item_dedication', pk=pk)
+
+
+def item_corporation_dedication_remove_place(request, pk, dedication_id):
+    dedication = get_object_or_404(ItemCorporationDedication, pk=dedication_id)
     dedication.place = None
     dedication.save()
     return redirect('edwoca:item_dedication', pk=pk)
@@ -648,9 +674,57 @@ class ItemDeleteView(EntityMixin, DeleteView):
 class LibraryListView(EdwocaListView):
     model = Library
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('libraries')
+        return context
+
+
+class LibraryManuscriptsView(EdwocaListView):
+    model = Manifestation
+    template_name = 'edwoca/library_list.html'
+
+    def get_queryset(self):
+        self.library = get_object_or_404(Library, pk=self.kwargs['pk'])
+
+        return Manifestation.objects.filter(
+                is_singleton = True,
+                items__signatures__library = self.library
+            ).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = self.library
+        context['entity_type'] = 'library'
+        return context
+
+
+class LibraryPrintsView(EdwocaListView):
+    model = Item
+    template_name = 'edwoca/library_list.html'
+
+    def get_queryset(self):
+        self.library = get_object_or_404(Library, pk=self.kwargs['pk'])
+
+        return Manifestation.objects.filter(
+                is_singleton = False,
+                items__signatures__library = self.library
+            ).distinct()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['object'] = self.library
+        context['entity_type'] = 'library'
+        return context
+
 
 class LibrarySearchView(EdwocaSearchView):
     model = Library
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('libraries')
+        return context
 
 
 class LibraryCreateView(CreateView):
@@ -683,30 +757,60 @@ class LibraryDeleteView(DeleteView):
 
 def item_manuscript_update(request, pk):
     item = get_object_or_404(EdwocaItem, pk=pk)
+
+    has_components = False
+    if Manifestation.objects.filter(component_of = item.manifestation.id).count():
+        has_components = True
+
     context = {
         'object': item,
-        'entity_type': 'item'
+        'entity_type': 'item',
+        'has_components': has_components
     }
 
     if request.method == 'POST':
+        open_collapse = {}
+
+        remove_annotation_string = 'remove-annotation'
+        if remove_annotation_string in request.POST:
+            annotation_id = request.POST.get(remove_annotation_string)
+            annotation = Annotation.objects.get(pk = annotation_id)
+            annotation.delete()
+
         remove_modification_string = 'remove-modification'
         if remove_modification_string in request.POST:
             modification_id = request.POST.get(remove_modification_string)
             modification = ItemModification.objects.get(pk = modification_id)
             modification.delete()
 
+        remove_handwriting_string = 'remove-annotationhandwriting'
+        if remove_handwriting_string in request.POST:
+            handwriting_id = request.POST.get(remove_handwriting_string)
+            handwriting = AnnotationHandwriting.objects.get(pk = handwriting_id)
+            open_collapse = {
+                    'open_collapse': handwriting.annotation.id,
+                    'collapse_type': 'annotation'
+                }
+            handwriting.delete()
+
         remove_handwriting_string = 'remove-modificationhandwriting'
         if remove_handwriting_string in request.POST:
             handwriting_id = request.POST.get(remove_handwriting_string)
             handwriting = ModificationHandwriting.objects.get(pk = handwriting_id)
+            open_collapse = {
+                    'open_collapse': handwriting.modification.id,
+                    'collapse_type': 'modification'
+                }
             handwriting.delete()
 
         form = ItemManuscriptForm(request.POST, instance=item)
+        function_form = FunctionForm(request.POST, instance=item)
         completeness_form = ItemCompletenessForm(request.POST, instance=item)
         text_type_form = ItemTextTypeForm(request.POST, instance=item)
 
         all_forms = [
                 form,
+                function_form,
                 completeness_form,
                 text_type_form
             ]
@@ -716,9 +820,22 @@ def item_manuscript_update(request, pk):
                 f.save()
         else:
             context['form'] = form
+            context['function_form'] = function_form
             context['text_type_form'] = text_type_form
             context['completeness_form'] = completeness_form
             return render(request, 'edwoca:item_manuscript.html', context)
+
+        for annotation in item.annotations.all():
+            prefix = f'annotation_{annotation.id}'
+            annotation_form = AnnotationForm(request.POST, instance=annotation, prefix=prefix)
+            if annotation_form.is_valid():
+                annotation_form.save()
+
+            for handwriting in annotation.handwritings.all():
+                prefix = f'annotation_handwriting_{handwriting.id}'
+                handwriting_form = AnnotationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                if handwriting_form.is_valid():
+                    handwriting_form.save()
 
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
@@ -733,22 +850,52 @@ def item_manuscript_update(request, pk):
                     handwriting_form.save()
 
         if 'add-modification' in request.POST:
-            ItemModification.objects.create(item=item)
+            modification = ItemModification.objects.create(item=item)
+            open_collapse = {
+                    'open_collapse': modification.id,
+                    'collapse_type': 'modification'
+                }
+
+        if 'add-annotation' in request.POST:
+            annotation = Annotation.objects.create(item=item)
+            open_collapse = {
+                    'open_collapse': annotation.id,
+                    'collapse_type': 'annotation'
+                }
+
+        add_handwriting_string = 'add-annotation-handwriting'
+        if add_handwriting_string in request.POST:
+            annotation_id = request.POST.get(add_handwriting_string)
+            annotation = get_object_or_404(Annotation, pk=annotation_id)
+            AnnotationHandwriting.objects.create(annotation=annotation)
+            open_collapse = {
+                    'open_collapse': annotation.id,
+                    'collapse_type': 'annotation'
+                }
 
         add_handwriting_string = 'add-modification-handwriting'
         if add_handwriting_string in request.POST:
             modification_id = request.POST.get(add_handwriting_string)
             modification = get_object_or_404(ItemModification, pk=modification_id)
             ModificationHandwriting.objects.create(modification=modification)
-            return redirect('edwoca:item_manuscript', pk=pk)
+            open_collapse = {
+                    'open_collapse': modification.id,
+                    'collapse_type': 'modification'
+                }
 
-        return redirect('edwoca:item_manuscript', pk=pk)
+        base_url = reverse_lazy('edwoca:item_manuscript', kwargs={'pk': pk})
+        url_params = urlencode(open_collapse)
+
+        return redirect(f'{base_url}?{url_params}')
 
     else:
         form = ItemManuscriptForm(instance=item)
+        function_form = FunctionForm(instance=item)
         text_type_form = ItemTextTypeForm(instance=item)
         completeness_form = ItemCompletenessForm(instance=item)
         modifications = []
+        annotations = []
+
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
             modification_form = ItemModificationForm(instance=modification, prefix=prefix)
@@ -764,8 +911,27 @@ def item_manuscript_update(request, pk):
             })
 
         context['modifications'] = modifications
+        context['open_collapse'] = int(request.GET.get('open_collapse', '-1'))
+        context['collapse_type'] = request.GET.get('collapse_type', '')
+
+        for annotation in item.annotations.all():
+            prefix = f'annotation_{annotation.id}'
+            annotation_form = AnnotationForm(instance=annotation, prefix=prefix)
+
+            handwriting_forms = []
+            for handwriting in annotation.handwritings.all():
+                prefix = f'annotation_handwriting_{handwriting.id}'
+                handwriting_forms.append(AnnotationHandwritingForm(instance=handwriting, prefix=prefix))
+
+            annotations.append({
+                'form': annotation_form,
+                'handwriting_forms': handwriting_forms
+            })
+
+        context['annotations'] = annotations
 
     context['form'] = form
+    context['function_form'] = function_form
     context['text_type_form'] = text_type_form
     context['completeness_form'] = completeness_form
     search_form = SearchForm(request.GET or None)
@@ -897,3 +1063,9 @@ class ItemBibDeleteView(DeleteView):
         return reverse_lazy('edwoca:item_bibliography', kwargs={'pk': self.object.item.id})
 
 
+class ItemHistoryUpdateView(BaseHistoryUpdateView):
+    model = Item
+    form_class = ItemHistoryForm
+    place_form = ItemPlaceForm
+    place_set_property = 'itemplace_set'
+    view_name = 'edwoca:item_history'

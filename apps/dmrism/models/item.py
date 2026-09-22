@@ -21,6 +21,30 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         ordering = ['-needs_review', 'manifestation', 'order_index']
         unique_together = ('manifestation', 'order_index')
 
+    class ItemStage(models.TextChoices):
+        PROOF = 'PR', _('print proof')
+
+    class SourceType(models.TextChoices):
+        PROOF_COPY = 'PRC', _('proof copy')
+        ANNOTATED_PROOF_COPY = 'APC', _('annotated proof copy')
+        MODIFIED_PRINT = 'MPR', _('modified print')
+
+    item_stage = models.CharField(
+            max_length = 2,
+            choices = ItemStage,
+            default = None,
+            null = True,
+            blank = True,
+            verbose_name = _('item stage')
+        )
+    source_type = models.CharField(
+            max_length = 3,
+            choices = SourceType,
+            default = None,
+            null = True,
+            blank = True,
+            verbose_name = _('source type')
+        )
     rism_id = models.CharField(
             max_length=20,
             null = True,
@@ -31,6 +55,16 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
             'Manifestation',
             on_delete = models.CASCADE,
             related_name = 'items',
+        )
+    date_diplomatic = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('diplomatic date')
+        )
+    private_history_comment = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('private dedication comment')
         )
     private_dedication_comment = models.TextField(
             blank = True,
@@ -84,6 +118,41 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
             default = False,
             verbose_name = _('is incomplete')
         )
+    # function
+    album_page = models.BooleanField(
+            default = False,
+            verbose_name = _('album page')
+        )
+    performance_material = models.BooleanField(
+            default = False,
+            verbose_name = _('performance material')
+        )
+    correction_sheet = models.BooleanField(
+            default = False,
+            verbose_name = _('correction sheet')
+        )
+    stitch_template = models.BooleanField(
+            default = False,
+            verbose_name = _('stitch template')
+        )
+    dedication_item = models.BooleanField(
+            default = False,
+            verbose_name = _('dedication item')
+        )
+    hand_copy = models.BooleanField(
+            default = False,
+            verbose_name = _('hand copy')
+        )
+    period = models.OneToOneField(
+            'dmad.Period',
+            on_delete = models.SET_NULL,
+            null = True,
+            blank = True,
+        )
+    places = models.ManyToManyField(
+            'dmad.Place',
+            through = 'ItemPlace'
+        )
 
     _group_field_names = ['manifestation']
 
@@ -98,7 +167,12 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
                 public_provenance_comment = self.public_provenance_comment,
                 private_manuscript_comment = self.private_manuscript_comment,
                 private_dedication_comment = self.private_dedication_comment,
-                private_provenance_comment = self.private_provenance_comment
+                private_provenance_comment = self.private_provenance_comment,
+                album_page = self.album_page,
+                performance_material = self.performance_material,
+                correction_sheet = self.correction_sheet,
+                stitch_template = self.stitch_template,
+                dedication_item = self.dedication_item,
             )
         for signature in self.signatures.all():
             ItemSignature.objects.create(
@@ -122,11 +196,11 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
     def __str__(self):
         if self.manifestation.is_singleton:
             return self.manifestation.__str__()
-        return self.get_current_signature()
+        return self.render_title()
 
     @property
     def title_suffix(self):
-        return self.manifestation.render_title_suffix()
+        return f'({self.get_source_type_display()})'
 
     @property
     def title_body(self):
@@ -134,7 +208,14 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
 
     @property
     def title_prefix(self):
-        return self.get_current_signature()
+        return self.mark_needs_review(self.get_current_signature())
+
+    def render_title(self):
+        return ' '.join([
+                self.title_prefix,
+                self.title_body,
+                self.title_suffix
+            ])
 
     def get_siblings(self):
         return self.manifestation.items.exclude(id = self.id)
@@ -203,6 +284,13 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         super().save(*args, **kwargs)
 
 
+class ItemPlace(BasePlaceRelation):
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE
+        )
+
+
 class Library(models.Model):
     class Meta:
         ordering = ['siglum', 'name']
@@ -229,6 +317,10 @@ class Library(models.Model):
             blank = True,
             verbose_name = _('corporation')
         )
+
+    @property
+    def title_body(self):
+        return self.name
 
     def get_absolute_url(self):
         return reverse('edwoca:library_update', kwargs = {'pk' : self.id})
@@ -526,4 +618,92 @@ class ItemBib(BaseBib):
             'item',
             on_delete = models.CASCADE,
             related_name = 'bib_set'
+        )
+
+
+class Annotation(models.Model):
+    collection_component = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.SET_NULL,
+            null = True,
+            related_name = 'annotations'
+        )
+    item = models.ForeignKey(
+            'Item',
+            on_delete = models.CASCADE,
+            related_name = 'annotations'
+        )
+    is_ownership_note = models.BooleanField(
+            default = False,
+            verbose_name = _('ownership note')
+        )
+    is_date_note = models.BooleanField(
+            default = False,
+            verbose_name = _('date note')
+        )
+    is_correction = models.BooleanField(
+            default = False,
+            verbose_name = _('correction')
+        )
+    is_addition = models.BooleanField(
+            default = False,
+            verbose_name = _('addition')
+        )
+    is_note = models.BooleanField(
+            default = False,
+            verbose_name = _('note')
+        )
+    is_title = models.BooleanField(
+            default = False,
+            verbose_name = _('title')
+        )
+    is_dedication = models.BooleanField(
+            default = False,
+            verbose_name = _('dedication')
+        )
+    description_title_correction = models.TextField(
+            blank = True,
+            null = True,
+            verbose_name = _('description of title correction')
+        )
+
+    def get_annotation_type(self):
+        return ', '.join(
+                str(getattr(Annotation, field).field.verbose_name)
+                for field
+                in [
+                    'is_ownership_note',
+                    'is_date_note',
+                    'is_correction',
+                    'is_addition',
+                    'is_note',
+                    'is_title',
+                    'is_dedication'
+                ]
+                if getattr(self, field)
+            )
+
+    def render_annotation_type(self):
+        if comma_sep_type := self.get_annotation_type():
+            return f' ({comma_sep_type})'
+        return ''
+
+    def render_handwriting(self):
+        if handwriting := self.handwritings.first():
+            if handwriting.writer:
+                if handwriting.dubious_writer:
+                    return f'[{handwriting.writer.__str__()}]'
+                return handwriting.writer.__str__()
+            return _('<writer>')
+        return _('<handwriting>')
+
+    def __str__(self):
+        return self.render_handwriting() + self.render_annotation_type()
+
+
+class AnnotationHandwriting(BaseHandwriting):
+    annotation = models.ForeignKey(
+            'Annotation',
+            on_delete = models.CASCADE,
+            related_name = 'handwritings'
         )
