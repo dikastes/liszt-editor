@@ -1,128 +1,165 @@
 {% extends 'edwoca/base.html' %}
-
 {% load i18n %}
 
 {% block content %}
 
-{% include 'edwoca/partials/manifestation/preview-divs/title_prolog.html' %}
+<div id="manifestation-title-wrapper">
 
-<h2 class="my-5">
-    {% translate 'front matter' %}
-</h2>
+    {% include 'edwoca/partials/manifestation/preview-divs/title_prolog.html' %}
 
-<form id="form" class="hidden" method="post">
-    {% csrf_token %}
-    <input id="submit-form" type="submit" />
-</form>
+    <h2 class="my-5">
+        {% translate 'front matter' %}
+    </h2>
 
-<h3 class="my-5"> {% translate 'title setting' %} </h3>
+    <form id="form" class="hidden" method="post"
+          hx-post=""
+          hx-target="#manifestation-title-wrapper"
+          hx-select="#manifestation-title-wrapper"
+          hx-swap="outerHTML"
+          hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+          hx-disinherit="*">
+        {% csrf_token %}
+        <input id="submit-form" type="submit" />
+    </form>
 
-{{ form.source_title_as_daisy }}
+    <h3 class="my-5"> {% translate 'title setting' %} </h3>
 
-<h3 class="my-5"> {% translate 'diplomatic titles' %} </h3>
+    {{ form.source_title_as_daisy }}
 
-<div class="mt-5">
-{% for title_form in title_forms %}
-    <div class="collapse collapse-arrow bg-base-100 my-5">
-        <input type="checkbox" />
-        <div class="bg-base-100 collapse-title truncate">
-            {{ title_form.instance.render_summary }}
-        </div>
-        <div class="collapse-content mt-5">
-            {{ title_form.as_daisy }}
+    <h3 class="my-5"> {% translate 'diplomatic titles' %} </h3>
 
-            {% if object.is_singleton %}
-                <div class="mt-5">
-                    <h3>
-                        {% translate 'writers/hands' %}
-                    </h3>
-                    {% for handwriting_form in title_form.handwriting_forms %}
-                        <div class="border border-black p-5 my-5">
-                            {% include 'edwoca/partials/forms/handwriting_form.html' with model='manifestationtitlehandwriting' app='dmrism' form=handwriting_form %}
+    <div class="mt-5">
+    {% for title_form in title_forms %}
+        <div class="collapse collapse-arrow bg-base-100 my-5">
+            <input type="checkbox" {% if 'create-title' in request.POST and forloop.last %}checked{% endif %} />
+            <div class="bg-base-100 collapse-title truncate">
+                {{ title_form.instance.render_summary }}
+            </div>
+            <div class="collapse-content mt-5">
+                {{ title_form.as_daisy }}
+
+                {% if object.is_singleton %}
+                    <div class="mt-5">
+                        <h3>
+                            {% translate 'writers/hands' %}
+                        </h3>
+                        {% for handwriting_form in title_form.handwriting_forms %}
+                            <div class="border border-black p-5 my-5">
+                                {% include 'edwoca/partials/forms/handwriting_form.html' with model='manifestationtitlehandwriting' app='dmrism' form=handwriting_form %}
+                            </div>
+                        {% endfor %}
+
+                        <div class="flex">
+                            <div class="flex-1"></div>
+                            <button type="submit" class="btn btn-outline my-5" name="add-manifestation-title-handwriting" form="form" value="{{ title_form.instance.id }}">
+                                {% translate 'create handwriting' %}
+                            </button>
                         </div>
-                    {% endfor %}
-
-                    <div class="flex">
-                        <div class="flex-1"></div>
-                        <button class="btn btn-outline my-5" name="add-manifestation-title-handwriting" form="form" value="{{ title_form.instance.id }}">
-                            {% translate 'create handwriting' %}
-                        </button>
                     </div>
-                </div>
-            {% endif %}
+                {% endif %}
 
-            <div class="flex mt-5">
-                <div class="flex-1"></div>
-                <button class="btn btn-primary btn-outline" name="remove-title" type="submit" form="form" value="{{ title_form.instance.id }}">
-                    {% translate 'remove title' %}
-                </button>
+                <div class="flex mt-5">
+                    <div class="flex-1"></div>
+                    <button class="btn btn-primary btn-outline" name="remove-title" type="submit" form="form" value="{{ title_form.instance.id }}">
+                        {% translate 'remove title' %}
+                    </button>
+                </div>
             </div>
         </div>
+    {% empty %}
+    <p> {% translate 'no titles' %}</p>
+    {% endfor %}
     </div>
-{% empty %}
-<p> {% translate 'no titles' %}</p>
-{% endfor %}
-</div>
 
-<div class="flex items-center">
-    <div class="flex-1"></div>
-    <button form="form" type="submit" class="btn btn-outline flex-0" name="create-title">
-        {% translate 'create title' %}
-    </button>
-</div>
-
-{% if not object.is_singleton %}
-    <h3 class="my-5">
-        {% translate 'title page' %}
-    </h3>
-
-    {{ title_page_form.as_daisy }}
-{% endif %}
-
-<h2 class="my-5"> {% translate 'dedications' %} </h2>
-
-<h3 class="my-5"> {% translate 'person dedications' %} </h3>
-{% for person_dedication_form in person_dedication_forms %}
-    {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=person_dedication_form dedicatee_class='person' %}
-
-{% empty %}
-    <p class="note"> {% translate 'no person dedications' %} </p>
-{% endfor %}
-
-<div class="flex items-center">
-    <div class="flex-1"></div>
-    <button class="btn-outline btn flex-0" name="create-person-dedication" type="submit" form="form">
-        {% translate 'create person dedication' %}
-    </button>
-</div>
-
-<h3 class="my-5"> {% translate 'corporation dedications' %} </h3>
-{% for corporation_dedication_form in corporation_dedication_forms %}
-    {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=corporation_dedication_form dedicatee_class='corporation' %}
-{% empty %}
-    <p class="note"> {% translate 'no corporation dedications' %} </p>
-{% endfor %}
-
-<div class="flex items-center">
-    <div class="flex-1"></div>
-    <button class="btn-outline btn flex-0" name="create-corporation-dedication" type="submit" form="form">
-        {% translate 'create corporation dedication' %}
-    </button>
-</div>
-
-<label>
-    <div class="label">
-        <span class="label-text">
-            {% translate source_title_form.plate_number.label %}
-        </span>
+    <div class="flex items-center">
+        <div class="flex-1"></div>
+        <button form="form" type="submit" class="btn btn-outline flex-0" name="create-title">
+            {% translate 'create title' %}
+        </button>
     </div>
-    {{ source_title_form.plate_number }}
-</label>
 
-<h3 class="my-5"> {% translate 'comment' %} </h3>
+    {% if not object.is_singleton %}
+        <h3 class="my-5">
+            {% translate 'title page' %}
+        </h3>
 
-{{ form.dedication_comment_as_daisy }}
+        {{ title_page_form.as_daisy }}
+    {% endif %}
 
-{% include 'edwoca/partials/manifestation/preview-divs/title_epilog.html' %}
+    <h2 class="my-5"> {% translate 'dedications' %} </h2>
 
+    <h3 class="my-5"> {% translate 'person dedications' %} </h3>
+    <div id="person-dedications-list">
+        {% for person_dedication_form in person_dedication_forms %}
+            {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=person_dedication_form dedicatee_class='person' %}
+        {% empty %}
+            <p class="note"> {% translate 'no person dedications' %} </p>
+        {% endfor %}
+    </div>
+
+    <div class="flex items-center">
+        <div class="flex-1"></div>
+        <button class="btn-outline btn flex-0" name="create-person-dedication" type="submit" form="form">
+            {% translate 'create person dedication' %}
+        </button>
+    </div>
+
+    <h3 class="my-5"> {% translate 'corporation dedications' %} </h3>
+    <div id="corporation-dedications-list">
+        {% for corporation_dedication_form in corporation_dedication_forms %}
+            {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=corporation_dedication_form dedicatee_class='corporation' %}
+        {% empty %}
+            <p class="note"> {% translate 'no corporation dedications' %} </p>
+        {% endfor %}
+    </div>
+
+    <div class="flex items-center">
+        <div class="flex-1"></div>
+        <button class="btn-outline btn flex-0" name="create-corporation-dedication" type="submit" form="form">
+            {% translate 'create corporation dedication' %}
+        </button>
+    </div>
+
+    <label>
+        <div class="label">
+            <span class="label-text">
+                {% translate source_title_form.plate_number.label %}
+            </span>
+        </div>
+        {{ source_title_form.plate_number }}
+    </label>
+
+    <h3 class="my-5"> {% translate 'comment' %} </h3>
+
+    {{ form.dedication_comment_as_daisy }}
+
+    {% include 'edwoca/partials/manifestation/preview-divs/title_epilog.html' %}
+
+    {% if 'create-person-dedication' in request.POST %}
+    <script>
+        (function() {
+            var element = document.getElementById('person-dedications-list').lastElementChild;
+            if (element) {
+                var checkbox = element.querySelector('input[type="checkbox"]');
+                if (checkbox) checkbox.checked = true;
+                if (element.tagName === 'DETAILS') element.open = true;
+            }
+        })();
+    </script>
+    {% endif %}
+
+    {% if 'create-corporation-dedication' in request.POST %}
+    <script>
+        (function () {
+            var element = document.getElementById('corporation-dedications-list').lastElementChild;
+            if (element) {
+                var checkbox = element.querySelector('input[type="checkbox"]');
+                if (checkbox) checkbox.checked = true;
+                if (element.tagName === 'DETAILS') element.open = true;
+            }
+        })();
+    </script>
+    {% endif %}
+
+</div>
 {% endblock %}

@@ -4,73 +4,116 @@
 
 {% block content %}
 
-{% if entity_type == 'manifestation' %}
-    {% include 'edwoca/partials/manifestation/preview-divs/provenance_prolog.html' %}
-{% endif %}
-{% if entity_type == 'item' %}
-    {% include 'edwoca/partials/item/preview-divs/provenance_prolog.html' %}
-{% endif %}
+<div id="provenance-wrapper">
 
-<form method="post" id="form" class="hidden">
-    {% csrf_token %}
-    <input type="submit" class="hidden" id="submit-form">
-</form>
+    {% if entity_type == 'manifestation' %}
+        {% include 'edwoca/partials/manifestation/preview-divs/provenance_prolog.html' %}
+    {% endif %}
+    {% if entity_type == 'item' %}
+        {% include 'edwoca/partials/item/preview-divs/provenance_epilog.html' %}
+    {% endif %}
 
-<h2 class="my-5">
-    {% translate 'provenance persons' %}
-</h2>
+    <form method="post" id="form" class="hidden">
+        {% csrf_token %}
+        <input type="submit" class="hidden" id="submit-form">
+    </form>
 
-{% include 'edwoca/partials/formset_management.html' with formset=person_formset form_id='form' %}
+    <h2 class="my-5">
+        {% translate 'provenance persons' %}
+    </h2>
 
-<div class="my-5">
-    {% for pp_station in pp_stations %}
-        {% include 'edwoca/partials/forms/provenance_station_form.html' with provenance_class='person' station=pp_station %}
-    {% empty %}
-        <p class="note">
-            {% translate 'no provenance entries' %}
-        </p>
-    {% endfor %}
+    {% include 'edwoca/partials/formset_management.html' with formset=person_formset form_id='form' %}
+
+    <div class="my-5" id="person-provenance-list">
+        {% for pp_station in pp_stations %}
+            {% include 'edwoca/partials/forms/provenance_station_form.html' with provenance_class='person' station=pp_station %}
+        {% empty %}
+            <p class="note">
+                {% translate 'no provenance entries' %}
+            </p>
+        {% endfor %}
+    </div>
+
+    <div class="flex justify-end">
+        <button form="form" class="btn btn-outline flex-0" name="add-person-provenance-station">
+            {% translate 'add person provenance station' %}
+        </button>
+    </div>
+
+    <h2 class="my-5">
+        {% translate 'provenance corporations' %}
+    </h2>
+
+    {% include 'edwoca/partials/formset_management.html' with formset=corporation_formset form_id='form' %}
+
+    <div class="my-5" id="corporation-provenance-list">
+        {% for cp_station in cp_stations %}
+            {% include 'edwoca/partials/forms/provenance_station_form.html' with provenance_class='corporation' station=cp_station %}
+        {% empty %}
+            <p class="note">
+                {% translate 'no provenance entries' %}
+            </p>
+        {% endfor %}
+    </div>
+
+    <div class="flex justify-end">
+        <button form="form" class="btn btn-outline flex-0" name="add-corporation-provenance-station">
+            {% translate 'add corporation provenance station' %}
+        </button>
+    </div>
+
+    <h2>
+        {% translate 'comment' %}
+    </h2>
+
+    {{ form.as_daisy }}
+
+    <div class="flex mt-10 mb-5">
+        <div class="flex-1"></div>
+        <button type="button" class="btn btn-primary"
+                hx-post=""
+                hx-include="#provenance-wrapper input, #provenance-wrapper select, #provenance-wrapper textarea"
+                hx-target="#provenance-wrapper"
+                hx-select="#provenance-wrapper"
+                hx-swap="outerHTML"
+                hx-vals='{"main-save": "true"}'>
+            {% translate 'save' %}
+        </button>
+    </div>
+
+    {% if entity_type == 'manifestation' %}
+        {% include 'edwoca/partials/manifestation/preview-divs/provenance_epilog.html' %}
+    {% endif %}
+    {% if entity_type == 'item' %}
+        {% include 'edwoca/partials/item/preview-divs/provenance_epilog.html' %}
+    {% endif %}
+
+    {% if 'add-person-provenance-station' in request.POST %}
+    <script>
+        (function() {
+            var el = document.getElementById('person-provenance-list').lastElementChild;
+            if (el) {
+                var cb = el.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = true;
+                if (el.tagName === 'DETAILS') el.open = true;
+            }
+        })();
+    </script>
+    {% endif %}
+
+    {% if 'add-corporation-provenance-station' in request.POST %}
+    <script>
+        (function() {
+            var el = document.getElementById('corporation-provenance-list').lastElementChild;
+            if (el) {
+                var cb = el.querySelector('input[type="checkbox"]');
+                if (cb) cb.checked = true;
+                if (el.tagName === 'DETAILS') el.open = true;
+            }
+        })();
+    </script>
+    {% endif %}
+
 </div>
-
-<div class="flex justify-end">
-    <button form="form" class="btn btn-outline flex-0" name="add-person-provenance-station">
-        {% translate 'add person provenance station' %}
-    </button>
-</div>
-
-<h2 class="my-5">
-    {% translate 'provenance corporations' %}
-</h2>
-
-{% include 'edwoca/partials/formset_management.html' with formset=corporation_formset form_id='form' %}
-
-<div class="my-5">
-    {% for cp_station in cp_stations %}
-        {% include 'edwoca/partials/forms/provenance_station_form.html' with provenance_class='corporation' station=cp_station %}
-    {% empty %}
-        <p class="note">
-            {% translate 'no provenance entries' %}
-        </p>
-    {% endfor %}
-</div>
-
-<div class="flex justify-end">
-    <button form="form" class="btn btn-outline flex-0" name="add-corporation-provenance-station">
-        {% translate 'add corporation provenance station' %}
-    </button>
-</div>
-
-<h2>
-    {% translate 'comment' %}
-</h2>
-
-{{ form.as_daisy }}
-
-{% if entity_type == 'manifestation' %}
-    {% include 'edwoca/partials/manifestation/preview-divs/provenance_epilog.html' %}
-{% endif %}
-{% if entity_type == 'item' %}
-    {% include 'edwoca/partials/item/preview-divs/provenance_epilog.html' %}
-{% endif %}
 
 {% endblock %}

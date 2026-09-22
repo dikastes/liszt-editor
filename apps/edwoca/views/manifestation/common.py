@@ -1013,7 +1013,20 @@ def manifestation_provenance(request, pk):
                 ps.period.not_after = None
                 ps.period.save()
 
-        base_url = reverse_lazy('edwoca:manifestation_provenance', kwargs={'pk':pk})
+        if request.headers.get('HX-Request') == 'true':
+            if 'main-save' in request.POST:
+                context['pp_stations'] = construct_ps_set('person')
+                context['cp_stations'] = construct_ps_set('corporation')
+                context['form'] = ItemProvenanceCommentForm(instance=item)
+            else:
+                context['pp_stations'] = construct_ps_set('person', request.POST)
+                context['cp_stations'] = construct_ps_set('corporation', request.POST)
+                context['form'] = ItemProvenanceCommentForm(request.POST, instance=item)
+            context['open_ps_type'] = open_ps_params.get('open_ps_type', '')
+            context['open_ps'] = open_ps_params.get('open_ps', -1)
+            return render(request, 'edwoca/provenance.html', context)
+
+        base_url = reverse_lazy('edwoca:manifestation_provenance', kwargs={'pk': pk})
         url_params = urlencode(open_ps_params)
 
         return redirect(f'{base_url}?{url_params}')
