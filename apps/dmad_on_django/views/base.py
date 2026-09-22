@@ -88,7 +88,7 @@ class DmadBaseViewMixin:
 
 class DmadCreateView(DmadBaseViewMixin, CreateView):
     template_name = 'dmad_on_django/create.html'
-    fields = ['interim_designator', 'gnd_id', 'comment']
+    fields = ['interim_designator', 'comment']
 
     def get_form_class(self):
         return forms.modelform_factory(
@@ -100,7 +100,11 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = 'Datensatz anlegen'
+        search_string = self.request.GET.get('q', '')
+        context['object_list'] = []
+        if search_string:
+            context['object_list'] = self.model.search(search_string)
+        context['q'] = search_string
         return context
 
     def post(self, request, *args, **kwargs):
@@ -114,6 +118,17 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
             pass
         return response
 
+    def get(self, *args, **kwargs):
+        response = super().get(*args, **kwargs)
+
+        if self.request.htmx:
+            context = self.get_context_data()
+            return render(
+                    self.request,
+                    'dmad_on_django/partials/gnd_search.html',
+                    context
+                )
+        return response
 
 class DmadUpdateView(DmadBaseViewMixin, UpdateView):
     template_name = 'dmad_on_django/form_view.html'

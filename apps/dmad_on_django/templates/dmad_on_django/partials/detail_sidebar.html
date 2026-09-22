@@ -22,19 +22,19 @@
         <ul class="flex flex-col gap-5 flex-0">
             {% if object.gnd_id %}
                 <li>
-                    <a class="btn w-full btn-outline btn-sm" href="{% url prefix|add:'_unlink' object.id %}">
+                    <a class="btn w-full btn-outline" href="{% url prefix|add:'_unlink' object.id %}">
                         {% translate 'remove GND link' %}
                     </a>
                 </li>
             {% else %}
                 <li>
-                    <a class="btn w-full btn-outline btn-sm" href="{% url prefix|add:'_link' object.id %}">
+                    <a class="btn w-full btn-outline" href="{% url prefix|add:'_link' object.id %}">
                         {% translate 'link to GND' %}
                     </a>
                 </li>
             {% endif %}
             <li>
-                <label class="btn w-full btn-primary btn-outline btn-sm" for="submit-form"> 
+                <label class="btn w-full btn-primary btn-outline" for="submit-form"> 
                     {% translate 'save' %}
                 </label>
             </li>

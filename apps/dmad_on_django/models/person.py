@@ -92,7 +92,6 @@ class Person(DisplayableModel):
         related_name='death_place_of'
     )
     activity_places = models.ManyToManyField(Place)
-
     professions = models.ManyToManyField(SubjectTerm)
 
     def get_search_placeholder():

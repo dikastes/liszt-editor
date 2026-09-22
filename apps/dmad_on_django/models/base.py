@@ -199,5 +199,3 @@ class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
 
     class Meta:
         abstract = True
-
-

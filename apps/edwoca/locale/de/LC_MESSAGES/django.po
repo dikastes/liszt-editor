@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-01 14:48+0200\n"
+"POT-Creation-Date: 2026-09-22 17:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -243,61 +243,61 @@ msgstr "Signatur"
 msgid "copy of"
 msgstr "Kopie von"
 
-#: apps/edwoca/models/base.py:866
+#: apps/edwoca/models/base.py:865
 msgid "<< publisher >>"
 msgstr "<< Verlag >>"
 
-#: apps/edwoca/models/base.py:966
+#: apps/edwoca/models/base.py:965
 msgid "Composer"
 msgstr "Komponist"
 
-#: apps/edwoca/models/base.py:967
+#: apps/edwoca/models/base.py:966
 msgid "Writer"
 msgstr "Schreiber"
 
-#: apps/edwoca/models/base.py:968
+#: apps/edwoca/models/base.py:967
 msgid "Translator"
 msgstr "Übersetzer"
 
-#: apps/edwoca/models/base.py:969
+#: apps/edwoca/models/base.py:968
 msgid "Poet"
 msgstr "Dichter"
 
-#: apps/edwoca/models/base.py:970
+#: apps/edwoca/models/base.py:969
 msgid "Dedicatee"
 msgstr "Widmungsträger"
 
-#: apps/edwoca/models/base.py:990 apps/edwoca/models/expression.py:165
+#: apps/edwoca/models/base.py:989 apps/edwoca/models/expression.py:165
 #: apps/edwoca/templates/edwoca/bib_update.html:29
 #: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:100
 msgid "title"
 msgstr "Titel"
 
-#: apps/edwoca/models/base.py:996
+#: apps/edwoca/models/base.py:995
 msgid "status"
 msgstr "Status"
 
-#: apps/edwoca/models/base.py:1002
+#: apps/edwoca/models/base.py:1001
 msgid "language"
 msgstr "Sprache"
 
-#: apps/edwoca/models/base.py:1019
+#: apps/edwoca/models/base.py:1018
 msgid "Published"
 msgstr "veröffentlicht"
 
-#: apps/edwoca/models/base.py:1054
+#: apps/edwoca/models/base.py:1053
 msgid "description of modification"
 msgstr "Beschreibung der Modifikationen"
 
-#: apps/edwoca/models/base.py:1082 apps/edwoca/models/expression.py:247
+#: apps/edwoca/models/base.py:1081 apps/edwoca/models/expression.py:247
 msgid "note"
 msgstr "Note"
 
-#: apps/edwoca/models/base.py:1098
+#: apps/edwoca/models/base.py:1097
 msgid "<writer>"
 msgstr "<Schreiber>"
 
-#: apps/edwoca/models/base.py:1099
+#: apps/edwoca/models/base.py:1098
 msgid "<handwriting>"
 msgstr "<Handschrift>"
 
@@ -536,7 +536,7 @@ msgstr "Kategorie"
 #: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:27
 #: apps/edwoca/templates/edwoca/partials/work/work_menu.html:56
 #: apps/edwoca/templates/edwoca/provenance.html:64
-#: apps/edwoca/views/manifestation/common.py:636
+#: apps/edwoca/views/manifestation/common.py:477
 msgid "comment"
 msgstr "Kommentar"
 
@@ -1651,6 +1651,10 @@ msgstr ""
 msgid "cmp"
 msgstr ""
 
+#: apps/edwoca/templates/edwoca/partials/result_list.html:9
+msgid "no hits"
+msgstr ""
+
 #: apps/edwoca/templates/edwoca/partials/search_form_switcher.html:8
 #, python-format
 msgid "search %(type)s"
@@ -1705,20 +1709,20 @@ msgstr "Provenienz anlegen"
 msgid "singleton"
 msgstr "Handschrift"
 
-#: apps/edwoca/views/manifestation/common.py:321
+#: apps/edwoca/views/manifestation/common.py:162
 #: apps/edwoca/views/manifestation/update.py:66
 msgid "search expressions"
 msgstr "Fassungen durchsuchen"
 
-#: apps/edwoca/views/manifestation/common.py:420
+#: apps/edwoca/views/manifestation/common.py:261
 msgid "search manuscripts"
 msgstr "Handschriften durchsuchen"
 
-#: apps/edwoca/views/manifestation/common.py:421
+#: apps/edwoca/views/manifestation/common.py:262
 msgid "search collections"
 msgstr "Sammlungen durchsuchen"
 
-#: apps/edwoca/views/manifestation/common.py:422
+#: apps/edwoca/views/manifestation/common.py:263
 msgid "search prints"
 msgstr "Drucke durchsuchen"
 

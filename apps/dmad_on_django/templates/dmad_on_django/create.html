@@ -8,55 +8,65 @@
     DMAd
 {% endblock %}
 
-{% block content %}
-
-<div class="flex-1">
-    <h2 class="prose"> {{ view_title }} </h2>
-
-    <div class="bg-white p-5 border my-5 border-base-300">
-        <div class="prose">
-            <h3>GND durchsuchen</h3>
-            <input class="input input-bordered" id="gnd-search" />
-            <ul class="list-disc h-64 text-sm" id="gnd-search-results">
-                <li> <em> bitte Suchbegriff eingeben </em> </li>
-            </ul>
-        </div>
+{% block navbar_title %}
+    <div class="mt-5 mx-5 md:mx-10 text-lg lg:text-2xl xl:text-3xl flex">
+        {% translate 'create dataset' %}
     </div>
-
-    <div class="bg-white p-5 border border-base-300">
-        <div class="prose">
-            <h3> Informationen </h3>
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_daisy }}
-                <input type="submit" id="submit-form" class="hidden" value="{{ button_label }}" class="btn btn-primary my-5">
-            </form>
-        </div>
-    </div>
-</div>
-
-<script src="{% static 'dmad_on_django/search_gnd.js' %}"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', _ => {
-        dmadOnDjangoSearchGnd.init({
-            'target': 'gnd-search-results',
-            'input': 'gnd-search',
-            'entityType': '{{ entity_type }}'
-        });
-    });
-</script>
 {% endblock %}
+
+{% block content %}
+    <div class="flex-1 flex flex-col h-full gap-10">
+        <div class="flex-0 mt-10">
+            <form
+                hx-get="{% url 'dmad_on_django:'|add:entity_type|add:'_create' %}"
+                hx-target="#gnd-search-results"
+                hx-trigger="input delay:500ms"
+                hx-push-url="true"
+                >
+                <label class="form-control">
+                    <div class="label">
+                        <span class="label-text">
+                            {% translate 'search GND' %}
+                        </span>
+                    </div>
+                    <input
+                        class="input input-bordered border-black bg-white"
+                        id="gnd-search"
+                        name="q"
+                        value="{{ q }}"
+                        placeholder="{% translate 'enter search term or GND ID' %}"
+                        />
+                </label>
+            </form>
+            <div class="mb-5" id="gnd-search-results">
+                {% include 'dmad_on_django/partials/gnd_search.html' %}
+            </div>
+        </div>
+        <div class="flex-0">
+            <div tabindex="0" class="collapse bg-base-100">
+                <div class="collapse-title">
+                    {% translate 'create stub' %}
+                </div>
+                <div class="collapse-content">
+                    <form method="post">
+                        {% csrf_token %}
+                        {{ form.as_daisy }}
+                        <input type="submit" id="submit-form" class="hidden" value="{{ button_label }}" class="btn btn-primary my-5">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
 {% block nav %}
 <div class="flex-0 flex flex-col h-full">
     <div class="flex-1"></div>
     <ul class="menu gap-5 flex-0">
         <li>
-            <label class="btn btn-primary" for="submit-form"> speichern </label>
-        </li>
-        <li>
-                <a href="{% url 'dmad_on_django:'|add:entity_type|add:'_list' %}" class="btn btn-primary">
-                        Abbrechen
-                </a>
+            <label class="btn btn-primary btn-outline" for="submit-form">
+                {% translate 'create new' %}
+            </label>
         </li>
     </ul>
 </div>

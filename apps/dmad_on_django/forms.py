@@ -4,6 +4,7 @@ from .models import Person
 from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
 
+
 formWidgets = {
         "interim_designator": TextInput(attrs={
                 'class': 'input input-bordered'
@@ -15,6 +16,7 @@ formWidgets = {
                 'class': 'input input-bordered h-64'
             })
     }
+
 
 class SearchForm(GenericAsDaisyMixin, SearchForm):
     layout = Layouts.LABEL_INSIDE
@@ -28,10 +30,19 @@ class SearchForm(GenericAsDaisyMixin, SearchForm):
         self.fields['q'].label = ''
 
 
-
 class DmadUpdateForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
 
 
 class DmadCreateForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
+
+    def __init__(self, **kwargs):
+        orig_data = kwargs.get('data')
+        if orig_data:
+            data = orig_data.copy()
+            gnd_id = data.get('gnd_id', '').replace('https://d-nb.info/gnd/', '')
+            data.__setitem__('gnd_id', gnd_id)
+            kwargs.update({'data': data})
+
+        super().__init__(**kwargs)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-14 15:44+0200\n"
+"POT-Creation-Date: 2026-09-22 17:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -86,8 +86,8 @@ msgid "search corporations"
 msgstr "Körperschaften durchsuchen"
 
 #: apps/dmad_on_django/models/corporation.py:144
-#: apps/dmad_on_django/models/person.py:209
-#: apps/dmad_on_django/models/person.py:214
+#: apps/dmad_on_django/models/person.py:208
+#: apps/dmad_on_django/models/person.py:213
 #: apps/dmad_on_django/models/place.py:121
 #: apps/dmad_on_django/models/subjectterm.py:121
 #: apps/dmad_on_django/models/work.py:142
@@ -273,7 +273,7 @@ msgstr "Herbst"
 msgid "winter"
 msgstr "Winter"
 
-#: apps/dmad_on_django/models/person.py:99
+#: apps/dmad_on_django/models/person.py:98
 msgid "search persons"
 msgstr "Personen durchsuchen"
 
@@ -302,8 +302,31 @@ msgid "alternative name"
 msgstr "alternativer Name"
 
 #: apps/dmad_on_django/templates/dmad_on_django/create.html:6
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:13
 msgid "create dataset"
 msgstr "Datensatz erstellen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:19
+msgid ""
+"search for authority data sets, enter a GND ID, or add a stump data set by "
+"entering an interim designator"
+msgstr ""
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:35
+msgid "search GND"
+msgstr "GND durchsuchen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:43
+msgid "enter search term or GND ID"
+msgstr "Suchbegriff oder GND-ID"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:54
+msgid "create stub"
+msgstr "Rumpfdatensatz erstellen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:74
+msgid "create new"
+msgstr "neu anlegen"
 
 #: apps/dmad_on_django/templates/dmad_on_django/form_view.html:15
 msgid "short description"
