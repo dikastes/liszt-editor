@@ -306,12 +306,6 @@ msgstr "alternativer Name"
 msgid "create dataset"
 msgstr "Datensatz erstellen"
 
-#: apps/dmad_on_django/templates/dmad_on_django/create.html:19
-msgid ""
-"search for authority data sets, enter a GND ID, or add a stump data set by "
-"entering an interim designator"
-msgstr ""
-
 #: apps/dmad_on_django/templates/dmad_on_django/create.html:35
 msgid "search GND"
 msgstr "GND durchsuchen"
