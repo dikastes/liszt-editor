@@ -166,6 +166,7 @@ class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
                 )
             ),
         }
+
     def get_index_title(self):
         return ' '.join(str(name) for name in list(self.names.all()) + [ self.interim_designator ])
 

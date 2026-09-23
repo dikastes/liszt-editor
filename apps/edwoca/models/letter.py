@@ -1,7 +1,11 @@
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models.base import DocumentationStatusMixin
+from django.db.models import OuterRef, Subquery, Value, Case, When, CharField
+from django.db.models.functions import Coalesce, Lower, NullIf, Concat, StrIndex, Substr, Length, LPad
 from dmrism.models import TrackedModel, BaseBib
 from .base import *
+from bib.models import ZotItem
+from liszt_util.tools import DisplayableQuerySet
 
 
 class LetterSignature(BaseSignature):
@@ -152,6 +156,80 @@ class Letter(TrackedModel):
             blank = True,
             verbose_name = _('sender corporation name according to source')
         )
+
+    objects = DisplayableQuerySet.as_manager()
+
+    ordering_fields = {
+        'sort_edition': (['edition'], _('edition'), _('A-Z'), _('Z-A'))
+    }
+
+    @classmethod
+    def get_ordering_annotations(cls):
+        location_type_choices = LetterMentioning._meta.get_field('location_type').choices or []
+        location_type_display_cases = [
+            When(location_type=val, then=Value(str(label)))
+            for val, label in location_type_choices
+        ]
+        location_type_label = Case(
+            *location_type_display_cases,
+            default='location_type'
+        )
+        dash_pos = StrIndex('location', Value('-'))
+
+        first_num_str = Case(
+            When(
+                location__contains='-',
+                then=Substr('location', 1, dash_pos - 1)
+            ),
+            default='location',
+            output_field=CharField()
+        )
+
+        rest_str = Case(
+            When(
+                location__contains='-',
+                then=Substr('location', dash_pos)
+            ),
+            default=Value(''),
+            output_field=CharField()
+        )
+
+        padded_location = Concat(
+            LPad(first_num_str, 5, Value('0')),
+            rest_str,
+            output_field=CharField()
+        )
+
+        first_mentioning = Subquery(
+                LetterMentioning.objects.filter(
+                        letter = OuterRef('pk')
+                    ).order_by('id').annotate(
+                        str_repr=Case(
+                            When(
+                                location__isnull=False,
+                                location__gt='',
+                                then=Concat(
+                                    'bib__zot_short_title',
+                                    Value(', '),
+                                    location_type_label,
+                                    Value(' '),
+                                    padded_location,
+                                    output_field=CharField()
+                                )
+                            ),
+                            default='bib__zot_short_title',
+                            output_field=CharField()
+                        )
+                    ).values('str_repr')[:1]
+            )
+        return {
+            'sort_edition': Lower(
+                Coalesce(
+                    NullIf(first_mentioning, Value('')),
+                    Value('zzz')
+                )
+            ),
+        }
 
     def get_first_mentioning(self):
         if self.lettermentioning_set.all():
