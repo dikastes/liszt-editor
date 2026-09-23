@@ -11,11 +11,13 @@
                 <li>
                     {% if type == 'rework' %}
                         <a
-                            href="{% url search_url %}?q={{ query }}"
-                            hx-get="{% url search_url %}"
+                            href="{% url search_url %}?q={{ query|default:'' }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}"
+                            hx-get="{% url search_url %}?q={{ query|default:'' }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}"
                             class="active"
                             hx-include="#query"
+                            hx-select="#search-results-container"
                             hx-target="#search-results-container"
+                            hx-swap="outerHTML"
                             hx-push-url="true"
                         >
                             {% translate 'rework' %}
@@ -24,15 +26,17 @@
                     {% endif %}
                     {% if not type %}
                         <a
-                            href="{% url search_url 'rework' %}?q={{ query }}"
-                            hx-get="{% url search_url 'rework' %}"
+                            href="{% url search_url 'rework' %}?q={{ query|default:'' }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}"
+                            hx-get="{% url search_url 'rework' %}?q={{ query|default:'' }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}"
                             hx-include="#query"
+                            hx-select="#search-results-container"
                             hx-target="#search-results-container"
+                            hx-swap="outerHTML"
                             hx-push-url="true"
                         >
                             {% translate 'rework' %}
                             ({{ rework_count }})
-                        </a> 
+                        </a>
                     {% endif %}
                 </li>
                 {% endif %}
@@ -40,11 +44,13 @@
                 <li>
                     {% if type == 'stub' %}
                         <a
-                            href="{% url search_url %}?q={{ query }}" class="active"
-                            hx-get="{% url search_url %}" class="active"
+                            href="{% url search_url %}?q={{ query|default:'' }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}"
+                            hx-get="{% url search_url %}?q={{ query|default:'' }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}"
                             class="active"
                             hx-include="#query"
+                            hx-select="#search-results-container"
                             hx-target="#search-results-container"
+                            hx-swap="outerHTML"
                             hx-push-url="true"
                         >
                             {% translate 'stubs' %}
@@ -53,10 +59,12 @@
                     {% endif %}
                     {% if not type %}
                         <a
-                            href="{% url search_url 'stub' %}?q={{ query }}"
-                            hx-get="{% url search_url 'stub' %}"
+                            href="{% url search_url 'stub' %}?q={{ query|default:'' }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}"
+                            hx-get="{% url search_url 'stub' %}?q={{ query|default:'' }}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}"
                             hx-include="#query"
+                            hx-select="#search-results-container"
                             hx-target="#search-results-container"
+                            hx-swap="outerHTML"
                             hx-push-url="true"
                         >
                             {% translate 'stubs' %}
@@ -65,6 +73,43 @@
                     {% endif %}
                 </li>
                 {% endif %}
+            </ul>
+        </li>
+    {% endif %}
+
+    {% if available_sorts %}
+        <li>
+            <h2 class="menu-title">
+                {% translate 'Sortierung' %}
+            </h2>
+            <ul>
+                {% for key, sort_meta in available_sorts.items %}
+                    <li>
+                        <a href="?{% if query %}q={{ query }}&{% endif %}{% if type %}type={{ type }}&{% endif %}sort={{ key }}&dir=asc"
+                           hx-get="?{% if query %}q={{ query }}&{% endif %}{% if type %}type={{ type }}&{% endif %}sort={{ key }}&dir=asc"
+                           class="{% if request.GET.sort == key and request.GET.dir != 'desc' %}active font-semibold{% endif %}"
+                           hx-include="#query"
+                           hx-select="#search-results-container"
+                           hx-target="#search-results-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true">
+                            {{ sort_meta.1 }} ({{ sort_meta.2|default:_('aufsteigend') }})
+                    </a>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="?{% if query %}q={{ query }}&{% endif %}{% if type %}type={{ type }}&{% endif %}sort={{ key }}&dir=desc"
+                           hx-get="?{% if query %}q={{ query }}&{% endif %}{% if type %}type={{ type }}&{% endif %}sort={{ key }}&dir=desc"
+                           class="{% if request.GET.sort == key and request.GET.dir == 'desc' %}active font-semibold{% endif %}"
+                           hx-include="#query"
+                           hx-select="#search-results-container"
+                           hx-target="#search-results-container"
+                           hx-swap="outerHTML"
+                           hx-push-url="true">
+                            {{ sort_meta.1 }} ({{ sort_meta.3|default:_('absteigend') }})
+                        </a>
+                    </li>
+                {% endfor %}
             </ul>
         </li>
     {% endif %}

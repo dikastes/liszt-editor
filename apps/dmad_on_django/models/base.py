@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import QuerySet, FilteredRelation, Q, Value
+from django.db.models.functions import Coalesce, Lower, NullIf
 from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -6,7 +8,7 @@ from dominate.tags import div, table, tr, td
 from dominate.util import raw
 from iso639 import data as iso639_data
 from json import loads
-from liszt_util.tools import RenderRawJSONMixin
+from liszt_util.tools import RenderRawJSONMixin, DisplayableQuerySet
 
 
 languages = { iso_data['iso639_1'].upper(): iso_data['name'] for iso_data in iso639_data }
@@ -114,6 +116,8 @@ class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
     class Meta:
         abstract = True
 
+    objects = DisplayableQuerySet.as_manager()
+
     raw_data = models.TextField(
             null = True,
             verbose_name = _('raw data')
@@ -141,6 +145,27 @@ class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
         verbose_name = _('interim designator')
     )
     gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
+
+    ordering_fields = {
+        'name': (['sort_name'], _('name'), _('A-Z'), _('Z-A')),
+        'modified': (['last_save'], _('last save'), _('oldest first'), _('newest first')),
+    }
+
+    @classmethod
+    def get_ordering_annotations(cls):
+        return {
+            'primary_name': FilteredRelation(
+                'names',
+                condition=Q(names__status=Status.PRIMARY)
+            ),
+            'sort_name': Lower(
+                Coalesce(
+                    NullIf('primary_name__name', Value('')),
+                    NullIf('interim_designator', Value('')),
+                    Value('zzz')
+                )
+            ),
+        }
 
     def get_index_title(self):
         return ' '.join(str(name) for name in list(self.names.all()) + [ self.interim_designator ])
@@ -199,5 +224,3 @@ class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
 
     class Meta:
         abstract = True
-
-

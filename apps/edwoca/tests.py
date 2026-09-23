@@ -8,14 +8,45 @@ from xml.etree import ElementTree as ET
 
 # Create your tests here.
 
+class PrintCreationTest(TestCase):
+
+    def test_print_creation_workflow(self):
+        working_title = 'working title'
+        print_title = 'print_title'
+        publisher = Corporation.objects.create()
+        plate_number = '200'
+        form_data = {
+                'temporary_title': working_title,
+                'source_title': print_title,
+                'publisher': publisher.pk,
+                'plate_number': plate_number
+            }
+
+        url = reverse('edwoca:manifestation_create')
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(Manifestation.objects.filter(working_title=working_title).exists())
+
+        manifestation = Manifestation.objects.get(working_title=working_title)
+
+        self.assertEqual(manifestation.source_title, print_title)
+        self.assertEqual(manifestation.publications.first().publisher, publisher)
+        self.assertEqual(manifestation.plate_number, plate_number)
+
+
 class SingletonCreationTest(TestCase):
 
     def test_singleton_creation_workflow(self):
         library = Library.objects.create()
+        signature = 'signature'
+        test_title = 'test title'
+
         form_data = {
-            'working_title': 'Mein Test-Titel',
+            'working_title': test_title,
             'library': library.pk,
-            'signature': 'Signatur-123'
+            'signature': signature
         }
 
         url = reverse('edwoca:singleton_create')
@@ -23,10 +54,12 @@ class SingletonCreationTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertTrue(Manifestation.objects.filter(working_title='Mein Test-Titel').exists())
-        manifestation = Manifestation.objects.get(working_title='Mein Test-Titel')
+        self.assertTrue(Manifestation.objects.filter(working_title=test_title).exists())
+        manifestation = Manifestation.objects.get(working_title=test_title)
 
         self.assertEqual(manifestation.items.count(), 1)
+        self.assertEqual(manifestation.items.first().signatures.first().library, library)
+        self.assertEqual(manifestation.items.first().signatures.first().signature, signature)
 
 
 class CollectionRelationsTest(TestCase):

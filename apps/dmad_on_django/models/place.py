@@ -85,7 +85,6 @@ class Place(DisplayableModel):
         self.geographic_area_codes.all().delete()
         PlaceGeographicAreaCode.create_geographic_area_codes(self)
 
-
     def fetch_raw(self):
         trials = max_trials
         url = f"http://d-nb.info/gnd/{self.gnd_id}"

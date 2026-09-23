@@ -6,22 +6,38 @@ from .base import *
 from ..forms.letter import *
 
 
-class LetterListView(EdwocaListView):
-    model = Letter
-
+class LetterListMixin:
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['page_title'] = _('letters')
+        context['available_sorts'] = Letter.ordering_fields
         return context
 
+    def get_queryset(self):
+        qs = super().get_queryset()
 
-class LetterSearchView(EdwocaSearchView):
+        type_ = self.kwargs.get('type')
+        if type_ == 'rework':
+            qs = qs.filter(rework_in_gnd = True)
+        if type_ == 'stub':
+            qs = qs.filter(gnd_id__isnull = True)
+
+        sort_param = self.request.GET.get('sort')
+        descending = self.request.GET.get('dir') == 'desc'
+
+        if sort_param:
+            if descending:
+                return qs.annotate(**Letter.get_ordering_annotations()).order_by(f'-{sort_param}')
+            return qs.annotate(**Letter.get_ordering_annotations()).order_by(sort_param)
+        return qs
+
+
+class LetterListView(LetterListMixin, EdwocaListView):
     model = Letter
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['page_title'] = _('letters')
-        return context
+
+class LetterSearchView(LetterListMixin, EdwocaSearchView):
+    model = Letter
 
 
 def letter_create(request):
