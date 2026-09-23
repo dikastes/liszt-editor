@@ -65,10 +65,6 @@ class Place(DisplayableModel):
 
     description = models.TextField(null=True)
 
-    ordering_fields = {
-        'modified': (['last_save'], _('Letzte Bearbeitung'), _('älteste zuerst'), _('neuste zuerst')),
-    }
-
     def get_search_placeholder():
         return _('search places')
 
@@ -88,7 +84,6 @@ class Place(DisplayableModel):
 
         self.geographic_area_codes.all().delete()
         PlaceGeographicAreaCode.create_geographic_area_codes(self)
-
 
     def fetch_raw(self):
         trials = max_trials
