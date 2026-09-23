@@ -1,0 +1,43 @@
+{% load i18n %}
+
+{% with prefix='dmad_on_django:'|add:entity_type %}
+    <div class="flex gap-10 flex-col h-full">
+        <div class="flex-1"></div>
+        <div class="text-gray-500 text-sm">
+            <p>
+                {% translate 'created' %}
+            </p>
+            <p>
+                {{ object.first_save }}
+            </p>
+        </div>
+        <div class="mb-10 text-gray-500 text-sm">
+            <p>
+                {% translate 'last save' %}
+            </p>
+            <p>
+                {{ object.last_save }}
+            </p>
+        </div>
+        <ul class="flex flex-col gap-5 flex-0">
+            {% if object.gnd_id %}
+                <li>
+                    <a class="btn w-full btn-outline" href="{% url prefix|add:'_unlink' object.id %}">
+                        {% translate 'remove GND link' %}
+                    </a>
+                </li>
+            {% else %}
+                <li>
+                    <a class="btn w-full btn-outline" href="{% url prefix|add:'_link' object.id %}">
+                        {% translate 'link to GND' %}
+                    </a>
+                </li>
+            {% endif %}
+            <li>
+                <label class="btn w-full btn-primary btn-outline" for="submit-form"> 
+                    {% translate 'save' %}
+                </label>
+            </li>
+        </ul>
+    </div>
+{% endwith %}

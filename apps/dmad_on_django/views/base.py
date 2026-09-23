@@ -2,7 +2,7 @@ from django import forms
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.http import JsonResponse, HttpResponseRedirect
 from liszt_util.forms import FramedSearchForm
 import dmad_on_django.models as dmad_models
@@ -87,7 +87,7 @@ class DmadBaseViewMixin:
 
 class DmadCreateView(DmadBaseViewMixin, CreateView):
     template_name = 'dmad_on_django/create.html'
-    fields = ['interim_designator', 'gnd_id', 'comment']
+    fields = ['interim_designator', 'comment']
 
     def get_form_class(self):
         return forms.modelform_factory(
@@ -99,7 +99,11 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = 'Datensatz anlegen'
+        search_string = self.request.GET.get('q', '')
+        context['object_list'] = []
+        if search_string:
+            context['object_list'] = self.model.search(search_string)
+        context['q'] = search_string
         return context
 
     def post(self, request, *args, **kwargs):
@@ -113,8 +117,19 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
             pass
         return response
 
+    def get(self, *args, **kwargs):
+        response = super().get(*args, **kwargs)
 
-class DmadUpdateView(DmadBaseViewMixin, NavbarContextMixin, UpdateView):
+        if self.request.htmx:
+            context = self.get_context_data()
+            return render(
+                    self.request,
+                    'dmad_on_django/partials/gnd_search.html',
+                    context
+                )
+        return response
+
+class DmadUpdateView(DmadBaseViewMixin, UpdateView):
     template_name = 'dmad_on_django/form_view.html'
 
     def get_form_class(self):
@@ -127,13 +142,13 @@ class DmadUpdateView(DmadBaseViewMixin, NavbarContextMixin, UpdateView):
 
     def get_form_fields(self):
         if not self.object.gnd_id:
-            return ['interim_designator', 'comment', 'rework_in_gnd']
+            return ['interim_designator', 'comment', 'first_editor', 'rework_in_gnd']
         return ['comment', 'rework_in_gnd']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # braucht man das?
         context['object'] = self.object
+        context['view'] = 'update'
         return context
 
     def get_model(self):
@@ -321,3 +336,21 @@ class DmadSearchView(ListContextMixin, NavbarContextMixin, SearchView):
 
     def get_model(self):
         return self.model
+
+
+class BaseAuthorityDataView(DmadBaseViewMixin, DetailView):
+    template_name = 'dmad_on_django/authority_data_view.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+        context['view'] = 'authority_data'
+        return context
+
+
+class BaseRawDataView(DmadBaseViewMixin, DetailView):
+    template_name = 'dmad_on_django/raw_data_view.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+        context['view'] = 'raw_data'
+        return context

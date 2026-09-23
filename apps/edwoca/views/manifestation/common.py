@@ -20,6 +20,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
+from django.utils.http import urlencode
 from django.views.decorators.http import require_POST
 from django.views.generic import DeleteView, FormView
 from django.views.generic.edit import CreateView, UpdateView
@@ -43,6 +44,11 @@ class ManifestationListView(EdwocaListView):
     def get_queryset(self):
         return super().get_queryset().filter(is_singleton = False)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('prints')
+        return context
+
 
 class ManifestationSearchView(EdwocaSearchView):
     model = EdwocaManifestation
@@ -50,6 +56,11 @@ class ManifestationSearchView(EdwocaSearchView):
 
     def get_queryset(self):
         return super().get_queryset().filter(is_singleton = False)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('prints')
+        return context
 
 
 class SingletonListView(EdwocaListView):
@@ -61,6 +72,7 @@ class SingletonListView(EdwocaListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list_entity_type'] = 'singleton'
+        context['page_title'] = _('manuscripts')
         return context
 
 
@@ -83,164 +95,9 @@ class SingletonSearchView(EdwocaSearchView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['list_entity_type'] = 'singleton'
+        context['page_title'] = _('manuscripts')
         return context
 
-
-def singleton_collection_create(request):
-    if request.method == 'POST':
-        form = SingletonCreateForm(request.POST)
-
-        forms_valid = True
-        if form.is_valid():
-            manifestation = EdwocaManifestation.objects.create()
-
-            item = Item.objects.create(manifestation=manifestation)
-
-            library = form.cleaned_data['library']
-            signature = ItemSignature.objects.create(
-                library=library,
-                signature=form.cleaned_data['signature']
-            )
-            item.signatures.add(signature)
-
-            manifestation.is_singleton=True
-            manifestation.source_type=form.cleaned_data.get('source_type')
-            manifestation.working_title = form.cleaned_data.get('working_title')
-            manifestation.save()
-
-            return redirect('edwoca:manifestation_update', pk=manifestation.pk)
-    else:
-        form = SingletonCreateForm(is_collection = True)
-
-    return render(request, 'edwoca/create_singleton.html', {
-        'form': form,
-    })
-
-
-def singleton_create(request):
-    if request.method == 'POST':
-        form = SingletonCreateForm(request.POST)
-        if form.is_valid():
-            manifestation = EdwocaManifestation.objects.create()
-
-            item = Item.objects.create(manifestation=manifestation)
-
-            library = form.cleaned_data['library']
-            signature = ItemSignature.objects.create(
-                library=library,
-                signature=form.cleaned_data['signature']
-            )
-            item.signatures.add(signature)
-
-            manifestation.is_singleton=True
-            manifestation.source_type=form.cleaned_data.get('source_type')
-            manifestation.working_title = form.cleaned_data.get('working_title')
-            manifestation.save()
-
-            return redirect('edwoca:manifestation_update', pk=manifestation.pk)
-    else:
-        form = SingletonCreateForm()
-
-    return render(request, 'edwoca/create_singleton.html', {
-        'form': form,
-    })
-
-
-def manifestation_collection_create(request, publisher_pk=None):
-    publisher = get_object_or_404(Corporation, pk=publisher_pk) if publisher_pk else None
-
-    if request.method == 'POST':
-        if not publisher:
-            # handle error, maybe redirect to search page
-            return redirect('edwoca:manifestation_collection_create')
-
-        data = request.POST.copy()
-        data['publisher'] = publisher
-        form = ManifestationCreateForm(data)
-        if form.is_valid():
-            manifestation = EdwocaManifestation.objects.create(
-                    plate_number = form.cleaned_data.get('plate_number'),
-                    source_title = form.cleaned_data['source_title'],
-                    is_collection = True
-                )
-            manifestation.save()
-            Publication.objects.create(
-                    publisher = form.cleaned_data.get('publisher'),
-                    manifestation = manifestation
-                )
-
-            return redirect('edwoca:manifestation_update', pk=manifestation.pk)
-    else:
-        if publisher:
-            form = ManifestationCreateForm(is_collection = True, initial = {'publisher': publisher})
-            context = {
-                    'form': form,
-                    'referrer': 'manifestation_collection_create'
-                }
-        else:
-            form = ManifestationCreateForm(is_collection = True, )
-            context = {
-                    'referrer': 'manifestation_collection_create'
-                }
-
-    if not publisher:
-        if request.GET.get('q'):
-            search_form = SearchForm(request.GET)
-            context['search_form'] = search_form
-            context['publisher_list'] = search_form.search().models(Corporation)
-        else:
-            context['search_form'] = SearchForm()
-
-    return render(request, 'edwoca/create_manifestation.html', context)
-
-
-def manifestation_create(request, publisher_pk=None):
-    publisher = get_object_or_404(Corporation, pk=publisher_pk) if publisher_pk else None
-
-    if request.method == 'POST':
-
-        data = request.POST.copy()
-        if publisher:
-            data['publisher'] = publisher.pk
-
-        form = ManifestationCreateForm(data)
-        if form.is_valid():
-
-            display = form.cleaned_data.get('display')
-            period = Period.objects.create(
-                display=display,
-            )
-
-            try:
-                period.parse_display()
-                period.save()
-            except Exception as e:
-                print(e)
-
-            manifestation = EdwocaManifestation.objects.create(
-                    source_type = form.cleaned_data.get('source_type'),
-                    plate_number = form.cleaned_data.get('plate_number'),
-                    working_title = form.cleaned_data['temporary_title'],
-                    period = period
-            )
-
-            chosen_publisher = form.cleaned_data.get('publisher')
-            if chosen_publisher:
-                chosen_publisher = Corporation.objects.get(pk=chosen_publisher)
-                Publication.objects.create(
-                        publisher = chosen_publisher,
-                        manifestation = manifestation
-                )
-
-            return redirect('edwoca:manifestation_update', pk=manifestation.pk)
-    else:
-
-        context = {
-            'form': ManifestationCreateForm(),
-            'referrer': 'manifestation_create'
-        }
-
-        return render(request, 'edwoca/create_manifestation.html', context)
 
 def publisher_search_view(request):
     search_text = request.GET.get('publisher_search', '')
@@ -425,7 +282,10 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
             found_collections = (collection_search_form
                     .search()
                     .models(Manifestation)
-                    .filter(may_have_component = True)
+                    .filter(
+                            may_have_component = True,
+                            is_singleton = self.object.is_singleton
+                        )
                 )
             if self.object.is_collection:
                 found_collections = found_collections.filter(is_collection = True)
@@ -514,63 +374,12 @@ def manifestation_expression_remove(request, pk, expression_pk):
     return redirect('edwoca:manifestation_update', pk=pk)
 
 
-class ManifestationHistoryUpdateView(SimpleFormView):
+class ManifestationHistoryUpdateView(BaseHistoryUpdateView):
     model = Manifestation
-    property = 'history'
-    template_name = 'edwoca/manifestation_history.html'
     form_class = ManifestationHistoryForm
-
-    def post(self, request, *args, **kwargs):
-        self.object = self.get_object()
-        form = self.get_form()
-
-        if not form.is_valid():
-            return self.form_invalid(form)
-
-        place_forms = []
-        for manifestation_place in self.object.manifestationplace_set.all():
-            place_form = ManifestationPlaceForm(request.POST, instance = manifestation_place, prefix=f'manifestation-place-{manifestation_place.id}')
-            if not place_form.is_valid():
-                return self.form_invalid(form)
-            place_forms.append(place_form)
-
-        for place_form in place_forms:
-            place_form.save()
-
-        self.object = form.save()
-        period = self.object.period
-
-        if 'calculate-machine-readable-date' in request.POST:
-            period.parse_display()
-            period.save()
-        elif 'clear-machine-readable-date' in request.POST:
-            period.not_before = None
-            period.not_after = None
-            period.assumed = False
-            period.inferred = False
-            period.save()
-
-        return redirect('edwoca:manifestation_history', pk = self.object.id)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        search_form = SearchForm(self.request.GET or None)
-        context['searchform'] = search_form
-        context['show_search_form'] = True
-
-        context['place_forms'] = []
-        for manifestation_place in self.object.manifestationplace_set.all():
-            place_form = ManifestationPlaceForm(instance = manifestation_place, prefix=f'manifestation-place-{manifestation_place.id}')
-            context['place_forms'].append(place_form)
-
-        if search_form.is_valid() and search_form.cleaned_data.get('q'):
-            context['query'] = search_form.cleaned_data.get('q')
-            context[f"found_places"] = search_form.search().models(Place)
-
-        return context
-
-    def get_model(self):
-        return self.model.__name__
+    place_form = ManifestationPlaceForm
+    place_set_property = 'manifestationplace_set'
+    view_name = 'edwoca:manifestation_history'
 
 
 def manifestation_add_place_view(request, pk, place_id):
@@ -851,12 +660,13 @@ def manifestation_classification(request, pk):
 
     if request.method == 'POST':
         forms = []
-        manifestation_form = ManifestationClassificationForm(request.POST, instance = manifestation)
-        forms += [manifestation_form]
 
         if manifestation.is_singleton:
             item_form = FunctionForm(request.POST, instance = item)
             forms += [item_form]
+
+        manifestation_form = ManifestationClassificationForm(request.POST, instance = manifestation)
+        forms += [manifestation_form]
 
         if all(f.is_valid() for f in forms):
             for f in forms:
@@ -925,17 +735,22 @@ def manifestation_provenance(request, pk):
         pp_stations = construct_ps_set('person', request.POST)
         cp_stations = construct_ps_set('corporation', request.POST)
 
+        open_ps_params = {}
         for ps_class in ['person', 'corporation']:
             ps_key = f'add-{ps_class}-provenance-station'
             if ps_key in request.POST:
                 period = Period.objects.create()
-                getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item, period = period)
+                new_station = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.create(item = item, period = period)
+                open_ps_params['open_ps_type'] = ps_class
+                open_ps_params['open_ps'] = new_station.pk
             webref_key = f'add-{ps_class}-provenance-webref'
             if webref_key in request.POST:
                 station_id = request.POST.get(webref_key)
                 station = getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStation').objects.get(pk = station_id)
                 creation_kwargs = { f'{ps_class}_provenance_station': station }
                 getattr(dmrism_models, f'{ps_class.capitalize()}ProvenanceStationWebReference').objects.create(**creation_kwargs)
+                open_ps_params['open_ps_type'] = ps_class
+                open_ps_params['open_ps'] = station.pk
 
         pps_forms = []
         pps_bib_forms = []
@@ -1039,7 +854,10 @@ def manifestation_provenance(request, pk):
                 ps.period.not_after = None
                 ps.period.save()
 
-        return redirect('edwoca:manifestation_provenance', pk=pk)
+        base_url = reverse_lazy('edwoca:manifestation_provenance', kwargs={'pk':pk})
+        url_params = urlencode(open_ps_params)
+
+        return redirect(f'{base_url}?{url_params}')
     else:
         pp_stations = construct_ps_set('person')
         cp_stations = construct_ps_set('corporation')
@@ -1047,6 +865,8 @@ def manifestation_provenance(request, pk):
 
         context['pp_stations'] = pp_stations
         context['cp_stations'] = cp_stations
+        context['open_ps'] = int(request.GET.get('open_ps', '-1'))
+        context['open_ps_type'] = request.GET.get('open_ps_type', '')
         context['form'] = provenance_comment_form
         return render(request, 'edwoca/provenance.html', context)
 
@@ -1280,11 +1100,11 @@ def singleton_part_create(request, pk, part_label):
     existing_manifestation = get_object_or_404(Manifestation, pk = pk)
 
     if request.method == 'POST':
-        form = SingletonCreateForm(request.POST)
+        form = SingletonCreateForm(request.POST, show_source_title = True)
         if form.is_valid():
             manifestation = EdwocaManifestation.objects.create(
                 is_singleton=True,
-                source_type = form.cleaned_data.get('source_type'),
+                source_title = form.cleaned_data.get('source_title'),
                 working_title = form.cleaned_data.get('working_title'),
                 part_of = existing_manifestation,
                 part_label = getattr(EdwocaManifestation.PartLabel, part_label.upper())
@@ -1299,8 +1119,9 @@ def singleton_part_create(request, pk, part_label):
             )
             item.signatures.add(signature)
             return redirect('edwoca:manifestation_update', pk = manifestation.id)
+        return render(request, 'edwoca/create_singleton.html', {'form': form})
     else:
-        form = SingletonCreateForm()
+        form = SingletonCreateForm(show_source_title = True)
 
     return render(request, 'edwoca/create_singleton.html', {'form': form})
 

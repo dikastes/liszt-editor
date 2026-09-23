@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-09 17:03+0200\n"
+"POT-Creation-Date: 2026-09-22 17:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -38,11 +38,46 @@ msgstr "ermittelt"
 msgid "assumed"
 msgstr "unsicher"
 
-#: apps/dmad_on_django/models/base.py:153
+#: apps/dmad_on_django/models/base.py:97
+msgid "first save"
+msgstr "Datum"
+
+#: apps/dmad_on_django/models/base.py:102
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_sidebar.html:16
+msgid "last save"
+msgstr "letzte Bearbeitung"
+
+#: apps/dmad_on_django/models/base.py:108
+msgid "first editor"
+msgstr "Ersterfasser"
+
+#: apps/dmad_on_django/models/base.py:119
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_navbar.html:21
+msgid "raw data"
+msgstr "Rohdaten"
+
+#: apps/dmad_on_django/models/base.py:123
+msgid "rework in GND"
+msgstr "in GND überarbeiten"
+
+#: apps/dmad_on_django/models/base.py:130
+#: apps/dmad_on_django/templates/dmad_on_django/authority_data_view.html:22
+msgid "GND ID"
+msgstr "GND-ID"
+
+#: apps/dmad_on_django/models/base.py:135
+msgid "comment"
+msgstr "Kommentar"
+
+#: apps/dmad_on_django/models/base.py:141
+msgid "interim designator"
+msgstr "vorläufiger Name"
+
+#: apps/dmad_on_django/models/base.py:194
 msgid "<< error >>"
 msgstr "<< Fehler >>"
 
-#: apps/dmad_on_django/models/base.py:156
+#: apps/dmad_on_django/models/base.py:197
 msgid "(stub)"
 msgstr "(RD)"
 
@@ -51,98 +86,110 @@ msgid "search corporations"
 msgstr "Körperschaften durchsuchen"
 
 #: apps/dmad_on_django/models/corporation.py:144
-#: apps/dmad_on_django/models/person.py:209
-#: apps/dmad_on_django/models/person.py:214
+#: apps/dmad_on_django/models/person.py:208
+#: apps/dmad_on_django/models/person.py:213
 #: apps/dmad_on_django/models/place.py:121
 #: apps/dmad_on_django/models/subjectterm.py:121
 #: apps/dmad_on_django/models/work.py:142
 msgid "without name"
 msgstr "ohne Name"
 
-#: apps/dmad_on_django/models/period.py:14
+#: apps/dmad_on_django/models/period.py:15
 msgid "imprecise"
 msgstr "unscharf"
 
-#: apps/dmad_on_django/models/period.py:15
+#: apps/dmad_on_django/models/period.py:16
 msgid "precise"
 msgstr "exakt"
 
-#: apps/dmad_on_django/models/period.py:17
+#: apps/dmad_on_django/models/period.py:18
 msgid "point"
 msgstr "Zeitpunkt"
 
-#: apps/dmad_on_django/models/period.py:18
+#: apps/dmad_on_django/models/period.py:19
 msgid "span"
 msgstr "Zeitraum"
 
-#: apps/dmad_on_django/models/period.py:20
+#: apps/dmad_on_django/models/period.py:21
 msgid "not before"
 msgstr "nicht vor"
 
-#: apps/dmad_on_django/models/period.py:21
-#: apps/dmad_on_django/models/period.py:24
+#: apps/dmad_on_django/models/period.py:22
+#: apps/dmad_on_django/models/period.py:25
 msgid "exact"
 msgstr "exakt"
 
-#: apps/dmad_on_django/models/period.py:23
+#: apps/dmad_on_django/models/period.py:24
 msgid "not after"
 msgstr "nicht nach"
 
-#: apps/dmad_on_django/models/period.py:29
+#: apps/dmad_on_django/models/period.py:30
 msgid "start"
 msgstr "Start"
 
-#: apps/dmad_on_django/models/period.py:34
+#: apps/dmad_on_django/models/period.py:35
 #: apps/dmad_on_django/models/period_calculation.py:360
 msgid "end"
 msgstr "Ende"
 
-#: apps/dmad_on_django/models/period.py:39
+#: apps/dmad_on_django/models/period.py:40
 msgid "standardized date"
 msgstr "Datierung (standardisiert)"
 
-#: apps/dmad_on_django/models/period.py:45
+#: apps/dmad_on_django/models/period.py:46
 msgid "time mode"
 msgstr "Art der Datierung"
 
-#: apps/dmad_on_django/models/period.py:51
+#: apps/dmad_on_django/models/period.py:52
 msgid "not before mode"
 msgstr "Typ"
 
-#: apps/dmad_on_django/models/period.py:59
+#: apps/dmad_on_django/models/period.py:60
 msgid "not after mode"
 msgstr "Typ"
 
-#: apps/dmad_on_django/models/period.py:67
+#: apps/dmad_on_django/models/period.py:68
 msgid "imprecision"
 msgstr "Unschärfe"
 
-#: apps/dmad_on_django/models/period.py:115
-#: apps/dmad_on_django/models/period.py:116
+#: apps/dmad_on_django/models/period.py:124
+#: apps/dmad_on_django/models/period.py:125
 msgid "and"
 msgstr "und"
 
-#: apps/dmad_on_django/models/period.py:120
+#: apps/dmad_on_django/models/period.py:129
 msgid "before"
 msgstr "vor"
 
-#: apps/dmad_on_django/models/period.py:121
+#: apps/dmad_on_django/models/period.py:130
 msgid "after"
 msgstr "nach"
 
-#: apps/dmad_on_django/models/period.py:139
+#: apps/dmad_on_django/models/period.py:131
+msgid "circa"
+msgstr "ca."
+
+#: apps/dmad_on_django/models/period.py:132
+msgid "around"
+msgstr "um"
+
+#: apps/dmad_on_django/models/period.py:163
 msgid "ies"
 msgstr "er"
 
-#: apps/dmad_on_django/models/period.py:140
+#: apps/dmad_on_django/models/period.py:164
 msgid "century"
 msgstr "Jahrhundert"
 
-#: apps/dmad_on_django/models/period.py:158
+#: apps/dmad_on_django/models/period.py:164
+msgid "ct"
+msgstr "Jh"
+
+#: apps/dmad_on_django/models/period.py:183
 msgid "without date"
 msgstr "o. D."
 
-#: apps/dmad_on_django/models/period.py:158
+#: apps/dmad_on_django/models/period.py:183
 msgid "without year"
 msgstr "o. J."
 
@@ -226,13 +273,13 @@ msgstr "Herbst"
 msgid "winter"
 msgstr "Winter"
 
-#: apps/dmad_on_django/models/person.py:99
+#: apps/dmad_on_django/models/person.py:98
 msgid "search persons"
 msgstr "Personen durchsuchen"
 
 #: apps/dmad_on_django/models/place.py:69
 msgid "search places"
-msgstr "Orte durchsuchen"
+msgstr "Geografika durchsuchen"
 
 #: apps/dmad_on_django/models/subjectterm.py:48
 msgid "search subject terms"
@@ -240,11 +287,133 @@ msgstr "Sachschlagworte durchsuchen"
 
 #: apps/dmad_on_django/models/work.py:188
 msgid "Werke suchen"
-msgstr ""
+msgstr "Werke suchen"
 
-#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:4
+#: apps/dmad_on_django/templates/dmad_on_django/authority_data_view.html:17
+msgid "identification"
+msgstr "Identifikation"
+
+#: apps/dmad_on_django/templates/dmad_on_django/authority_data_view.html:26
+msgid "preferred name"
+msgstr "bevorzugter Name"
+
+#: apps/dmad_on_django/templates/dmad_on_django/authority_data_view.html:31
+msgid "alternative name"
+msgstr "alternativer Name"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:6
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:13
+msgid "create dataset"
+msgstr "Datensatz erstellen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:35
+msgid "search GND"
+msgstr "GND durchsuchen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:43
+msgid "enter search term or GND ID"
+msgstr "Suchbegriff oder GND-ID"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:54
+msgid "create stub"
+msgstr "Rumpfdatensatz erstellen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:74
+msgid "create new"
+msgstr "neu anlegen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:15
+msgid "short description"
+msgstr "Kurzbeschreibung"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:21
+msgid "Lobid info"
+msgstr "Lobid-Info"
+
+#: apps/dmad_on_django/templates/dmad_on_django/form_view.html:27
+msgid "edit"
+msgstr "bearbeiten"
+
+#: apps/dmad_on_django/templates/dmad_on_django/list.html:8
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:7
+msgid "persons"
+msgstr "Personen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/list.html:11
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:25
+msgid "places"
+msgstr "Geografika"
+
+#: apps/dmad_on_django/templates/dmad_on_django/list.html:14
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:16
+msgid "works"
+msgstr "Werke"
+
+#: apps/dmad_on_django/templates/dmad_on_django/list.html:17
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:34
+msgid "subject terms"
+msgstr "Sachschlagworte"
+
+#: apps/dmad_on_django/templates/dmad_on_django/list.html:20
+#: apps/dmad_on_django/templates/dmad_on_django/partials/navbar.html:43
+msgid "corporations"
+msgstr "Körperschaften"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:5
 msgid "create"
 msgstr "anlegen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:10
+msgid "person"
+msgstr "Person"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:15
+msgid "work"
+msgstr "Werk"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:20
+msgid "place"
+msgstr "Geografikum"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:25
+msgid "subject term"
+msgstr "Sachschlagwort"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/create_button.html:30
+msgid "corporation"
+msgstr "Körperschaft"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_navbar.html:9
+msgid "update"
+msgstr "Anpassen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_navbar.html:15
+msgid "authority data"
+msgstr "Normdaten"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_navbar.html:30
+msgid "back"
+msgstr "zurück"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_navbar.html:35
+msgid "delete"
+msgstr "löschen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_sidebar.html:8
+msgid "created"
+msgstr "angelegt"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_sidebar.html:26
+msgid "remove GND link"
+msgstr "GND-Verknüpfung entfernen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_sidebar.html:32
+msgid "link to GND"
+msgstr "mit GND verknüpfen"
+
+#: apps/dmad_on_django/templates/dmad_on_django/partials/detail_sidebar.html:38
+msgid "save"
+msgstr "speichern"
 
 #: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:7
 msgid "filters"
@@ -253,7 +422,7 @@ msgstr "Filter"
 #: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:21
 #: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:33
 msgid "rework"
-msgstr "überarbeiten"
+msgstr "in GND überarbeiten"
 
 #: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:50
 #: apps/dmad_on_django/templates/dmad_on_django/partials/facets.html:62
@@ -275,6 +444,10 @@ msgstr "von"
 #: apps/dmad_on_django/templates/dmad_on_django/partials/search_results.html:32
 msgid "no search results"
 msgstr "keine Suchergebnisse"
+
+#: apps/dmad_on_django/templates/dmad_on_django/unlink.html:6
+msgid "unlink dataset"
+msgstr "Datensatz entkoppeln"
 
 #~ msgid "search works"
 #~ msgstr "Werke durchsuchen"

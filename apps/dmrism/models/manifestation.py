@@ -16,6 +16,7 @@ from liszt_util.models import Sortable
 
 
 class TitleTypes(models.TextChoices):
+    ELSE = 'EL', _('other title position')
     HEAD_TITLE = 'HT', _('Head Title')
     TITLE_PAGE = 'TP', _('Title Page')
     ENVELOPE = 'EN', _('Envelope')
@@ -31,7 +32,8 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        PROOF = 'PR', _('manuscript proof'),
+        PROOF = 'PR', _('proof'),
+        SKETCH = 'SK', _('sketch')
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
@@ -65,7 +67,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 case 'copy': return Manifestation.SourceType.TRANSCRIPT
                 case 'correctedcopy': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
                 case 'print': return Manifestation.SourceType.PRINT
-                case 'correctedprint': return Manifestation.SourceType.CORRECTED_PRINT
+                case 'correctedprint': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
@@ -137,7 +139,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             max_length = 10,
             choices = Edition,
             default = Edition.FOLLOWING_EDITION,
-            verbose_name = _('edition')
+            verbose_name = _('edition'),
+            null = True,
+            blank = True
         )
     state = models.CharField(
             max_length = 10,
@@ -148,11 +152,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     extent = models.TextField(
             blank = True,
             verbose_name = _('extent'),
-            default = ''
-        )
-    history = models.TextField(
-            blank = True,
-            verbose_name = _('history'),
             default = ''
         )
     bib = models.ManyToManyField(
@@ -410,7 +409,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             ])
 
     def render_title_suffix(self):
-        return f'({self.get_source_type_display()})'
+        if self.source_type:
+            return f'({self.get_source_type_display()})'
+        return ''
 
     def standardized_search_entry(self):
         return self.render_title()
@@ -697,23 +698,10 @@ class PublicationPlace(DocumentationStatusMixin, models.Model):
         )
 
 
-
-class ManifestationPlace(models.Model):
+class ManifestationPlace(BasePlaceRelation):
     manifestation = models.ForeignKey(
             'Manifestation',
             on_delete = models.CASCADE
-        )
-    place = models.ForeignKey(
-            'dmad.Place',
-            on_delete = models.CASCADE
-        )
-    inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
-        )
-    assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
         )
 
 
@@ -769,6 +757,7 @@ class RelatedManifestation(RelatedEntity):
         STITCH_TEMPLATE = 'SD', _('is stitch template (as documented)')
         STITCH_TEMPLATE_INFERRED = 'SI', _('is stitch template (inferred)')
         RELATED = 'R', _('is related to')
+        REVISION = 'RV', _('is revision of')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',

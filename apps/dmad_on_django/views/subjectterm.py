@@ -46,3 +46,11 @@ class SubjectTermPullView(PullView):
 
 class SubjectTermDeleteView(DeleteView):
     model = SubjectTerm
+
+
+class SubjectTermRawDataView(BaseRawDataView):
+    model = SubjectTerm
+
+
+class SubjectTermAuthorityDataView(BaseAuthorityDataView):
+    model = SubjectTerm

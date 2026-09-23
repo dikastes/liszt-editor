@@ -94,7 +94,6 @@ class Person(DisplayableModel):
         related_name='death_place_of'
     )
     activity_places = models.ManyToManyField(Place)
-
     professions = models.ManyToManyField(SubjectTerm)
 
     ordering_fields = {
@@ -234,7 +233,7 @@ class Person(DisplayableModel):
     def get_natural_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).get_natural_name()
-        return _('without name')
+        return self.interim_designator or _('without name')
 
     def get_table(self):
             rows = [

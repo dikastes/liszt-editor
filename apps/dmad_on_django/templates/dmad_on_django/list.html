@@ -3,6 +3,26 @@
 {% load i18n %}
 {% load static %}
 
+{% block page_title %}
+    {% if active == 'person' %}
+        {% translate 'persons' %}
+    {% endif %}
+    {% if active == 'place' %}
+        {% translate 'places' %}
+    {% endif %}
+    {% if active == 'work' %}
+        {% translate 'works' %}
+    {% endif %}
+    {% if active == 'subject_term' %}
+        {% translate 'subject terms' %}
+    {% endif %}
+    {% if active == 'corporation' %}
+        {% translate 'corporations' %}
+    {% endif %}
+    |
+    DMAd
+{% endblock %}
+
 {% block content %}
 
 <div class="bg-white p-5 w-full overflow-auto">
@@ -30,4 +50,10 @@
         {% include 'dmad_on_django/partials/search_form.html' with action_url=search_url hx_get=search_url %}
         {% include 'dmad_on_django/partials/create_button.html' %}
     </div>
+{% endblock %}
+
+{% block navbar_title %}
+<div class="mt-5 mx-5 md:mx-10 text-lg lg:text-2xl xl:text-3xl flex">
+    &nbsp;
+</div>
 {% endblock %}

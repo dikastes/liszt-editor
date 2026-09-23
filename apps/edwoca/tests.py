@@ -1,20 +1,52 @@
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from dmad_on_django.models import Status, Language, Person, Place
+from dmad_on_django.models import Status, Language, Person, Place, Corporation
+from dmrism.models import Publication, PublicationPlace
 from .models import Manifestation, Item, Library
 from xml.etree import ElementTree as ET
 
 # Create your tests here.
 
+class PrintCreationTest(TestCase):
+
+    def test_print_creation_workflow(self):
+        working_title = 'working title'
+        print_title = 'print_title'
+        publisher = Corporation.objects.create()
+        plate_number = '200'
+        form_data = {
+                'temporary_title': working_title,
+                'source_title': print_title,
+                'publisher': publisher.pk,
+                'plate_number': plate_number
+            }
+
+        url = reverse('edwoca:manifestation_create')
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 302)
+
+        self.assertTrue(Manifestation.objects.filter(working_title=working_title).exists())
+
+        manifestation = Manifestation.objects.get(working_title=working_title)
+
+        self.assertEqual(manifestation.source_title, print_title)
+        self.assertEqual(manifestation.publications.first().publisher, publisher)
+        self.assertEqual(manifestation.plate_number, plate_number)
+
+
 class SingletonCreationTest(TestCase):
 
     def test_singleton_creation_workflow(self):
         library = Library.objects.create()
+        signature = 'signature'
+        test_title = 'test title'
+
         form_data = {
-            'working_title': 'Mein Test-Titel',
+            'working_title': test_title,
             'library': library.pk,
-            'signature': 'Signatur-123'
+            'signature': signature
         }
 
         url = reverse('edwoca:singleton_create')
@@ -22,10 +54,12 @@ class SingletonCreationTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertTrue(Manifestation.objects.filter(working_title='Mein Test-Titel').exists())
-        manifestation = Manifestation.objects.get(working_title='Mein Test-Titel')
+        self.assertTrue(Manifestation.objects.filter(working_title=test_title).exists())
+        manifestation = Manifestation.objects.get(working_title=test_title)
 
         self.assertEqual(manifestation.items.count(), 1)
+        self.assertEqual(manifestation.items.first().signatures.first().library, library)
+        self.assertEqual(manifestation.items.first().signatures.first().signature, signature)
 
 
 class CollectionRelationsTest(TestCase):
@@ -40,9 +74,29 @@ class CollectionRelationsTest(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class ManifestationCopyTest(TestCase):
+class PrintCopyTest(TestCase):
 
-    def test_manifestation_copy_workflow(self):
+    def test_print_copy_workflow(self):
+        copy_title = 'test_copy_workflow_title'
+        copied_title = f'{_("copy of")} {copy_title}'
+        publisher = Corporation.objects.create()
+        m = Manifestation.objects.create(working_title = copy_title)
+        publication = Publication.objects.create(manifestation = m, publisher = publisher)
+
+        url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
+
+        copied_publisher = Manifestation.objects.filter(working_title=copied_title).first().publications.first().publisher
+        self.assertEqual(publisher, copied_publisher)
+
+
+class ManuscriptCopyTest(TestCase):
+
+    def test_manuscript_copy_workflow(self):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
         m = Manifestation.objects.create(is_singleton = True, working_title = copy_title)

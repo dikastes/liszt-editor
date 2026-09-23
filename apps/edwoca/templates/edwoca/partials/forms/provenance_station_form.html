@@ -1,7 +1,12 @@
 {% load i18n %}
 
 <div class="collapse collapse-arrow bg-base-100 my-5">
-    <input type="checkbox" />
+    <input
+        {% if open_ps == station.instance.id and open_ps_type == provenance_class %}
+            checked
+        {% endif %}
+        type="checkbox"
+        />
 
     <div class="collapse-title truncate">
         {{ station.instance }}
