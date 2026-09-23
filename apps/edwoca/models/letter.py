@@ -160,7 +160,7 @@ class Letter(TrackedModel):
     objects = DisplayableQuerySet.as_manager()
 
     ordering_fields = {
-        'sort_edition': (['edition'], _('edition'), _('A-Z'), _('Z-A'))
+        'sort_edition': (['sort_edition'], _('letter edition'), _('A-Z'), _('Z-A'))
     }
 
     @classmethod
