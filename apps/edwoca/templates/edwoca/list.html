@@ -93,24 +93,28 @@
 {% block content %}
 
 <div id="search-results-container" class="flex">
-    <div class="pagination flex-1">
-        <span class="join mb-5 ml-5">
-            {% if page_obj.has_previous %}
-                <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
-                   class="btn-outline btn join-item"> &laquo; </a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
-                   class="btn-outline btn join-item"> &lsaquo; </a>
-            {% endif %}
-            <span class="current border-black btn-outline btn join-item text-primary">
-                {% translate 'page' %} {{ page_obj.number }} {% translate 'of' %} {{ page_obj.paginator.num_pages }}
-            </span>
-            {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
-                   class="join-item btn-outline btn"> &rsaquo; </a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
-                   class="join-item btn-outline btn"> &raquo; </a>
-            {% endif %}
-        </span>
+    <div id="search-results-container" class="flex-1">
+        {% if page_obj.has_previous or page_obj.has_next %}
+            <div class="pagination">
+                <span class="join mb-5 ml-5">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1{% if query %}&q={{ query }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
+                           class="btn-outline btn join-item"> &laquo; </a>
+                        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
+                           class="btn-outline btn join-item"> &lsaquo; </a>
+                    {% endif %}
+                    <span class="current border-black btn-outline btn join-item text-primary">
+                        {% translate 'page' %} {{ page_obj.number }} {% translate 'of' %} {{ page_obj.paginator.num_pages }}
+                    </span>
+                    {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
+                           class="join-item btn-outline btn"> &rsaquo; </a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}{% if request.GET.dir %}&dir={{ request.GET.dir }}{% endif %}{% if request.GET.type %}&type={{ request.GET.type }}{% endif %}"
+                           class="join-item btn-outline btn"> &raquo; </a>
+                    {% endif %}
+                </span>
+            </div>
+        {% endif %}
         <div class="prose">
             <ul id="result-list">
                 {% include 'edwoca/partials/result_list.html' %}

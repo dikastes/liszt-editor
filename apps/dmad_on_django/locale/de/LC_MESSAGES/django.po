@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 17:20+0200\n"
+"POT-Creation-Date: 2026-09-24 09:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -323,23 +323,23 @@ msgid "alternative name"
 msgstr "alternativer Name"
 
 #: apps/dmad_on_django/templates/dmad_on_django/create.html:6
-#: apps/dmad_on_django/templates/dmad_on_django/create.html:13
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:23
 msgid "create dataset"
 msgstr "Datensatz erstellen"
 
-#: apps/dmad_on_django/templates/dmad_on_django/create.html:29
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:39
 msgid "search GND"
 msgstr "GND durchsuchen"
 
-#: apps/dmad_on_django/templates/dmad_on_django/create.html:37
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:47
 msgid "enter search term or GND ID"
 msgstr "Suchbegriff oder GND-ID"
 
-#: apps/dmad_on_django/templates/dmad_on_django/create.html:48
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:59
 msgid "create stub"
 msgstr "Rumpfdatensatz erstellen"
 
-#: apps/dmad_on_django/templates/dmad_on_django/create.html:68
+#: apps/dmad_on_django/templates/dmad_on_django/create.html:79
 msgid "create new"
 msgstr "neu anlegen"
 
