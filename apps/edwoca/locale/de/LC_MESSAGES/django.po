@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-23 17:20+0200\n"
+"POT-Creation-Date: 2026-09-24 09:58+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -557,7 +557,7 @@ msgid "sender corporation name according to source"
 msgstr "Name der Körperschaft (nach Originalquelle)"
 
 #: apps/edwoca/models/letter.py:163
-msgid "edition"
+msgid "sort edition"
 msgstr "Edition"
 
 #: apps/edwoca/models/letter.py:163
@@ -1676,7 +1676,7 @@ msgstr ""
 
 #: apps/edwoca/templates/edwoca/partials/result_list.html:9
 msgid "no hits"
-msgstr ""
+msgstr "keine Treffer"
 
 #: apps/edwoca/templates/edwoca/partials/search_form_switcher.html:8
 #, python-format
@@ -1752,6 +1752,9 @@ msgstr "Drucke durchsuchen"
 #: apps/edwoca/views/manifestation/title.py:191
 msgid "search persons"
 msgstr "Personen durchsuchen"
+
+#~ msgid "edition"
+#~ msgstr "Edition"
 
 #~ msgid "component of part"
 #~ msgstr "Teil"
