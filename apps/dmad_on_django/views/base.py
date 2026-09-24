@@ -85,9 +85,12 @@ class DmadBaseViewMixin:
                kwargs={'pk': self.object.id})
 
 
-class DmadCreateView(DmadBaseViewMixin, CreateView):
+class DmadCreateView(NavbarContextMixin, DmadBaseViewMixin, CreateView):
     template_name = 'dmad_on_django/create.html'
     fields = ['interim_designator', 'comment']
+
+    def get_model(self):
+        return self.model
 
     def get_form_class(self):
         return forms.modelform_factory(
