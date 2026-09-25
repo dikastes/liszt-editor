@@ -87,7 +87,7 @@ class DmadBaseViewMixin:
 
 class DmadCreateView(NavbarContextMixin, DmadBaseViewMixin, CreateView):
     template_name = 'dmad_on_django/create.html'
-    fields = ['interim_designator', 'comment']
+    fields = ['interim_designator', 'comment', 'gnd_id']
 
     def get_model(self):
         return self.model
@@ -105,7 +105,14 @@ class DmadCreateView(NavbarContextMixin, DmadBaseViewMixin, CreateView):
         search_string = self.request.GET.get('q', '')
         context['object_list'] = []
         if search_string:
-            context['object_list'] = self.model.search(search_string)
+            context['object_list'] = [
+                {
+                    'label': entity['label'],
+                    'id': entity['id'].replace('https://d-nb.info/gnd/', '')
+                }
+                for entity
+                in self.model.search(search_string)
+            ]
         context['q'] = search_string
         return context
 
