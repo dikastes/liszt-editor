@@ -88,7 +88,7 @@ def manifestation_collection_create(request, publisher_pk=None):
                 print(e)
 
             manifestation = EdwocaManifestation.objects.create(
-                    source_type = form.cleaned_data.get('source_type'),
+                    source_title = form.cleaned_data.get('source_title'),
                     plate_number = form.cleaned_data.get('plate_number'),
                     working_title = form.cleaned_data['temporary_title'],
                     period = period,

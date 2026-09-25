@@ -12,7 +12,7 @@ class PrintCreationTest(TestCase):
 
     def test_print_creation_workflow(self):
         working_title = 'working title'
-        print_title = 'print_title'
+        print_title = 'print title'
         publisher = Corporation.objects.create()
         plate_number = '200'
         form_data = {
@@ -34,6 +34,30 @@ class PrintCreationTest(TestCase):
         self.assertEqual(manifestation.source_title, print_title)
         self.assertEqual(manifestation.publications.first().publisher, publisher)
         self.assertEqual(manifestation.plate_number, plate_number)
+
+        collection_working_title = 'collection working title'
+        collection_print_title = 'collection print title'
+        collection_publisher = Corporation.objects.create()
+        collection_plate_number = '400'
+        collection_form_data = {
+                'temporary_title': collection_working_title,
+                'source_title': collection_print_title,
+                'publisher': collection_publisher.pk,
+                'plate_number': collection_plate_number
+            }
+
+        collection_url = reverse('edwoca:manifestation_create')
+        collection_response = self.client.post(collection_url, data=collection_form_data)
+
+        self.assertEqual(collection_response.status_code, 302)
+
+        self.assertTrue(Manifestation.objects.filter(working_title=collection_working_title).exists())
+
+        collection_manifestation = Manifestation.objects.get(working_title=collection_working_title)
+
+        self.assertEqual(collection_manifestation.source_title, collection_print_title)
+        self.assertEqual(collection_manifestation.publications.first().publisher, collection_publisher)
+        self.assertEqual(collection_manifestation.plate_number, collection_plate_number)
 
 
 class SingletonCreationTest(TestCase):
