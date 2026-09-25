@@ -32,6 +32,7 @@ class PrintCreationTest(TestCase):
         manifestation = Manifestation.objects.get(working_title=working_title)
 
         self.assertEqual(manifestation.source_title, print_title)
+        self.assertEqual(manifestation.source_type, Manifestation.SourceType.PRINT)
         self.assertEqual(manifestation.publications.first().publisher, publisher)
         self.assertEqual(manifestation.plate_number, plate_number)
 
@@ -56,6 +57,7 @@ class PrintCreationTest(TestCase):
         collection_manifestation = Manifestation.objects.get(working_title=collection_working_title)
 
         self.assertEqual(collection_manifestation.source_title, collection_print_title)
+        self.assertEqual(collection_manifestation.source_type, Manifestation.SourceType.PRINT)
         self.assertEqual(collection_manifestation.publications.first().publisher, collection_publisher)
         self.assertEqual(collection_manifestation.plate_number, collection_plate_number)
 
