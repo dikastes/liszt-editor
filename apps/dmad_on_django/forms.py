@@ -36,13 +36,3 @@ class DmadUpdateForm(GenericAsDaisyMixin, ModelForm):
 
 class DmadCreateForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE
-
-    def __init__(self, **kwargs):
-        orig_data = kwargs.get('data')
-        if orig_data:
-            data = orig_data.copy()
-            gnd_id = data.get('gnd_id', '').replace('https://d-nb.info/gnd/', '')
-            data.__setitem__('gnd_id', gnd_id)
-            kwargs.update({'data': data})
-
-        super().__init__(**kwargs)
