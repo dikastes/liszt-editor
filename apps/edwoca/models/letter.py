@@ -32,6 +32,26 @@ class LetterDigitalCopy(BaseDigitalCopy):
             related_name = 'digital_copies'
         )
 
+class LetterWorkReference(models.Model):
+    class Mentions(models.TextChoices):
+        WORK = 'W', _('Workplane')
+        SOURCE = 'S', _('Sourceplane')
+
+    letter = models.ForeignKey(
+        'Letter',
+        on_delete=models.CASCADE,
+        related_name='work_references'
+    )
+
+    reference = models.TextField(null=True, blank=True)
+    entstehung = models.BooleanField(default=False) # TODO: Nach Englischer Übersetzung suchen
+    source_transfer = models.BooleanField(default=False)
+    work_catalogue_number = models.TextField(null=True, blank=True)
+    work_title = models.TextField(null=True, blank=True)
+    comment = models.TextField(null=True, blank=True)
+
+
+    #TODO: Werkerwähnung, Entstehung, Quellentransfer, Aufführungen, WVZ, Werktitel, Kommentar (intern), Erwähnung (W OR Q)
 
 class Letter(TrackedModel):
     class Category(models.TextChoices):

@@ -6,4 +6,6 @@ migrate:
 	uv run manage.py migrate
 import: liszt_csv/ import_manifestations.sh
 	./import_manifestations.sh liszt_csv
-.PHONY: server makemig migrate
+shell: manage.py
+	uv run manage.py shell
+.PHONY: server makemig migrate import shell
