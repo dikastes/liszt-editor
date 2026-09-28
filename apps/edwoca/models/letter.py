@@ -51,7 +51,7 @@ class LetterWorkReference(models.Model):
     comment = models.TextField(null=True, blank=True)
 
 
-    #TODO: Werkerwähnung, Entstehung, Quellentransfer, Aufführungen, WVZ, Werktitel, Kommentar (intern), Erwähnung (W OR Q)
+    # TODO: Werkerwähnung, Entstehung, Quellentransfer, Aufführungen, WVZ, Werktitel, Kommentar (intern), Erwähnung (W OR Q)
 
 class Letter(TrackedModel):
     class Category(models.TextChoices):
