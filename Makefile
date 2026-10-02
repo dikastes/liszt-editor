@@ -8,4 +8,6 @@ import: liszt_csv/ import_manifestations.sh
 	./import_manifestations.sh liszt_csv
 shell: manage.py
 	uv run manage.py shell
-.PHONY: server makemig migrate import shell
+rebuild:
+	uv run manage.py rebuild_index
+.PHONY: server makemig migrate import shell rebuild
