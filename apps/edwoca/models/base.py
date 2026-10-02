@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace, PublicationPlace
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace, PublicationPlace, RelatedExpression
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -111,7 +111,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         copy_of = _('copy of')
         copy = Manifestation.objects.create(
-            working_title = f'{copy_of} {self.working_title}',
             source_title = self.source_title,
             rism_id_unaligned = True,
             rism_id = self.rism_id,
@@ -121,6 +120,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             print_type = self.print_type,
             state = self.state,
             language = self.language,
+            plate_number = self.plate_number,
+            title_page = self.title_page,
             watermark = self.watermark,
             watermark_url = self.watermark_url,
             is_singleton = self.is_singleton,
@@ -143,6 +144,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             private_print_comment = self.private_print_comment
         )
         copy.save()
+
+        for expression_relation in self.expression_relations.all():
+            RelatedExpression.objects.create(
+                    manifestation = copy,
+                    working_title = f'{copy_of} {expression_relation.working_title}'
+                )
         #copy.places.set(self.places.all())
 
         copy.bib.set(self.bib.all())

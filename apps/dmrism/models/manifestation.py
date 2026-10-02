@@ -416,10 +416,10 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         if self.source_type == Manifestation.SourceType.MODIFIED_PRINT:
             if related_manifestation := self.get_related_manifestation():
                 return related_manifestation.source_title
-            else:
-                if self.expression_relations.count() == 1:
-                    return self.expression_relations.first().working_title
+        if self.expression_relations.count() == 1:
+            return self.expression_relations.first().working_title
         return self.source_title or str(_('empty'))
+
 
     def render_title(self):
         return ' '.join([
