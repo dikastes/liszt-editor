@@ -106,7 +106,7 @@ class PrintCopyTest(TestCase):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
         publisher = Corporation.objects.create()
-        m = Manifestation.objects.create(working_title = copy_title)
+        m = Manifestation.objects.create(working_title = copy_title, source_type = 'MPR')
         publication = Publication.objects.create(manifestation = m, publisher = publisher)
 
         url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
@@ -115,6 +115,9 @@ class PrintCopyTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
         self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
+
+        copy = Manifestation.objects.get(working_title=copied_title)
+        self.assertEqual(m.source_type, copy.source_type)
 
         copied_publisher = Manifestation.objects.filter(working_title=copied_title).first().publications.first().publisher
         self.assertEqual(publisher, copied_publisher)

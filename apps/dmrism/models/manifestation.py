@@ -23,6 +23,23 @@ class TitleTypes(models.TextChoices):
     ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
 
 
+class RelatedExpression(models.Model):
+    working_title = models.TextField(
+            null = True,
+            verbose_name = _('working title'),
+            blank = True
+        )
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE,
+            related_name = 'expression_relations',
+            null = True
+        )
+
+    def __str__(self):
+        return self.working_title or ''
+
+
 class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     class Meta:
         ordering = ['-needs_review', 'order_index']
@@ -43,10 +60,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             match german_string.lower():
                 case 'plattendruck' | 'platte': return Manifestation.PrintType.PLATE_PRINT
                 case 'lithographie': return Manifestation.PrintType.LITHOGRAPH
-
-    class Edition(models.TextChoices):
-        FIRST_EDITION = '1', _('first issue')
-        FOLLOWING_EDITION = 'F', _('following issue')
 
     class SourceType(models.TextChoices):
         TRANSCRIPT = 'TSC', _('transcript')
@@ -73,11 +86,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         COMPLETE= 'CP', _('complete')
         INCOMPLETE= 'INC', _('incomplete')
 
-    working_title = models.TextField(
-            blank = True,
-            verbose_name = _('working title'),
-            default = ''
-        )
     source_title = models.TextField(
             blank = True,
             verbose_name = _('source title'),
@@ -134,14 +142,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             null = True,
             blank = True,
             verbose_name = _('print type')
-        )
-    edition = models.CharField(
-            max_length = 10,
-            choices = Edition,
-            default = None,
-            verbose_name = _('edition'),
-            null = True,
-            blank = True
         )
     state = models.CharField(
             max_length = 10,
@@ -339,6 +339,24 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             default = False,
             verbose_name = _('partial edition')
         )
+    without_proof_copy = models.BooleanField(
+            default = False,
+            verbose_name = _('without proof copy')
+        )
+
+    def get_related_manifestation(self):
+        if self.source_type != Manifestation.SourceType.MODIFIED_PRINT:
+            raise Exception('Tried to retrieve the related manifestation of a non modified print manifestation')
+
+        related_manifestation = (
+            self.source_manifestation_of
+            .filter(label = RelatedManifestation.Label.REVISION)
+            .first()
+        )
+
+        if related_manifestation:
+            return related_manifestation.target_manifestation
+        return None
 
     @property
     def may_have_component(self):
@@ -357,12 +375,8 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         if is_collection:
             # set collection
             self.is_collection = True
-            if self.working_title and not self.source_title:
-                self.source_title = self.working_title
         else:
             # unset collection
-            if self.source_title and not self.working_title:
-                self.working_title = self.source_title
             self.is_collection = False
 
     def get_edition_type(self):
@@ -399,7 +413,13 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return False
 
     def render_title_body(self):
-        return self.working_title or self.source_title or str(_('empty'))
+        if self.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+            if related_manifestation := self.get_related_manifestation():
+                return related_manifestation.source_title
+            else:
+                if self.expression_relations.count() == 1:
+                    return self.expression_relations.first().working_title
+        return self.source_title or str(_('empty'))
 
     def render_title(self):
         return ' '.join([
@@ -757,7 +777,6 @@ class RelatedManifestation(RelatedEntity):
         STITCH_TEMPLATE = 'SD', _('is stitch template (as documented)')
         STITCH_TEMPLATE_INFERRED = 'SI', _('is stitch template (inferred)')
         RELATED = 'R', _('is related to')
-        REVISION = 'RV', _('is revision of')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',

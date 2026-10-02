@@ -808,12 +808,39 @@ def item_manuscript_update(request, pk):
         completeness_form = ItemCompletenessForm(request.POST, instance=item)
         text_type_form = ItemTextTypeForm(request.POST, instance=item)
 
-        all_forms = [
+        annotation_forms = []
+        handwriting_forms = []
+        for annotation in item.annotations.all():
+            prefix = f'annotation_{annotation.id}'
+            annotation_form = AnnotationForm(request.POST, instance=annotation, prefix=prefix)
+            annotation_forms += [ annotation_form ]
+
+            for handwriting in annotation.handwritings.all():
+                prefix = f'annotation_handwriting_{handwriting.id}'
+                handwriting_form = AnnotationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                handwriting_forms += [ handwriting_form ]
+
+        modification_forms = []
+        for modification in item.modifications.all():
+            prefix = f'modification_{modification.id}'
+            modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
+            modification_forms += [ modification_form ]
+
+            for handwriting in modification.handwritings.all():
+                prefix = f'modification_handwriting_{handwriting.id}'
+                handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+                handwriting_forms += [ handwriting_form ]
+
+        all_forms = ([
                 form,
                 function_form,
                 completeness_form,
                 text_type_form
-            ]
+            ] +
+            modification_forms +
+            handwriting_forms +
+            annotation_forms
+        )
 
         if all(f.is_valid for f in all_forms):
             for f in all_forms:
@@ -824,30 +851,6 @@ def item_manuscript_update(request, pk):
             context['text_type_form'] = text_type_form
             context['completeness_form'] = completeness_form
             return render(request, 'edwoca:item_manuscript.html', context)
-
-        for annotation in item.annotations.all():
-            prefix = f'annotation_{annotation.id}'
-            annotation_form = AnnotationForm(request.POST, instance=annotation, prefix=prefix)
-            if annotation_form.is_valid():
-                annotation_form.save()
-
-            for handwriting in annotation.handwritings.all():
-                prefix = f'annotation_handwriting_{handwriting.id}'
-                handwriting_form = AnnotationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
-                if handwriting_form.is_valid():
-                    handwriting_form.save()
-
-        for modification in item.modifications.all():
-            prefix = f'modification_{modification.id}'
-            modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
-            if modification_form.is_valid():
-                modification_form.save()
-
-            for handwriting in modification.handwritings.all():
-                prefix = f'modification_handwriting_{handwriting.id}'
-                handwriting_form = ModificationHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
-                if handwriting_form.is_valid():
-                    handwriting_form.save()
 
         if 'add-modification' in request.POST:
             modification = ItemModification.objects.create(item=item)

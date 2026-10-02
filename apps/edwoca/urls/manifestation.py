@@ -4,6 +4,7 @@ from .. import views
 urlpatterns = [
     path('singletons', views.SingletonListView.as_view(), name = 'singleton_list'),
     path('singletons/search', views.SingletonSearchView.as_view(), name = 'singleton_search'),
+    path('modified_print/new', views.modified_print_create, name = 'modified_print_create'),
     path('singletons/new', views.singleton_create, name = 'singleton_create'),
     path('<int:pk>/create_part/<str:part_label>', views.part_create, name = 'part_create'),
     path('<int:pk>/create_component', views.component_create, name = 'component_create'),
@@ -81,5 +82,7 @@ urlpatterns = [
     path('<int:pk>/addplace/<int:place_id>', views.manifestation_add_place_view, name = 'manifestation_place_add'),
     path('<int:pk>/remove_place/<int:place_id>', views.manifestation_remove_place_view, name = 'manifestation_remove_place'),
     path('publisher-search', views.publisher_search_view, name='publisher_search_view'),
+    path('print-search', views.print_search_view, name='print_search_view'),
+    path('library-search', views.library_search_view, name='library_search_view'),
     path('<int:pk>/swap_order/<int:parent_pk>/<str:direction>', views.collection_part_swap_view, name = 'collection_part_swap_order')
 ]

@@ -484,6 +484,7 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Item
         fields = [
+                'edition',
                 'source_type',
                 'item_stage',
                 'extent',
@@ -522,6 +523,10 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
+                'edition': Select( attrs = {
+                        'class': SimpleFormMixin.select_classes,
+                        'form': 'form'
+                    }),
                 'item_stage': Select( attrs = {
                         'class': SimpleFormMixin.select_classes,
                         'form': 'form'
@@ -543,6 +548,7 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
 
     def type_as_daisy(self):
         source_type_field = self['source_type']
+        edition_field = self['edition']
 
         form = div(cls='my-5')
 
@@ -551,6 +557,10 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(source_type_field.label)+'*', cls=SimpleFormMixin.label_text_classes)
                 raw(str(source_type_field))
+            with label():
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_(edition_field.label), cls=SimpleFormMixin.label_text_classes)
+                raw(str(edition_field))
 
         return mark_safe(str(form))
 
@@ -577,14 +587,6 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
         form = div(cls='my-5')
 
         with form:
-            with label():
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(measure_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(measure_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(extent_field))
             with div(cls='mb-2'):
                 h3(_('text type'), cls='text-lg my-5')
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
@@ -596,6 +598,15 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
                     raw(str(explanation_field))
                     span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+            if not self.instance.source_type == Item.SourceType.ANNOTATED_PROOF_COPY:
+                with label(cls=SimpleFormMixin.form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(extent_field))
+                with label():
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(measure_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(measure_field))
 
         return mark_safe(str(form))
 
@@ -785,6 +796,11 @@ class AnnotationForm(ModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields['collection_component'].queryset = Manifestation.objects.filter(component_of = self.instance.item.manifestation.id)
+        if collection := self.instance.item.manifestation.expression_relations.count():
+            self.fields['collection_component'].queryset = Manifestation.objects.filter(
+                    Q(component_of = self.instance.item.manifestation.id) |
+                    Q(pk = self.instance.item.manifestation.id)
+                )
 
     def collection_component_as_daisy(self):
         form = div(cls='my-5')

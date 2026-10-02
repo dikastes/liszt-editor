@@ -3,11 +3,9 @@
 {% load i18n %}
 
 {% block content %}
-    {% if 'collection' in request.path %}
-        <h2>Neue Drucksammlung anlegen</h2>
-    {% else %}
-        <h2>Neuen Druck anlegen</h2>
-    {% endif %}
+    <h2>
+        {{ view_title }}
+    </h2>
 
     {% if search_form %}
         <form class="flex mt-5">

@@ -854,6 +854,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 )
 
     def render_title_prefix(self):
+        if self.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+            if related_manifestation := self.get_related_manifestation():
+                related_manifestation.__class__ = self.__class__
+                return related_manifestation.render_title_prefix()
+
         collection_prefix = super().render_title_prefix()
         if self.is_singleton:
             return collection_prefix
@@ -1042,9 +1047,10 @@ class Event(models.Model):
 
 class ItemModification(models.Model):
     collection_component = models.ForeignKey(
-            'Manifestation',
+            'dmrism.RelatedExpression',
             on_delete = models.SET_NULL,
             null = True,
+            blank = True,
             related_name = 'modifications'
         )
     modification_description = models.TextField(
@@ -1079,6 +1085,22 @@ class ItemModification(models.Model):
             null = True,
             blank = True,
             verbose_name = _('note')
+        )
+    is_addition = models.BooleanField(
+            default = False,
+            verbose_name = _('addition')
+        )
+    is_correction = models.BooleanField(
+            default = False,
+            verbose_name = _('correction')
+        )
+    is_note = models.BooleanField(
+            default = False,
+            verbose_name = _('note')
+        )
+    is_title = models.BooleanField(
+            default = False,
+            verbose_name = _('title')
         )
 
     def render_writer(self):

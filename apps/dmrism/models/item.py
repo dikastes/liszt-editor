@@ -29,6 +29,10 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         ANNOTATED_PROOF_COPY = 'APC', _('annotated proof copy')
         MODIFIED_PRINT = 'MPR', _('modified print')
 
+    class Edition(models.TextChoices):
+        FIRST_EDITION = '1', _('first issue')
+        FOLLOWING_EDITION = 'F', _('following issue')
+
     item_stage = models.CharField(
             max_length = 2,
             choices = ItemStage,
@@ -148,6 +152,14 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
             on_delete = models.SET_NULL,
             null = True,
             blank = True,
+        )
+    edition = models.CharField(
+            max_length = 10,
+            choices = Edition,
+            default = None,
+            verbose_name = _('edition'),
+            null = True,
+            blank = True
         )
     places = models.ManyToManyField(
             'dmad.Place',
@@ -623,7 +635,7 @@ class ItemBib(BaseBib):
 
 class Annotation(models.Model):
     collection_component = models.ForeignKey(
-            'Manifestation',
+            'RelatedExpression',
             on_delete = models.SET_NULL,
             null = True,
             related_name = 'annotations'

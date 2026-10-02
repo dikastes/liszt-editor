@@ -16,6 +16,20 @@ def manifestation_update(request, pk):
     if request.method == 'POST':
         manifestation_form = ManifestationForm(request.POST, instance=manifestation)
 
+        if 'remove-related-expression' in request.POST:
+            related_expression_id = request.POST.get('remove-related-expression')
+            related_expression = RelatedExpression.objects.get(pk=related_expression_id)
+            related_expression.delete()
+
+        related_expression_forms = []
+        for related_expression in manifestation.expression_relations.all():
+            related_expression_form = RelatedExpressionForm(
+                    request.POST,
+                    instance = related_expression,
+                    prefix = f'related-expression-{related_expression.pk}'
+                )
+            related_expression_forms += [ related_expression_form ]
+
         signature_forms = []
         if manifestation.is_singleton:
             item = manifestation.get_single_item()
@@ -29,19 +43,23 @@ def manifestation_update(request, pk):
                     )
                 signature_forms.append(signature_form)
 
-        if manifestation_form.is_valid() and all(s.is_valid() for s in signature_forms):
-            manifestation_form.save()
+        all_forms = signature_forms + related_expression_forms + [ manifestation_form ]
+
+        if all(f.is_valid() for f in all_forms):
             if manifestation.is_singleton:
                 for signature in manifestation.get_single_item().signatures.all():
                     signature.status = ItemSignature.Status.FORMER
                     signature.save()
-                for signature_form in signature_forms:
-                    signature_form.save()
+            for f in all_forms:
+                f.save()
         else:
             context['manifestation_form'] = manifestation_form
             context['signature_forms'] = signature_forms
 
             return render(request, 'edwoca/manifestation_update.html', context)
+
+        if 'add-related-expression' in request.POST:
+            RelatedExpression.objects.create(manifestation=manifestation)
 
         if 'add_signature' in request.POST:
             status = ItemSignature.Status.CURRENT
@@ -72,6 +90,14 @@ def manifestation_update(request, pk):
             context['expression_query'] = expression_search_form.cleaned_data.get('q')
             context['found_expressions'] = expression_search_form.search().models(Expression)
 
+        related_expression_forms = []
+        for related_expression in manifestation.expression_relations.all():
+            related_expression_form = RelatedExpressionForm(
+                    instance = related_expression,
+                    prefix = f'related-expression-{related_expression.pk}'
+                )
+            related_expression_forms += [ related_expression_form ]
+
         manifestation_form = ManifestationForm(instance=manifestation)
         signature_forms = []
         if manifestation.is_singleton:
@@ -85,6 +111,7 @@ def manifestation_update(request, pk):
         context['signature_forms'] = signature_forms
         context['library_search_form'] = SearchForm()
         context['manifestation_form'] = manifestation_form
+        context['related_expression_forms'] = related_expression_forms
 
     return render(request, 'edwoca/manifestation_update.html', context)
 

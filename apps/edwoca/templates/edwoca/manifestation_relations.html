@@ -508,21 +508,20 @@
     {% translate 'relations comment' %}
 </h2>
 
-<form method="post">
+<form method="post" id="form">
     {% csrf_token %}
     {{ relations_comment_form.as_daisy }}
-    <input type="submit" id="submit-form" value="Speichern" class="hidden">
+    <input type="submit" id="submit-form" class="hidden">
 </form>
 
 {% if not object.is_singleton %}
     <h2 class="my-5"> 
         {% translate 'items' %}
     </h2>
-    {% if object.missing_item %}
-        <p>
-            {% translate 'all items of this print are lost' %}
-        </p>
-    {% else %}
+    {% if not object.items.count %}
+        {{ proof_copy_form.as_daisy }}
+    {% endif %}
+    {% if not object.without_proof_copy %}
         <div id="item-list-container">
             {% include 'edwoca/partials/manifestation/item_list.html' %}
         </div>
