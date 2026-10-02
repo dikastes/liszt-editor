@@ -582,7 +582,7 @@ class ModifiedPrintCreateForm(forms.Form):
     )
 
     library_search = forms.CharField(
-        label=_('library'),
+        label=_('holding institution'),
         required=False,
         widget=TextInput(attrs={
             'class': 'input input-bordered w-full bg-white border-black',
@@ -636,6 +636,8 @@ class ModifiedPrintCreateForm(forms.Form):
                 if related_print_field.errors:
                     with div(cls=SimpleFormMixin.label_classes):
                         span(related_print_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_('leave free for proof'), cls='label-text-alt')
             with label(cls=SimpleFormMixin.palette_classes):
                 with label(cls=SimpleFormMixin.palette_form_control_classes):
                     with div(cls=SimpleFormMixin.label_classes):

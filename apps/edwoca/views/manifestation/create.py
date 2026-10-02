@@ -223,6 +223,8 @@ def modified_print_create(request):
                         target_manifestation = target_manifestation,
                         label = RelatedManifestation.Label.RELATED
                     )
+                manifestation.source_title = target_manifestation.source_title
+                manifestation.save()
             else:
                 manifestation.manifestation_form = EdwocaManifestation.ManifestationForm.PROOF
                 manifestation.save()

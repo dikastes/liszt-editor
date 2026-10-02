@@ -220,7 +220,7 @@ msgstr "Bibliotheken durchsuchen"
 
 #: apps/edwoca/forms/manifestation.py:596
 msgid "related print"
-msgstr "Bezugsdruck"
+msgstr "Originalmanifestation (Bezug)"
 
 #: apps/edwoca/forms/manifestation.py:600
 msgid "search related print"
