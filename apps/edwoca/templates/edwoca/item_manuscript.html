@@ -52,20 +52,7 @@
                     {{ annotation.form.instance }}
                 </div>
                 <div class="collapse-content mt-5">
-                    {% if has_components %}
-                        {{ annotation.form.collection_component_as_daisy }}
-                    {% else %}
-                        <label class="form-control">
-                            <div class="label">
-                                <span class="label-text">
-                                    {% translate 'work relation (working title)' %}
-                                </span>
-                            </div>
-                            <div class="flex pseudo-input bg-white border border-black p-2 items-center">
-                                {{ object.manifestation.working_title }}
-                            </div>
-                        </label>
-                    {% endif %}
+                    {{ annotation.form.collection_component_as_daisy }}
                     {{ annotation.form.as_daisy }}
                     <div class="mt-5">
                         <h3>
@@ -123,20 +110,7 @@
                     {{ modification.form.instance }}
                 </div>
                 <div class="collapse-content mt-5">
-                    {% if has_components %}
-                        {{ modification.form.collection_component_as_daisy }}
-                    {% else %}
-                        <label class="form-control">
-                            <div class="label">
-                                <span class="label-text">
-                                    {% translate 'work relation (working title)' %}
-                                </span>
-                            </div>
-                            <div class="flex pseudo-input bg-white border border-black p-2 items-center">
-                                {{ object.manifestation.working_title }}
-                            </div>
-                        </label>
-                    {% endif %}
+                    {{ modification.form.collection_component_as_daisy }}
                     {{ modification.form.classification_as_daisy }}
                     {{ modification.form.description_as_daisy }}
                     <div class="mt-5">

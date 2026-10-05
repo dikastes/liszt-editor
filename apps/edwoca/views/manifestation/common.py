@@ -1001,12 +1001,15 @@ def part_create(request, pk, part_label):
                     display = form.cleaned_data.get('display')
                 )
             manifestation = Manifestation.objects.create(
-                    working_title = form.cleaned_data.get('temporary_title'),
                     plate_number = form.cleaned_data.get('plate_number'),
                     source_type = form.cleaned_data.get('source_type'),
                     part_of = existing_manifestation,
                     part_label = getattr(EdwocaManifestation.PartLabel, part_label.upper()),
                     period = period
+                )
+            RelatedExpression.objects.create(
+                    working_title = form.cleaned_data.get('working_title'),
+                    manifestation = manifestation
                 )
 
             chosen_publisher = form.cleaned_data.get('publisher')
@@ -1042,11 +1045,14 @@ def component_create(request, pk, publisher_pk = None):
                     display = form.cleaned_data.get('display')
                 )
             manifestation = Manifestation.objects.create(
-                    working_title = form.cleaned_data.get('temporary_title'),
                     plate_number = form.cleaned_data.get('plate_number'),
                     source_type = form.cleaned_data.get('source_type'),
                     component_of = existing_manifestation,
                     period = period
+                )
+            RelatedExpression.objects.create(
+                    working_title = form.cleaned_data.get('working_title'),
+                    manifestation = manifestation
                 )
 
             chosen_publisher = form.cleaned_data.get('publisher')
@@ -1079,9 +1085,12 @@ def singleton_part_create(request, pk, part_label):
             manifestation = EdwocaManifestation.objects.create(
                 is_singleton=True,
                 source_title = form.cleaned_data.get('source_title'),
-                working_title = form.cleaned_data.get('working_title'),
                 part_of = existing_manifestation,
                 part_label = getattr(EdwocaManifestation.PartLabel, part_label.upper())
+            )
+            RelatedExpression.objects.create(
+                working_title = form.cleaned_data.get('working_title'),
+                manifestation = manifestation
             )
 
             item = Item.objects.create(manifestation=manifestation)
@@ -1109,8 +1118,11 @@ def singleton_component_create(request, pk):
             manifestation = EdwocaManifestation.objects.create(
                 is_singleton=True,
                 source_type=form.cleaned_data.get('source_type'),
-                working_title = form.cleaned_data['working_title'],
                 component_of = existing_manifestation
+            )
+            RelatedExpression.objects.create(
+                working_title = form.cleaned_data['working_title'],
+                manifestation = manifestation
             )
 
             item = Item.objects.create(manifestation=manifestation)

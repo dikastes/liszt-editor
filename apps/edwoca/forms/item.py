@@ -5,6 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from dmad_on_django.models import Period
 from dmrism.models.item import *
+from dmrism.models.manifestation import RelatedExpression
 from dominate.tags import div, label, span, form, input_, h3
 from dominate.util import raw
 from django import forms
@@ -795,12 +796,12 @@ class AnnotationForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['collection_component'].queryset = Manifestation.objects.filter(component_of = self.instance.item.manifestation.id)
-        if collection := self.instance.item.manifestation.expression_relations.count():
-            self.fields['collection_component'].queryset = Manifestation.objects.filter(
-                    Q(component_of = self.instance.item.manifestation.id) |
-                    Q(pk = self.instance.item.manifestation.id)
-                )
+        manifestations = Manifestation.objects.filter(
+                Q(component_of = self.instance.item.manifestation.id) |
+                Q(pk = self.instance.item.manifestation.id)
+            )
+
+        self.fields['collection_component'].queryset = RelatedExpression.objects.filter(manifestation__in = manifestations)
 
     def collection_component_as_daisy(self):
         form = div(cls='my-5')

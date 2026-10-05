@@ -95,6 +95,7 @@ class ItemModificationForm(DateFormMixin, ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+
         component_manifestations = Manifestation.objects.filter(
                 Q(component_of = self.instance.item.manifestation.id) |
                 Q(pk = self.instance.item.manifestation.id)

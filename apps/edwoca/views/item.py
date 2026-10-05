@@ -758,14 +758,10 @@ class LibraryDeleteView(DeleteView):
 def item_manuscript_update(request, pk):
     item = get_object_or_404(EdwocaItem, pk=pk)
 
-    has_components = False
-    if Manifestation.objects.filter(component_of = item.manifestation.id).count():
-        has_components = True
 
     context = {
         'object': item,
         'entity_type': 'item',
-        'has_components': has_components
     }
 
     if request.method == 'POST':

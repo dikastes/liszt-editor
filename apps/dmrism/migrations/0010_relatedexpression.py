@@ -4,15 +4,22 @@ import django.db.models.deletion
 from django.db import migrations, models
 import django.db.migrations.operations.special
 
+def set_print_source_type(apps, schema_editor):
+    for manifestation in Manifestation.objects.filter(is_singleton = False):
+        if not manifestation.source_type:
+            manifestation.source_type = Manifestation.SourceType.PRINT
+            manifestaion.save()
+
 def migrate_related_expression(apps, schema_editor):
     Manifestation = apps.get_model('dmrism', 'manifestation')
     RelatedExpression = apps.get_model('dmrism', 'relatedexpression')
 
     for manifestation in Manifestation.objects.all():
-        RelatedExpression.objects.create(
-                manifestation = manifestation,
-                working_title = manifestation.working_title
-            )
+        if manifestation.working_title:
+            RelatedExpression.objects.create(
+                    manifestation = manifestation,
+                    working_title = manifestation.working_title
+                )
 
 class Migration(migrations.Migration):
 

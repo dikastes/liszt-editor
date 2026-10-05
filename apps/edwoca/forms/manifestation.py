@@ -533,7 +533,7 @@ class ManifestationClassificationForm(ModelForm):
                 if self.instance.is_singleton and not self.instance.source_type == Manifestation.SourceType.MODIFIED_PRINT:
                     raw(str(source_type_field))
                 else:
-                    div(self.instance.get_source_type_display(), cls='pseudo-input border border-black flex items-center')
+                    div(self.instance.get_source_type_display() or '', cls='pseudo-input border border-black flex items-center')
             with label(cls=SimpleFormMixin.form_control_classes + ' xl:mb-5'):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)

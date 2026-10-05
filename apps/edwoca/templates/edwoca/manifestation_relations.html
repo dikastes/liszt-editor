@@ -269,7 +269,7 @@
     {% for manifestation_relation in object.source_manifestation_of.all %}
         {% if manifestation_relation.target_manifestation.is_singleton %}
             <p>
-                {% translate 'this object is related to' %}
+                {% translate 'this object is derivative of' %}
                 <a class="font-bold" href="{% url 'edwoca:manifestation_relations' manifestation_relation.target_manifestation.id %}">
                     → {{ manifestation_relation.target_manifestation }}.
                 </a>
@@ -286,6 +286,9 @@
     {% for manifestation_relation in object.target_manifestation_of.all %}
         {% if manifestation_relation.source_manifestation.is_singleton %}
             <p>
+                {% if manifestation_relation.label == 'D' %}
+                    {% translate 'this object is derivative of' %}
+                {% endif %}
                 {% if manifestation_relation.label == 'R' %}
                     {% translate 'this object is related to' %}
                 {% endif %}
@@ -345,6 +348,12 @@
                     <li>
                         {{ found_manuscript.object }}
                         <div class="flex mb-2 mx-2 gap-2">
+                            <form method="post" class="flex-0">
+                                {% csrf_token %}
+                                <input type="hidden" name="manifestation-link-type" value="derivative" />
+                                <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
+                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is derivative of' %}" />
+                            </form>
                             <form method="post" class="flex-0">
                                 {% csrf_token %}
                                 <input type="hidden" name="manifestation-link-type" value="related" />

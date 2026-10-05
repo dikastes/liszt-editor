@@ -237,7 +237,7 @@ def modified_print_create(request):
                 RelatedManifestation.objects.create(
                         source_manifestation = manifestation,
                         target_manifestation = target_manifestation,
-                        label = RelatedManifestation.Label.RELATED
+                        label = RelatedManifestation.Label.DERIVATIVE
                     )
                 manifestation.source_title = target_manifestation.source_title
                 manifestation.save()

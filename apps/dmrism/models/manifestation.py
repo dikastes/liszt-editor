@@ -416,8 +416,8 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         if self.source_type == Manifestation.SourceType.MODIFIED_PRINT:
             if related_manifestation := self.get_related_manifestation():
                 return related_manifestation.source_title
-        if self.expression_relations.count() == 1:
-            return self.expression_relations.first().working_title
+        if self.expression_relations.count() == 1 and (working_title := self.expression_relations.first().working_title):
+            return working_title
         return self.source_title or str(_('empty'))
 
 
@@ -777,6 +777,7 @@ class RelatedManifestation(RelatedEntity):
         STITCH_TEMPLATE = 'SD', _('is stitch template (as documented)')
         STITCH_TEMPLATE_INFERRED = 'SI', _('is stitch template (inferred)')
         RELATED = 'R', _('is related to')
+        DERIVATIVE = 'D', _('is derivative of')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',
