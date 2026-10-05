@@ -137,7 +137,13 @@ def publisher_search_view(request):
     if len(search_text) < 2:
         return HttpResponse('')
 
-    publishers = SearchQuerySet().models(Corporation).filter(content=search_text)
+    publishers = [
+        {
+            'id': p.object.id,
+            'name': str(p.object)
+        }
+        for p in SearchQuerySet().models(Corporation).filter(content=search_text)[:10]
+    ]
     return render(request, 'edwoca/partials/manifestation/results.html', {'result_list': publishers, 'type': 'publisher'})
 
 

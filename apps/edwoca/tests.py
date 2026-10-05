@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Place, Corporation
-from dmrism.models import Publication, PublicationPlace
+from dmrism.models import Publication, PublicationPlace, RelatedExpression
 from .models import Manifestation, Item, Library
 from xml.etree import ElementTree as ET
 
@@ -27,9 +27,11 @@ class PrintCreationTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertTrue(Manifestation.objects.filter(working_title=working_title).exists())
+        expression_relation = RelatedExpression.objects.filter(working_title = working_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
 
-        manifestation = Manifestation.objects.get(working_title=working_title)
+        manifestation = expression_relation.manifestation
 
         self.assertEqual(manifestation.source_title, print_title)
         self.assertEqual(manifestation.source_type, Manifestation.SourceType.PRINT)
@@ -52,9 +54,11 @@ class PrintCreationTest(TestCase):
 
         self.assertEqual(collection_response.status_code, 302)
 
-        self.assertTrue(Manifestation.objects.filter(working_title=collection_working_title).exists())
+        collection_expression_relation = RelatedExpression.objects.filter(working_title = working_title).first()
+        self.assertIsNotNone(collection_expression_relation)
+        self.assertIsNotNone(collection_expression_relation.manifestation)
 
-        collection_manifestation = Manifestation.objects.get(working_title=collection_working_title)
+        collection_manifestation = collection_expression_relation.manifestation
 
         self.assertEqual(collection_manifestation.source_title, collection_print_title)
         self.assertEqual(collection_manifestation.source_type, Manifestation.SourceType.PRINT)
@@ -80,8 +84,11 @@ class SingletonCreationTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertTrue(Manifestation.objects.filter(working_title=test_title).exists())
-        manifestation = Manifestation.objects.get(working_title=test_title)
+        expression_relation = RelatedExpression.objects.filter(working_title = test_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        manifestation = expression_relation.manifestation
 
         self.assertEqual(manifestation.items.count(), 1)
         self.assertEqual(manifestation.items.first().signatures.first().library, library)
@@ -114,9 +121,13 @@ class PrintCopyTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
 
-        copy = Manifestation.objects.get(working_title=copied_title)
+        expression_relation = RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+
         self.assertEqual(m.source_type, copy.source_type)
 
         copied_publisher = Manifestation.objects.filter(working_title=copied_title).first().publications.first().publisher
@@ -136,8 +147,14 @@ class ManuscriptCopyTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
-        self.assertEqual(Manifestation.objects.get(working_title=copied_title).items.count(), 1)
+
+        expression_relation = RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+
+        self.assertEqual(copy.items.count(), 1)
 
 
 """

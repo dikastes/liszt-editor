@@ -22,9 +22,13 @@ def singleton_collection_create(request):
             item.signatures.add(signature)
 
             manifestation.is_singleton=True
-            manifestation.working_title = form.cleaned_data.get('working_title')
             manifestation.source_title = form.cleaned_data.get('source_title')
             manifestation.save()
+
+            RelatedExpression.objects.create(
+                    manifestation = manifestation,
+                    working_title = form.cleaned_data.get('working_title')
+                )
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
         return render(request, 'edwoca/create_singleton.html', {
@@ -57,8 +61,12 @@ def singleton_create(request):
 
             manifestation.is_singleton=True
             manifestation.source_type=form.cleaned_data.get('source_type')
-            manifestation.working_title = form.cleaned_data.get('working_title')
             manifestation.save()
+
+            RelatedExpression.objects.create(
+                    manifestation = manifestation,
+                    working_title = form.cleaned_data.get('working_title')
+                )
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
         return render(request, 'edwoca/create_singleton.html', {
@@ -101,10 +109,14 @@ def manifestation_collection_create(request, publisher_pk=None):
                     source_title = form.cleaned_data.get('source_title'),
                     source_type = EdwocaManifestation.SourceType.PRINT,
                     plate_number = form.cleaned_data.get('plate_number'),
-                    working_title = form.cleaned_data['temporary_title'],
                     period = period,
                     is_collection = True
             )
+
+            RelatedExpression.objects.create(
+                    manifestation = manifestation,
+                    working_title = form.cleaned_data.get('working_title')
+                )
 
             chosen_publisher = form.cleaned_data.get('publisher')
             if chosen_publisher:
@@ -163,9 +175,13 @@ def manifestation_create(request, publisher_pk=None):
                     source_title = form.cleaned_data.get('source_title'),
                     source_type = EdwocaManifestation.SourceType.PRINT,
                     plate_number = form.cleaned_data.get('plate_number'),
-                    working_title = form.cleaned_data['temporary_title'],
                     period = period
             )
+
+            RelatedExpression.objects.create(
+                    manifestation = manifestation,
+                    working_title = form.cleaned_data.get('working_title')
+                )
 
             chosen_publisher = form.cleaned_data.get('publisher')
             if chosen_publisher:

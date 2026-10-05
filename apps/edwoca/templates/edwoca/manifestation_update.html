@@ -24,6 +24,26 @@
         {{ manifestation_form.rism_id }}
     </label>
 
+    <div class="mb-5">
+        {% for expression_relation_form in related_expression_forms %}
+            {{ expression_relation_form.as_daisy }}
+
+            <div class="flex my-5">
+                <div class="flex-1"></div>
+                <button class="btn btn-outline btn-primary flex-0" form="form" type="submit" value="{{ expression_relation_form.instance.id }}" name="remove-related-expression">
+                    {% translate 'remove expression relation' %}
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="flex">
+        <div class="flex-1"></div>
+        <button class="btn btn-outline flex-0" form="form" type="submit" name="add-related-expression">
+            {% translate 'add expression relation' %}
+        </button>
+    </div>
+
     {% if object.missing_item %}
         {% comment %}
             <p> Dieses Manuskript ist verschollen. </p>

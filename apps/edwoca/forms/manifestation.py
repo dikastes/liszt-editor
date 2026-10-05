@@ -667,7 +667,7 @@ class ManifestationCreateForm(forms.Form):
             }
         }
     read_only_fields = ['publisher']
-    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
+    working_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     source_title = forms.CharField(label=_('print title'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     #source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
@@ -705,7 +705,7 @@ class ManifestationCreateForm(forms.Form):
     def as_daisy(self):
         form = div(cls='mb-10')
 
-        temporary_title_field = self['temporary_title']
+        temporary_title_field = self['working_title']
         source_title_field = self['source_title']
         publisher_search_field = self['publisher_search']
         publisher_field = self['publisher']
@@ -750,7 +750,6 @@ class SingletonCreateForm(forms.ModelForm):
     class Meta:
         model = Manifestation
         fields = [
-                'working_title',
                 'source_title',
                 'library',
                 'signature'
