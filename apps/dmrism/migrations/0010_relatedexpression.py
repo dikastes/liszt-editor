@@ -5,10 +5,9 @@ from django.db import migrations, models
 import django.db.migrations.operations.special
 
 def set_print_source_type(apps, schema_editor):
-    for manifestation in Manifestation.objects.filter(is_singleton = False):
-        if not manifestation.source_type:
-            manifestation.source_type = Manifestation.SourceType.PRINT
-            manifestaion.save()
+    Manifestation = apps.get_model('dmrism', 'manifestation')
+
+    Manifestation.objects.filter(is_singleton = False, source_type__isnull = True).update(source_type = 'PRT')
 
 def migrate_related_expression(apps, schema_editor):
     Manifestation = apps.get_model('dmrism', 'manifestation')
@@ -38,6 +37,10 @@ class Migration(migrations.Migration):
         ),
         migrations.RunPython(
             code=migrate_related_expression,
+            reverse_code=django.db.migrations.operations.special.RunPython.noop,
+        ),
+        migrations.RunPython(
+            code=set_print_source_type,
             reverse_code=django.db.migrations.operations.special.RunPython.noop,
         ),
     ]
