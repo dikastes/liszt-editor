@@ -244,8 +244,6 @@ def modified_print_create(request):
             else:
                 manifestation.manifestation_form = EdwocaManifestation.ManifestationForm.PROOF
                 manifestation.save()
-                first_item.item_stage = Item.ItemStage.PROOF
-                first_item.save()
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
         else:
