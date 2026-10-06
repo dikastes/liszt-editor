@@ -21,9 +21,6 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         ordering = ['-needs_review', 'manifestation', 'order_index']
         unique_together = ('manifestation', 'order_index')
 
-    class ItemStage(models.TextChoices):
-        PROOF = 'PR', _('print proof')
-
     class SourceType(models.TextChoices):
         PROOF_COPY = 'PRC', _('proof copy')
         ANNOTATED_PROOF_COPY = 'APC', _('annotated proof copy')
@@ -33,14 +30,6 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         FIRST_EDITION = '1', _('first issue')
         FOLLOWING_EDITION = 'F', _('following issue')
 
-    item_stage = models.CharField(
-            max_length = 2,
-            choices = ItemStage,
-            default = None,
-            null = True,
-            blank = True,
-            verbose_name = _('item stage')
-        )
     source_type = models.CharField(
             max_length = 3,
             choices = SourceType,
@@ -645,14 +634,6 @@ class Annotation(models.Model):
             on_delete = models.CASCADE,
             related_name = 'annotations'
         )
-    is_ownership_note = models.BooleanField(
-            default = False,
-            verbose_name = _('ownership note')
-        )
-    is_date_note = models.BooleanField(
-            default = False,
-            verbose_name = _('date note')
-        )
     is_correction = models.BooleanField(
             default = False,
             verbose_name = _('correction')
@@ -668,10 +649,6 @@ class Annotation(models.Model):
     is_title = models.BooleanField(
             default = False,
             verbose_name = _('title')
-        )
-    is_dedication = models.BooleanField(
-            default = False,
-            verbose_name = _('dedication')
         )
     description_title_correction = models.TextField(
             blank = True,

@@ -221,7 +221,7 @@ def modified_print_create(request):
                 )
             first_item = Item.objects.create(
                     source_type = Item.SourceType.MODIFIED_PRINT,
-                    manifestation = manifestation
+                    manifestation = manifestation,
                 )
 
             library_id = form.cleaned_data.get('library')
@@ -244,6 +244,8 @@ def modified_print_create(request):
             else:
                 manifestation.manifestation_form = EdwocaManifestation.ManifestationForm.PROOF
                 manifestation.save()
+                first_item.item_stage = Item.ItemStage.PROOF
+                first_item.save()
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
         else:

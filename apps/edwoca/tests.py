@@ -113,7 +113,8 @@ class PrintCopyTest(TestCase):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
         publisher = Corporation.objects.create()
-        m = Manifestation.objects.create(working_title = copy_title, source_type = 'MPR')
+        m = Manifestation.objects.create(source_type = 'MPR')
+        RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
         publication = Publication.objects.create(manifestation = m, publisher = publisher)
 
         url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
@@ -130,7 +131,13 @@ class PrintCopyTest(TestCase):
 
         self.assertEqual(m.source_type, copy.source_type)
 
-        copied_publisher = Manifestation.objects.filter(working_title=copied_title).first().publications.first().publisher
+        RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+        copied_publisher = copy.publications.first().publisher
+
         self.assertEqual(publisher, copied_publisher)
 
 
@@ -139,7 +146,8 @@ class ManuscriptCopyTest(TestCase):
     def test_manuscript_copy_workflow(self):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
-        m = Manifestation.objects.create(is_singleton = True, working_title = copy_title)
+        m = Manifestation.objects.create(is_singleton = True)
+        RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
         i = Item.objects.create(manifestation = m)
 
         url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})

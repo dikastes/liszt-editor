@@ -560,10 +560,8 @@ msgid "partial edition"
 msgstr "Teilausgabe"
 
 #: apps/dmrism/models/manifestation.py:344
-#, fuzzy
-#| msgid "proof copy"
 msgid "without proof copy"
-msgstr "Nachweisexemplar"
+msgstr "ohne Nachweisexemplar, Druck ermittelt"
 
 #: apps/dmrism/models/manifestation.py:421
 msgid "empty"

@@ -96,7 +96,7 @@
 
 <h3 class="my-5"> {% translate 'person dedications' %} </h3>
 
-{% if object.source_type == 'MPR' %}
+{% if object.source_type == 'MPR' and object.get_related_manifestation %}
     {% for person_dedication in object.get_related_manifestation.manifestation_person_dedications.all %}
         <div class="form-control">
             <div class="label">
@@ -127,7 +127,7 @@
 
 <h3 class="my-5"> {% translate 'corporation dedications' %} </h3>
 
-{% if object.source_type == 'MPR' %}
+{% if object.source_type == 'MPR' and object.get_related_manifestation %}
     {% for corporation_dedication in object.get_related_manifestation.manifestation_corporation_dedications.all %}
         <div class="form-control">
             <div class="label">

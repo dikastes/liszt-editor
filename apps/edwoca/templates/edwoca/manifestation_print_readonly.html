@@ -187,19 +187,6 @@
     {% endif %}
 </div>
 
-<div class="flex gap-5 items-end mb-5">
-    <label class="flex-1 form-control">
-        <div class="label">
-            <span class="label-text">
-                {% translate 'edition' %}
-            </span>
-        </div>
-        <div class="pseudo-input border flex items-center border-black bg-white">
-            {{ related_object.get_edition_display|default:'--------' }}
-        </div>
-    </label>
-</div>
-
 {% if related_object.extent %}
     <div class="mb-5">
         <label class="flex-1 form-control">
