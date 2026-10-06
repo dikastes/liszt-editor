@@ -302,7 +302,7 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
                 request.POST.get('manifestation-link-type').upper()
             )
 
-            if self.object.is_singleton:
+            if self.object.is_singleton or not manifestation_link.is_singleton:
                 source = self.object
                 target = manifestation_link
             else:

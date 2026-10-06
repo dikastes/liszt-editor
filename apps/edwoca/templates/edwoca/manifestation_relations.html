@@ -495,15 +495,9 @@
                             {% else %}
                                 <form method="post" class="flex-0">
                                     {% csrf_token %}
-                                    <input type="hidden" name="manifestation-link-type" value="revision" />
+                                    <input type="hidden" name="manifestation-link-type" value="derivative" />
                                     <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
-                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is revision of' %}" />
-                                </form>
-                                <form method="post" class="flex-0">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="manifestation-link-type" value="revision" />
-                                    <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
-                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'has as revision' %}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is derivative of' %}" />
                                 </form>
                             {% endif %}
                         </div>
