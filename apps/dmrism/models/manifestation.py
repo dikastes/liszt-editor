@@ -350,7 +350,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
 
         related_manifestation = (
             self.source_manifestation_of
-            .filter(label = RelatedManifestation.Label.RELATED)
+            .filter(label = RelatedManifestation.Label.DERIVATIVE)
             .first()
         )
 

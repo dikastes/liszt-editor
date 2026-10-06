@@ -390,6 +390,9 @@
     {% for manifestation_relation in object.source_manifestation_of.all %}
         {% if not manifestation_relation.target_manifestation.is_singleton %}
             <p>
+                {% if manifestation_relation.label == 'D' %}
+                    {% translate 'this object is derivative of' %}
+                {% endif %}
                 {% if manifestation_relation.label == 'R' %}
                     {% translate 'this object is related to' %}
                 {% endif %}
@@ -418,7 +421,11 @@
     {% for manifestation_relation in object.target_manifestation_of.all %}
         {% if not manifestation_relation.source_manifestation.is_singleton %}
             <p>
-                {% translate 'this object is related to' %}
+                {% if manifestation_relation.label == 'D' %}
+                    {% translate 'a derivative of this object is' %}
+                {% else %}
+                    {% translate 'this object is related to' %}
+                {% endif %}
                 <a class="font-bold" href="{% url 'edwoca:manifestation_relations' manifestation_relation.source_manifestation.id %}">
                     → {{ manifestation_relation.source_manifestation }}.
                 </a>

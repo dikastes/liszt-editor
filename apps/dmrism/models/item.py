@@ -684,13 +684,10 @@ class Annotation(models.Model):
                 str(getattr(Annotation, field).field.verbose_name)
                 for field
                 in [
-                    'is_ownership_note',
-                    'is_date_note',
                     'is_correction',
                     'is_addition',
                     'is_note',
                     'is_title',
-                    'is_dedication'
                 ]
                 if getattr(self, field)
             )

@@ -1,5 +1,6 @@
 from .base import *
 from secrets import token_urlsafe
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
@@ -538,6 +539,16 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                     })
             }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if not self.instance.manifestation.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+            self.fields['source_type'].choices = [
+                    (None, BLANK_CHOICE_DASH),
+                    (Item.SourceType.PROOF_COPY.value, Item.SourceType.PROOF_COPY.label),
+                    (Item.SourceType.ANNOTATED_PROOF_COPY.value, Item.SourceType.ANNOTATED_PROOF_COPY.label)
+                ]
+
     def completeness_as_daisy(self):
         form = div(cls='my-5')
         completeness_field = self['is_incomplete']
@@ -557,7 +568,10 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
             with label():
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(source_type_field.label)+'*', cls=SimpleFormMixin.label_text_classes)
-                raw(str(source_type_field))
+                if self.instance.manifestation.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+                    div(self.instance.get_source_type_display(), cls='pseudo-input flex items-center border border-black')
+                else:
+                    raw(str(source_type_field))
             with label():
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(edition_field.label), cls=SimpleFormMixin.label_text_classes)

@@ -17,7 +17,7 @@
 
 <h3 class="my-5"> {% translate 'title setting' %} </h3>
 
-{% if object.source_type == 'MPR' %}
+{% if object.source_type == 'MPR' and object.get_related_manifestation %}
     <div class="form-control">
         <div class="label">
             <span class="label-text">
@@ -28,9 +28,9 @@
             {{ object.get_related_manifestation.source_title }}
         </div>
     </div>
+{% else %}
+    {{ form.source_title_as_daisy }}
 {% endif %}
-
-{{ form.source_title_as_daisy }}
 
 <h3 class="my-5"> {% translate 'diplomatic titles' %} </h3>
 
