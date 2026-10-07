@@ -80,6 +80,32 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
                     }),
             }
 
+    def comment_as_daisy(self):
+        form = div(cls='my-5')
+
+        comment_field = self['private_head_comment']
+
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(comment_field))
+
+        return mark_safe(str(form))
+
+    def rism_id_as_daisy(self):
+        form = div(cls='my-5')
+
+        rism_id_field = self['rism_id']
+
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(rism_id_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(rism_id_field))
+
+        return mark_safe(str(form))
+
 
 class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
     layout = Layouts.LABEL_OUTSIDE

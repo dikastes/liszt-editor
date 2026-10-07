@@ -20,7 +20,28 @@
     <input type="submit" id="submit-form">
 </form>
 
-{{ form.type_as_daisy }}
+<div class="collapse bg-base-100 my-5">
+    <input type="checkbox" />
+    <div class="collapse-title">
+        <span class="mr-5">
+            {% translate 'source type' %}*
+        </span>
+        {{ object.get_source_type_display|default:'--------' }}
+    </div>
+    <div class="collapse-content">
+            <div class="join">
+                <button class="justify-start btn btn-outline {% if not object.source_type %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-none">
+                    -------
+                </button>
+                <button class="justify-start btn btn-outline {% if object.source_type == 'PRC' %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-proof-copy">
+                    {% translate 'proof copy' %}
+                </button>
+                <button class="justify-start btn btn-outline {% if object.source_type == 'APC' %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-annotated-proof-copy">
+                    {% translate 'annotated proof copy' %}
+                </button>
+            </div>
+    </div>
+</div>
 
 {{ completeness_form.as_daisy }}
 

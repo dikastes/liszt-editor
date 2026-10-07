@@ -530,6 +530,16 @@ def item_dedication(request, pk):
             corporation_dedication = get_object_or_404(ItemCorporationDedication, pk = request.POST.get('remove-corporation-dedication'))
             corporation_dedication.delete()
 
+        for dedication_class in ['person', 'corporation']:
+            for dedication in getattr(item, f'item{dedication_class}dedication_set').all():
+                if f'{dedication_class}_dedication_{dedication.id}-calculate-machine-readable-date' in request.POST:
+                    dedication.period.parse_display()
+                    dedication.period.save()
+                if f'{dedication_class}_dedication_{dedication.id}-clear-machine-readable-date' in request.POST:
+                    dedication.period.not_before = None
+                    dedication.period.not_after = None
+                    dedication.period.save()
+
         return redirect('edwoca:item_dedication', pk=pk)
     else:
         person_dedication_forms = []
@@ -861,6 +871,15 @@ def item_manuscript_update(request, pk):
                     'open_collapse': annotation.id,
                     'collapse_type': 'annotation'
                 }
+
+        if 'set-type-none' in request.POST:
+            item.source_type = None
+            item.save()
+        else:
+            for source_type in Item.SourceType:
+                if f'set-type-{source_type.name.lower().replace("_", "-")}' in request.POST:
+                    item.source_type = source_type
+                    item.save()
 
         add_handwriting_string = 'add-annotation-handwriting'
         if add_handwriting_string in request.POST:

@@ -144,7 +144,7 @@
             </span>
         </div>
         <div class="pseudo-input border flex items-center border-black bg-white">
-            {{ related_object.print_type|default:'--------' }}
+            {{ related_object.get_print_type_display|default:'--------' }}
         </div>
     </label>
 </div>

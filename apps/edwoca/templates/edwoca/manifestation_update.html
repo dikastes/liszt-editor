@@ -146,7 +146,7 @@
         {% translate 'print' %}
     </h2>
 
-    {{ manifestation_form.as_daisy }}
+    {{ manifestation_form.rism_id_as_daisy }}
 
     <div class="mb-5">
         {% for expression_relation_form in related_expression_forms %}
@@ -167,6 +167,8 @@
             {% translate 'add expression relation' %}
         </button>
     </div>
+
+    {{ manifestation_form.comment_as_daisy }}
 
     <h3 class="my-5">
         {% translate 'template copy' %}
