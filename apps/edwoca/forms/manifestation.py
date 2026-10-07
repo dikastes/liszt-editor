@@ -478,10 +478,15 @@ class ManifestationClassificationForm(ModelForm):
                 ]
             self.initial.update({'is_incomplete': self.instance.get_single_item().is_incomplete})
         else:
-            self.fields['manifestation_form'].choices = [
-                    (None, BLANK_CHOICE_DASH),
-                    (Manifestation.ManifestationForm.PROOF.value, Manifestation.ManifestationForm.PROOF.label)
-                ]
+            if self.instance.get_related_manifestation():
+                self.fields['manifestation_form'].choices = [
+                        (None, BLANK_CHOICE_DASH)
+                    ]
+            else:
+                self.fields['manifestation_form'].choices = [
+                        (None, BLANK_CHOICE_DASH),
+                        (Manifestation.ManifestationForm.PROOF.value, Manifestation.ManifestationForm.PROOF.label)
+                    ]
             self.fields['source_type'].choices = [
                     (None, BLANK_CHOICE_DASH),
                     (Manifestation.SourceType.PRINT.value, Manifestation.SourceType.PRINT.label),
@@ -560,16 +565,10 @@ class ManifestationClassificationForm(ModelForm):
                     raw(str(source_type_field))
                 else:
                     div(self.instance.get_source_type_display() or '', cls='pseudo-input border border-black flex items-center')
-            if instance.source_type == Manifestation.SourceType.MODIFIED_PRINT:
-                with label(cls=SimpleFormMixin.form_control_classes + ' xl:mb-5'):
-                    with div(cls=SimpleFormMixin.label_classes):
-                        span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
-                    div(instance.get_manifestation_form_display() or '', cls='pseudo-input flex items-center border border-black')
-            else:
-                with label(cls=SimpleFormMixin.form_control_classes + ' xl:mb-5'):
-                    with div(cls=SimpleFormMixin.label_classes):
-                        span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
-                    raw(str(manifestation_form_field))
+            with label(cls=SimpleFormMixin.form_control_classes + ' xl:mb-5'):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(manifestation_form_field))
             if instance.is_singleton:
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
                     raw(str(incomplete_field))
