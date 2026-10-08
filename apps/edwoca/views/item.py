@@ -777,6 +777,12 @@ def item_manuscript_update(request, pk):
     if request.method == 'POST':
         open_collapse = {}
 
+        remove_handwriting_string = 'remove-itemhandwriting'
+        if remove_handwriting_string in request.POST:
+            handwriting_id = request.POST.get(remove_handwriting_string)
+            handwriting = ItemHandwriting.objects.get(pk = handwriting_id)
+            handwriting.delete()
+
         remove_annotation_string = 'remove-annotation'
         if remove_annotation_string in request.POST:
             annotation_id = request.POST.get(remove_annotation_string)
@@ -814,8 +820,15 @@ def item_manuscript_update(request, pk):
         completeness_form = ItemCompletenessForm(request.POST, instance=item)
         text_type_form = ItemTextTypeForm(request.POST, instance=item)
 
-        annotation_forms = []
         handwriting_forms = []
+        for handwriting in item.handwritings.all():
+            prefix = f'handwriting_{handwriting.id}'
+            handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
+            if handwriting_form.is_valid():
+                handwriting_form.save()
+            handwriting_forms.append(handwriting_form)
+
+        annotation_forms = []
         for annotation in item.annotations.all():
             prefix = f'annotation_{annotation.id}'
             annotation_form = AnnotationForm(request.POST, instance=annotation, prefix=prefix)
@@ -857,6 +870,9 @@ def item_manuscript_update(request, pk):
             context['text_type_form'] = text_type_form
             context['completeness_form'] = completeness_form
             return render(request, 'edwoca:item_manuscript.html', context)
+
+        if 'add-handwriting' in request.POST:
+            ItemHandwriting.objects.create(item=item)
 
         if 'add-modification' in request.POST:
             modification = ItemModification.objects.create(item=item)
@@ -914,6 +930,11 @@ def item_manuscript_update(request, pk):
         modifications = []
         annotations = []
 
+        handwriting_forms = []
+        for handwriting in item.handwritings.all():
+            prefix = f'handwriting_{handwriting.id}'
+            handwriting_forms.append(ItemHandwritingForm(instance=handwriting, prefix=prefix))
+
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
             modification_form = ItemModificationForm(instance=modification, prefix=prefix)
@@ -929,6 +950,7 @@ def item_manuscript_update(request, pk):
             })
 
         context['modifications'] = modifications
+        context['handwriting_forms'] = handwriting_forms
         context['open_collapse'] = int(request.GET.get('open_collapse', '-1'))
         context['collapse_type'] = request.GET.get('collapse_type', '')
 

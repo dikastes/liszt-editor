@@ -744,6 +744,9 @@ class ManifestationTitle(models.Model):
             on_delete=models.CASCADE,
             related_name='titles',
         )
+    printed = models.BooleanField(
+            default=False
+        )
 
     def render_handwritings(self):
         return ', '.join(handwriting.__str__() for handwriting in self.handwritings.all())

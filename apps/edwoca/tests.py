@@ -16,7 +16,7 @@ class PrintCreationTest(TestCase):
         publisher = Corporation.objects.create()
         plate_number = '200'
         form_data = {
-                'temporary_title': working_title,
+                'working_title': working_title,
                 'source_title': print_title,
                 'publisher': publisher.pk,
                 'plate_number': plate_number
@@ -43,18 +43,18 @@ class PrintCreationTest(TestCase):
         collection_publisher = Corporation.objects.create()
         collection_plate_number = '400'
         collection_form_data = {
-                'temporary_title': collection_working_title,
+                'working_title': collection_working_title,
                 'source_title': collection_print_title,
                 'publisher': collection_publisher.pk,
                 'plate_number': collection_plate_number
             }
 
-        collection_url = reverse('edwoca:manifestation_create')
+        collection_url = reverse('edwoca:manifestation_collection_create')
         collection_response = self.client.post(collection_url, data=collection_form_data)
 
         self.assertEqual(collection_response.status_code, 302)
 
-        collection_expression_relation = RelatedExpression.objects.filter(working_title = working_title).first()
+        collection_expression_relation = RelatedExpression.objects.filter(working_title = collection_working_title).first()
         self.assertIsNotNone(collection_expression_relation)
         self.assertIsNotNone(collection_expression_relation.manifestation)
 

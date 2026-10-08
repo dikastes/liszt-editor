@@ -44,7 +44,7 @@
         <div class="collapse-content mt-5">
             {{ title_form.as_daisy }}
 
-            {% if object.is_singleton or object.source_type == 'MPR' %}
+            {% if not title_form.instance.printed and object.source_type == 'MPR' or object.is_singleton %}
                 <div class="mt-5">
                     <h3>
                         {% translate 'writers/hands' %}
@@ -84,13 +84,11 @@
     </button>
 </div>
 
-{% if not object.is_singleton and not object.source_type == 'MPR' %}
-    <h3 class="my-5">
-        {% translate 'title page' %}
-    </h3>
+<h3 class="my-5">
+    {% translate 'title page' %}
+</h3>
 
-    {{ title_page_form.as_daisy }}
-{% endif %}
+{{ title_page_form.as_daisy }}
 
 <h2 class="my-5"> {% translate 'dedications' %} </h2>
 

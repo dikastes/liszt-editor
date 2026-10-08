@@ -20,7 +20,7 @@
     <input type="submit" id="submit-form">
 </form>
 
-<div class="collapse bg-base-100 my-5">
+<div class="collapse collapse-arrow bg-base-100 my-5">
     <input type="checkbox" />
     <div class="collapse-title">
         <span class="mr-5">
@@ -47,9 +47,9 @@
 
 {% if not object.source_type == 'PRC' %}
 
-    {{ function_form.as_daisy }}
-
     {{ form.as_daisy }}
+
+    {{ function_form.as_daisy }}
 
 {% endif %}
 
@@ -114,57 +114,18 @@
 {% if object.source_type == 'MPR' %}
 
     <div class="mt-5">
-        <h3 class="text-lg font-bold mb-5 prose">
-            {% translate 'modifications' %}
-        </h3>
-        {% for modification in modifications %}
-            <div class="collapse bg-base-100 collapse-arrow my-5">
-                <input
-                    type="checkbox"
-                    {% if open_collapse == modification.form.instance.id and collapse_type == 'modification' %}
-                        checked
-                    {% endif %}
-                />
-                <div class="collapse-title truncate">
-                    {{ modification.form.instance }}
+        <div class="mt-5">
+            <h3>{% translate 'writers / hands' %}</h3>
+            {% for form in handwriting_forms %}
+                <div class="bg-base-100 p-5 my-5">
+                    {% include 'edwoca/partials/forms/handwriting_form.html' with model='itemhandwriting' app='dmrism' %}
                 </div>
-                <div class="collapse-content mt-5">
-                    {{ modification.form.collection_component_as_daisy }}
-                    {{ modification.form.classification_as_daisy }}
-                    {{ modification.form.description_as_daisy }}
-                    <div class="mt-5">
-                        <h3>
-                            {% translate 'modification writers / hands' %}
-                        </h3>
-                        {% for form in modification.handwriting_forms %}
-                            {% include 'edwoca/partials/forms/handwriting_form.html' with model='modificationhandwriting' app='edwoca' %}
-                        {% endfor %}
-
-                        <div class="flex">
-                            <div class="flex-1"></div>
-                            <div class="flex-0">
-                                <button form="form" type="submit" name="add-modification-handwriting" value="{{ modification.form.instance.id }}" class="btn btn-outline mt-3">
-                                    {% translate 'create handwriting' %}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end">
-                        <button form="form" value="{{ modification.form.instance.id }}" name="remove-modification" class="btn btn-primary btn-outline mt-3">
-                            {% translate 'remove modification' %}
-                        </button>
-                    </div>
-                </div>
+            {% endfor %}
+            <div class="flex justify-end">
+                <button class="btn btn-outline mt-3" name="add-handwriting" form="form">
+                    {% translate 'create writer' %}
+                </button>
             </div>
-        {% empty %}
-            <p class="note">
-                {% translate 'no modifications' %}
-            </p>
-        {% endfor %}
-        <div class="flex justify-end">
-            <button form="form" name="add-modification" class="btn btn-outline mt-3">
-                {% translate 'create modification' %}
-            </button>
         </div>
     </div>
 

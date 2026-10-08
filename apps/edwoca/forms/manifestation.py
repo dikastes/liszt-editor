@@ -208,31 +208,34 @@ class ManifestationTitleForm(ModelForm):
         fields = [
                 'title',
                 'title_type',
-                'manifestation'
+                'printed'
             ]
         widgets = {
             'title': Textarea(attrs={'form': 'form', 'class': 'textarea border-black bg-white textarea-bordered h-64'}),
             'title_type': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
-            'manifestation': HiddenInput(attrs={'form': 'form'}),
+            'printed': CheckboxInput(attrs={'form': 'form', 'class': SimpleFormMixin.toggle_classes})
         }
 
     def as_daisy(self):
-        form = div(cls='flex flex-col gap-5')
+        form = div(cls='my-5')
 
-        # Title field (textarea)
-        title_label = label(self['title'].label, _for=self['title'].id_for_label, cls='form-control w-full')
-        title_label.add(raw(str(self['title'])))
-        form.add(title_label)
+        title_field = self['title']
+        type_field = self['title_type']
+        printed_field = self['printed']
 
-        # Remaining properties on a palette with flex-1
-        palette = div(cls='flex flex-wrap gap-5')
-        for field_name in ['title_type']:
-            field = self[field_name]
-            field_label = label(field.label, _for=field.id_for_label, cls='form-control flex-1 min-w-[200px]')
-            field_label.add(raw(str(field)))
-            palette.add(field_label)
-        form.add(palette)
-        form.add(raw(str(self['manifestation'])))
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(title_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(title_field))
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(type_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(type_field))
+            if not self.instance.manifestation.is_singleton and self.instance.manifestation.source_type == 'MPR':
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(printed_field))
+                    span(printed_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
 
@@ -478,7 +481,7 @@ class ManifestationClassificationForm(ModelForm):
                 ]
             self.initial.update({'is_incomplete': self.instance.get_single_item().is_incomplete})
         else:
-            if self.instance.get_related_manifestation():
+            if self.instance.source_type == Manifestation.SourceType.MODIFIED_PRINT and self.instance.get_related_manifestation():
                 self.fields['manifestation_form'].choices = [
                         (None, BLANK_CHOICE_DASH)
                     ]

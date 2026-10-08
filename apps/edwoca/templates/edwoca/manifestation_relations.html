@@ -8,7 +8,7 @@
 {% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
 
 {% if not object.is_collection and not object.component_of %}
-    <div class="flex">
+    <div class="flex my-5">
         <div class="flex-1"></div>
         <form action="{% url 'edwoca:manifestation_set_collection' object.id %}" class="flex-0">
             <input type="submit" class="btn btn-outline btn-primary" value="{% translate 'set collection status' %}" />
@@ -16,7 +16,27 @@
     </div>
 {% endif %}
 
-<h2 class="mb-5">
+{% if not object.is_singleton %}
+    <h2 class="my-5"> 
+        {% translate 'items' %}
+    </h2>
+    {% if not object.items.count %}
+        {{ proof_copy_form.as_daisy }}
+    {% endif %}
+    {% if not object.without_proof_copy %}
+        <div id="item-list-container">
+            {% include 'edwoca/partials/manifestation/item_list.html' %}
+        </div>
+        <div class="flex mt-4">
+            <div class="flex-1"></div>
+            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn btn-outline flex-0">
+                {% translate 'create item' %}
+            </a>
+        </div>
+    {% endif %}
+{% endif %}
+
+<h2 class="my-5">
     {% translate 'parent references' %}
 </h2>
 
@@ -523,26 +543,6 @@
     {{ relations_comment_form.as_daisy }}
     <input type="submit" id="submit-form" class="hidden">
 </form>
-
-{% if not object.is_singleton %}
-    <h2 class="my-5"> 
-        {% translate 'items' %}
-    </h2>
-    {% if not object.items.count %}
-        {{ proof_copy_form.as_daisy }}
-    {% endif %}
-    {% if not object.without_proof_copy %}
-        <div id="item-list-container">
-            {% include 'edwoca/partials/manifestation/item_list.html' %}
-        </div>
-        <div class="flex mt-4">
-            <div class="flex-1"></div>
-            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn btn-outline flex-0">
-                {% translate 'create item' %}
-            </a>
-        </div>
-    {% endif %}
-{% endif %}
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_epilog.html' %}
 
