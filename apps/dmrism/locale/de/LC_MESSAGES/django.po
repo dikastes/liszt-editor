@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 17:14+0200\n"
+"POT-Creation-Date: 2026-10-08 14:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -82,7 +82,7 @@ msgstr "bezogen"
 msgid "comment"
 msgstr "Kommentar"
 
-#: apps/dmrism/models/base.py:110 apps/dmrism/models/manifestation.py:795
+#: apps/dmrism/models/base.py:110 apps/dmrism/models/manifestation.py:798
 msgid "label"
 msgstr "Relation"
 
@@ -567,25 +567,25 @@ msgstr "diplomatischer Titel"
 msgid "title type"
 msgstr "Titelposition"
 
-#: apps/dmrism/models/manifestation.py:762
+#: apps/dmrism/models/manifestation.py:765
 msgid "<< new title >>"
 msgstr "<< neuer Titel >>"
 
-#: apps/dmrism/models/manifestation.py:777
+#: apps/dmrism/models/manifestation.py:780
 msgid "is stitch template (as documented)"
 msgstr "ist Stichvorlage (nach Vorlage)"
 
-#: apps/dmrism/models/manifestation.py:778
+#: apps/dmrism/models/manifestation.py:781
 msgid "is stitch template (inferred)"
 msgstr "ist Stichvorlage (angenommen)"
 
-#: apps/dmrism/models/manifestation.py:779
+#: apps/dmrism/models/manifestation.py:782
 msgid "is related to"
 msgstr "hat Bezug zu"
 
-#: apps/dmrism/models/manifestation.py:780
+#: apps/dmrism/models/manifestation.py:783
 msgid "is derivative of"
-msgstr ""
+msgstr "ist Ableitung von"
 
 #~ msgid "print proof"
 #~ msgstr "Korrekturabzug"

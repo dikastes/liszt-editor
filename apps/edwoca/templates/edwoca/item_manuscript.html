@@ -20,28 +20,23 @@
     <input type="submit" id="submit-form">
 </form>
 
-<div class="collapse collapse-arrow bg-base-100 my-5">
-    <input type="checkbox" />
-    <div class="collapse-title">
-        <span class="mr-5">
-            {% translate 'source type' %}*
-        </span>
-        {{ object.get_source_type_display|default:'--------' }}
+{% if object.manifestation.source_type == 'MPR' %}
+    <div class="btn btn-outline my-5">
+        {% translate 'modified print' %}
     </div>
-    <div class="collapse-content">
-            <div class="join">
-                <button class="justify-start btn btn-outline {% if not object.source_type %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-none">
-                    -------
-                </button>
-                <button class="justify-start btn btn-outline {% if object.source_type == 'PRC' %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-proof-copy">
-                    {% translate 'proof copy' %}
-                </button>
-                <button class="justify-start btn btn-outline {% if object.source_type == 'APC' %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-annotated-proof-copy">
-                    {% translate 'annotated proof copy' %}
-                </button>
-            </div>
+{% else %}
+    <div class="join my-5">
+        <button class="justify-start btn btn-outline {% if not object.source_type %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-none">
+            -------
+        </button>
+        <button class="justify-start btn btn-outline {% if object.source_type == 'PRC' %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-proof-copy">
+            {% translate 'proof copy' %}
+        </button>
+        <button class="justify-start btn btn-outline {% if object.source_type == 'APC' %}btn-active{% endif %} bg-white" form="form" type="submit" name="set-type-annotated-proof-copy">
+            {% translate 'annotated proof copy' %}
+        </button>
     </div>
-</div>
+{% endif %}
 
 {{ completeness_form.as_daisy }}
 

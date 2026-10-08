@@ -440,6 +440,7 @@ class ManifestationCommentUpdateView(SimpleFormView):
     model = Manifestation
     property = 'comment'
     view_title = _('comment')
+    template_name = 'edwoca/manifestation_comment.html'
 
 
 def manifestation_print_update(request, pk):

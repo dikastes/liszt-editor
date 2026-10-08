@@ -241,9 +241,6 @@ def modified_print_create(request):
                     )
                 manifestation.source_title = target_manifestation.source_title
                 manifestation.save()
-            else:
-                manifestation.manifestation_form = EdwocaManifestation.ManifestationForm.PROOF
-                manifestation.save()
 
             return redirect('edwoca:manifestation_update', pk=manifestation.pk)
         else:

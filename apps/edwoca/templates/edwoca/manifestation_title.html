@@ -24,7 +24,7 @@
                 {% translate 'print title of template' %}
             </span>
         </div>
-        <div class="pseudo-input border flex items-center border-black">
+        <div class="p-3 border flex items-center border-black">
             {{ object.get_related_manifestation.source_title }}
         </div>
     </div>
@@ -88,7 +88,27 @@
     {% translate 'title page' %}
 </h3>
 
-{{ title_page_form.as_daisy }}
+{% if object.source_type == 'MPR' and object.get_related_manifestation %}
+    <p class="note">
+        {% if object.get_related_manifestation.figure %}
+            {% translate 'figurative title page' %}
+        {% else %}
+            {% translate 'no figurative title page' %}
+        {% endif %}
+    </p>
+    <div class="form-control">
+        <div class="label">
+            <span class="label-text">
+                {% translate 'title page diplomatic' %}
+            </span>
+        </div>
+        <div class="border border-black p-3">
+            {{ object.get_related_manifestation.title_page }}
+        </div>
+    </div>
+{% else %}
+    {{ title_page_form.as_daisy }}
+{% endif %}
 
 <h2 class="my-5"> {% translate 'dedications' %} </h2>
 
