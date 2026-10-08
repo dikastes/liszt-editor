@@ -1,10 +1,12 @@
 from .base import *
 from secrets import token_urlsafe
+from django.db.models.fields import BLANK_CHOICE_DASH
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
 from dmad_on_django.models import Period
 from dmrism.models.item import *
+from dmrism.models.manifestation import RelatedExpression
 from dominate.tags import div, label, span, form, input_, h3
 from dominate.util import raw
 from django import forms
@@ -484,8 +486,8 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
     class Meta:
         model = Item
         fields = [
+                'edition',
                 'source_type',
-                'item_stage',
                 'extent',
                 'is_lyrics',
                 'is_program',
@@ -522,7 +524,7 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                         'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
-                'item_stage': Select( attrs = {
+                'edition': Select( attrs = {
                         'class': SimpleFormMixin.select_classes,
                         'form': 'form'
                     }),
@@ -531,6 +533,16 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                         'form': 'form'
                     })
             }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        if not self.instance.manifestation.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+            self.fields['source_type'].choices = [
+                    (None, BLANK_CHOICE_DASH),
+                    (Item.SourceType.PROOF_COPY.value, Item.SourceType.PROOF_COPY.label),
+                    (Item.SourceType.ANNOTATED_PROOF_COPY.value, Item.SourceType.ANNOTATED_PROOF_COPY.label)
+                ]
 
     def completeness_as_daisy(self):
         form = div(cls='my-5')
@@ -543,6 +555,7 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
 
     def type_as_daisy(self):
         source_type_field = self['source_type']
+        edition_field = self['edition']
 
         form = div(cls='my-5')
 
@@ -550,20 +563,14 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
             with label():
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(source_type_field.label)+'*', cls=SimpleFormMixin.label_text_classes)
-                raw(str(source_type_field))
-
-        return mark_safe(str(form))
-
-    def stage_as_daisy(self):
-        stage_field = self['item_stage']
-
-        form = div(cls='my-5')
-
-        with form:
+                if self.instance.manifestation.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+                    div(self.instance.get_source_type_display(), cls='pseudo-input flex items-center border border-black')
+                else:
+                    raw(str(source_type_field))
             with label():
                 with div(cls=SimpleFormMixin.label_classes):
-                    span(_(stage_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(stage_field))
+                    span(_(edition_field.label), cls=SimpleFormMixin.label_text_classes)
+                raw(str(edition_field))
 
         return mark_safe(str(form))
 
@@ -577,14 +584,6 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
         form = div(cls='my-5')
 
         with form:
-            with label():
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(measure_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(measure_field))
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(extent_field))
             with div(cls='mb-2'):
                 h3(_('text type'), cls='text-lg my-5')
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
@@ -596,6 +595,15 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 with label(cls=SimpleFormMixin.toggle_inverted_classes):
                     raw(str(explanation_field))
                     span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+            if not self.instance.source_type == Item.SourceType.ANNOTATED_PROOF_COPY:
+                with label(cls=SimpleFormMixin.form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(extent_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(extent_field))
+                with label():
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(measure_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(measure_field))
 
         return mark_safe(str(form))
 
@@ -760,31 +768,30 @@ class AnnotationForm(ModelForm):
         model = Annotation
         fields = [
                 'collection_component',
-                'is_ownership_note',
-                'is_date_note',
                 'is_correction',
                 'is_addition',
                 'is_note',
                 'is_title',
-                'is_dedication',
                 'description_title_correction'
             ]
         widgets = {
             'collection_component': Select(attrs={'class': SimpleFormMixin.select_classes, 'form': 'form'}),
-            'is_ownership_note': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
-            'is_date_note': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'is_correction': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'is_addition': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'is_note': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'is_title': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
-            'is_dedication': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'description_title_correction': Textarea(attrs={'class': SimpleFormMixin.text_area_classes, 'form': 'form'})
         }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['collection_component'].queryset = Manifestation.objects.filter(component_of = self.instance.item.manifestation.id)
+        manifestations = Manifestation.objects.filter(
+                Q(component_of = self.instance.item.manifestation.id) |
+                Q(pk = self.instance.item.manifestation.id)
+            )
+
+        self.fields['collection_component'].queryset = RelatedExpression.objects.filter(manifestation__in = manifestations)
 
     def collection_component_as_daisy(self):
         form = div(cls='my-5')
@@ -802,22 +809,13 @@ class AnnotationForm(ModelForm):
     def as_daisy(self):
         form = div(cls='my-5')
 
-        is_ownership_note_field = self['is_ownership_note']
-        is_date_note_field = self['is_date_note']
         is_correction_field = self['is_correction']
         is_addition_field = self['is_addition']
         is_title_field = self['is_title']
-        is_dedication_field = self['is_dedication']
         is_note_field = self['is_note']
         description_field = self['description_title_correction']
 
         with form:
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(is_ownership_note_field))
-                span(is_ownership_note_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(is_date_note_field))
-                span(is_date_note_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(is_addition_field))
                 span(is_addition_field.label, cls=SimpleFormMixin.label_text_classes)
@@ -830,9 +828,6 @@ class AnnotationForm(ModelForm):
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(is_title_field))
                 span(is_title_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls=SimpleFormMixin.toggle_inverted_classes):
-                raw(str(is_dedication_field))
-                span(is_dedication_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(description_field.label, cls=SimpleFormMixin.label_text_classes)

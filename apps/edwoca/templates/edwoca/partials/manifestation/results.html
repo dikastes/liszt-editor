@@ -1,31 +1,33 @@
-{% if publisher_list %}
+{% load i18n %}
+
+{% if result_list %}
     <ul class="menu p-2 bg-base-100 rounded-box w-full shadow-lg border border-base-300">
-        {% for result in publisher_list %}
+        {% for result in result_list %}
             <li>
                 <button type="button" 
                         class="text-left w-full block p-2 hover:bg-base-200"
-                        onclick="selectPublisher('{{ result.object.pk }}', '{{ result.object.name|escapejs }}')">
-                    {{ result.object.name }}
+                        onclick="selectResult('{{ result.id }}', '{{ result.name|escapejs }}')">
+                    {{ result.name }}
                 </button>
             </li>
         {% endfor %}
     </ul>
 {% else %}
     <div class="p-4 text-sm text-base-content/50 bg-base-100 rounded-box shadow-lg border border-base-300">
-        Keine Verlage gefunden.
+        {% translate 'no hits' %}
     </div>
 {% endif %}
 
 <script>
-function selectPublisher(id, name) {
+function selectResult(id, name) {
 
-    const hiddenField = document.getElementById('id_publisher');
+    const hiddenField = document.getElementById('id_{{ type }}');
     if (hiddenField) hiddenField.value = id;
 
-    const searchField = document.getElementById('id_publisher_search');
+    const searchField = document.getElementById('id_{{ type }}_search');
     if (searchField) searchField.value = name;
 
-    const resultsContainer = document.getElementById('publisher-results');
+    const resultsContainer = document.getElementById('{{ type }}-results');
     if (resultsContainer) resultsContainer.innerHTML = '';
 }
 </script>

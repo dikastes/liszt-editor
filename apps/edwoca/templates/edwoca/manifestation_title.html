@@ -17,7 +17,20 @@
 
 <h3 class="my-5"> {% translate 'title setting' %} </h3>
 
-{{ form.source_title_as_daisy }}
+{% if object.source_type == 'MPR' and object.get_related_manifestation %}
+    <div class="form-control">
+        <div class="label">
+            <span class="label-text">
+                {% translate 'print title of template' %}
+            </span>
+        </div>
+        <div class="p-3 border flex items-center border-black">
+            {{ object.get_related_manifestation.source_title }}
+        </div>
+    </div>
+{% else %}
+    {{ form.source_title_as_daisy }}
+{% endif %}
 
 <h3 class="my-5"> {% translate 'diplomatic titles' %} </h3>
 
@@ -31,7 +44,7 @@
         <div class="collapse-content mt-5">
             {{ title_form.as_daisy }}
 
-            {% if object.is_singleton %}
+            {% if not title_form.instance.printed and object.source_type == 'MPR' or object.is_singleton %}
                 <div class="mt-5">
                     <h3>
                         {% translate 'writers/hands' %}
@@ -71,44 +84,95 @@
     </button>
 </div>
 
-{% if not object.is_singleton %}
-    <h3 class="my-5">
-        {% translate 'title page' %}
-    </h3>
+<h3 class="my-5">
+    {% translate 'title page' %}
+</h3>
 
+{% if object.source_type == 'MPR' and object.get_related_manifestation %}
+    <p class="note">
+        {% if object.get_related_manifestation.figure %}
+            {% translate 'figurative title page' %}
+        {% else %}
+            {% translate 'no figurative title page' %}
+        {% endif %}
+    </p>
+    <div class="form-control">
+        <div class="label">
+            <span class="label-text">
+                {% translate 'title page diplomatic' %}
+            </span>
+        </div>
+        <div class="border border-black p-3">
+            {{ object.get_related_manifestation.title_page }}
+        </div>
+    </div>
+{% else %}
     {{ title_page_form.as_daisy }}
 {% endif %}
 
 <h2 class="my-5"> {% translate 'dedications' %} </h2>
 
 <h3 class="my-5"> {% translate 'person dedications' %} </h3>
-{% for person_dedication_form in person_dedication_forms %}
-    {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=person_dedication_form dedicatee_class='person' %}
 
-{% empty %}
-    <p class="note"> {% translate 'no person dedications' %} </p>
-{% endfor %}
-
-<div class="flex items-center">
-    <div class="flex-1"></div>
-    <button class="btn-outline btn flex-0" name="create-person-dedication" type="submit" form="form">
-        {% translate 'create person dedication' %}
-    </button>
-</div>
+{% if object.source_type == 'MPR' and object.get_related_manifestation %}
+    {% for person_dedication in object.get_related_manifestation.manifestation_person_dedications.all %}
+        <div class="form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'dedication' %}
+                </span>
+            </div>
+            <div class="pseudo-input flex items-center border border-black">
+                {{ person_dedication }}
+            </div>
+        </div>
+    {% empty %}
+        <p class="note"> {% translate 'no person dedications' %} </p>
+    {% endfor %}
+{% else %}
+    {% for person_dedication_form in person_dedication_forms %}
+        {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=person_dedication_form dedicatee_class='person' %}
+    {% empty %}
+        <p class="note"> {% translate 'no person dedications' %} </p>
+    {% endfor %}
+    <div class="flex items-center">
+        <div class="flex-1"></div>
+        <button class="btn-outline btn flex-0" name="create-person-dedication" type="submit" form="form">
+            {% translate 'create person dedication' %}
+        </button>
+    </div>
+{% endif %}
 
 <h3 class="my-5"> {% translate 'corporation dedications' %} </h3>
-{% for corporation_dedication_form in corporation_dedication_forms %}
-    {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=corporation_dedication_form dedicatee_class='corporation' %}
-{% empty %}
-    <p class="note"> {% translate 'no corporation dedications' %} </p>
-{% endfor %}
 
-<div class="flex items-center">
-    <div class="flex-1"></div>
-    <button class="btn-outline btn flex-0" name="create-corporation-dedication" type="submit" form="form">
-        {% translate 'create corporation dedication' %}
-    </button>
-</div>
+{% if object.source_type == 'MPR' and object.get_related_manifestation %}
+    {% for corporation_dedication in object.get_related_manifestation.manifestation_corporation_dedications.all %}
+        <div class="form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'dedication' %}
+                </span>
+            </div>
+            <div class="pseudo-input flex items-center border border-black">
+                {{ corporation_dedication }}
+            </div>
+        </div>
+    {% empty %}
+        <p class="note"> {% translate 'no corporation dedications' %} </p>
+    {% endfor %}
+{% else %}
+    {% for corporation_dedication_form in corporation_dedication_forms %}
+        {% include 'edwoca/partials/forms/dedication_form.html' with dedication_form=corporation_dedication_form dedicatee_class='corporation' %}
+    {% empty %}
+        <p class="note"> {% translate 'no corporation dedications' %} </p>
+    {% endfor %}
+    <div class="flex items-center">
+        <div class="flex-1"></div>
+        <button class="btn-outline btn flex-0" name="create-corporation-dedication" type="submit" form="form">
+            {% translate 'create corporation dedication' %}
+        </button>
+    </div>
+{% endif %}
 
 <label>
     <div class="label">

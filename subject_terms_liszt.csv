@@ -1,0 +1,387 @@
+term,gnd_id
+Komponist,4032009-1
+Musiker,4040841-3
+Pianist,4131406-2
+Instrumentalmusiker,4192865-9
+Dirigent,4012434-4
+Redakteur,4177294-5
+Journalist,4028781-6
+Medienberuf,4202773-1
+Beruf,4005857-8
+Pädagoge,4044300-0
+Musiklehrer,4140880-9
+Lehrer,4035088-5
+Pädagogischer Beruf,4173086-0
+Organist,4172793-9
+Kantor,4163221-7
+Arrangeur,4604119-9
+Herausgeber,4159575-0
+Schriftsteller,4053309-8
+Autor,4003982-1
+Übersetzer,4061414-1
+Fremdsprachenberuf,4518976-6
+Schauspieler,4052154-0
+Darstellender Künstler,4456880-0
+Künstler,4033423-5
+Jurist,4029050-5
+Pianistin,4426550-5
+Instrumentalmusikerin,4315897-3
+Musikerin,4170818-0
+Musikschriftsteller,4398800-3
+Musikwissenschaftler,4170836-2
+Wissenschaftler,4066567-7
+Kapellmeister,4398802-7
+Generalmusikdirektor,4398808-8
+Musikkritiker,4120774-9
+Kritiker,4165775-5
+Kontrabassist,7553337-6
+Geiger,4156342-6
+Musikdirektor,7628980-1
+Direktor,4300473-8
+Leiter <Verwaltung>,4319488-6
+Führungskraft,4071497-4
+Konzertmeister,4231707-1
+Orchestermusiker,4172711-3
+Theaterdirektor,4398844-1
+Theaterschaffender,4185043-9
+Bibliothekar,4145258-6
+Bibliothekspersonal,4145271-9
+Theaterintendant,4185044-0
+Lyriker,4168391-2
+Regisseur,4049050-6
+Dramaturg,4398838-6
+Archivar,4002865-3
+Tubaspieler,7553291-8
+Kopist,4165276-9
+Schreiber,4130947-9
+Violoncellist,4188376-7
+Klavierlehrer,4429653-8
+Freiherr,4018333-6
+Adel,4000464-8
+Oberschicht,4042976-3
+Soziale Schichtung,4077574-4
+Politiker,4046517-2
+Minister,4130305-2
+Philologe,4199236-2
+Geisteswissenschaftler,4156360-8
+Literarhistoriker,4167838-2
+Literaturwissenschaftler,4167889-8
+Publizist,4176310-5
+Posaunist,4351420-0
+Korrepetitor,4283458-2
+Maler,4037215-7
+Dramatiker,4140241-8
+Zeichner,4200345-3
+Grafiker,4125173-8
+Lithograf,4398813-1
+Radierer,4176793-7
+Historiker,4025098-2
+Germanist,4156858-8
+Musikethnologe,7628911-4
+Musikalienhändler,4170799-0
+Händler,4221401-4
+Kompositionslehrer,7628955-2
+Hochschullehrer,4025243-7
+Musikbibliothekar,4469595-0
+Militärmusiker,4169959-2
+Kirchenmusiker,4163926-1
+Theologe,4059756-8
+Hofkapellmeister,4398807-6
+Flötist,4126534-8
+Bläser,4145838-2
+Musikverleger,4398799-0
+Verleger,4138343-6
+Buchhändler,4130948-0
+Bratschist,4398810-6
+Viola da Gamba,4127766-1
+Viola,4188364-0
+Streichinstrument,4058020-9
+Saiteninstrument,4129455-5
+Musikinstrument,4040851-6
+Chorleiter,4443068-1
+Musikjournalist,7628915-1
+Schriftstellerin,4053311-6
+Autorin,4258697-5
+Musiklehrerin,4395042-5
+Lehrerin,4035097-6
+Musikschriftstellerin,7628949-7
+Herausgeberin,4430555-2
+Komponistin,4032010-8
+Sängerin,4051246-0
+Sopranistin,4367362-4
+Klavierlehrerin,4520408-1
+Kaufmann,4128272-3
+Kaufmännischer Beruf,4030067-5
+Gründer,4562113-5
+Sänger,4124099-6
+Klarinettist,4749746-4
+Kunstsammler,4166042-0
+Sammler,4179037-6
+Papst,4044561-6
+Kirchenoberhaupt,7519705-4
+Oberhaupt,7519703-0
+Erzbischof,4015471-3
+Bischof,4006949-7
+Kirchliches Amt,4030826-1
+Kardinal,4163313-1
+Malerin,4037223-6
+Künstlerin,4033430-2
+Librettistin,4683584-2
+Librettist,4167564-2
+Erzähler,4152967-4
+Arzt,4003157-3
+Heilberuf,4024024-1
+Helfender Beruf,4126932-9
+Rechtsanwalt,4048755-6
+Freiheitskämpfer,4447167-1
+Volkskundler,4139824-5
+Sozialwissenschaftler,4140123-2
+Kulturwissenschaftler,4485235-6
+Linguist,4224183-2
+Abgeordneter,4000135-0
+Tenor <Sänger>,4605819-9
+Gesangslehrer,7628966-7
+Opernsänger,4125219-6
+Offizier,4043375-4
+Soldat,4055409-0
+Militär,4039305-7
+Theaterkritiker,4185045-2
+Naturwissenschaftler,4041423-1
+Wissenschaftlerin,4136652-9
+Gymnasiallehrer,4158589-6
+Slawist,4322831-8
+Ordensgründer,4243057-4
+Ordensleute,4309954-3
+Orden,4043726-7
+Institut des Geweihten Lebens,4382267-8
+Mönch,4039902-3
+Katholischer Theologe,4030020-1
+Trompeter,4462762-2
+Blechbläser,4126730-8
+Unternehmer,4061949-7
+Hausgehilfin,4159247-5
+Kirchenfürst,4739580-1
+Klerus,4031147-8
+Diplomat,4012401-0
+Hauptmann,7698002-9
+Oberst,4570115-5
+Stabsoffizier,4182710-7
+Generalmajor,4664235-3
+Schauspielerin,4153179-6
+Darstellende Künstlerin,4506381-3
+Hofdame,4160401-5
+Hofstaat,4160420-9
+Hof,4025453-7
+Schachspieler,4179279-8
+Sportler,4056399-6
+Kunstkritiker,4166037-7
+Kunsthistoriker,4033654-2
+Arrangeurin,7712885-0
+Mäzenin,7607868-1
+Illustratorin,4454346-3
+Klassischer Philologe,4199241-6
+Bauingenieur,4004812-3
+Ingenieur,4026955-3
+Technischer Beruf,4222042-7
+Geigerin,4334809-9
+Priester,4047233-4
+Geistlicher,4137184-7
+Baronin,7538688-4
+Weiblicher Adel,4236528-4
+Bankier,4140768-4
+Mäzen,7607862-0
+Opernsängerin,4172628-5
+Philanthropin,1175760102
+Philanthrop,1143159993
+Freimaurer,4123227-6
+Sekretär,4116469-6
+Büroberuf,4127560-3
+Sammlerin,4572875-6
+Bassbariton <Sänger>,7628958-8
+Ehefrau,4013634-6
+Frau,4018202-2
+Erwachsener,4015431-2
+Erwachsener <18- Jahre>,1118421167
+Lebensalter,4034834-9
+Ehegatte,4013638-3
+Prediger,4130322-2
+Philosoph,4045790-4
+Operndirektor,7628971-0
+Vicomté,4302941-3
+Bildhauer,4139550-5
+Harfenist,4272861-7
+Revolutionär,4177943-5
+Beamter,4005081-6
+Kirchenlieddichter,4215617-8
+Liederdichter,4398215-3
+Pfarrer,4132592-8
+Lutherischer Theologe,1041366884
+Evangelischer Theologe,4015882-2
+Romancier,4124076-5
+Theaterdichter,7708037-3
+Generalkonsul,4398829-5
+Staatsrat,4182669-3
+Rat,4139103-2
+Gemeindeorgan,4231197-4
+Organ <Recht>,4191867-8
+Bariton <Sänger>,7553360-1
+Abt,4000273-1
+Karikaturist,4232470-1
+Paläontologe,4277277-1
+Geowissenschaftler,4156773-0
+Botaniker,4146402-3
+Biologe,4131826-2
+Dialektologe,4398841-6
+Pazifist,4137384-4
+Tierschützer,7635523-8
+Orientalist,4415844-0
+Reiseschriftsteller,4798807-1
+Selbstverleger,7719046-4
+Ordenspriester,4121430-4
+Gutsherr,4196107-9
+Oboist,4442748-7
+Musikverlag,4170835-0
+Verlag,4063004-3
+Buchhandel,4008626-4
+Klavierbauindustrie,4548953-1
+Tasteninstrumentenbau,4614569-2
+Musikinstrumentenbau,4040852-8
+Angewandte Musikwissenschaft,4142445-1
+Musikwissenschaft,4130526-7
+Industrie,4026779-9
+Wirtschaftssektor,4191554-9
+Produzierendes Gewerbe,4235141-8
+Gewerbe,4133849-2
+Wirtschaft,4066399-1
+Musikalienhandel,4122294-5
+Unternehmen,4061963-1
+Druckerei,4133333-0
+Klavier- und Cembalobauer,4164056-1
+Musikinstrumentenbauer,4170830-1
+Essayist,4464763-3
+Prosaist,4391928-5
+Humorist,4160798-3
+Prinzessin,4175724-5
+Bildnismaler,4332867-2
+Illustrator,4161277-2
+Literaturkritiker,4167874-6
+Domkapitular,4138339-4
+Theologie,4059758-1
+Geisteswissenschaften,4019838-8
+Wissenschaft,4066562-8
+Gesangslehrerin,7628964-3
+Mezzosopranistin,4874092-5
+Harfenistin,4712027-7
+Schulleiter,4127948-7
+Drucker,4013091-5
+Druck- und Papierberuf,7631588-5
+Klavierunterricht,4114218-4
+Instrumentalunterricht,4027218-7
+Musikerziehung,4040843-7
+Musische Erziehung,4040890-5
+Erziehung,4015482-8
+Unterricht,4062005-0
+Orgelbauer,4043847-8
+Erbprinz,7525754-3
+Prinz,4201101-2
+Präsident,4115611-0
+Regierungschef,4130306-4
+Außenminister,4143621-0
+Journalistin,4028786-5
+General,4132742-1
+Hornist,4712307-2
+Altistin,4367366-1
+Alt <Stimmlage>,4270768-7
+Stimmlage,4183344-2
+Chemiker,4009836-9
+Chirurg,4009985-4
+Facharzt,4153470-0
+Musikkritikerin,7540312-2
+Kritikerin,7539326-8
+Übersetzerin,4372438-3
+Finanzbeamter,4489416-8
+Archivdirektor,4623517-6
+Hofrat,4160419-2
+Bassist <Sänger>,4362006-1
+Bibliograf,4349925-9
+Bühnenbildner,4122089-4
+Dozent,4150507-4
+Theosoph,7637321-6
+Marineoffizier,4168900-8
+Publizistin,4381669-1
+Feministin,4275213-9
+Theaterdirektorin,4501736-0
+Kostümbildnerin,4428817-7
+Musikgesellschaft,4518247-4
+Firma,4017250-8
+Philosophische Fakultät,4174287-4
+Fakultät,4016344-1
+Universität,4061778-6
+Wissenschaftliche Hochschule,4190096-0
+Hochschule,4072560-1
+Tertiärbereich,4184808-1
+Bildungseinrichtung,4145467-4
+Pädagogische Einrichtung,4152997-2
+Einrichtung,4113393-6
+Körperschaft,4128521-9
+Juristische Person,4029063-3
+Rechtssubjekt,4177269-6
+Sortimentsbuchhandel,4055640-2
+Einzelhandel,4127747-8
+Handel,4023222-0
+Verbreitender Buchhandel,4824827-7
+Antiquariat,4002323-0
+Musikzeitschrift,4128543-8
+Zeitschrift,4067488-5
+Fortlaufendes Sammelwerk,4155074-2
+Sammelwerk,4202533-3
+Werk,4117633-9
+Presse,4047150-0
+Massenmedien,4037877-9
+Medien,4169187-8
+Publizistik,4047770-8
+Adelsbibliothek,4334390-9
+Privatbibliothek,4047289-9
+Bibliothek,4006439-6
+Kulturelle Einrichtung,4136812-5
+Kultur,4125698-0
+Sammlung,4128844-0
+Wissenschaftliche Bibliothek,4066573-2
+Ballettmeister,4452780-9
+Konservatorium,4375589-6
+Musikschule,4170834-9
+Schule,4053474-1
+Kommissionsbuchhandel,4566978-8
+Zwischenbuchhandel,4244193-6
+Kunsthandel,4033647-5
+Orthopäde,4390479-8
+Kirchenhistoriker,4398113-6
+Forschungseinrichtung,4017909-6
+Musikarchiv,4170811-8
+Archiv,4002859-8
+Nationalbibliothek,4171211-0
+Landesbibliothek,4166544-2
+Museumsbibliothek,4170785-0
+Spezialbibliothek,4182209-2
+Universitätsbibliothek,4133334-2
+Hochschulbibliothek,4160196-8
+Regionalbibliothek,4240106-9
+Nationalmuseum,4297953-5
+Museum,4040795-0
+Stadtarchiv,4336196-1
+Gemeindearchiv,4156489-3
+Kunstmuseum,4166041-9
+Literaturarchiv,4201789-0
+Literarisches Museum,4167854-0
+Druckindustrie,4021852-1
+Kunstverlag,4166086-9
+Buchbinderei,4122967-8
+Karte,4029783-4
+Grafische Darstellung,4129552-3
+Leihbücherei,4167239-2
+Kunsthändler,4320478-8
+Antiquar,4332106-9
+Versteigerer,4131454-2
+Auktionshaus,4712310-2
+Homöopath,7547376-8
+Musikbibliothek,4128838-5

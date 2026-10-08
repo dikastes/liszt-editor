@@ -30,7 +30,7 @@
                 {% translate 'item characteristics' %}
             </a>
         </li>
-        {% if object.source_type == 'APC' %}
+        {% if object.source_type == 'APC' or object.source_type == 'MPR' %}
             <li>
                 <a href="{% url 'edwoca:item_dedication' object.id %}"
                     {% if 'dedication' in request.path %}class="active"{% endif %}

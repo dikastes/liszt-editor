@@ -1,0 +1,244 @@
+{% extends 'edwoca/base.html' %}
+{% load i18n %}
+
+{% block content %}
+
+{% include 'edwoca/partials/manifestation/preview-divs/print_prolog.html' %}
+
+<h2 class="mb-5"> {% translate 'publisher and print characteristics' %} </h2>
+
+<span class="mr-5 note">
+    {% translate 'to edit, visit' %}:
+</span>
+
+<a class="font-bold" href="{% url 'edwoca:manifestation_print' related_object.pk %}">
+    → {{ related_object }}
+</a>
+
+<h3 class="my-5"> {% translate 'publication' %}</h3>
+
+{% for publication in related_object.publications.all %}
+    {% if publication.publisher %}
+        <div class="border border-black p-5 my-5">
+            <div class="flex gap-5 items-end mb-5">
+                <label class="flex-1 form-control">
+                    <div class="label">
+                        <span class="label-text">
+                            {% translate 'publisher' %}
+                        </span>
+                    </div>
+                    <div class="pseudo-input border-black flex items-center border">
+                        {{ publication.publisher.get_designator }}
+                    </div>
+                </label>
+            </div>
+            {% for publication_place in publication.place_relations.all %}
+                {% if publication_place.place %}
+                    <div class="flex gap-5 items-end mb-5">
+                        <label class="flex-1 form-control">
+                            <div class="label">
+                                <span class="label-text">
+                                    {% translate 'place' %}
+                                </span>
+                            </div>
+                            <div class="pseudo-input border flex items-center border-black bg-white">
+                                {% if publication_place.inferred %}
+                                    {% if publication_place.assumed %}
+                                        [{{ publication_place.place }} ?]
+                                    {% else %}
+                                        [{{ publication_place.place }}]
+                                    {% endif %}
+                                {% else %}
+                                    {% if publication_place.assumed %}
+                                        {{ publication_place.place }} [?]
+                                    {% else %}
+                                        {{ publication_place.place }}
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                        </label>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endfor %}
+
+<h3 class="my-5">
+    {% translate 'more information' %}
+</h3>
+
+{% if related_object.plate_number %}
+    <div class="flex gap-5 items-end mb-5">
+        <label class="flex-1 form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'plate number' %}
+                </span>
+            </div>
+            <div class="pseudo-input border flex items-center border-black bg-white">
+                {{ related_object.plate_number }}
+            </div>
+        </label>
+    </div>
+{% endif %}
+
+{% if related_object.stitcher %}
+    <div class="flex my-5 gap-5 items-end">
+        <label class="flex-1 form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'stitcher' %}
+                </span>
+            </div>
+            <div class="pseudo-input flex items-center border border-black">
+                {{ related_object.stitcher.get_designator }}
+            </div>
+        </label>
+    </div>
+{% endif %}
+
+{% if related_object.price %}
+    <div class="flex gap-5 items-end mb-5">
+        <label class="flex-1 form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'price' %}
+                </span>
+            </div>
+            <div class="pseudo-input border flex items-center border-black bg-white">
+                {{ related_object.price }}
+            </div>
+        </label>
+    </div>
+{% endif %}
+
+<h3 class="my-5">
+    {% translate 'date' %}
+</h3>
+
+{% if related_object.period %}
+    <div class="flex gap-5 items-end mb-5">
+        <label class="flex-1 form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'standardized date' %}
+                </span>
+            </div>
+            <div class="pseudo-input border flex items-center border-black bg-white">
+                {{ related_object.period.display }}
+            </div>
+        </label>
+    </div>
+{% endif %}
+
+<h3 class="my-5">
+    {% translate 'print characteristics' %}
+</h3>
+
+<div class="flex gap-5 items-end mb-5">
+    <label class="flex-1 form-control">
+        <div class="label">
+            <span class="label-text">
+                {% translate 'print type' %}
+            </span>
+        </div>
+        <div class="pseudo-input border flex items-center border-black bg-white">
+            {{ related_object.get_print_type_display|default:'--------' }}
+        </div>
+    </label>
+</div>
+
+{% if related_object.edition_by_source %}
+    <div class="flex gap-5 items-end mb-5">
+        <label class="flex-1 form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'edition_by_source' %}
+                </span>
+            </div>
+            <div class="pseudo-input border flex items-center border-black bg-white">
+                {{ related_object.edition_by_source }}
+            </div>
+        </label>
+    </div>
+{% endif %}
+
+<div class="flex gap-5 my-5">
+    {% if related_object.authorized_edition %}
+        <span class="border border-black p-2 flex-0">
+            {% translate 'authorized edition' %}
+        </span>
+    {% endif %}
+    {% if related_object.first_edition %}
+        <span class="border border-black p-2 flex-0">
+            {% translate 'first edition' %}
+        </span>
+    {% endif %}
+    {% if related_object.further_edition %}
+        <span class="border border-black p-2 flex-0">
+            {% translate 'further edition' %}
+        </span>
+    {% endif %}
+    {% if related_object.is_partial_edition %}
+        <span class="border border-black p-2 flex-0">
+            {% translate 'partial edition' %}
+        </span>
+    {% endif %}
+</div>
+
+{% if related_object.extent %}
+    <div class="mb-5">
+        <label class="flex-1 form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'extent' %}
+                </span>
+            </div>
+            <div class="p-3 truncate border flex items-center border-black bg-white">
+                {{ related_object.extent }}
+            </div>
+        </label>
+    </div>
+{% endif %}
+
+<div class="flex gap-5 my-5">
+    {% if related_object.is_lyrics %}
+        <span class="border border-black p-2 flex-0">
+            {% translate 'lyrics' %}
+        </span>
+    {% endif %}
+    {% if related_object.is_program %}
+        <span class="border border-black p-2 flex-0">
+            {% translate 'program' %}
+        </span>
+    {% endif %}
+    {% if related_object.is_explanation %}
+        <span class="border border-black p-2 flex-0">
+            {% translate 'explanation' %}
+        </span>
+    {% endif %}
+</div>
+
+{% if related_object.private_print_comment %}
+    <h3 class="my-5">
+        {% translate 'comment' %}
+    </h3>
+
+    <div class="mb-5">
+        <label class="flex-1 form-control">
+            <div class="label">
+                <span class="label-text">
+                    {% translate 'private comment' %}
+                </span>
+            </div>
+            <div class="pseudo-input truncate border flex items-center border-black bg-white">
+                {{ related_object.private_print_comment }}
+            </div>
+        </label>
+    </div>
+{% endif %}
+
+{% include 'edwoca/partials/manifestation/preview-divs/print_epilog.html' %}
+
+{% endblock %}

@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Place, Corporation
-from dmrism.models import Publication, PublicationPlace
+from dmrism.models import Publication, PublicationPlace, RelatedExpression
 from .models import Manifestation, Item, Library
 from xml.etree import ElementTree as ET
 
@@ -16,7 +16,7 @@ class PrintCreationTest(TestCase):
         publisher = Corporation.objects.create()
         plate_number = '200'
         form_data = {
-                'temporary_title': working_title,
+                'working_title': working_title,
                 'source_title': print_title,
                 'publisher': publisher.pk,
                 'plate_number': plate_number
@@ -27,9 +27,11 @@ class PrintCreationTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertTrue(Manifestation.objects.filter(working_title=working_title).exists())
+        expression_relation = RelatedExpression.objects.filter(working_title = working_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
 
-        manifestation = Manifestation.objects.get(working_title=working_title)
+        manifestation = expression_relation.manifestation
 
         self.assertEqual(manifestation.source_title, print_title)
         self.assertEqual(manifestation.source_type, Manifestation.SourceType.PRINT)
@@ -41,20 +43,22 @@ class PrintCreationTest(TestCase):
         collection_publisher = Corporation.objects.create()
         collection_plate_number = '400'
         collection_form_data = {
-                'temporary_title': collection_working_title,
+                'working_title': collection_working_title,
                 'source_title': collection_print_title,
                 'publisher': collection_publisher.pk,
                 'plate_number': collection_plate_number
             }
 
-        collection_url = reverse('edwoca:manifestation_create')
+        collection_url = reverse('edwoca:manifestation_collection_create')
         collection_response = self.client.post(collection_url, data=collection_form_data)
 
         self.assertEqual(collection_response.status_code, 302)
 
-        self.assertTrue(Manifestation.objects.filter(working_title=collection_working_title).exists())
+        collection_expression_relation = RelatedExpression.objects.filter(working_title = collection_working_title).first()
+        self.assertIsNotNone(collection_expression_relation)
+        self.assertIsNotNone(collection_expression_relation.manifestation)
 
-        collection_manifestation = Manifestation.objects.get(working_title=collection_working_title)
+        collection_manifestation = collection_expression_relation.manifestation
 
         self.assertEqual(collection_manifestation.source_title, collection_print_title)
         self.assertEqual(collection_manifestation.source_type, Manifestation.SourceType.PRINT)
@@ -80,8 +84,11 @@ class SingletonCreationTest(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-        self.assertTrue(Manifestation.objects.filter(working_title=test_title).exists())
-        manifestation = Manifestation.objects.get(working_title=test_title)
+        expression_relation = RelatedExpression.objects.filter(working_title = test_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        manifestation = expression_relation.manifestation
 
         self.assertEqual(manifestation.items.count(), 1)
         self.assertEqual(manifestation.items.first().signatures.first().library, library)
@@ -106,7 +113,8 @@ class PrintCopyTest(TestCase):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
         publisher = Corporation.objects.create()
-        m = Manifestation.objects.create(working_title = copy_title)
+        m = Manifestation.objects.create(source_type = 'MPR')
+        RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
         publication = Publication.objects.create(manifestation = m, publisher = publisher)
 
         url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
@@ -114,9 +122,22 @@ class PrintCopyTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
 
-        copied_publisher = Manifestation.objects.filter(working_title=copied_title).first().publications.first().publisher
+        expression_relation = RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+
+        self.assertEqual(m.source_type, copy.source_type)
+
+        RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+        copied_publisher = copy.publications.first().publisher
+
         self.assertEqual(publisher, copied_publisher)
 
 
@@ -125,7 +146,8 @@ class ManuscriptCopyTest(TestCase):
     def test_manuscript_copy_workflow(self):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
-        m = Manifestation.objects.create(is_singleton = True, working_title = copy_title)
+        m = Manifestation.objects.create(is_singleton = True)
+        RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
         i = Item.objects.create(manifestation = m)
 
         url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
@@ -133,8 +155,14 @@ class ManuscriptCopyTest(TestCase):
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(Manifestation.objects.filter(working_title=copied_title).exists())
-        self.assertEqual(Manifestation.objects.get(working_title=copied_title).items.count(), 1)
+
+        expression_relation = RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+
+        self.assertEqual(copy.items.count(), 1)
 
 
 """

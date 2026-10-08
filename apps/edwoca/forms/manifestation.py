@@ -15,11 +15,52 @@ from django.utils.functional import lazy
 from dmad_on_django.models import Period, Corporation
 from dmad_on_django.models.base import DocumentationStatusMixin
 from dmrism.models.item import Item, Library
-from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting, ManifestationPlace
+from dmrism.models.manifestation import Manifestation, ManifestationTitle, ManifestationBib, RelatedManifestation, ManifestationTitleHandwriting, ManifestationPlace, RelatedExpression
 from dominate.tags import div, label, span, _input, h1, h2, h3
 from dominate.util import raw
 from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
+
+
+class ProofCopyForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
+    class Meta:
+        model = Manifestation
+        fields = [
+                'without_proof_copy'
+            ]
+        widgets = {
+                'without_proof_copy': CheckboxInput(attrs={'class': 'toggle', 'form': 'form'})
+            }
+
+    #def as_daisy(self):
+        #form = div()
+
+        #proof_copy_field = self['without_proof_copy']
+
+        #with form:
+            #with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                #str(raw(proof_copy_field))
+                #span(proof_copy_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        #return form
+
+
+class RelatedExpressionForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
+    class Meta:
+        model = RelatedExpression
+        fields = [
+                'working_title',
+            ]
+        widgets = {
+                'working_title': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    })
+            }
 
 
 class ManifestationForm(GenericAsDaisyMixin, ModelForm):
@@ -27,14 +68,10 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
 
     class Meta:
         model = Manifestation
-        fields = ['rism_id', 'private_head_comment', 'working_title']
+        fields = ['rism_id', 'private_head_comment']
         widgets = {
                 'rism_id': TextInput( attrs = {
                         'class': SimpleFormMixin.text_input_classes,
-                        'form': 'form'
-                    }),
-                'working_title': Textarea( attrs = {
-                        'class': SimpleFormMixin.text_area_classes,
                         'form': 'form'
                     }),
                 'private_head_comment': Textarea( attrs = {
@@ -42,6 +79,32 @@ class ManifestationForm(GenericAsDaisyMixin, ModelForm):
                         'form': 'form'
                     }),
             }
+
+    def comment_as_daisy(self):
+        form = div(cls='my-5')
+
+        comment_field = self['private_head_comment']
+
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(comment_field))
+
+        return mark_safe(str(form))
+
+    def rism_id_as_daisy(self):
+        form = div(cls='my-5')
+
+        rism_id_field = self['rism_id']
+
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(rism_id_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(rism_id_field))
+
+        return mark_safe(str(form))
 
 
 class ManifestationTitleDedicationForm(GenericAsDaisyMixin, ModelForm):
@@ -145,31 +208,34 @@ class ManifestationTitleForm(ModelForm):
         fields = [
                 'title',
                 'title_type',
-                'manifestation'
+                'printed'
             ]
         widgets = {
             'title': Textarea(attrs={'form': 'form', 'class': 'textarea border-black bg-white textarea-bordered h-64'}),
             'title_type': Select(attrs={'form': 'form', 'class': 'select select-bordered border-black bg-white w-full'}),
-            'manifestation': HiddenInput(attrs={'form': 'form'}),
+            'printed': CheckboxInput(attrs={'form': 'form', 'class': SimpleFormMixin.toggle_classes})
         }
 
     def as_daisy(self):
-        form = div(cls='flex flex-col gap-5')
+        form = div(cls='my-5')
 
-        # Title field (textarea)
-        title_label = label(self['title'].label, _for=self['title'].id_for_label, cls='form-control w-full')
-        title_label.add(raw(str(self['title'])))
-        form.add(title_label)
+        title_field = self['title']
+        type_field = self['title_type']
+        printed_field = self['printed']
 
-        # Remaining properties on a palette with flex-1
-        palette = div(cls='flex flex-wrap gap-5')
-        for field_name in ['title_type']:
-            field = self[field_name]
-            field_label = label(field.label, _for=field.id_for_label, cls='form-control flex-1 min-w-[200px]')
-            field_label.add(raw(str(field)))
-            palette.add(field_label)
-        form.add(palette)
-        form.add(raw(str(self['manifestation'])))
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(title_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(title_field))
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(type_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(type_field))
+            if not self.instance.manifestation.is_singleton and self.instance.manifestation.source_type == 'MPR':
+                with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                    raw(str(printed_field))
+                    span(printed_field.label, cls=SimpleFormMixin.label_text_classes)
 
         return mark_safe(str(form))
 
@@ -415,10 +481,15 @@ class ManifestationClassificationForm(ModelForm):
                 ]
             self.initial.update({'is_incomplete': self.instance.get_single_item().is_incomplete})
         else:
-            self.fields['manifestation_form'].choices = [
-                    (None, BLANK_CHOICE_DASH),
-                    (Manifestation.ManifestationForm.PROOF.value, Manifestation.ManifestationForm.PROOF.label)
-                ]
+            if self.instance.source_type == Manifestation.SourceType.MODIFIED_PRINT and self.instance.get_related_manifestation():
+                self.fields['manifestation_form'].choices = [
+                        (None, BLANK_CHOICE_DASH)
+                    ]
+            else:
+                self.fields['manifestation_form'].choices = [
+                        (None, BLANK_CHOICE_DASH),
+                        (Manifestation.ManifestationForm.PROOF.value, Manifestation.ManifestationForm.PROOF.label)
+                    ]
             self.fields['source_type'].choices = [
                     (None, BLANK_CHOICE_DASH),
                     (Manifestation.SourceType.PRINT.value, Manifestation.SourceType.PRINT.label),
@@ -493,7 +564,10 @@ class ManifestationClassificationForm(ModelForm):
             with label(cls=SimpleFormMixin.form_control_classes + ' xl:mb-5'):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(source_type_field.label, cls=SimpleFormMixin.label_text_classes)
-                raw(str(source_type_field))
+                if self.instance.is_singleton and not self.instance.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+                    raw(str(source_type_field))
+                else:
+                    div(self.instance.get_source_type_display() or '', cls='pseudo-input border border-black flex items-center')
             with label(cls=SimpleFormMixin.form_control_classes + ' xl:mb-5'):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(manifestation_form_field.label, cls=SimpleFormMixin.label_text_classes)
@@ -528,6 +602,97 @@ class ManifestationRelationsCommentForm(ModelForm, SimpleFormMixin):
             }
 
 
+class ModifiedPrintCreateForm(forms.Form):
+    signature = forms.CharField(
+            label = _('Signature'),
+            max_length = 255,
+            widget = TextInput(attrs={'class': SimpleFormMixin.text_input_classes}),
+            required = False
+        )
+
+    library = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required = False,
+    )
+
+    library_search = forms.CharField(
+        label=_('holding institution'),
+        required=False,
+        widget=TextInput(attrs={
+            'class': 'input input-bordered w-full bg-white border-black',
+            'placeholder': _('search library'),
+            'hx-get': '/edwoca/manifestations/library-search',
+            'hx-trigger': 'keyup changed delay:300ms',
+            'hx-target': '#library-results'
+        })
+    )
+
+    related_print = forms.IntegerField(
+        widget=forms.HiddenInput(),
+        required = False,
+    )
+
+    related_print_search = forms.CharField(
+        label=_('related print'),
+        required=False,
+        widget=TextInput(attrs={
+            'class': 'input input-bordered w-full bg-white border-black',
+            'placeholder': _('search related print'),
+            'hx-get': '/edwoca/manifestations/print-search',
+            'hx-trigger': 'keyup changed delay:300ms',
+            'hx-target': '#related_print-results'
+        })
+    )
+
+    # wird das noch gebraucht? siehe auch manifestation create view
+    #def clean(self):
+        #cleaned_data = super().clean()
+        #if self.publisher_instance:
+            #cleaned_data['publisher'] = self.publisher_instance
+        #return cleaned_data
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        library_search_field = self['library_search']
+        library_field = self['library']
+        related_print_search_field = self['related_print_search']
+        related_print_field = self['related_print']
+        signature_field = self['signature']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(related_print_search_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(related_print_search_field))
+                raw(str(related_print_field))
+                div(id='related_print-results', cls='w-full bg-base-100 rounded-box shadow-lg')
+                if related_print_field.errors:
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(related_print_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(_('leave free for proof'), cls='label-text-alt')
+            with label(cls=SimpleFormMixin.palette_classes):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(library_search_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(library_search_field))
+                    raw(str(library_field))
+                    div(id='library-results', cls='w-full bg-base-100 rounded-box shadow-lg')
+                    if library_field.errors:
+                        with div(cls=SimpleFormMixin.label_classes):
+                            span(library_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(signature_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(signature_field))
+                    if signature_field.errors:
+                        with div(cls=SimpleFormMixin.label_classes):
+                            span(signature_field.errors, cls=SimpleFormMixin.error_label_text_classes)
+
+        return mark_safe(str(form))
+
+
 class ManifestationCreateForm(forms.Form):
     kwargs = {
             'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
@@ -536,7 +701,7 @@ class ManifestationCreateForm(forms.Form):
             }
         }
     read_only_fields = ['publisher']
-    temporary_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
+    working_title = forms.CharField(label=_('Temporary'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     source_title = forms.CharField(label=_('print title'), max_length=255, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     plate_number = forms.CharField(label=_('plate number'), max_length=50, required=False, widget=TextInput(attrs={'class': SimpleFormMixin.text_input_classes}))
     #source_type = forms.ChoiceField(label=_('source type'), choices=Manifestation.SourceType.choices, widget=forms.Select(attrs={'class': SimpleFormMixin.select_classes}), required = False)
@@ -562,6 +727,7 @@ class ManifestationCreateForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.is_collection = kwargs.pop('is_collection', False)
         self.publisher_instance = kwargs.pop('publisher', None)
+        self.library_instance = kwargs.pop('library', None)
         super().__init__(*args, **kwargs)
 
     def clean(self):
@@ -573,7 +739,7 @@ class ManifestationCreateForm(forms.Form):
     def as_daisy(self):
         form = div(cls='mb-10')
 
-        temporary_title_field = self['temporary_title']
+        temporary_title_field = self['working_title']
         source_title_field = self['source_title']
         publisher_search_field = self['publisher_search']
         publisher_field = self['publisher']
@@ -618,7 +784,6 @@ class SingletonCreateForm(forms.ModelForm):
     class Meta:
         model = Manifestation
         fields = [
-                'working_title',
                 'source_title',
                 'library',
                 'signature'
@@ -771,7 +936,6 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
                 'private_print_comment',
                 'print_type',
                 'extent',
-                'edition',
                 'price',
                 'authorized_edition',
                 'first_edition',
@@ -840,12 +1004,6 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
                             'form': 'form'
                         }
                 ),
-            'edition': Select(
-                    attrs={
-                            'class': SimpleFormMixin.select_classes,
-                            'form': 'form'
-                        }
-                ),
         }
 
     def price_as_daisy(self):
@@ -891,7 +1049,6 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
         type_field = self['print_type']
         edition_by_source_field = self['edition_by_source']
         extent_field = self['extent']
-        edition_field = self['edition']
         authorized_edition_field = self['authorized_edition']
         first_edition_field = self['first_edition']
         further_edition_field = self['further_edition']
@@ -917,10 +1074,6 @@ class ManifestationPrintForm(DateFormMixin, ModelForm):
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(partial_field))
                 span(partial_field.label, cls=SimpleFormMixin.label_text_classes)
-            with label(cls='flex-1 form-control w-full'):
-                with div(cls='label'):
-                    span(edition_field.label, cls='label-text')
-                raw(str(edition_field))
             with label(cls='form-control w-full'):
                 with div(cls='label'):
                     span(extent_field.label, cls='label-text')

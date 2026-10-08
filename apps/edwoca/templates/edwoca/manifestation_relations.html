@@ -8,7 +8,7 @@
 {% include 'edwoca/partials/manifestation/preview-divs/relations_prolog.html' %}
 
 {% if not object.is_collection and not object.component_of %}
-    <div class="flex">
+    <div class="flex my-5">
         <div class="flex-1"></div>
         <form action="{% url 'edwoca:manifestation_set_collection' object.id %}" class="flex-0">
             <input type="submit" class="btn btn-outline btn-primary" value="{% translate 'set collection status' %}" />
@@ -16,7 +16,27 @@
     </div>
 {% endif %}
 
-<h2 class="mb-5">
+{% if not object.is_singleton %}
+    <h2 class="my-5"> 
+        {% translate 'items' %}
+    </h2>
+    {% if not object.items.count %}
+        {{ proof_copy_form.as_daisy }}
+    {% endif %}
+    {% if not object.without_proof_copy %}
+        <div id="item-list-container">
+            {% include 'edwoca/partials/manifestation/item_list.html' %}
+        </div>
+        <div class="flex mt-4">
+            <div class="flex-1"></div>
+            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn btn-outline flex-0">
+                {% translate 'create item' %}
+            </a>
+        </div>
+    {% endif %}
+{% endif %}
+
+<h2 class="my-5">
     {% translate 'parent references' %}
 </h2>
 
@@ -269,7 +289,7 @@
     {% for manifestation_relation in object.source_manifestation_of.all %}
         {% if manifestation_relation.target_manifestation.is_singleton %}
             <p>
-                {% translate 'this object is related to' %}
+                {% translate 'this object is derivative of' %}
                 <a class="font-bold" href="{% url 'edwoca:manifestation_relations' manifestation_relation.target_manifestation.id %}">
                     → {{ manifestation_relation.target_manifestation }}.
                 </a>
@@ -286,6 +306,9 @@
     {% for manifestation_relation in object.target_manifestation_of.all %}
         {% if manifestation_relation.source_manifestation.is_singleton %}
             <p>
+                {% if manifestation_relation.label == 'D' %}
+                    {% translate 'this object is derivative of' %}
+                {% endif %}
                 {% if manifestation_relation.label == 'R' %}
                     {% translate 'this object is related to' %}
                 {% endif %}
@@ -347,6 +370,12 @@
                         <div class="flex mb-2 mx-2 gap-2">
                             <form method="post" class="flex-0">
                                 {% csrf_token %}
+                                <input type="hidden" name="manifestation-link-type" value="derivative" />
+                                <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
+                                <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is derivative of' %}" />
+                            </form>
+                            <form method="post" class="flex-0">
+                                {% csrf_token %}
                                 <input type="hidden" name="manifestation-link-type" value="related" />
                                 <input type="hidden" name="manifestation-link" value="{{ found_manuscript.object.id }}" />
                                 <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is related to' %}" />
@@ -381,6 +410,9 @@
     {% for manifestation_relation in object.source_manifestation_of.all %}
         {% if not manifestation_relation.target_manifestation.is_singleton %}
             <p>
+                {% if manifestation_relation.label == 'D' %}
+                    {% translate 'this object is derivative of' %}
+                {% endif %}
                 {% if manifestation_relation.label == 'R' %}
                     {% translate 'this object is related to' %}
                 {% endif %}
@@ -409,7 +441,11 @@
     {% for manifestation_relation in object.target_manifestation_of.all %}
         {% if not manifestation_relation.source_manifestation.is_singleton %}
             <p>
-                {% translate 'this object is related to' %}
+                {% if manifestation_relation.label == 'D' %}
+                    {% translate 'a derivative of this object is' %}
+                {% else %}
+                    {% translate 'this object is related to' %}
+                {% endif %}
                 <a class="font-bold" href="{% url 'edwoca:manifestation_relations' manifestation_relation.source_manifestation.id %}">
                     → {{ manifestation_relation.source_manifestation }}.
                 </a>
@@ -479,15 +515,9 @@
                             {% else %}
                                 <form method="post" class="flex-0">
                                     {% csrf_token %}
-                                    <input type="hidden" name="manifestation-link-type" value="revision" />
+                                    <input type="hidden" name="manifestation-link-type" value="derivative" />
                                     <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
-                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is revision of' %}" />
-                                </form>
-                                <form method="post" class="flex-0">
-                                    {% csrf_token %}
-                                    <input type="hidden" name="manifestation-link-type" value="revision" />
-                                    <input type="hidden" name="manifestation-link" value="{{ found_print.object.id }}" />
-                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'has as revision' %}" />
+                                    <input type="submit" class="btn btn-outline btn-sm" value="{% translate 'is derivative of' %}" />
                                 </form>
                             {% endif %}
                         </div>
@@ -508,35 +538,13 @@
     {% translate 'relations comment' %}
 </h2>
 
-<form method="post">
+<form method="post" id="form">
     {% csrf_token %}
     {{ relations_comment_form.as_daisy }}
-    <input type="submit" id="submit-form" value="Speichern" class="hidden">
+    <input type="submit" id="submit-form" class="hidden">
 </form>
 
-{% if not object.is_singleton %}
-    <h2 class="my-5"> 
-        {% translate 'items' %}
-    </h2>
-    {% if object.missing_item %}
-        <p>
-            {% translate 'all items of this print are lost' %}
-        </p>
-    {% else %}
-        <div id="item-list-container">
-            {% include 'edwoca/partials/manifestation/item_list.html' %}
-        </div>
-        <div class="flex mt-4">
-            <div class="flex-1"></div>
-            <a href="{% url 'edwoca:manifestation_item_create' object.id %}" class="btn flex-0">
-                {% translate 'create item' %}
-            </a>
-        </div>
-    {% endif %}
-{% endif %}
 
 {% include 'edwoca/partials/manifestation/preview-divs/relations_epilog.html' %}
-
-<div id="modal-container"></div>
 
 {% endblock %}

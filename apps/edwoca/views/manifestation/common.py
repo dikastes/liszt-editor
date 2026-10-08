@@ -10,7 +10,7 @@ from calendar import monthrange
 from ...forms.item import SignatureForm, ItemDigitizedCopyForm, PersonProvenanceStationForm, CorporationProvenanceStationForm, ItemProvenanceCommentForm, NewItemSignatureFormSet, ItemManuscriptForm, ItemHandwritingForm, PersonProvenanceStationBibForm, CorporationProvenanceStationBibForm, PersonProvenanceFormSet, PersonProvenanceBibFormSet, CorporationProvenanceFormSet, CorporationProvenanceBibFormSet, PersonProvenanceStationWebReference, CorporationProvenanceStationWebReference, PersonProvenanceStationWebReferenceForm, CorporationProvenanceStationWebReferenceForm, FunctionForm
 from ...forms.modification import ItemModificationForm, ModificationHandwritingForm
 from ...forms.dedication import ManifestationPersonDedicationForm, ManifestationCorporationDedicationForm
-from ...models import Manifestation as EdwocaManifestation, Letter, Expression, Work, ItemModification, ModificationHandwriting
+from ...models import Manifestation as EdwocaManifestation, Letter, Expression, Work, ItemModification, ModificationHandwriting, RelatedExpression
 from ..base import *
 from ...models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from bib.models import ZotItem
@@ -99,91 +99,52 @@ class SingletonSearchView(EdwocaSearchView):
         return context
 
 
+def library_search_view(request):
+    search_text = request.GET.get('library_search', '')
+
+    if len(search_text) < 2:
+        return HttpResponse('')
+
+    libraries = [
+        {
+            'id': l.object.id,
+            'name': str(l.object)
+        }
+        for l in SearchQuerySet().models(Library).filter(content=search_text)[:10]
+    ]
+    return render(request, 'edwoca/partials/manifestation/results.html', {'result_list': libraries, 'type': 'library'})
+
+
+def print_search_view(request):
+    search_text = request.GET.get('related_print_search', '')
+
+    if len(search_text) < 2:
+        return HttpResponss('')
+
+    prints = [
+        {
+            'id': p.object.id,
+            'name': ' '.join([p.object.title_prefix, p.object.title_body, p.object.title_suffix])
+        }
+        for p in SearchQuerySet().models(Manifestation).filter(content=search_text, is_singleton=False)[:10]
+    ]
+    return render(request, 'edwoca/partials/manifestation/results.html', {'result_list': prints, 'type': 'related_print'})
+
+
 def publisher_search_view(request):
     search_text = request.GET.get('publisher_search', '')
 
     if len(search_text) < 2:
         return HttpResponse('')
 
-    publisher = SearchQuerySet().models(Corporation).filter(content=search_text)
-    return render(request, 'edwoca/partials/manifestation/publisher_results.html', {'publisher_list': publisher})
-
-def manifestation_update(request, pk):
-    manifestation = Manifestation.objects.get(id=pk)
-    context = {
-        'object': manifestation,
-        'entity_type': 'manifestation'
-    }
-
-    if request.method == 'POST':
-        manifestation_form = ManifestationForm(request.POST, instance=manifestation)
-
-        signature_forms = []
-        if manifestation.is_singleton:
-            item = manifestation.get_single_item()
-            signature_forms_valid = True
-
-            for signature in manifestation.get_single_item().signatures.all():
-                signature_form = SignatureForm(
-                        request.POST,
-                        instance = signature,
-                        prefix = f"signature-{signature.id}"
-                    )
-                signature_forms.append(signature_form)
-
-        if manifestation_form.is_valid() and all(s.is_valid() for s in signature_forms):
-            manifestation_form.save()
-            for signature in manifestation.get_single_item().signatures.all():
-                signature.status = ItemSignature.Status.FORMER
-                signature.save()
-            for signature_form in signature_forms:
-                signature_form.save()
-        else:
-            context['manifestation_form'] = manifestation_form
-            context['signature_forms'] = signature_forms
-
-            return render(request, 'edwoca/manifestation_update.html', context)
-
-        if 'add_signature' in request.POST:
-            status = ItemSignature.Status.CURRENT
-            if item.signatures.count():
-                status = ItemSignature.Status.FORMER
-            signature = ItemSignature.objects.create(
-                    item = item,
-                    status = status
-                )
-            signature_forms += [ SignatureForm(instance = signature, prefix = f"signature-{signature.id}") ]
-
-        context['signature_forms'] = signature_forms
-        context['library_search_form'] = SearchForm()
-
-        return redirect('edwoca:manifestation_update', pk = pk)
-    else:
-        expression_search_form = FramedSearchForm(request.GET or None, prefix='expression', placeholder = _('search expressions'))
-        context['expression_search_form'] = expression_search_form
-        if 'expression_link' in request.GET:
-            expression_link = get_object_or_404(Expression, pk = request.GET['expression_link'])
-            context['expression_link'] = expression_link
-        if expression_search_form.is_valid() and expression_search_form.cleaned_data.get('q'):
-            context['expression_query'] = expression_search_form.cleaned_data.get('q')
-            context['found_expressions'] = expression_search_form.search().models(Expression)
-
-        manifestation_form = ManifestationForm(instance=manifestation)
-
-        signature_forms = []
-        if manifestation.is_singleton:
-            for signature in manifestation.get_single_item().signatures.all():
-                signature_form = SignatureForm(
-                        instance = signature,
-                        prefix = f"signature-{signature.id}"
-                    )
-                signature_forms.append(signature_form)
-            context['signature_forms'] = signature_forms
-
-        context['library_search_form'] = SearchForm()
-        context['manifestation_form'] = manifestation_form
-
-    return render(request, 'edwoca/manifestation_update.html', context)
+    publishers = [
+        {
+            'id': p.object.id,
+            'name': str(p.object)
+        }
+        for p in SearchQuerySet().models(Corporation).filter(content=search_text)[:10]
+    ]
+    return render(request, 'edwoca/partials/manifestation/results.html', {'result_list': publishers, 'type': 'publisher'})
 
 
 def manifestation_item_create(request, pk):
@@ -262,6 +223,7 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
         collection_search_form = ManifestationSearchForm(self.request.GET or None, prefix='collection', placeholder = _('search collections'))
         print_search_form = ManifestationSearchForm(self.request.GET or None, prefix='print', placeholder=_('search prints'))
         context['relations_comment_form'] = ManifestationRelationsCommentForm(instance=self.object)
+        context['proof_copy_form'] = ProofCopyForm(instance=self.object)
         context['manuscript_search_form'] = manuscript_search_form
         context['collection_search_form'] = collection_search_form
         context['print_search_form'] = print_search_form
@@ -300,13 +262,16 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
 
-        form = ManifestationRelationsCommentForm(request.POST, instance=self.object)
-        if not form.is_valid():
+        relations_form = ManifestationRelationsCommentForm(request.POST, instance=self.object)
+        proof_copy_form = ProofCopyForm(request.POST, instance=self.object)
+
+        if relations_form.is_valid() and proof_copy_form.is_valid():
+            relations_form.save()
+            proof_copy_form.save()
+        else:
             context = self.get_context_data(**kwargs)
             context['relations_comment_form'] = form
             return self.render_to_response(context)
-        else:
-            form.save()
 
         if 'collection-link-type' in request.POST:
             manifestation_link = get_object_or_404(
@@ -337,7 +302,7 @@ class ManifestationRelationsUpdateView(EntityMixin, UpdateView):
                 request.POST.get('manifestation-link-type').upper()
             )
 
-            if self.object.is_singleton:
+            if self.object.is_singleton or not manifestation_link.is_singleton:
                 source = self.object
                 target = manifestation_link
             else:
@@ -475,14 +440,24 @@ class ManifestationCommentUpdateView(SimpleFormView):
     model = Manifestation
     property = 'comment'
     view_title = _('comment')
+    template_name = 'edwoca/manifestation_comment.html'
 
 
 def manifestation_print_update(request, pk):
     manifestation = get_object_or_404(EdwocaManifestation, pk=pk)
+    editable = True
+
     context = {
         'object': manifestation,
-        'entity_type': 'manifestation'
+        'entity_type': 'manifestation',
     }
+
+    # show manifestation data of related manifestation for modified prints
+    if manifestation.source_type == EdwocaManifestation.SourceType.MODIFIED_PRINT:
+        related_manifestation = manifestation.get_related_manifestation()
+        if related_manifestation:
+            context['related_object'] = related_manifestation
+            return render(request, 'edwoca/manifestation_print_readonly.html', context)
 
     if request.method == 'POST':
         if 'add-publication' in request.POST:
@@ -1027,12 +1002,15 @@ def part_create(request, pk, part_label):
                     display = form.cleaned_data.get('display')
                 )
             manifestation = Manifestation.objects.create(
-                    working_title = form.cleaned_data.get('temporary_title'),
                     plate_number = form.cleaned_data.get('plate_number'),
                     source_type = form.cleaned_data.get('source_type'),
                     part_of = existing_manifestation,
                     part_label = getattr(EdwocaManifestation.PartLabel, part_label.upper()),
                     period = period
+                )
+            RelatedExpression.objects.create(
+                    working_title = form.cleaned_data.get('working_title'),
+                    manifestation = manifestation
                 )
 
             chosen_publisher = form.cleaned_data.get('publisher')
@@ -1068,11 +1046,14 @@ def component_create(request, pk, publisher_pk = None):
                     display = form.cleaned_data.get('display')
                 )
             manifestation = Manifestation.objects.create(
-                    working_title = form.cleaned_data.get('temporary_title'),
                     plate_number = form.cleaned_data.get('plate_number'),
                     source_type = form.cleaned_data.get('source_type'),
                     component_of = existing_manifestation,
                     period = period
+                )
+            RelatedExpression.objects.create(
+                    working_title = form.cleaned_data.get('working_title'),
+                    manifestation = manifestation
                 )
 
             chosen_publisher = form.cleaned_data.get('publisher')
@@ -1105,9 +1086,12 @@ def singleton_part_create(request, pk, part_label):
             manifestation = EdwocaManifestation.objects.create(
                 is_singleton=True,
                 source_title = form.cleaned_data.get('source_title'),
-                working_title = form.cleaned_data.get('working_title'),
                 part_of = existing_manifestation,
                 part_label = getattr(EdwocaManifestation.PartLabel, part_label.upper())
+            )
+            RelatedExpression.objects.create(
+                working_title = form.cleaned_data.get('working_title'),
+                manifestation = manifestation
             )
 
             item = Item.objects.create(manifestation=manifestation)
@@ -1135,8 +1119,11 @@ def singleton_component_create(request, pk):
             manifestation = EdwocaManifestation.objects.create(
                 is_singleton=True,
                 source_type=form.cleaned_data.get('source_type'),
-                working_title = form.cleaned_data['working_title'],
                 component_of = existing_manifestation
+            )
+            RelatedExpression.objects.create(
+                working_title = form.cleaned_data['working_title'],
+                manifestation = manifestation
             )
 
             item = Item.objects.create(manifestation=manifestation)

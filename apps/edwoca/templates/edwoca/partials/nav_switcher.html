@@ -1,23 +1,25 @@
 {% load i18n %}
 
 <div class="navigation flex flex-col h-full items-stretch md:pr-10">
-    <div class="flex-1 mb-10 overflow-auto">
-    {% if entity_type == 'work' %}
-        -- Navigation --
-    {% endif %}
-    {% if entity_type == 'expression' %}
-        -- Navigation --
-    {% endif %}
-    {% if entity_type == 'manifestation' %}
-        {% include 'edwoca/partials/navigation/manifestation_navigation.html' %}
-    {% endif %}
-    {% if entity_type == 'item' %}
-            {% include 'edwoca/partials/navigation/item_navigation.html' %}
-    {% endif %}
+    <div class="flex-1 overflow-auto mb-10">
+        <div class="mb-10">
+            {% if entity_type == 'work' %}
+                -- Navigation --
+            {% endif %}
+            {% if entity_type == 'expression' %}
+                -- Navigation --
+            {% endif %}
+            {% if entity_type == 'manifestation' %}
+                {% include 'edwoca/partials/navigation/manifestation_navigation.html' %}
+            {% endif %}
+            {% if entity_type == 'item' %}
+                    {% include 'edwoca/partials/navigation/item_navigation.html' %}
+            {% endif %}
+        </div>
+        {% if entity_type == 'manifestation' or entity_type == 'letter' or entity_type == 'item' %}
+            {% include 'edwoca/partials/tracked_model_display.html' %}
+        {% endif %}
     </div>
-    {% if entity_type == 'manifestation' or entity_type == 'letter' or entity_type == 'item' %}
-        {% include 'edwoca/partials/tracked_model_display.html' %}
-    {% endif %}
     <div class="flex-0">
         <label for="submit-form" class="w-full btn btn-sm xl:btn-base text-primary btn-outline"> {% translate 'save' %} </label>
     </div>

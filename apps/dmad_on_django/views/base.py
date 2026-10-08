@@ -196,7 +196,7 @@ class UnlinkView(DmadBaseViewMixin, UpdateView):
 
     def post(self, request, **kwargs):
         response = super().post(self, request, **kwargs)
-        self.object.gnd_id = ''
+        self.object.gnd_id = None
         self.object.save()
         return response
 
