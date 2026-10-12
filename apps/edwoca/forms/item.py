@@ -18,6 +18,17 @@ from liszt_util.forms.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
 
 
+class ItemDedicationForm(GenericAsDaisyMixin, ModelForm):
+    layout = Layouts.LABEL_OUTSIDE
+
+    class Meta:
+        model = Item
+        fields = [ 'private_dedication_comment' ]
+        widgets = {
+                'without_proof_copy': TextInput(attrs={'class': SimpleFormMixin.text_input_classes, 'form': 'form'})
+            }
+
+
 class FunctionForm(ModelForm):
     class Meta:
         model = Item
@@ -553,9 +564,20 @@ class ItemManuscriptForm(ModelForm, SimpleFormMixin):
                 span(completeness_field.label, cls=SimpleFormMixin.label_text_classes)
         return mark_safe(str(form))
 
+    def edition_as_daisy(self):
+        form = div(cls='my-5')
+        edition_field = self['edition']
+
+        with form:
+            with div(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(edition_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(edition_field))
+
+        return mark_safe(str(form))
+
     def type_as_daisy(self):
         source_type_field = self['source_type']
-        edition_field = self['edition']
 
         form = div(cls='my-5')
 
