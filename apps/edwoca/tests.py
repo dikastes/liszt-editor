@@ -81,7 +81,7 @@ class PrintCreationTest(TestCase):
 
         self.assertIsNotNone(manifestation)
         self.assertEqual(manifestation.publications.first().publisher, publisher)
-        self.assertEqual(manifestation.plate_nuber, plate_number)
+        self.assertEqual(manifestation.plate_number, plate_number)
 
 class SingletonCreationTest(TestCase):
 
