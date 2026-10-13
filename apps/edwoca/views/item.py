@@ -501,6 +501,8 @@ def item_dedication(request, pk):
                     item = item
                 )
 
+        form = ItemDedicationForm(request.POST, instance=item)
+
         person_dedication_forms = []
         for person_dedication in item.itempersondedication_set.all():
             prefix = f'person_dedication_{person_dedication.id}'
@@ -513,7 +515,7 @@ def item_dedication(request, pk):
             form = ItemCorporationDedicationForm(request.POST, instance=corporation_dedication, prefix=prefix)
             corporation_dedication_forms += [ form ]
 
-        all_forms = person_dedication_forms + corporation_dedication_forms
+        all_forms = person_dedication_forms + corporation_dedication_forms + [ form ]
         if all(f.is_valid for f in all_forms):
             for f in all_forms:
                 f.save()
@@ -554,8 +556,11 @@ def item_dedication(request, pk):
             form = ItemCorporationDedicationForm(instance=corporation_dedication, prefix=prefix)
             corporation_dedication_forms += [ form ]
 
+        form = ItemDedicationForm(instance=item)
+
         context['person_dedication_forms'] = person_dedication_forms
         context['corporation_dedication_forms'] = corporation_dedication_forms
+        context['form'] = form
 
     #q_dedicatee = request.GET.get('dedicatee-q')
     #q_place = request.GET.get('place-q')
@@ -823,6 +828,8 @@ def item_manuscript_update(request, pk):
         handwriting_forms = []
         for handwriting in item.handwritings.all():
             prefix = f'handwriting_{handwriting.id}'
+            if not any(key.startswith(f'{prefix}-') for key in request.POST):
+                continue
             handwriting_form = ItemHandwritingForm(request.POST, instance=handwriting, prefix=prefix)
             if handwriting_form.is_valid():
                 handwriting_form.save()
@@ -831,6 +838,8 @@ def item_manuscript_update(request, pk):
         annotation_forms = []
         for annotation in item.annotations.all():
             prefix = f'annotation_{annotation.id}'
+            if not any(key.startswith(f'{prefix}-') for key in request.POST):
+                continue
             annotation_form = AnnotationForm(request.POST, instance=annotation, prefix=prefix)
             annotation_forms += [ annotation_form ]
 
@@ -842,6 +851,8 @@ def item_manuscript_update(request, pk):
         modification_forms = []
         for modification in item.modifications.all():
             prefix = f'modification_{modification.id}'
+            if not any(key.startswith(f'{prefix}-') for key in request.POST):
+                continue
             modification_form = ItemModificationForm(request.POST, instance=modification, prefix=prefix)
             modification_forms += [ modification_form ]
 
