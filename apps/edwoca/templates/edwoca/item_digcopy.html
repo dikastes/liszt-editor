@@ -1,32 +1,9 @@
 {% extends 'edwoca/base.html' %}
 
-{% block modals %}
-    {% for form in forms %}
-        <div class="modal" role="dialog" id="digital-copy-modal-{{ form.instance.id }}">
-            <div class="modal-box w-11/12 max-w-5xl">
-                <h3 class="text-lg font-bold">Digitale Kopie bearbeiten</h3>
-                <form method="post" class="mt-5">
-                    {% csrf_token %}
-
-                    {{ form.as_daisy }}
-
-                    <input type="submit" name="save_changes" value="Speichern" class="hidden" id="save-button-{{ form.instance.id }}">
-                </form>
-
-                <div class="modal-action flex-0 m-0">
-                    <label for="save-button-{{ form.instance.id }}" class="btn btn-primary">Speichern</label>
-                    <a href="#" class="btn">Schließen</a>
-                </div>
-            </div>
-        </div>
-    {% endfor %}
-{% endblock %}
-
 {% block content %}
 
 {% include 'edwoca/partials/item/preview-divs/digcopy_prolog.html' %}
 
-{# probably the view should use a generic template for item and manifestation manuscript characteristics #}
 <div class="bg-white border border-base-300 p-5">
     <h2 class="card-title mt-0 flex-1"> Digitalisate von {{ object }} </h2>
 

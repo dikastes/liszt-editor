@@ -65,6 +65,23 @@ class PrintCreationTest(TestCase):
         self.assertEqual(collection_manifestation.publications.first().publisher, collection_publisher)
         self.assertEqual(collection_manifestation.plate_number, collection_plate_number)
 
+        only_print_title = 'only print title'
+        form_data = {
+                'source_title': only_print_title,
+                'publisher': publisher.pk,
+                'plate_number': plate_number
+            }
+
+        url = reverse('edwoca:manifestation_create')
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 302)
+
+        manifestation = Manifestation.objects.get(source_title = only_print_title)
+
+        self.assertIsNotNone(manifestation)
+        self.assertEqual(manifestation.publications.first().publisher, publisher)
+        self.assertEqual(manifestation.plate_number, plate_number)
 
 class SingletonCreationTest(TestCase):
 

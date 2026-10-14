@@ -534,7 +534,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 item.signatures.add(signature)
 
         if data.get('240') and data.get('240').get('k'):
-            self.manifestation_form = getattr(Manifestation.ManifestationForm, data.get('240').get('k').upper())
+            manifestation_form_key = data.get('240').get('k').upper()
+            if hasattr(Manifestation.ManifestationForm, manifestation_form_key):
+                self.manifestation_form = getattr(Manifestation.ManifestationForm, manifestation_form_key)
 
         # beispiel für former owner: 1001340874
         personal_names = data.get_fields('700')
