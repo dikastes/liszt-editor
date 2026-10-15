@@ -7,7 +7,11 @@
 
 {% block content %}
 
-{% include 'edwoca/partials/manifestation/preview-divs/digitized_copy_prolog.html' %}
+{% if entity_type == 'manifestation' %}
+    {% include 'edwoca/partials/manifestation/preview-divs/digitized_copy_prolog.html' %}
+{% else %}
+    {% include 'edwoca/partials/item/preview-divs/digitized_copy_prolog.html' %}
+{% endif %}
 
 <h2>
     {% translate 'digital copies' %}
@@ -43,5 +47,11 @@
         {% translate 'add digital copy' %}
     </button>
 </div>
+
+{% if entity_type == 'manifestation' %}
+    {% include 'edwoca/partials/manifestation/preview-divs/digitized_copy_epilog.html' %}
+{% else %}
+    {% include 'edwoca/partials/item/preview-divs/digitized_copy_epilog.html' %}
+{% endif %}
 
 {% endblock %}
