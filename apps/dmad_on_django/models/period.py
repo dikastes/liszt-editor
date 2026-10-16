@@ -77,6 +77,7 @@ class Period(DocumentationStatusMixin):
         return self.display or ''
 
     def parse_display(self):
+
         self.initialize_patterns()
 
         if self.imprecision == Period.Imprecision.IMPRECISE:
@@ -166,7 +167,7 @@ class Period(DocumentationStatusMixin):
         self.unknown_decade_pattern = re.compile(rf'^\d{{0,2}}.?\d{{0,2}}.?\d{{2}}\?\?$', re.IGNORECASE)
         self.month_pattern = re.compile(rf'^({prefix_pipe_string})\s+({month_pipe_string})\s+(\d{{4}})$', re.IGNORECASE)
         self.year_pattern = re.compile(rf'^({prefix_pipe_string})\s+(\d{{4}})(/\d{{2}})?$', re.IGNORECASE)
-        self.decade_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{3}}0){decade_suffix}$', re.IGNORECASE)
+        self.decade_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{3}}0){decade_suffix}', re.IGNORECASE)
         self.century_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{2}}).?\s*({century_suffix})$', re.IGNORECASE)
 
         self.earliest = date(
