@@ -3,17 +3,25 @@
 import django.db.migrations.operations.special
 from django.db import migrations, models
 import csv
+from pathlib import Path
 
 def set_print_types(apps, schema_editor):
     Manifestation = apps.get_model('dmrism', 'manifestation')
 
-    with open('liszt_csv/print_types.csv') as f:
-        r = csv.DictReader(f)
-        for row in r:
-            if row['type'] == 'aD':
-                m = Manifestation.objects.get(pk=row['id'])
-                m.source_type = 'PRT'
-                m.save()
+
+    path = Path('liszt_csv/print_types.csv')
+
+    if path.is_file():
+        with open(path) as f:
+            r = csv.DictReader(f)
+            for row in r:
+                if row['type'] == 'aD':
+                    try:
+                        m = Manifestation.objects.get(pk=row['id'])
+                        m.source_type = 'PRT'
+                        m.save()
+                    except:
+                        pass
 
 class Migration(migrations.Migration):
 
