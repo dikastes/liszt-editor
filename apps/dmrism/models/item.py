@@ -638,6 +638,18 @@ class Annotation(models.Model):
             default = False,
             verbose_name = _('correction')
         )
+    is_ownership_note = models.BooleanField(
+            default = False,
+            verbose_name = _('ownership note')
+        )
+    is_date_note = models.BooleanField(
+            default = False,
+            verbose_name = _('date note')
+        )
+    is_dedication = models.BooleanField(
+            default = False,
+            verbose_name = _('dedication')
+        )
     is_addition = models.BooleanField(
             default = False,
             verbose_name = _('addition')
@@ -661,10 +673,13 @@ class Annotation(models.Model):
                 str(getattr(Annotation, field).field.verbose_name)
                 for field
                 in [
+                    'is_ownership_note',
+                    'is_date_note',
                     'is_correction',
                     'is_addition',
                     'is_note',
                     'is_title',
+                    'is_dedication'
                 ]
                 if getattr(self, field)
             )

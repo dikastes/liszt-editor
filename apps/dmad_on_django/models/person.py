@@ -223,6 +223,8 @@ class Person(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
+        if self.interim_designator:
+            return self.interim_designator
         return _('without name')
 
     def get_natural_name(self):

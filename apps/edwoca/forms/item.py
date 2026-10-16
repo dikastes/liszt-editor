@@ -790,18 +790,24 @@ class AnnotationForm(ModelForm):
         model = Annotation
         fields = [
                 'collection_component',
+                'is_ownership_note',
+                'is_date_note',
                 'is_correction',
                 'is_addition',
                 'is_note',
                 'is_title',
+                'is_dedication',
                 'description_title_correction'
             ]
         widgets = {
             'collection_component': Select(attrs={'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            'is_ownership_note': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
+            'is_date_note': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'is_correction': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'is_addition': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'is_note': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'is_title': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
+            'is_dedication': CheckboxInput(attrs={'class': SimpleFormMixin.toggle_classes, 'form': 'form'}),
             'description_title_correction': Textarea(attrs={'class': SimpleFormMixin.text_area_classes, 'form': 'form'})
         }
 
@@ -831,6 +837,9 @@ class AnnotationForm(ModelForm):
     def as_daisy(self):
         form = div(cls='my-5')
 
+        is_ownership_note_field = self['is_ownership_note']
+        is_date_note_field = self['is_date_note']
+        is_dedication_field = self['is_dedication']
         is_correction_field = self['is_correction']
         is_addition_field = self['is_addition']
         is_title_field = self['is_title']
@@ -838,6 +847,12 @@ class AnnotationForm(ModelForm):
         description_field = self['description_title_correction']
 
         with form:
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(is_ownership_note_field))
+                span(is_ownership_note_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(is_date_note_field))
+                span(is_date_note_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(is_addition_field))
                 span(is_addition_field.label, cls=SimpleFormMixin.label_text_classes)
@@ -850,6 +865,9 @@ class AnnotationForm(ModelForm):
             with label(cls=SimpleFormMixin.toggle_inverted_classes):
                 raw(str(is_title_field))
                 span(is_title_field.label, cls=SimpleFormMixin.label_text_classes)
+            with label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(is_dedication_field))
+                span(is_dedication_field.label, cls=SimpleFormMixin.label_text_classes)
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(description_field.label, cls=SimpleFormMixin.label_text_classes)

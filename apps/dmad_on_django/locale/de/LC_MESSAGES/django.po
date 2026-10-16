@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-24 09:58+0200\n"
+"POT-Creation-Date: 2026-10-16 16:43+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -107,11 +107,11 @@ msgid "search corporations"
 msgstr "Körperschaften durchsuchen"
 
 #: apps/dmad_on_django/models/corporation.py:144
-#: apps/dmad_on_django/models/person.py:226
-#: apps/dmad_on_django/models/person.py:231
-#: apps/dmad_on_django/models/place.py:120
+#: apps/dmad_on_django/models/person.py:228
+#: apps/dmad_on_django/models/person.py:233
+#: apps/dmad_on_django/models/place.py:122
 #: apps/dmad_on_django/models/subjectterm.py:121
-#: apps/dmad_on_django/models/work.py:142
+#: apps/dmad_on_django/models/work.py:144
 msgid "without name"
 msgstr "ohne Name"
 
@@ -173,44 +173,44 @@ msgstr "Typ"
 msgid "imprecision"
 msgstr "Unschärfe"
 
-#: apps/dmad_on_django/models/period.py:124
 #: apps/dmad_on_django/models/period.py:125
+#: apps/dmad_on_django/models/period.py:126
 msgid "and"
 msgstr "und"
 
-#: apps/dmad_on_django/models/period.py:129
+#: apps/dmad_on_django/models/period.py:130
 msgid "before"
 msgstr "vor"
 
-#: apps/dmad_on_django/models/period.py:130
+#: apps/dmad_on_django/models/period.py:131
 msgid "after"
 msgstr "nach"
 
-#: apps/dmad_on_django/models/period.py:131
+#: apps/dmad_on_django/models/period.py:132
 msgid "circa"
 msgstr "ca."
 
-#: apps/dmad_on_django/models/period.py:132
+#: apps/dmad_on_django/models/period.py:133
 msgid "around"
 msgstr "um"
 
-#: apps/dmad_on_django/models/period.py:163
+#: apps/dmad_on_django/models/period.py:164
 msgid "ies"
 msgstr "er"
 
-#: apps/dmad_on_django/models/period.py:164
+#: apps/dmad_on_django/models/period.py:165
 msgid "century"
 msgstr "Jahrhundert"
 
-#: apps/dmad_on_django/models/period.py:164
+#: apps/dmad_on_django/models/period.py:165
 msgid "ct"
 msgstr "Jh"
 
-#: apps/dmad_on_django/models/period.py:183
+#: apps/dmad_on_django/models/period.py:184
 msgid "without date"
 msgstr "o. D."
 
-#: apps/dmad_on_django/models/period.py:183
+#: apps/dmad_on_django/models/period.py:184
 msgid "without year"
 msgstr "o. J."
 
@@ -306,7 +306,7 @@ msgstr "Geografika durchsuchen"
 msgid "search subject terms"
 msgstr "Sachschlagworte durchsuchen"
 
-#: apps/dmad_on_django/models/work.py:188
+#: apps/dmad_on_django/models/work.py:190
 msgid "Werke suchen"
 msgstr "Werke suchen"
 
