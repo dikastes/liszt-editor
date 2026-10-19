@@ -161,11 +161,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     manifestation = copy
                 )
 
-        if self.is_singleton:
+        if self.is_singleton or self.source_type == Manifestation.SourceType.MODIFIED_PRINT:
             # most of this logic should move to the item copy function
-            single_item_copy = self.get_single_item().get_copy(copy)
+            single_item = self.items.first()
+            single_item_copy = single_item.get_copy(copy)
             copy.items.set([single_item_copy])
-            for pps in self.get_single_item().person_provenance_stations.all():
+            for pps in single_item.person_provenance_stations.all():
                 period = None
                 if pps.period:
                     period = Period.objects.create(
@@ -182,7 +183,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 pps_copy.bib.set(pps.bib.all())
                 pps_copy.save()
 
-            for cps in self.get_single_item().corporation_provenance_stations.all():
+            for cps in single_item.corporation_provenance_stations.all():
                 period = None
                 if cps.period:
                     period = Period.objects.create(
@@ -199,7 +200,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 cps_copy.bib.set(cps.bib.all())
                 cps_copy.save()
 
-            for modification in self.get_single_item().modifications.all():
+            for modification in single_item.modifications.all():
                 if modification.period:
                     period = Period.objects.create(
                             not_before = modification.period.not_before,
@@ -221,7 +222,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             dubious_writer = handwriting.dubious_writer
                         )
 
-            for handwriting in self.get_single_item().handwritings.all():
+            for handwriting in single_item.handwritings.all():
                 ItemHandwriting.objects.create(
                         item = single_item_copy,
                         writer = handwriting.writer,

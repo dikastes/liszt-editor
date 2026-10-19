@@ -130,7 +130,7 @@ class PrintCopyTest(TestCase):
         copy_title = 'test_copy_workflow_title'
         copied_title = f'{_("copy of")} {copy_title}'
         publisher = Corporation.objects.create()
-        m = Manifestation.objects.create(source_type = 'MPR')
+        m = Manifestation.objects.create(source_type = 'PRT')
         RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
         publication = Publication.objects.create(manifestation = m, publisher = publisher)
 
@@ -147,6 +147,42 @@ class PrintCopyTest(TestCase):
         copy = expression_relation.manifestation
 
         self.assertEqual(m.source_type, copy.source_type)
+
+        RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+        copied_publisher = copy.publications.first().publisher
+
+        self.assertEqual(publisher, copied_publisher)
+
+
+class ModifiedPrintCopyTest(TestCase):
+
+    def test_print_copy_workflow(self):
+        copy_title = 'test_copy_workflow_title'
+        copied_title = f'{_("copy of")} {copy_title}'
+        publisher = Corporation.objects.create()
+        m = Manifestation.objects.create(source_type = 'MPR')
+        Item.objects.create(source_type = 'MPR', manifestation = m)
+        RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
+        publication = Publication.objects.create(manifestation = m, publisher = publisher)
+
+        url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+
+        expression_relation = RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+
+        self.assertEqual(m.source_type, copy.source_type)
+        self.assertEqual(m.items.first().source_type, copy.items.first().source_type)
 
         RelatedExpression.objects.filter(working_title = copied_title).first()
         self.assertIsNotNone(expression_relation)

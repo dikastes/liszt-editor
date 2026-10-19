@@ -170,6 +170,7 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
                 private_dedication_comment = self.private_dedication_comment,
                 private_provenance_comment = self.private_provenance_comment,
                 album_page = self.album_page,
+                source_type = self.source_type,
                 performance_material = self.performance_material,
                 correction_sheet = self.correction_sheet,
                 stitch_template = self.stitch_template,
