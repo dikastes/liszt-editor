@@ -1,5 +1,34 @@
 {% load i18n %}
 
-<a href="{% url 'dmad_on_django:'|add:active|add:'_create' %}" class="text-xl text-primary w-16 text-center flex items-center">
-    {% translate 'create' %}
-</a>
+<div class="dropdown dropdown-end min-h-inherit">
+    <div tabindex="0" role="button" class="text-xl flex mx-10 items-center text-primary rounded-none min-h-inherit h-full">
+        {% translate 'create' %}
+    </div>
+    <ul tabindex="0" class="menu dropdown-content rounded-box z-[1] mt-4 w-52 p-2 shadow bg-white">
+        <li>
+            <a href="{% url 'dmad_on_django:person_create' %}">
+                {% translate 'person' %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'dmad_on_django:work_create' %}">
+                {% translate 'work' %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'dmad_on_django:place_create' %}">
+                {% translate 'place' %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'dmad_on_django:subject_term_create' %}">
+                {% translate 'subject term' %}
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'dmad_on_django:corporation_create' %}">
+                {% translate 'corporation' %}
+            </a>
+        </li>
+    </ul>
+</div>

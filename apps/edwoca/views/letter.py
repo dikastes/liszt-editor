@@ -6,18 +6,43 @@ from .base import *
 from ..forms.letter import *
 
 
-class LetterListView(EdwocaListView):
+class LetterListMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['page_title'] = _('letters')
+        context['available_sorts'] = Letter.ordering_fields
+        return context
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+
+        type_ = self.kwargs.get('type')
+        if type_ == 'rework':
+            qs = qs.filter(rework_in_gnd = True)
+        if type_ == 'stub':
+            qs = qs.filter(gnd_id__isnull = True)
+
+        sort_param = self.request.GET.get('sort')
+        descending = self.request.GET.get('dir') == 'desc'
+
+        if sort_param:
+            if descending:
+                return qs.annotate(**Letter.get_ordering_annotations()).order_by(f'-{sort_param}')
+            return qs.annotate(**Letter.get_ordering_annotations()).order_by(sort_param)
+        return qs
+
+
+class LetterListView(LetterListMixin, EdwocaListView):
     model = Letter
 
 
-class LetterSearchView(EdwocaSearchView):
+class LetterSearchView(LetterListMixin, EdwocaSearchView):
     model = Letter
 
 
-class LetterCreateView(CreateView):
-    model = Letter
-    template_name = 'edwoca/simple_form.html'
-    form_class = LetterForm
+def letter_create(request):
+    letter = Letter.objects.create()
+    return redirect('edwoca:letter_update', pk = letter.pk)
 
 
 class LetterDeleteView(DeleteView):
@@ -185,6 +210,15 @@ def letter_update(request, pk):
                 }
             return render(request, 'edwoca/letter_update.html', context)
 
+        if 'edition_period-clear-machine-readable-date' in request.POST:
+            letter.edition_period.not_before = None
+            letter.edition_period.not_after = None
+            letter.edition_period.save()
+        if 'source_period-clear-machine-readable-date' in request.POST:
+            letter.source_period.not_before = None
+            letter.source_period.not_after = None
+            letter.source_period.save()
+
         if 'edition_period-calculate-machine-readable-date' in request.POST:
             letter.edition_period.parse_display()
             letter.edition_period.save()
@@ -316,7 +350,7 @@ def letter_update(request, pk):
             edition_search_form = SearchForm(request.GET, prefix='edition')
             if edition_search_form.is_valid():
                 context['query_edition'] = edition_search_form.cleaned_data.get('q')
-                context['found_editions'] = edition_search_form.search().models(ZotItem)
+                context['found_editions'] = edition_search_form.search().models(ZotItem).order_by('text')
         else:
             edition_search_form = SearchForm(prefix='edition')
 

@@ -1,0 +1,17 @@
+{% load i18n %}
+
+{% if object_list %}
+    <ul class="border border-black p-2 h-32 overflow-auto">
+        {% for object in object_list %}
+            <li>
+                <form method="post" class="m-0" action="{% url 'dmad_on_django:'|add:entity_type|add:'_create' %}">
+                    {% csrf_token %}
+                    <input class="hidden" value="{{ object.id }}" name="gnd_id" />
+                    <button>
+                        {{ object.label }}
+                    </button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}

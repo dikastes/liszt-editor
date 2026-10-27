@@ -6,15 +6,16 @@
 
 {% include 'edwoca/partials/manifestation/preview-divs/history_prolog.html' %}
 
+<form method="post" id="form">
+    {% csrf_token %}
+    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+</form>
+
 <h2>
     {% translate 'date' %}
 </h2>
 
-<form method="post" id="form">
-    {% csrf_token %}
-    {{ form.as_daisy }}
-    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
-</form>
+{{ form.as_daisy }}
 
 <h2 class="my-5">
     {% translate 'places' %}
@@ -22,18 +23,6 @@
 
 <div class="my-5">
     {% for place_form in place_forms %}
-            {% comment %}
-            <div class="flex-1">
-                <div class="label">
-                    <span class="label-text">
-                        {% translate 'place' %}
-                    </span>
-                </div>
-                <div class="flex-1 pseudo-input border border-black items-center flex gap-5">
-                    {{ place_form.instance.place }}
-                </div>
-            </div>
-            {% endcomment %}
         <form method="post" action="{% url 'edwoca:manifestation_remove_place' object.id place_form.instance.id %}" class="flex gap-5 mb-0">
             <div class="flex-1 pseudo-input border border-black items-center flex">
                 {{ place_form.instance.place }}

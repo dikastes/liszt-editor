@@ -4,7 +4,7 @@ from django.db.models import Q, UniqueConstraint
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from dmad_on_django.models import Status, Language, Person, Corporation, Place, Period
-from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace
+from dmrism.models import WemiBaseClass, TitleTypes, Library, ItemSignature, BaseHandwriting, ItemHandwriting, ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy, BaseDigitalCopy, BaseSignature, Publication, ItemHandwriting, RelatedManifestation, ManifestationPersonDedication, ManifestationCorporationDedication, PersonProvenanceStation, CorporationProvenanceStation, ManifestationPlace, PublicationPlace, RelatedExpression, Annotation, AnnotationHandwriting, ItemPlace
 from dmrism.models import Manifestation as DmRismManifestation
 from dmrism.models import ManifestationTitle as DmRismManifestationTitle
 from dmrism.models import Item as DmRismItem
@@ -26,6 +26,18 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
     class Meta:
         proxy = True
+
+    @property
+    def title_prefix(self):
+        return self.render_title_prefix()
+
+    @property
+    def title_body(self):
+        return self.render_title_body()
+
+    @property
+    def title_suffix(self):
+        return self.render_title_suffix()
 
     @property
     def collection_parts(self):
@@ -91,12 +103,14 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     not_before = self.period.not_before,
                     not_after = self.period.not_after,
                     display = self.period.display,
-                    status = self.period.status
+                    time_mode = self.period.time_mode,
+                    start_qualifier = self.period.start_qualifier,
+                    end_qualifier = self.period.end_qualifier,
+                    imprecision = self.period.imprecision
                 )
 
         copy_of = _('copy of')
         copy = Manifestation.objects.create(
-            working_title = f'{copy_of} {self.working_title}',
             source_title = self.source_title,
             rism_id_unaligned = True,
             rism_id = self.rism_id,
@@ -105,8 +119,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             source_type = self.source_type,
             print_type = self.print_type,
             state = self.state,
-            history = self.history,
             language = self.language,
+            plate_number = self.plate_number,
+            title_page = self.title_page,
             watermark = self.watermark,
             watermark_url = self.watermark_url,
             is_singleton = self.is_singleton,
@@ -115,11 +130,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             taken_information = self.taken_information,
             stitcher = self.stitcher,
             specific_figure = self.specific_figure,
-            album_page = self.album_page,
-            performance_material = self.performance_material,
-            correction_sheet = self.correction_sheet,
-            stitch_template = self.stitch_template,
-            dedication_item = self.dedication_item,
             choir_score = self.choir_score,
             piano_reduction = self.piano_reduction,
             particell = self.particell,
@@ -134,6 +144,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             private_print_comment = self.private_print_comment
         )
         copy.save()
+
+        for expression_relation in self.expression_relations.all():
+            RelatedExpression.objects.create(
+                    manifestation = copy,
+                    working_title = f'{copy_of} {expression_relation.working_title}'
+                )
         #copy.places.set(self.places.all())
 
         copy.bib.set(self.bib.all())
@@ -145,11 +161,12 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     manifestation = copy
                 )
 
-        if self.is_singleton:
+        if self.is_singleton or self.source_type == Manifestation.SourceType.MODIFIED_PRINT:
             # most of this logic should move to the item copy function
-            single_item_copy = self.get_single_item().get_copy(copy)
+            single_item = self.items.first()
+            single_item_copy = single_item.get_copy(copy)
             copy.items.set([single_item_copy])
-            for pps in self.get_single_item().person_provenance_stations.all():
+            for pps in single_item.person_provenance_stations.all():
                 period = None
                 if pps.period:
                     period = Period.objects.create(
@@ -166,7 +183,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 pps_copy.bib.set(pps.bib.all())
                 pps_copy.save()
 
-            for cps in self.get_single_item().corporation_provenance_stations.all():
+            for cps in single_item.corporation_provenance_stations.all():
                 period = None
                 if cps.period:
                     period = Period.objects.create(
@@ -183,7 +200,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 cps_copy.bib.set(cps.bib.all())
                 cps_copy.save()
 
-            for modification in self.get_single_item().modifications.all():
+            for modification in single_item.modifications.all():
                 if modification.period:
                     period = Period.objects.create(
                             not_before = modification.period.not_before,
@@ -205,6 +222,27 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                             dubious_writer = handwriting.dubious_writer
                         )
 
+            for handwriting in single_item.handwritings.all():
+                ItemHandwriting.objects.create(
+                        item = single_item_copy,
+                        writer = handwriting.writer,
+                        medium = handwriting.medium,
+                        dubious_writer = handwriting.dubious_writer
+                )
+
+        for publication in self.publications.all():
+            publication_copy = Publication.objects.create(
+                    manifestation = copy,
+                    publisher = publication.publisher
+                )
+            for publication_place in publication.place_relations.all():
+                PublicationPlace.objects.create(
+                        place = publication_place.place,
+                        publication = publication_copy,
+                        inferred = publication_place.inferred,
+                        assumed = publication_place.assumed
+                    )
+
         for title in self.titles.all():
             title_copy = ManifestationTitle.objects.create(
                     title = title.title,
@@ -218,14 +256,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                         medium = handwriting.medium,
                         dubious_writer = handwriting.dubious_writer
                     )
-
-            for handwriting in self.get_single_item().handwritings.all():
-                ItemHandwriting.objects.create(
-                        item = single_item_copy,
-                        writer = handwriting.writer,
-                        medium = handwriting.medium,
-                        dubious_writer = handwriting.dubious_writer
-                )
 
         for related_manifestation in self.target_manifestation_of.all():
             RelatedManifestation.objects.create(
@@ -281,7 +311,7 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         return copy
 
     def parse_csv(self, raw_data, source_type, manifestation_form = None, function = None, singleton = True):
-        # Head keys
+        SOURCE_TYPE_KEY = 'edwoca Druckzuordnung'
         IDENTIFICATION_KEY = 'WVZ-Nr.'
         INSTITUTION_KEY = 'Bestandeshaltende Institution'
         FORMER_SIGNATURE_KEY = 'Signatur, vormalig'
@@ -302,6 +332,9 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         HEAD_TITLE_MEDIUM_KEY = 'Autor Kopftitel (Liszt egh.)'
         HEAD_TITLE_COMMENT_KEY = 'Kommentarfeld zu: Titel (der Quelle) Notentext'
 
+        TITLE_MANUAL_ADDITIONS_KEY ='Titel Umschlag und/oder Titelblatt (handschriftliche Zusätze)'
+        HEAD_TITLE_MANUAL_ADDITIONS_KEY ='Kopftitel (handschriftliche Zusätze)'
+
         DEDICATION_KEY = 'Widmung (diplomatisch)'
         DEDICATION_COMMENT_KEY = 'Kommentar zur Widmung'
 
@@ -320,25 +353,33 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         RELATED_PRINT_PLATE_NUMBER_KEY = 'Bezug zu Druck: Plattennr.'
 
         PUBLISHER_KEY = 'Verlags GND-Nr.'
+        PUBLISHER_NAME = 'Verlag'
         PLATE_NUMBER_KEY = 'Plattennummer'
         STITCHER_KEY = 'Stecherei GND-Nr.'
+        STITCHER_NAME = 'Stecherei'
         FIGURE_KEY = 'Abbildung (figurativ)'
         PRINT_TYPE_KEY = 'Drucktyp'
+        PRICE_KEY = 'Preis'
 
         AUTOGRAPH_HANDWRITING_KEY = 'Schrift (Liszt egh.)'
         FOREIGN_HANDWRITING_KEY = 'Schrift (fremder Hand)'
         WRITING_KEY = 'Schreiber zu AB gehörig bitte mit Information in AC kombinieren'
 
         EXTENT_KEY = 'Umfang'
+        PRINT_EXTENT_KEY = 'Druckumfang'
         MEASURE_KEY = 'Papiermaß'
         PHYSICAL_FEATURES_KEY = 'Beschreibung physischer Merkmale'
         CONTENT_KEY = 'Inhalt'
 
+        TITLE_DIGITAL_COPY_KEY = 'Digitalisat Titelei'
         DIGITAL_COPY_KEY = 'Digitalisat'
+        GIFT_KEY = 'Geschenkvermerk (handschriftlich) (diplomatisch)'
 
         DEDUCED_PLACE_NAME_KEY = 'Ort ermittelt (normiert)'
         DEDUCED_PLACE_ID_KEY = 'Ort ermittelt GND-Nr.'
         DEDUCED_DATE_KEY = 'Datierung ermittelt (maschinenlesbar)'
+
+        MANUAL_PLACE_KEY = 'GND-Nr. Ort handschriftlich'
 
         PROVENANCE_KEY = 'Provenienz'
         PROVSTATION_SUFFIX = ' Station '
@@ -348,14 +389,24 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         COMMENT_QUESTION_KEY = 'Kommentar intern / Fragen (interne Kommunikation)'
         FURTHER_INFORMATION_KEY = 'Weiterführende Informationen (Ausgaben, Permalinks etc.) (intern)'
 
+        FIRST_EDITION_DATE_KEY = 'Datierung Erstauflage'
+        COMMENT_FIRST_EDITION_DATE_KEY = 'Kommentar Datierung Erstauflage'
+
         WATERMARK_KEY = 'Wasserzeichen (intern)'
 
         USER_KEY = 'Bearbeiter'
 
         single_item = Item.objects.create(manifestation = self)
+        self.is_singleton = True
+        if not singleton:
+            self.is_singleton = False
+            single_item.is_template = True
+            single_item.source_type = Item.SourceType.MODIFIED_PRINT
+
 
         self.manifestation_form = manifestation_form
         self.first_editor = raw_data[USER_KEY]
+        single_item.first_editor = raw_data[USER_KEY]
 
         for function_option in [
                 'album page',
@@ -367,8 +418,14 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             if function and function in function_option:
                 setattr(self, function_option, True)
             if FUNCTION_KEY in raw_data:
-                if str(_(function_option)) in raw_data[FUNCTION_KEY]:
-                    setattr(self, function_option.replace(' ', '_'), True)
+                if self.is_singleton:
+                    if str(_(function_option)) in raw_data[FUNCTION_KEY]:
+                        setattr(self, function_option.replace(' ', '_'), True)
+                else:
+                    if raw_data[FUNCTION_KEY] == 'Korrekturabzug':
+                        self.manifestation_form = Manifestation.ManifestationForm.PROOF
+                    if raw_data[FUNCTION_KEY] == 'Widmungsexemplar':
+                        single_item.dedication_item = True
 
         taken_information = []
         if MANIFESTATION_NOTES_KEY in raw_data and (manifestation_notes := raw_data[MANIFESTATION_NOTES_KEY]):
@@ -399,8 +456,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         # add stitch template flag to manifestation?
 
         self.source_type = source_type
+        source_type_toggle = ''
+        if SOURCE_TYPE_KEY in raw_data and (source_type_from_table := raw_data[SOURCE_TYPE_KEY]):
+            if source_type_from_table == 'mD':
+                self.source_type = Manifestation.SourceType.MODIFIED_PRINT
+                source_type_toggle = 'mD'
+            if source_type_from_table == 'aD':
+                self.source_type = Manifestation.SourceType.MODIFIED_PRINT
+                single_item.source_type = Item.SourceType.ANNOTATED_PROOF_COPY
+                source_type_toggle = 'aD'
 
-        #only makes sense if doubles may be detected and overriding may be activated
         #self.titles.all().delete()
 
         private_head_comment = []
@@ -418,10 +483,23 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             private_head_comment += [ 'Besetzung: ' + medium ]
         self.private_head_comment = '\n'.join(private_head_comment)
 
+        if MANUAL_PLACE_KEY in raw_data and (place_id := raw_data[MANUAL_PLACE_KEY]):
+            place = Place.fetch_or_get(place_id.replace('[', '').replace(']', ''))
+            ItemPlace.objects.create(
+                    place=place,
+                    item=single_item
+                )
+
         if DEDUCED_PLACE_NAME_KEY in raw_data and raw_data[DEDUCED_PLACE_NAME_KEY]:
             self.private_history_comment = f"Ort ermittelt: {raw_data[DEDUCED_PLACE_NAME_KEY]}, {raw_data[DEDUCED_PLACE_ID_KEY]}"
         if DATE_COMMENT_KEY in raw_data and (comment := raw_data[DATE_COMMENT_KEY]):
             self.private_history_comment = f"Datierung Kommentar: {comment}"
+
+        print_comments = []
+        if FIRST_EDITION_DATE_KEY in raw_data and (first_edition_date := raw_data[FIRST_EDITION_DATE_KEY]):
+            print_comments += [ 'Datierung Erstauflage: ' + first_edition_date ]
+        if COMMENT_FIRST_EDITION_DATE_KEY in raw_data and (first_edition_date_comment := raw_data[COMMENT_FIRST_EDITION_DATE_KEY]):
+            print_comments += [ 'Kommentar Datierung Erstauflage: ' + first_edition_date_comment ]
 
         if self.RISM_ID_KEY in raw_data and\
             (rism_id := raw_data[self.RISM_ID_KEY].replace('Eintrag', '').replace('besteht', '').replace('schon', '').replace('[', '').replace(']', '').strip()) and\
@@ -446,6 +524,10 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 )
             single_item.signatures.add(former_signature)
 
+        private_title_comments = []
+        if GIFT_KEY in raw_data and (gift := raw_data[GIFT_KEY]):
+            private_title_comments += [ 'Geschenkvermerk: ' + gift ]
+
         provenance_comment = []
         if PROVENANCE_KEY + PROVSTATION_SUFFIX + '1' in raw_data:
             provenance_comment = [
@@ -466,14 +548,19 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if OWNER_NOTE_KEY in raw_data and (owner := raw_data[OWNER_NOTE_KEY]):
             provenance_comment += [ f'Besitzvermerk: {owner}' ]
 
-        self.is_singleton = True
-        if not singleton:
-            self.is_singleton = False
-            single_item.is_template = True
+        if source_type_toggle == 'mD':
+            single_item.extent = raw_data[EXTENT_KEY]
+        elif source_type_toggle == 'aD':
+            print_comments += [ 'Umfang: ' + raw_data[EXTENT_KEY] ]
+        else:
+            single_item.extent = raw_data[EXTENT_KEY]
+        self.private_print_comment = '\n'.join(print_comments)
 
-        single_item.extent = raw_data[EXTENT_KEY]
+        if PRINT_EXTENT_KEY in raw_data and (print_extent := raw_data[PRINT_EXTENT_KEY]):
+            self.extent = print_extent
+
         single_item.measure = raw_data[MEASURE_KEY]
-        single_item.private_provenance_comment = '\n'.join([comment for comment in provenance_comment if comment])
+        single_item.private_provenance_comment = '\n'.join([comment for comment in provenance_comment if comment]).strip()
         private_manuscript_comment = []
         if WATERMARK_KEY in raw_data and (watermark := raw_data[WATERMARK_KEY]):
             private_manuscript_comment += [ 'Wasserzeichen: ' + watermark ]
@@ -481,28 +568,11 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             private_manuscript_comment += [ f'Beschreibung physischer Merkmale: {phys_features}' ]
         single_item.private_manuscript_comment = '\n'.join(private_manuscript_comment)
 
-        single_item.save()
-
-        if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY]:
-            for gnd_id in raw_data[LOCATION_KEY].split('|'):
-                place = Place.fetch_or_get(gnd_id.strip())
-                ManifestationPlace.objects.create(
-                        place = place,
-                        manifestation = self
-                    )
-                #self.places.add(place)
-        elif DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY]:
-            for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
-                place = Place.fetch_or_get(gnd_id.strip())
-                ManifestationPlace.objects.create(
-                        manifestation = self,
-                        place = place
-                    )
-                #self.places.add(place)
-            self.place_inferred = True
-
         if raw_data[TITLE_KEY]:
-            self.working_title = raw_data[TITLE_KEY]
+            RelatedExpression.objects.create(
+                    working_title = raw_data[TITLE_KEY],
+                    manifestation = self
+                )
 
         if EDITION_TYPE_KEY in raw_data:
             for edition_type in [
@@ -515,13 +585,20 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 if str(_(edition_type)) in raw_data[EDITION_TYPE_KEY]:
                     setattr(self, edition_type.replace(' ', '_'), True)
 
-        self.private_dedication_comment = raw_data[DEDICATION_KEY]
+        private_title_comments += [ raw_data[DEDICATION_KEY] ]
 
-        self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY]#.replace(' | ', '\n')
+        if self.is_singleton:
+            self.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY]#.replace(' | ', '\n')
+        else:
+            single_item.date_diplomatic = raw_data[DIPLOMATIC_DATE_KEY]
         if raw_data[MACHINE_READABLE_DATE_KEY]:
             self.period = Period.parse(raw_data[MACHINE_READABLE_DATE_KEY])
             if 'x' in raw_data[MACHINE_READABLE_DATE_KEY]:
                 self.period.assumed = True
+            try:
+                self.period.parse_display()
+            except:
+                pass
             self.period.save()
         elif raw_data[DEDUCED_DATE_KEY]:
             self.period = Period.parse(raw_data[DEDUCED_DATE_KEY])
@@ -529,6 +606,8 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             if 'x' in raw_data[DEDUCED_DATE_KEY]:
                 self.period.assumed = True
             self.period.save()
+
+        single_item.save()
 
         relations_comment = []
         if RELATED_PRINT_PUBLISHER_KEY in raw_data:
@@ -541,14 +620,68 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
             self.private_relations_comment = f'Bezug zu Druck: {", ".join(relations_comment)}'
 
         if PUBLISHER_KEY in raw_data:
-            if raw_data[PUBLISHER_KEY]:
-                Publication.objects.create(
+            if publisher := raw_data[PUBLISHER_KEY]:
+                if not ('|') in publisher:
+                    if publisher == 'RD':
+                        publisher = Corporation.objects.create(interim_designator = raw_data[PUBLISHER_NAME])
+                        publication = Publication.objects.create(
+                                manifestation = self,
+                                publisher = publisher
+                            )
+                    else:
+                        publication = Publication.objects.create(
+                                manifestation = self,
+                                publisher = Corporation.fetch_or_get(raw_data[PUBLISHER_KEY]),
+                            )
+                    self.plate_number = raw_data[PLATE_NUMBER_KEY]
+                    if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY]:
+                        for gnd_id in raw_data[LOCATION_KEY].split('|'):
+                            place = Place.fetch_or_get(gnd_id.strip())
+                            PublicationPlace.objects.create(
+                                    place = place,
+                                    publication = publication
+                                )
+                    if DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY]:
+                        for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
+                            place = Place.fetch_or_get(gnd_id.strip())
+                            PublicationPlace.objects.create(
+                                    publication = publication,
+                                    place = place
+                                )
+
+        if LOCATION_KEY in raw_data and raw_data[LOCATION_KEY] and not PUBLISHER_KEY in raw_data:
+            for gnd_id in raw_data[LOCATION_KEY].split('|'):
+                place = Place.fetch_or_get(gnd_id.strip())
+                if self.is_singleton:
+                    ManifestationPlace.objects.create(
+                            place = place,
+                            manifestation = self
+                        )
+                else:
+                    PublicationPlace.objects.create(
+                            place = place,
+                            publication = publication
+                        )
+                #self.places.add(place)
+        elif DEDUCED_PLACE_ID_KEY in raw_data and raw_data[DEDUCED_PLACE_ID_KEY] and not PUBLISHER_KEY in raw_data:
+            for gnd_id in raw_data[DEDUCED_PLACE_ID_KEY].split('|'):
+                place = Place.fetch_or_get(gnd_id.strip())
+                ManifestationPlace.objects.create(
                         manifestation = self,
-                        publisher = Corporation.fetch_or_get(raw_data[PUBLISHER_KEY]),
+                        place = place
                     )
-                self.plate_number = raw_data[PLATE_NUMBER_KEY]
+                #self.places.add(place)
+            self.place_inferred = True
+
         if STITCHER_KEY in raw_data and (stitcher := raw_data[STITCHER_KEY]):
-            self.stitcher = Corporation.fetch_or_get(stitcher)
+            if stitcher == 'RD':
+                self.stitcher = Corporation.objects.create(
+                        interim_designator = raw_data[STITCHER_NAME]
+                    )
+            else:
+                self.stitcher = Corporation.fetch_or_get(stitcher)
+        if PRICE_KEY in raw_data and (price := raw_data[PRICE_KEY]):
+            self.price = price
 
         if FIGURE_KEY in raw_data and raw_data[FIGURE_KEY]:
             self.specific_figure = True
@@ -558,11 +691,21 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
 
         if AUTOGRAPH_HANDWRITING_KEY in raw_data and \
             raw_data[AUTOGRAPH_HANDWRITING_KEY]:
-            ItemHandwriting.objects.create(
-                    writer = Person.objects.get(gnd_id = list(fixed_persons.values())[0]),
-                    item = single_item,
-                    medium = raw_data[AUTOGRAPH_HANDWRITING_KEY]
-                )
+            if source_type_toggle == 'aD':
+                annotation = Annotation.objects.create(
+                        item = single_item
+                    )
+                AnnotationHandwriting.objects.create(
+                        writer = Person.objects.get(gnd_id = list(fixed_persons.values())[0]),
+                        annotation = annotation,
+                        medium = raw_data[AUTOGRAPH_HANDWRITING_KEY]
+                    )
+            else:
+                ItemHandwriting.objects.create(
+                        writer = Person.objects.get(gnd_id = list(fixed_persons.values())[0]),
+                        item = single_item,
+                        medium = raw_data[AUTOGRAPH_HANDWRITING_KEY]
+                    )
 
         if FOREIGN_HANDWRITING_KEY in raw_data\
             and raw_data[FOREIGN_HANDWRITING_KEY]:
@@ -574,6 +717,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                 medium = Manifestation.extract_medium(entry)
                 if writer_gnd_id:
                     writer = Person.fetch_or_get(writer_gnd_id)
+                    if source_type_toggle == 'aD':
+                        annotation = Annotation.objects.create(
+                                item = single_item
+                            )
+                        AnnotationHandwriting.objects.create(
+                                writer = writer,
+                                annotation = annotation,
+                                medium = raw_data[FOREIGN_HANDWRITING_KEY],
+                                dubious_writer = dubious_writer
+                            )
                     ItemHandwriting.objects.create(
                             writer = writer,
                             item = single_item,
@@ -585,6 +738,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     for person in fixed_persons:
                         if (gnd_id := fixed_persons[person]):
                             if person in entry:
+                                if source_type_toggle == 'aD':
+                                    annotation = Annotation.objects.create(
+                                            item = single_item
+                                        )
+                                    AnnotationHandwriting.objects.create(
+                                            writer = Person.objects.get(gnd_id = gnd_id),
+                                            annotation = annotation,
+                                            medium = raw_data[FOREIGN_HANDWRITING_KEY],
+                                            dubious_writer = dubious_writer
+                                        )
                                 ItemHandwriting.objects.create(
                                         writer = Person.objects.get(gnd_id = gnd_id),
                                         item = single_item,
@@ -595,6 +758,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 break
                         else:
                             if person in entry:
+                                if source_type_toggle == 'aD':
+                                    annotation = Annotation.objects.create(
+                                            item = single_item
+                                        )
+                                    AnnotationHandwriting.objects.create(
+                                            writer = Person.objects.get(interim_designator = person),
+                                            annotation = annotation,
+                                            medium = raw_data[FOREIGN_HANDWRITING_KEY],
+                                            dubious_writer = dubious_writer
+                                        )
                                 ItemHandwriting.objects.create(
                                         writer = Person.objects.get(interim_designator = person),
                                         item = single_item,
@@ -604,6 +777,16 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 fixed_person_found = True
                                 break
                     if not fixed_person_found:
+                        if source_type_toggle == 'aD':
+                            annotation = Annotation.objects.create(
+                                    item = single_item
+                                )
+                            AnnotationHandwriting.objects.create(
+                                    writer = Person.objects.get(interim_designator = person),
+                                    annotation = annotation,
+                                    medium = raw_data[FOREIGN_HANDWRITING_KEY],
+                                    dubious_writer = dubious_writer
+                                )
                         ItemHandwriting.objects.create(
                                 item = single_item,
                                 medium = medium,
@@ -800,16 +983,41 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                                 manifestation_title = manifestation_title_list[i]
                             )
 
-        private_title_comments = []
+        if source_type_toggle == 'mD':
+            if TITLE_MANUAL_ADDITIONS_KEY in raw_data and (title_addition := raw_data[TITLE_MANUAL_ADDITIONS_KEY]):
+                private_title_comments += [ title_addition ]
+            if HEAD_TITLE_MANUAL_ADDITIONS_KEY in raw_data and (title_addition := raw_data[HEAD_TITLE_MANUAL_ADDITIONS_KEY]):
+                private_title_comments += [ title_addition ]
+        if source_type_toggle == 'aD':
+            if HEAD_TITLE_MANUAL_ADDITIONS_KEY in raw_data and (title_addition := raw_data[HEAD_TITLE_MANUAL_ADDITIONS_KEY]):
+                Annotation.objects.create(
+                        item = single_item,
+                        is_title = True,
+                        description_title_correction = title_addition
+                    )
+            if TITLE_MANUAL_ADDITIONS_KEY in raw_data and (title_addition := raw_data[TITLE_MANUAL_ADDITIONS_KEY]):
+                Annotation.objects.create(
+                        item = single_item,
+                        is_title = True,
+                        description_title_correction = title_addition
+                    )
+        #only makes sense if doubles may be detected and overriding may be activated
         if ENVELOPE_TITLE_COMMENT_KEY in raw_data and (comment := raw_data[ENVELOPE_TITLE_COMMENT_KEY]):
             private_title_comments += ['Kommentar Umschlagstitel: ' + comment]
         if HEAD_TITLE_COMMENT_KEY in raw_data and (comment := raw_data[HEAD_TITLE_COMMENT_KEY]):
             private_title_comments += ['Kommentar Kopftitel: ' + comment]
 
-        self.private_title_comment = '\n'.join(private_title_comments)
-
         if DEDICATION_COMMENT_KEY in raw_data and (comment := raw_data[DEDICATION_COMMENT_KEY]):
-            self.private_dedication_comment = comment
+            private_title_comments += [ 'Kommentar Widmung: ' + comment ]
+
+        self.private_dedication_comment = '\n'.join(private_title_comments)
+
+        if raw_data[TITLE_DIGITAL_COPY_KEY]:
+            ItemDigitalCopy.objects.create(
+                    item = single_item,
+                    url = raw_data[TITLE_DIGITAL_COPY_KEY],
+                    link_type = None
+                )
 
         if raw_data[DIGITAL_COPY_KEY]:
             ItemDigitalCopy.objects.create(
@@ -817,12 +1025,15 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     url = raw_data[DIGITAL_COPY_KEY]
                 )
 
-    def render_title(self, prefix):
-        if self.is_singleton:
-            return super().render_title(prefix)
+    def render_title_prefix(self):
+        if self.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+            if related_manifestation := self.get_related_manifestation():
+                related_manifestation.__class__ = self.__class__
+                return related_manifestation.render_title_prefix()
 
-        #if self.missing_item:
-            #return f"{catalog_number} unbekannt {numerus_currens}"
+        collection_prefix = super().render_title_prefix()
+        if self.is_singleton:
+            return collection_prefix
 
         publisher_addition = self.period
         if self.plate_number:
@@ -832,9 +1043,26 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
         if self.publications.first() and self.publications.first().publisher:
             publisher_string = self.publications.first().publisher.get_designator()
 
-        prefix = f"{publisher_string} {publisher_addition}"
+        return f"{collection_prefix} {publisher_string} {publisher_addition}"
 
-        return super().render_title(prefix)
+    #def render_title(self, prefix):
+        #if self.is_singleton:
+            #return super().render_title(prefix)
+
+        #if self.missing_item:
+            #return f"{catalog_number} unbekannt {numerus_currens}"
+
+        #publisher_addition = self.period
+        #if self.plate_number:
+            #publisher_addition = self.plate_number
+
+        #publisher_string = _('<< publisher >>')
+        #if self.publications.first() and self.publications.first().publisher:
+            #publisher_string = self.publications.first().publisher.get_designator()
+
+        #prefix = f"{publisher_string} {publisher_addition}"
+
+        #return super().render_title(prefix)
 
     def __str__(self):
         if self.get_current_signature_normalized():
@@ -844,9 +1072,6 @@ class Manifestation(EdwocaUpdateUrlMixin, DmRismManifestation):
                     return f'{self.pk} {self.standardized_search_entry()}'
 
         return self.standardized_search_entry()
-
-
-
 
 
 class ManifestationTitle(DmRismManifestationTitle):
@@ -879,11 +1104,11 @@ class Item (EdwocaUpdateUrlMixin, DmRismItem):
     def get_manifestation_url(self):
         return reverse(f'edwoca:manifestation_update', kwargs={'pk': self.manifestation.id})
 
-    def __str__(self):
-        manifestation = self.manifestation
-        if (title := self.manifestation.working_title):
-            return super().__str__() + title
-        return super().__str__()
+    #def __str__(self):
+        #manifestation = self.manifestation
+        ##if (title := self.manifestation.working_title):
+            #return f'{super().__str__()} {title}'
+        #return super().__str__()
 
 
 class WeBaseClass(EdwocaUpdateUrlMixin, WemiBaseClass):
@@ -993,6 +1218,18 @@ class Event(models.Model):
 
 
 class ItemModification(models.Model):
+    collection_component = models.ForeignKey(
+            'dmrism.RelatedExpression',
+            on_delete = models.SET_NULL,
+            null = True,
+            blank = True,
+            related_name = 'modifications'
+        )
+    modification_description = models.TextField(
+            null = True,
+            blank = True,
+            verbose_name = _('description of modification')
+        )
     item = models.ForeignKey(
             'dmrism.Item',
             related_name = 'modifications',
@@ -1021,14 +1258,44 @@ class ItemModification(models.Model):
             blank = True,
             verbose_name = _('note')
         )
+    is_addition = models.BooleanField(
+            default = False,
+            verbose_name = _('addition')
+        )
+    is_correction = models.BooleanField(
+            default = False,
+            verbose_name = _('correction')
+        )
+    is_note = models.BooleanField(
+            default = False,
+            verbose_name = _('note')
+        )
+    is_title = models.BooleanField(
+            default = False,
+            verbose_name = _('title')
+        )
+
+    def render_writer(self):
+        if handwriting := self.handwritings.first():
+            if writer := handwriting.writer:
+                writer_string = str(writer)
+                if handwriting.dubious_writer:
+                    if handwriting.medium:
+                        return f'[{writer_string}] ({handwriting.medium})'
+                    else:
+                        return f'[{writer_string}]'
+                if handwriting.medium:
+                    return f'({writer_string}, {handwriting.medium})'
+                else:
+                    return f'({writer_string})'
+            return _('<writer>')
+        return _('<handwriting>')
 
     def __str__(self):
-        if handwriting := self.handwritings.first():
-            if handwriting.dubious_writer:
-                return f"{self.period} [{handwriting.writer.__str__()}] ({handwriting.medium})"
-            return f"{self.period} ({handwriting.writer.__str__()}, {handwriting.medium})"
+        if self.period:
+            return f'{self.period} {str(self.render_writer())}'
         else:
-            return f"{self.period} <Handschrift>"
+            return str(self.render_writer())
 
     def ensure_period(self):
         if self.period is None:

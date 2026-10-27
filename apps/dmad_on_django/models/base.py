@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models import QuerySet, FilteredRelation, Q, Value
+from django.db.models.functions import Coalesce, Lower, NullIf
 from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -6,7 +8,7 @@ from dominate.tags import div, table, tr, td
 from dominate.util import raw
 from iso639 import data as iso639_data
 from json import loads
-from liszt_util.tools import RenderRawJSONMixin
+from liszt_util.tools import RenderRawJSONMixin, DisplayableQuerySet
 
 
 languages = { iso_data['iso639_1'].upper(): iso_data['name'] for iso_data in iso639_data }
@@ -33,7 +35,6 @@ class Status(models.TextChoices):
 class DocumentationStatusMixin(models.Model):
     class Meta:
         abstract = True
-
 
     inferred = models.BooleanField(
             default=False,
@@ -90,20 +91,84 @@ class GNDSubjectCategory(models.Model):
         return self.label
 
 
-class DisplayableModel(RenderRawJSONMixin, models.Model):
+class TimestampedModel(models.Model):
+    class Meta:
+        abstract = True
+    first_save = models.DateTimeField(
+            auto_now_add = True,
+            verbose_name = _('first save'),
+            null = True
+        )
+    last_save = models.DateTimeField(
+            auto_now = True,
+            verbose_name = _('last save'),
+            null = True
+        )
+    first_editor = models.CharField(
+            max_length = 50,
+            blank = True,
+            verbose_name = _('first editor'),
+            default = ''
+        )
+
+
+class DisplayableModel(RenderRawJSONMixin, TimestampedModel):
     class Meta:
         abstract = True
 
-    raw_data = models.TextField(null=True)
-    rework_in_gnd = models.BooleanField(default=False)
-    gnd_id = models.CharField(max_length=20, null=True, blank=True, unique=True)
-    comment = models.TextField(null=True, blank=True)
+    objects = DisplayableQuerySet.as_manager()
+
+    raw_data = models.TextField(
+            null = True,
+            verbose_name = _('raw data')
+        )
+    rework_in_gnd = models.BooleanField(
+            default = False,
+            verbose_name = _('rework in GND')
+        )
+    gnd_id = models.CharField(
+            max_length = 20,
+            null = True,
+            blank = True,
+            unique = True,
+            verbose_name = _('GND ID')
+        )
+    comment = models.TextField(
+            null = True,
+            blank = True,
+            verbose_name = _('comment')
+        )
     interim_designator = models.CharField(
-        max_length=150,
-        null=True,
-        blank=True
+        max_length = 150,
+        null = True,
+        blank = True,
+        verbose_name = _('interim designator')
     )
     gnd_subject_category = models.ManyToManyField(GNDSubjectCategory)
+
+    ordering_fields = {
+        'name': (['sort_name'], _('name'), _('A-Z'), _('Z-A')),
+        'modified': (['last_save'], _('last save'), _('oldest first'), _('newest first')),
+    }
+
+    @classmethod
+    def get_ordering_annotations(cls):
+        return {
+            'primary_name': FilteredRelation(
+                'names',
+                condition=Q(names__status=Status.PRIMARY)
+            ),
+            'sort_name': Lower(
+                Coalesce(
+                    NullIf('primary_name__name', Value('')),
+                    NullIf('interim_designator', Value('')),
+                    Value('zzz')
+                )
+            ),
+        }
+
+    def get_index_title(self):
+        return ' '.join(str(name) for name in list(self.names.all()) + [ self.interim_designator ])
 
     @property
     def name(self):
@@ -146,6 +211,16 @@ class DisplayableModel(RenderRawJSONMixin, models.Model):
 
     def get_search_placeholder():
         raise NotImplementedError("Please override get_search_placeholder")
+
+    def __str__(self):
+        if self.gnd_id:
+            if self.get_default_name():
+                return f'{self.get_default_name()} ({self.gnd_id})'
+            error = _('<< error >>')
+            return f'{error} ({self.gnd_id})'
+
+        stub = _('(stub)')
+        return f'{self.interim_designator} {stub}'
 
     class Meta:
         abstract = True

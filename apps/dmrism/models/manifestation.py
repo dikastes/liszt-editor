@@ -8,6 +8,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from .item import Item, ItemSignature, Library
 from dmad_on_django.models import Language, Status, Period, Person, Corporation
+from dmad_on_django.models.base import DocumentationStatusMixin
 from bib.models import ZotItem
 from iso639 import find as lang_find
 from liszt_util.tools import RenderRawJSONMixin
@@ -15,10 +16,28 @@ from liszt_util.models import Sortable
 
 
 class TitleTypes(models.TextChoices):
+    ELSE = 'EL', _('other title position')
     HEAD_TITLE = 'HT', _('Head Title')
     TITLE_PAGE = 'TP', _('Title Page')
     ENVELOPE = 'EN', _('Envelope')
     ENVELOPE_OR_TITLE_PAGE = 'ET', _('Envelope or Title Page')
+
+
+class RelatedExpression(models.Model):
+    working_title = models.TextField(
+            null = True,
+            verbose_name = _('working title'),
+            blank = True
+        )
+    manifestation = models.ForeignKey(
+            'Manifestation',
+            on_delete = models.CASCADE,
+            related_name = 'expression_relations',
+            null = True
+        )
+
+    def __str__(self):
+        return self.working_title or ''
 
 
 class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
@@ -26,20 +45,12 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         ordering = ['-needs_review', 'order_index']
 
     class PartLabel(models.TextChoices):
-        CONSTITUTING = 'c', _('constituting')
-        BOUND_TOGETHER = 'b', _('bound together')
+        JOINED = 'j', _('joined')
         SEPARATED = 's', _('separated')
 
     class ManifestationForm(models.TextChoices):
-        EXCERPTS = 'EX', _('Excerpts')
-        SKETCHES = 'SK', _('Sketches'),
-        FRAGMENTS = 'FR', _('Fragments'),
-
-        def parse(string):
-            match string.lower():
-                case 'sketch' | 'sketches': return Manifestation.ManifestationForm.SKETCHES
-                case 'fragment' | 'fragments': return Manifestation.ManifestationForm.FRAGMENTS
-                case 'excerpt' | 'excerpts': return Manifestation.ManifestationForm.EXCERPTS
+        PROOF = 'PR', _('proof'),
+        SKETCH = 'SK', _('sketch')
 
     class PrintType(models.TextChoices):
         PLATE_PRINT = 'P', _('Plate Print')
@@ -50,16 +61,13 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 case 'plattendruck' | 'platte': return Manifestation.PrintType.PLATE_PRINT
                 case 'lithographie': return Manifestation.PrintType.LITHOGRAPH
 
-    class Edition(models.TextChoices):
-        FIRST_EDITION = '1', _('first issue')
-        FOLLOWING_EDITION = 'F', _('following issue')
-
     class SourceType(models.TextChoices):
         TRANSCRIPT = 'TSC', _('transcript')
         CORRECTED_TRANSCRIPT = 'CTS', _('transcript with autograph entries')
         AUTOGRAPH = 'AUT', _('autograph')
         QUESTIONABLE_AUTOGRAPH = 'QAU', _('questionable autograph')
-        CORRECTED_PRINT = 'CPR', _('print with autograph entries')
+        MODIFIED_PRINT = 'MPR', _('modified print')
+        PRINT = 'PRT', _('print')
 
         def parse_from_rism(rism_string):
             match rism_string:
@@ -72,22 +80,20 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 case 'copy': return Manifestation.SourceType.TRANSCRIPT
                 case 'correctedcopy': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
                 case 'print': return Manifestation.SourceType.PRINT
-                case 'correctedprint': return Manifestation.SourceType.CORRECTED_PRINT
+                case 'correctedprint': return Manifestation.SourceType.CORRECTED_TRANSCRIPT
 
     class State(models.TextChoices):
         COMPLETE= 'CP', _('complete')
         INCOMPLETE= 'INC', _('incomplete')
 
-    working_title = models.TextField(
-            max_length = 200,
-            blank = True,
-            verbose_name = _('working title'),
-            default = ''
-        )
     source_title = models.TextField(
-            max_length = 200,
             blank = True,
             verbose_name = _('source title'),
+            default = ''
+        )
+    title_page = models.TextField(
+            blank = True,
+            verbose_name = _('title page diplomatic'),
             default = ''
         )
     rism_id_unaligned = models.BooleanField(default=False)
@@ -126,6 +132,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             choices = SourceType.choices,
             default = SourceType.AUTOGRAPH,
             blank = True,
+            null = True,
             verbose_name = _('source type')
         )
     print_type = models.CharField(
@@ -133,13 +140,8 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             choices = PrintType,
             default = None,
             null = True,
-            verbose_name = _('edition')
-        )
-    edition = models.CharField(
-            max_length = 10,
-            choices = Edition,
-            default = Edition.FOLLOWING_EDITION,
-            verbose_name = _('edition')
+            blank = True,
+            verbose_name = _('print type')
         )
     state = models.CharField(
             max_length = 10,
@@ -150,11 +152,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     extent = models.TextField(
             blank = True,
             verbose_name = _('extent'),
-            default = ''
-        )
-    history = models.TextField(
-            blank = True,
-            verbose_name = _('history'),
             default = ''
         )
     bib = models.ManyToManyField(
@@ -250,21 +247,13 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         )
     specific_figure = models.BooleanField(
             default = False,
-            verbose_name = 'specific figure'
+            verbose_name = _('specific figure')
         )
     plate_number = models.CharField(
             max_length=20,
             blank = True,
             verbose_name = _('plate number'),
             default = ''
-        )
-    album_page = models.BooleanField(
-            default = False,
-            verbose_name = _('album page')
-        )
-    performance_material = models.BooleanField(
-            default = False,
-            verbose_name = _('performance material')
         )
     authorized_edition = models.BooleanField(
             default = False,
@@ -274,10 +263,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             default = False,
             verbose_name = _('first edition')
         )
-    proof = models.BooleanField(
-            default = False,
-            verbose_name = _('proof')
-        )
     part = models.BooleanField(
             default = False,
             verbose_name = _('part')
@@ -285,18 +270,6 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
     further_edition = models.BooleanField(
             default = False,
             verbose_name = _('further edition')
-        )
-    correction_sheet = models.BooleanField(
-            default = False,
-            verbose_name = _('correction sheet')
-        )
-    stitch_template = models.BooleanField(
-            default = False,
-            verbose_name = _('stitch template')
-        )
-    dedication_item = models.BooleanField(
-            default = False,
-            verbose_name = _('dedication item')
         )
     choir_score = models.BooleanField(
             default = False,
@@ -333,6 +306,11 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             on_delete = models.SET_NULL,
             null = True
         )
+    is_text = models.BooleanField(
+            default = False,
+            verbose_name = _('is text')
+        )
+    _group_field_names = ['part_of', 'component_of']
     is_lyrics = models.BooleanField(
             default = False,
             verbose_name = _('is lyrics')
@@ -345,11 +323,44 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             default = False,
             verbose_name = _('is explanation')
         )
-    is_text = models.BooleanField(
-            default = False,
-            verbose_name = _('is text')
+    price = models.CharField(
+            max_length = 50,
+            verbose_name = _('price'),
+            null = True,
+            blank = True
         )
-    _group_field_names = ['part_of', 'component_of']
+    edition_by_source = models.CharField(
+            max_length = 200,
+            null = True,
+            blank = True,
+            verbose_name = _('edition by source')
+        )
+    is_partial_edition = models.BooleanField(
+            default = False,
+            verbose_name = _('partial edition')
+        )
+    without_proof_copy = models.BooleanField(
+            default = False,
+            verbose_name = _('without proof copy')
+        )
+
+    def get_related_manifestation(self):
+        if self.source_type != Manifestation.SourceType.MODIFIED_PRINT:
+            raise Exception('Tried to retrieve the related manifestation of a non modified print manifestation')
+
+        related_manifestation = (
+            self.source_manifestation_of
+            .filter(label = RelatedManifestation.Label.DERIVATIVE)
+            .first()
+        )
+
+        if related_manifestation:
+            return related_manifestation.target_manifestation
+        return None
+
+    @property
+    def may_have_component(self):
+        return self.is_collection or self.part_of is not None
 
     def get_absolute_url(self):
         return reverse('dmrism:manifestation_detail', kwargs={'pk': self.id})
@@ -364,41 +375,79 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         if is_collection:
             # set collection
             self.is_collection = True
-            if self.working_title and not self.source_title:
-                self.source_title = self.working_title
         else:
             # unset collection
-            if self.source_title and not self.working_title:
-                self.working_title = self.source_title
             self.is_collection = False
 
-    def render_title(self, prefix):
-        review_string = ''
-        if self.needs_review:
-            review_string = '!'
+    def get_edition_type(self):
+        potential_edition_types = [
+                'choir_score',
+                'piano_reduction',
+                'particell',
+                'score',
+                'part'
+            ]
 
-        if self.is_collection:
-            collection = _('coll')
-            title = self.source_title or _('empty')
-            return f'{review_string}({collection}) {prefix} {title}'
+        return self._render_types(potential_edition_types)
 
-        title = self.working_title or _('empty')
-        source_typed_title = f'{prefix} {title} ({self.get_source_type_display()})'
+    def get_source_type(self):
+        potential_source_types = [
+                #'album_page',
+                #'performance_material',
+                'authorized_edition',
+                'first_edition',
+                'part',
+                'further_edition',
+                #'correction_sheet',
+                #'stitch_template',
+                #'dedication_item'
+            ]
 
-        if self.part_of:
-            part = _('pt')
-            return f'{review_string}({part}) {source_typed_title}'
-        if self.component_of:
-            component = _('cmp')
-            return f'{review_string}({component}) {source_typed_title}'
+        return self._render_types(potential_source_types)
 
-        return review_string + source_typed_title
+    def _render_types(self, types):
+        truthy_types = [ str(getattr(Manifestation, t).field.verbose_name) for t in types if getattr(self, t) ]
+
+        if truthy_types:
+            return ', '.join(truthy_types)
+        return False
+
+    def render_title_body(self):
+        if self.source_type == Manifestation.SourceType.MODIFIED_PRINT:
+            if related_manifestation := self.get_related_manifestation():
+                return related_manifestation.source_title
+        if self.expression_relations.count() == 1 and (working_title := self.expression_relations.first().working_title):
+            return working_title
+        return self.source_title or str(_('empty'))
+
+
+    def render_title(self):
+        return ' '.join([
+                self.render_title_prefix(),
+                self.render_title_body(),
+                self.render_title_suffix()
+            ])
+
+    def render_title_suffix(self):
+        if self.source_type:
+            return f'({self.get_source_type_display()})'
+        return ''
 
     def standardized_search_entry(self):
-        if self.items.count():
-            prefix = self.items.first().get_current_signature()
-            return self.render_title(prefix)
-        return '<Fehler: keine Items>'
+        return self.render_title()
+
+    def render_title_prefix(self):
+        signature = self.get_current_signature()
+        if self.is_collection:
+            collection = _('coll')
+            return self.mark_needs_review(f'({collection}) {signature}')
+        if self.part_of:
+            part = _('pt')
+            return self.mark_needs_review(f'({part}) {signature}')
+        if self.component_of:
+            component = _('cmp')
+            return self.mark_needs_review(f'({component}) {signature}')
+        return self.mark_needs_review(signature)
 
     def __str__(self):
         return self.standardized_search_entry()
@@ -485,7 +534,9 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
                 item.signatures.add(signature)
 
         if data.get('240') and data.get('240').get('k'):
-            self.manifestation_form = getattr(Manifestation.ManifestationForm, data.get('240').get('k').upper())
+            manifestation_form_key = data.get('240').get('k').upper()
+            if hasattr(Manifestation.ManifestationForm, manifestation_form_key):
+                self.manifestation_form = getattr(Manifestation.ManifestationForm, manifestation_form_key)
 
         # beispiel für former owner: 1001340874
         personal_names = data.get_fields('700')
@@ -559,7 +610,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
             target_manifestation.set_collection(True)
             target_manifestation.save()
             self.part_of = target_manifestation
-            self.part_label = Manifestation.PartLabel.CONSTITUTING
+            self.part_label = Manifestation.PartLabel.JOINED
             #RelatedManifestation.objects.create(
                     #source_manifestation = self,
                     #target_manifestation = target_manifestation,
@@ -619,9 +670,10 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         raise Exception('You are trying to retrieve a single item from a non singleton manifestation.')
 
     def get_current_signature(self):
-        if self.is_singleton and self.get_single_item():
+        try:
             return self.get_single_item().get_current_signature()
-        return ''
+        except:
+            return ''
 
     def get_current_signature_normalized(self):
         try:
@@ -647,36 +699,31 @@ class Publication(models.Model):
             null = True,
             on_delete = models.SET_NULL
         )
-    place = models.ManyToManyField(
+    places = models.ManyToManyField(
             'dmad.Place',
+            through = 'PublicationPlace',
             related_name = 'published_manifestations'
         )
-    inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
-        )
-    assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
-        )
 
 
-class ManifestationPlace(models.Model):
-    manifestation = models.ForeignKey(
-            'Manifestation',
-            on_delete = models.CASCADE
+class PublicationPlace(DocumentationStatusMixin, models.Model):
+    publication = models.ForeignKey(
+            'Publication',
+            on_delete = models.CASCADE,
+            related_name = 'place_relations'
         )
     place = models.ForeignKey(
             'dmad.Place',
+            on_delete = models.SET_NULL,
+            related_name = 'publications',
+            null = True
+        )
+
+
+class ManifestationPlace(BasePlaceRelation):
+    manifestation = models.ForeignKey(
+            'Manifestation',
             on_delete = models.CASCADE
-        )
-    inferred = models.BooleanField(
-            default=False,
-            verbose_name = _("inferred")
-        )
-    assumed = models.BooleanField(
-            default=False,
-            verbose_name = _("assumed")
         )
 
 
@@ -698,6 +745,9 @@ class ManifestationTitle(models.Model):
             'Manifestation',
             on_delete=models.CASCADE,
             related_name='titles',
+        )
+    printed = models.BooleanField(
+            default=False
         )
 
     def render_handwritings(self):
@@ -732,6 +782,7 @@ class RelatedManifestation(RelatedEntity):
         STITCH_TEMPLATE = 'SD', _('is stitch template (as documented)')
         STITCH_TEMPLATE_INFERRED = 'SI', _('is stitch template (inferred)')
         RELATED = 'R', _('is related to')
+        DERIVATIVE = 'D', _('is derivative of')
 
     source_manifestation = models.ForeignKey(
             'Manifestation',

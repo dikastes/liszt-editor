@@ -3,7 +3,7 @@ from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import ListView
+from django.views.generic import ListView, DetailView
 from django.views.generic.edit import UpdateView, FormView, CreateView, DeleteView
 from django.db.models import Case, When
 from liszt_util.forms import FramedSearchForm, SearchForm
@@ -178,7 +178,8 @@ class EdwocaSearchView(SearchView):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        return qs.models(getattr(edwoca_models, self.get_model_name()))
+        return (qs.models(getattr(edwoca_models, self.get_model_name()))
+                .order_by('id'))
 
 
 class SimpleFormView(EntityMixin, UpdateView):
@@ -373,3 +374,109 @@ class ContributorAddView(EntityMixin, FormView):
         return super().form_valid(form)
 
 
+class BaseBibliographyUpdateView(EntityMixin, UpdateView):
+    fields = []
+    property = 'bib'
+    template_name = 'edwoca/bib_update.html'
+
+    def form_valid(self, form):
+        context = self.get_context_data()
+        bib_forms = context['bib_forms']
+
+        if not all(f.is_valid() for f in bib_forms):
+            return self.form_invalid(form)
+
+        self.object = form.save()
+
+        for f in bib_forms:
+            f.save()
+
+        return redirect(self.get_success_url())
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        bib_forms = []
+        for bib in self.object.bib_set.all():
+            bib_form = self.form(
+                    prefix = f'bib_{bib.pk}',
+                    instance = bib,
+                    data = self.request.POST or None
+                )
+            bib_forms.append(bib_form)
+        context['bib_forms'] = bib_forms
+
+        zotitem_search_form = SearchForm(self.request.GET or None, prefix='zotitem')
+        context['zotitem_searchform'] = zotitem_search_form
+        context['show_zotitem_search_form'] = True
+
+        if zotitem_search_form.is_valid() and zotitem_search_form.cleaned_data.get('q'):
+            context['zotitem_query'] = zotitem_search_form.cleaned_data.get('q')
+            context['found_bibs'] = zotitem_search_form.search().models(ZotItem)
+
+        letter_search_form = SearchForm(self.request.GET or None, prefix='letter')
+        context['letter_searchform'] = letter_search_form
+        context['show_letter_search_form'] = True
+
+        if letter_search_form.is_valid() and letter_search_form.cleaned_data.get('q'):
+            context['letter_query'] = letter_search_form.cleaned_data.get('q')
+            context[f"found_letters"] = letter_search_form.search().models(Letter)
+
+        return context
+
+
+class BaseHistoryUpdateView(SimpleFormView):
+    property = 'history'
+    template_name = 'edwoca/history.html'
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = self.get_form()
+
+        if not form.is_valid():
+            return self.form_invalid(form)
+
+        place_forms = []
+        for place in getattr(self.object, self.place_set_property).all():
+            place_form = self.place_form(request.POST, instance = place, prefix=f'place-{place.id}')
+            if not place_form.is_valid():
+                return self.form_invalid(form)
+            place_forms.append(place_form)
+
+        for place_form in place_forms:
+            place_form.save()
+
+        self.object = form.save()
+        period = self.object.period
+
+        if 'calculate-machine-readable-date' in request.POST:
+            period.parse_display()
+            period.save()
+        elif 'clear-machine-readable-date' in request.POST:
+            period.not_before = None
+            period.not_after = None
+            period.assumed = False
+            period.inferred = False
+            period.save()
+
+        return redirect(self.view_name, pk = self.object.id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        search_form = SearchForm(self.request.GET or None)
+        context['searchform'] = search_form
+        context['show_search_form'] = True
+
+        context['place_forms'] = []
+        for place in getattr(self.object, self.place_set_property).all():
+            place_form = self.place_form(instance = place, prefix=f'place-{place.id}')
+            context['place_forms'].append(place_form)
+
+        if search_form.is_valid() and search_form.cleaned_data.get('q'):
+            context['query'] = search_form.cleaned_data.get('q')
+            context[f"found_places"] = search_form.search().models(Place)
+
+        return context
+
+    def get_model(self):
+        return self.model.__name__

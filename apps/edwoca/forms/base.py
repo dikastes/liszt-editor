@@ -3,13 +3,13 @@ from liszt_util.forms import GenericAsDaisyMixin
 from liszt_util.forms.layouts import Layouts
 from django.utils.translation import gettext_lazy as _
 from django.conf import settings
-from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateField, SelectDateWidget, BooleanField, TypedChoiceField, RadioSelect, DateTimeField
+from django.forms import ModelForm, TextInput, Select, HiddenInput, CheckboxInput, Textarea, CharField, DateField, SelectDateWidget, BooleanField, TypedChoiceField, RadioSelect, DateTimeField, ChoiceField
 from django.forms.models import inlineformset_factory, BaseInlineFormSet
 from django.utils.safestring import mark_safe
 from dominate.util import raw
 from dmad_on_django.forms import SearchForm
 from dmad_on_django.models import Period
-from dominate.tags import div, label, span
+from dominate.tags import div, label, span, a
 
 
 class SimpleFormMixin:
@@ -27,6 +27,7 @@ class SimpleFormMixin:
     toggle_label_classes = 'cursor-pointer label flex gap-2'
     toggle_inverted_classes = 'cursor-pointer label justify-start gap-5'
     label_text_classes = 'label-text'
+    error_label_text_classes = 'label-text-alt text-primary'
 
     def as_daisy(self):
         form = tags.div()
@@ -213,8 +214,8 @@ class HandwritingForm(ModelForm):
                     })
             }
 
-    def as_daisy(self):
-        form = tags.div(cls='flex gap-5 items-end')
+    def get_core_form(self):
+        form = tags.div(cls='my-5')
 
         medium_field = self['medium']
         dubious_writer_field = self['dubious_writer']
@@ -225,27 +226,19 @@ class HandwritingForm(ModelForm):
         })
 
         with form:
-            with tags.label(cls='flex-1'):
-                with tags.div(cls=SimpleFormMixin.label_classes):
-                    tags.span(_(medium_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(medium_field))
-            with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0 mb-1 gap-2'):
-                tags.span(_(dubious_writer_field.label))
-                raw(str(dubious_writer_field))
+            with div(cls='flex gap-5 items-end'):
+                with tags.label(cls='flex-1'):
+                    with tags.div(cls=SimpleFormMixin.label_classes):
+                        tags.span(_(medium_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(medium_field))
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-0 mb-1 gap-2'):
+                    tags.span(_(dubious_writer_field.label))
+                    raw(str(dubious_writer_field))
 
-        #medium_label = tags.label(medium_field.label, _for=medium_field.id_for_label, cls='input input-bordered border-black bg-white flex items-center gap-2 flex-1')
-        #medium_label.add(raw(str(medium_field)))
-        #form.add(medium_label)
+        return form
 
-        # Dubious writer toggle
-        #dubious_writer_label = tags.label(cls='label cursor-pointer flex items-center gap-2')
-        #dubious_writer_label.add(tags.span(dubious_writer_field.label, cls='label-text'))
-
-        #dubious_writer_label.add(raw(str(dubious_writer_field)))
-
-        #form.add(dubious_writer_label)
-
-        return mark_safe(str(form))
+    def as_daisy(self):
+        return mark_safe(str(self.get_core_form()))
 
 
 class DateFormMixin:
@@ -257,8 +250,40 @@ class DateFormMixin:
                 'form': 'form'
             }
         }
-    not_before = DateField(widget = SelectDateWidget(**kwargs), required = False)
-    not_after = DateField(widget = SelectDateWidget(**kwargs), required = False)
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {'class': SimpleFormMixin.select_classes, 'form': 'form'}),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {'class': 'select border border-black bg-white w-40'}),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
     display = CharField(required=False, widget = TextInput( attrs = { 'class': SimpleFormMixin.text_input_classes}), label=Period.display.field.verbose_name)
     inferred = TypedChoiceField(
             choices = ((False, _('based on source')), (True, _('inferred'))),
@@ -269,11 +294,25 @@ class DateFormMixin:
             required = False
         )
     assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+    period_instance = None
 
     def __init__(self, *args, **kwargs):
         self.period_property = kwargs.pop('period_property', 'period')
         super().__init__(*args, **kwargs)
 
+        self.period_instance = getattr(self.instance, self.period_property)
+
+        if not self.period_instance:
+            self.period_instance = Period.objects.create()
+
+        self.is_precise_date = (
+                self.period_instance.imprecision == Period.Imprecision.PRECISE and
+                self.period_instance.time_mode == Period.TimeMode.POINT
+            )
+
+        if self.period_instance.imprecision == Period.Imprecision.PRECISE:
+            self.fields['start_qualifier'].widget.attrs['disabled'] = True
+            self.fields['end_qualifier'].widget.attrs['disabled'] = True
 
         if self.is_bound:
             return
@@ -285,8 +324,30 @@ class DateFormMixin:
                 'not_after': period.not_after,
                 'display': period.display,
                 'inferred': period.inferred,
-                'assumed': period.assumed
+                'time_mode': period.time_mode,
+                'start_qualifier': period.start_qualifier,
+                'end_qualifier': period.end_qualifier,
+                'assumed': period.assumed,
+                'imprecision': period.imprecision
             })
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        time_mode = cleaned_data.get('time_mode')
+        imprecision = cleaned_data.get('imprecision')
+        not_before = cleaned_data.get('not_before')
+
+        is_point_and_precise = (
+            time_mode == Period.TimeMode.POINT and
+            imprecision == Period.Imprecision.PRECISE
+        )
+
+        if is_point_and_precise and 'not_after' in self._errors:
+            del self._errors['not_after']
+            cleaned_data['not_after'] = not_before
+
+        return cleaned_data
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -295,25 +356,38 @@ class DateFormMixin:
         if not getattr(self.instance, self.period_property):
             setattr(self.instance, self.period_property, Period.objects.create())
 
-        period_instance = getattr(self.instance, self.period_property)
-        period_instance.not_before = self.cleaned_data['not_before']
-        period_instance.not_after = self.cleaned_data['not_after']
-        period_instance.display = self.cleaned_data['display']
-        period_instance.inferred = self.cleaned_data['inferred'] or False
-        period_instance.assumed = self.cleaned_data['assumed']
+        self.period_instance.not_before = self.cleaned_data['not_before']
+        self.period_instance.time_mode = self.cleaned_data['time_mode']
+        self.period_instance.imprecision = self.cleaned_data['imprecision']
+        self.period_instance.not_after = self.cleaned_data['not_after']
 
-        period_instance.save()
+        if self.period_instance.imprecision == Period.Imprecision.PRECISE:
+            self.period_instance.start_qualifier = Period.StartQualifier.EXACT
+            self.period_instance.end_qualifier = Period.EndQualifier.EXACT
+        else:
+            self.period_instance.start_qualifier = self.cleaned_data['start_qualifier']
+            self.period_instance.end_qualifier = self.cleaned_data['end_qualifier']
+
+        self.period_instance.display = self.cleaned_data['display']
+        self.period_instance.inferred = self.cleaned_data['inferred'] or False
+        self.period_instance.assumed = self.cleaned_data['assumed']
+
+        self.period_instance.save()
         instance.save()
 
         return instance
 
     def get_date_div(self, disable_inferred = False):
         date_div = tags.div()
+        time_mode_field = self['time_mode']
+        start_qualifier_field = self['start_qualifier']
+        end_qualifier_field = self['end_qualifier']
         not_before_field = self['not_before']
         not_after_field = self['not_after']
         display_field = self['display']
         assumed_field = self['assumed']
         inferred_field = self['inferred']
+        imprecision_field = self['imprecision']
 
         calculate = 'calculate'
         clear = 'clear'
@@ -324,38 +398,69 @@ class DateFormMixin:
 
         with date_div:
             # first row: standardized date
-            with tags.div(cls='flex gap-5 items-end w-full mb-5'):
+            with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
+                with tags.div(cls=SimpleFormMixin.label_classes):
+                    # display_field.label retrieves for some reason display instead of standardized date
+                    tags.label(display_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(display_field))
+                if display_field.errors:
+                    with div(cls='label'):
+                        with span(cls='text-primary text-sm'):
+                            display_field.errors
+            # second row: time mode and imprecision
+            with tags.div(cls='flex flex-col lg:flex-row gap-5 w-full my-5'):
                 with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
                     with tags.div(cls=SimpleFormMixin.label_classes):
-                        # display_field.label retrieves for some reason display instead of standardized date
-                        tags.label(display_field.label, cls=SimpleFormMixin.label_text_classes)
-                    raw(str(display_field))
-                    if display_field.errors:
-                        with div(cls='label'):
-                            with span(cls='text-primary text-sm'):
-                                display_field.errors
-                tags._input(type='submit', cls='btn btn-outline flex-0', form='form', value=_('calculate'), name=calculate_name)
-            # second row: not before & not after
-            with tags.div(cls='flex flex-col xl:flex-row gap-5'):
-                with tags.label(cls='form-control flex-0'):
-                    tags.div(_('not before'), cls=SimpleFormMixin.label_text_classes)
+                        tags.label(time_mode_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(time_mode_field))
+                with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with tags.div(cls=SimpleFormMixin.label_classes):
+                        tags.label(imprecision_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(imprecision_field))
+            # third row: controls
+            with tags.div(cls='flex gap-5 w-full my-5'):
+                tags._input(type='submit', cls='btn btn-outline flex-1', form='form', value=_('calculate'), name=calculate_name)
+                tags._input(type='submit', cls='btn btn-outline btn-primary flex-1', form='form' ,value=_('clear'), name=clear_name)
+            # fourth row: not before
+            with tags.div(cls='flex flex-col lg:flex-row lg:gap-5 mb-5'):
+                with tags.label(cls='form-control flex-none date-container'):
+                    with tags.div(cls=SimpleFormMixin.label_classes):
+                        if self.period_instance.time_mode == Period.TimeMode.POINT and self.period_instance.imprecision == Period.Imprecision.PRECISE:
+                            tags.span(_('point in time'), cls=SimpleFormMixin.label_text_classes)
+                        else:
+                            tags.span(not_before_field.label, cls=SimpleFormMixin.label_text_classes)
                     with tags.div(cls='flex'):
                         raw(str(not_before_field))
                     if not_before_field.errors:
                         with div(cls='label'):
                             with span(cls='text-primary text-sm'):
                                 not_before_field.errors
-                with tags.label(cls='form-control flex-0'):
-                    tags.div(_('not after'), cls=SimpleFormMixin.label_text_classes)
-                    with tags.div(cls='flex'):
-                        raw(str(not_after_field))
-                    if not_after_field.errors:
-                        with div(cls='label'):
-                            with span(cls='text-primary text-sm'):
-                                not_after_field.errors
+                tags.div(cls='flex-1')
+                with tags.label(cls=SimpleFormMixin.form_control_classes + ' flex-none'):
+                    with tags.div(cls=SimpleFormMixin.label_classes + ''):
+                        tags.label(start_qualifier_field.label, cls=SimpleFormMixin.label_text_classes)
+                    raw(str(start_qualifier_field))
+            # fifth row: not after
+            if not self.is_precise_date:
+                with tags.div(cls='flex flex-col lg:flex-row lg:gap-5 mb-5'):
+                    with tags.label(cls='form-control flex-none date-container'):
+                        with tags.div(cls=SimpleFormMixin.label_classes):
+                            tags.span(not_after_field.label, cls=SimpleFormMixin.label_text_classes)
+                        with tags.div(cls='flex'):
+                            raw(str(not_after_field))
+                        if not_after_field.errors:
+                            with div(cls='label'):
+                                with span(cls='text-primary text-sm'):
+                                    not_after_field.errors
+                    tags.div(cls='flex-1')
+                    with tags.label(cls=SimpleFormMixin.form_control_classes + ' flex-none'):
+                        with tags.div(cls=SimpleFormMixin.label_classes):
+                            tags.label(end_qualifier_field.label, cls=SimpleFormMixin.label_text_classes)
+                        raw(str(end_qualifier_field))
             # third row: controls
-            with tags.div(cls=SimpleFormMixin.palette_classes + ' items-center'):
-                with tags.label(cls=SimpleFormMixin.toggle_label_classes):
+            with tags.div(cls='flex flexcol lg:flex-row gap-5'):
+                tags.div(cls='flex-1')
+                with tags.label(cls=SimpleFormMixin.toggle_label_classes + ' flex-none'):
                     tags.span(_(assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
                     raw(str(assumed_field))
                 tags.div(cls='flex-1')
@@ -372,8 +477,6 @@ class DateFormMixin:
                                     form='form',
                                     disabled = disable_inferred
                                 )
-                tags.div(cls='flex-1')
-                tags._input(type='submit', cls='btn btn-outline btn-primary flex-0', form='form' ,value=_('clear'), name=clear_name)
 
         return date_div
 
@@ -403,6 +506,8 @@ class BaseSignatureForm(GenericAsDaisyMixin, ModelForm):
         super().__init__(*args, **kwargs)
         lib_field = self.fields['library']
         lib_field.label = f'{lib_field.label}*'
+        sig_field = self.fields['signature']
+        sig_field.label = f'{sig_field.label}*'
 
     def as_daisy(self):
         form_wrapper = div(cls='mb-10')
@@ -455,16 +560,19 @@ class BaseDigitizedCopyForm(GenericAsDaisyMixin, ModelForm, SimpleFormMixin):
         }
 
     def as_daisy(self):
-        form = div()
+        form = div(cls='mb-5')
 
         url_field = self['url']
         link_type_field = self['link_type']
 
         with form:
-            with label(cls=SimpleFormMixin.form_control_classes):
-                with div(cls=SimpleFormMixin.label_classes):
-                    span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
-                raw(str(url_field))
+            with div(cls='flex gap-5 items-end'):
+                with label(cls=SimpleFormMixin.palette_form_control_classes):
+                    with div(cls=SimpleFormMixin.label_classes):
+                        span(_(url_field.label), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(url_field))
+                if self.instance.url:
+                    a(_('open'), cls='flex-0 btn btn-outline', href=self.instance.url, target='_blank')
             with label(cls=SimpleFormMixin.form_control_classes):
                 with div(cls=SimpleFormMixin.label_classes):
                     span(_(link_type_field.label), cls=SimpleFormMixin.label_text_classes)
@@ -488,6 +596,10 @@ class BaseTrackedModelForm:
                 'editing_history': Textarea( attrs ={
                     'class': SimpleFormMixin.text_area_classes,
                     'form': 'form'
+                    }),
+                'needs_review': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
                     })
             }
 
@@ -541,7 +653,7 @@ class BaseTrackedModelForm:
                 with tags.div(cls=SimpleFormMixin.label_classes):
                     tags.span(editing_history_field.label, cls=SimpleFormMixin.label_text_classes)
                 raw(str(editing_history_field))
-            with tags.div(cls=SimpleFormMixin.palette_classes + ' items-end'):
+            with tags.div(cls='flex flex-col lg:flex-row gap-2 my-5 lg:items-end'):
                 with tags.label(cls=SimpleFormMixin.palette_form_control_classes):
                     with tags.div(cls=SimpleFormMixin.label_classes):
                         tags.span(last_save_field.label, cls=SimpleFormMixin.label_text_classes)
@@ -555,3 +667,230 @@ class BaseTrackedModelForm:
                     raw(str(needs_review_field))
 
         return editing_history_div
+
+
+class BaseTextTypeForm(ModelForm, SimpleFormMixin):
+    class Meta:
+        fields = ['is_lyrics', 'is_program', 'is_explanation']
+        widgets = {
+                'is_lyrics': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_program': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    }),
+                'is_explanation': CheckboxInput( attrs = {
+                        'class': 'toggle',
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        lyrics_field = self['is_lyrics']
+        program_field = self['is_program']
+        explanation_field = self['is_explanation']
+
+        form = div()
+
+        with form:
+            tags.h3(_('text type'), cls='text-lg my-5')
+            with tags.label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(lyrics_field))
+                tags.span(lyrics_field.label, cls=SimpleFormMixin.label_text_classes)
+            with tags.label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(program_field))
+                tags.span(program_field.label, cls=SimpleFormMixin.label_text_classes)
+            with tags.label(cls=SimpleFormMixin.toggle_inverted_classes):
+                raw(str(explanation_field))
+                tags.span(explanation_field.label, cls=SimpleFormMixin.label_text_classes)
+
+        return mark_safe(str(form))
+
+
+class BaseHistoryForm(DateFormMixin, ModelForm, SimpleFormMixin):
+    kwargs = {
+            'years': range(settings.EDWOCA_FIXED_DATES['birth']['year'], 1900),
+            'attrs': {
+                'class': SimpleFormMixin.select_classes,
+                'form': 'form'
+            }
+        }
+    imprecision = ChoiceField(
+            choices = Period.Imprecision,
+            label = _('imprecision'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    time_mode = ChoiceField(
+            choices = Period.TimeMode,
+            label = _('time mode'),
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    start_qualifier = ChoiceField(
+            label = _('not before mode'),
+            choices = Period.StartQualifier,
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    end_qualifier = ChoiceField(
+            label = _('not after mode'),
+            choices = Period.EndQualifier,
+            widget = Select(attrs = {
+                    'class': SimpleFormMixin.select_classes,
+                    'form': 'form'
+                }),
+            required = False
+        )
+    not_before = DateField(
+            label = _('start'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    not_after = DateField(
+            label = _('end'),
+            widget = SelectDateWidget(**kwargs),
+            required = False
+        )
+    display = CharField(
+            label = _('display'),
+            required=False,
+            widget = TextInput( attrs = {
+                    'class': SimpleFormMixin.text_input_classes,
+                    'form': 'form'
+                }),
+        )
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect( attrs = {
+                    'class': 'radio',
+                    'form': 'form'
+                }),
+            required = False
+        )
+    assumed = BooleanField(
+            widget = CheckboxInput(attrs = {
+                    'class': 'toggle',
+                    'form': 'form'
+                }),
+            required = False
+        )
+
+    class Meta:
+        fields = [
+            'date_diplomatic',
+            'private_history_comment',
+            'not_before',
+            'not_after',
+            'display',
+            'inferred',
+            'assumed',
+        ]
+        widgets = {
+                'history': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+                'date_diplomatic': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    }),
+                'private_history_comment': Textarea( attrs = {
+                        'class': SimpleFormMixin.text_area_classes,
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        form = div(cls='mb-10')
+
+        date_diplomatic_field = self['date_diplomatic']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(date_diplomatic_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(date_diplomatic_field))
+            self.get_date_div()
+
+        return mark_safe(str(form))
+
+    def comment_as_daisy(self):
+        form = div(cls='mb-10')
+
+        private_history_comment_field = self['private_history_comment']
+
+        with form:
+            with label(cls=SimpleFormMixin.form_control_classes):
+                with div(cls=SimpleFormMixin.label_classes):
+                    span(private_history_comment_field.label, cls=SimpleFormMixin.label_text_classes)
+                raw(str(private_history_comment_field))
+
+        return mark_safe(str(form))
+
+
+class BaseHistoryPlaceForm(ModelForm, SimpleFormMixin):
+    inferred = TypedChoiceField(
+            choices = ((False, _('based on source')), (True, _('inferred'))),
+            coerce = lambda x: x == 'True',
+            widget = RadioSelect(
+                    attrs = { 'class': 'radio', 'form': 'form'}
+                ),
+            required = False
+        )
+    assumed = BooleanField(widget = CheckboxInput(attrs = { 'class': 'toggle', 'form': 'form'}), required = False)
+
+    class Meta:
+        fields = [
+            'inferred',
+            'assumed'
+        ]
+        widgets = {
+                'inferred': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    }),
+                'assumed': CheckboxInput( attrs = {
+                        'class': SimpleFormMixin.toggle_classes,
+                        'form': 'form'
+                    })
+            }
+
+    def as_daisy(self):
+        palette = div(cls='flex gap-10 items-center')
+
+        place_assumed_field = self['assumed']
+        place_inferred_field = self['inferred']
+
+        with palette:
+            div(cls='flex-1')
+            with div(cls='form-control flex-0'):
+                with label(cls='cursor-pointer label flex gap-5'):
+                    span(_(place_assumed_field.label.lower()), cls=SimpleFormMixin.label_text_classes)
+                    raw(str(place_assumed_field))
+            for sw in place_inferred_field.subwidgets:
+                with tags.div(cls=SimpleFormMixin.form_control_classes):
+                    with tags.label(cls='label cursor-pointer gap-5'):
+                        tags.span(_(sw.choice_label), cls=SimpleFormMixin.label_text_classes)
+                        tags.input_(
+                                type='radio',
+                                name=sw.data.get('name'),
+                                value=str(sw.data.get('value')),
+                                cls='radio',
+                                checked = sw.data.get('selected', False),
+                                form='form'
+                            )
+
+        return mark_safe(str(palette))

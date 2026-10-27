@@ -1,0 +1,28 @@
+{% load i18n %}
+
+<div class="flex-0 text-xs xl:text-sm text-gray-500 mb-10">
+    <p>
+        {% translate 'created' %}
+    </p>
+    <p>
+        {{ object.first_save|date:"d.m.Y H:i:s" }}
+    </p>
+    {% if object.first_editor %}
+        </p>
+            {% translate 'by' %}
+            {{ object.first_editor }}
+        </p>
+    {% else %}
+        <p class="text-primary">
+            {% translate 'missing first editor' %}
+        </p>
+    {% endif %}
+</div>
+<div class="flex-0 text-xs xl:text-sm text-gray-500 mb-10">
+    <p>
+        {% translate 'last update' %}
+    </p>
+    <p>
+        {{ object.last_save|date:"d.m.Y H:i:s" }}
+    </p>
+</div>

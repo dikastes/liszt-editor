@@ -36,8 +36,6 @@ class Command(BaseCommand):
                 print(f'{str(i+1)} von {total}')
                 print(f'{row["Absender Person"]}{row["Absender Körperschaft"]} an {row["Adressat Person"]}{row["Adressat Körperschaft"]}')
 
-
-                #try:
                 sender_persons_config = {
                         'gnd_ids': 'GND Absender Person',
                         'names': 'Absender Person',
@@ -76,7 +74,6 @@ class Command(BaseCommand):
                         'edition_names': 'Absendeort Edition',
                         'model': Place
                     }
-                #breakpoint()
                 sender_places = self.get_contributor_data(row, sender_places_config)
 
                 receiver_places_config = {
@@ -86,20 +83,18 @@ class Command(BaseCommand):
                         'model': Place
                     }
                 receiver_places = self.get_contributor_data(row, receiver_places_config)
-                #except:
-                    #breakpoint()
 
-                work_comments = []
+                work_mentionings = []
                 for number in roman_literals:
                     if row[f'Werkerwähnung ({number})']:
-                        work_comments += [' // '.join([
+                        work_mentionings += [' // '.join([
                                 string for
                                 string in [
                                     row[f'Werkerwähnung ({number})'],
                                     'Entstehung' if row[f'Entstehung ({number})'] else None,
                                     'Quellentransfer' if row[f'Quellentransfer ({number})'] else None,
                                     'Aufführungen' if row[f'Aufführungen ({number})'] else None,
-                                    f'Seite {row[f"Seite ({number})"]}',
+                                    #f'Seite {row[f"Seite ({number})"]}',
                                     row[f'WVZ (Raabe) ({number})'],
                                     row[f'Werktitel ({number})'],
                                     row[f'Kommentar (intern) ({number})'],
@@ -107,11 +102,12 @@ class Command(BaseCommand):
                                 ]
                                 if string
                             ])]
-                comment = '\n'.join([
+                work_mentionings = '\n'.join(work_mentionings)
+
+                comment = '\n'.join(s for s in [
                         row['Kommentar (intern)'],
-                        row['Bemerkungen'],
-                        *work_comments
-                        ])
+                        row['Bemerkungen']
+                        ] if s)
 
                 display = row['Datierung (standardisiert)']
                 not_before = row['Datierung maschinenlesbar Teil 1']
@@ -137,9 +133,16 @@ class Command(BaseCommand):
                         assumed = assumed
                     )
 
+                needs_review = False
+                if row['zu überarbeiten']:
+                    needs_review = True
+
                 letter = Letter.objects.create(
                         edition_period = edition_period,
-                        comment = comment
+                        comment = comment,
+                        work_mentionings = work_mentionings,
+                        needs_review = needs_review,
+                        first_editor = 'Excelimport'
                     )
 
                 # contributors
@@ -158,30 +161,33 @@ class Command(BaseCommand):
                 for receiver_place in receiver_places:
                     self.create_contributor(receiver_place, letter, ReceiverPlace, 'place')
 
-                for mentioning in row['Sigle / Kurztitel'].split(' / '):
-                    proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
+                #for mentioning in row['Sigle / Kurztitel'].split(' / '):
+                proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
+                proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
+                if not proof:
+                    print(f"{proof_title} not found")
+                    continue
+                LetterMentioning.objects.create(
+                        bib = proof,
+                        location = proof_page[0].replace('S.', '').strip() if len(proof_page) else '',
+                        letter = letter
+                    )
+
+                #for mentioning in row['Weitere Editionen'].split(' / '):
+                if row['Weitere Editionen']:
+                    proof_title, *proof_page = row['Weitere Editionen'].split(', ')
                     proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
                     if not proof:
                         print(f"{proof_title} not found")
                         continue
                     LetterMentioning.objects.create(
                             bib = proof,
-                            pages = proof_page[0] if len(proof_page) else '',
+                            location = proof_page[0] if len(proof_page) else '',
                             letter = letter
                         )
 
-                for mentioning in row['Weitere Editionen'].split(' / '):
-                    if mentioning:
-                        proof_title, *proof_page = row['Sigle / Kurztitel'].split(', ')
-                        proof = ZotItem.objects.filter(zot_short_title = proof_title).first()
-                        if not proof:
-                            print(f"{proof_title} not found")
-                            continue
-                        LetterMentioning.objects.create(
-                                bib = proof,
-                                pages = proof_page[0] if len(proof_page) else '',
-                                letter = letter
-                            )
+    def turn_name(name):
+        return ' '.join(part.strip() for part in name.split(',')[::-1])
 
     def create_contributor(self, data, letter, model, target_property):
         den = DocumentedEntityName.objects.create(
@@ -215,7 +221,7 @@ class Command(BaseCommand):
                     assumed = False
 
                 if id.strip() == 'RD':
-                    get_kwargs = {'interim_designator': name}
+                    get_kwargs = {'interim_designator': Command.turn_name(name)}
                 else:
                     get_kwargs = {'gnd_id': id.strip()}
 
@@ -226,4 +232,5 @@ class Command(BaseCommand):
                         'target_inferred': inferred,
                         'target_assumed': assumed
                     })
+
         return contributors

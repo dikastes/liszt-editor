@@ -118,7 +118,7 @@ class SubjectTerm(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        return _('without name')
 
     def get_designator(self):
         if self.gnd_id:
@@ -132,9 +132,8 @@ class SubjectTerm(DisplayableModel):
         return f'{self.gnd_id}: {self.names.get(status=Status.PRIMARY).name}'
 
     def get_table(self):
-            
             return GNDSubjectCategory.get_subject_category_table(self) +\
             self.get_parent_subject_table()
-    
+
     def get_overview_title(self):
         return "Angaben"

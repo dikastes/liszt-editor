@@ -1,37 +1,72 @@
 from .period_calculation import MONTHS, PERIOD_CODES, resolve_month, resolve_period
+from dateutil.relativedelta import relativedelta
 from calendar import monthrange
 from django.utils.translation import gettext_lazy as _
 from django.db import models
 from django.conf import settings
 import re
 from re import split
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from .base import DocumentationStatusMixin
 
 
 class Period(DocumentationStatusMixin):
+    class Imprecision(models.TextChoices):
+        IMPRECISE = 'I', _('imprecise')
+        PRECISE = 'P', _('precise')
+    class TimeMode(models.TextChoices):
+        POINT = 'P', _('point')
+        SPAN = 'S', _('span')
+    class StartQualifier(models.TextChoices):
+        NOT_BEFORE = 'N', _('not before')
+        EXACT = 'E', _('exact')
+    class EndQualifier(models.TextChoices):
+        NOT_AFTER = 'N', _('not after')
+        EXACT = 'E', _('exact')
+
     not_before = models.DateField(
             null=True,
             blank=True,
-            verbose_name = _("not before")
+            verbose_name = _("start")
         )
     not_after = models.DateField(
             null=True,
             blank=True,
-            verbose_name = _("not after")
+            verbose_name = _("end")
         )
     display = models.TextField(
             null=True,
             blank=True,
             verbose_name = _("standardized date")
         )
-    #status = models.TextField(
-            #choices = DocumentationStatus,
-            #max_length = 1,
-            #null = True,
-            #blank = True,
-            #verbose_name = _("status")
-        #)
+    time_mode = models.CharField(
+            max_length = 1,
+            choices = TimeMode.choices,
+            default = TimeMode.POINT,
+            verbose_name = _("time mode")
+        )
+    start_qualifier = models.CharField(
+            max_length = 1,
+            choices = StartQualifier.choices,
+            default = StartQualifier.NOT_BEFORE,
+            verbose_name = _("not before mode"),
+            null = True,
+            blank = True
+        )
+    end_qualifier = models.CharField(
+            max_length = 1,
+            choices = EndQualifier.choices,
+            default = EndQualifier.NOT_AFTER,
+            verbose_name = _("not after mode"),
+            null = True,
+            blank = True
+        )
+    imprecision = models.CharField(
+            max_length = 1,
+            choices = Imprecision.choices,
+            default = Imprecision.IMPRECISE,
+            verbose_name = _("imprecision"),
+        )
 
     def render_detailed(self):
         if self.not_before == self.not_after:
@@ -42,7 +77,12 @@ class Period(DocumentationStatusMixin):
         return self.display or ''
 
     def parse_display(self):
+
         self.initialize_patterns()
+
+        if self.imprecision == Period.Imprecision.IMPRECISE:
+            self.start_qualifier = Period.StartQualifier.NOT_BEFORE
+            self.end_qualifier = Period.EndQualifier.NOT_AFTER
 
         ASSUMED_TOKEN = '[?]'
         display_value = self.display or ''
@@ -78,6 +118,10 @@ class Period(DocumentationStatusMixin):
             dates = [ date.strip() for date in display_value.split('-') ]
             if len(dates[1]) == 2:
                 dates[1] = dates[0][:2] + dates[1]
+        elif '–' in display_value:
+            dates = [ date.strip() for date in display_value.split('–') ]
+            if len(dates[1]) == 2:
+                dates[1] = dates[0][:2] + dates[1]
         elif str(_('and')) in display_value:
             dates = [ date.strip() for date in display_value.split(str(_('and'))) ]
         else:
@@ -85,12 +129,27 @@ class Period(DocumentationStatusMixin):
 
         before_string = _('before')
         after_string = _('after')
+        circa_string1 = _('circa')
+        circa_string2 = _('around')
 
-        if str(before_string) in dates[0]:
+        if str(circa_string1) in dates[0] or str(circa_string2) in dates[0]:
+            raw_date = dates[0].replace(str(circa_string1), '').replace(str(circa_string2), '')
+            self.not_before = self._parse_date(raw_date, 'lower')
+            self.not_after = self._parse_date(raw_date, 'upper')
+            if len(raw_date.split('.')) == 3:
+                self.not_before = self.not_before - timedelta(days=5)
+                self.not_after = self.not_after + timedelta(days=5)
+            if len(raw_date.split('.')) == 2:
+                self.not_before = self.not_before - relativedelta(months=1)
+                self.not_after = self.not_after + relativedelta(months=1)
+            if len(raw_date.split('.')) == 1:
+                self.not_before = self.not_before - relativedelta(years=5)
+                self.not_after = self.not_after + relativedelta(years=5)
+        elif str(before_string) in dates[0]:
             self.not_before = self.earliest
-            self.not_after = self._parse_date(dates[0].replace(str(before_string), ''), 'upper')
+            self.not_after = self._parse_date(dates[0].replace(str(before_string), ''), 'lower') - timedelta(days=1)
         elif str(after_string) in dates[0]:
-            self.not_before = self._parse_date(dates[0].replace(str(after_string), ''), 'lower')
+            self.not_before = self._parse_date(dates[0].replace(str(after_string), ''), 'upper') + timedelta(days=1)
             self.not_after = self.latest
         elif len(dates) == 2:
             self.not_before = self._parse_date(dates[0], 'lower')
@@ -103,12 +162,13 @@ class Period(DocumentationStatusMixin):
         prefix_pipe_string = '|'.join(str(_(prefix)) for prefix in PERIOD_CODES)
         month_pipe_string = '|'.join(str(_(month)) for month in MONTHS)
         decade_suffix = _('ies')
-        century_suffix = _('century')
+        century_suffix = '|'.join([str(_('century')) + '.?', str(_('ct')) + '.?'])
 
+        self.unknown_decade_pattern = re.compile(rf'^\d{{0,2}}.?\d{{0,2}}.?\d{{2}}\?\?$', re.IGNORECASE)
         self.month_pattern = re.compile(rf'^({prefix_pipe_string})\s+({month_pipe_string})\s+(\d{{4}})$', re.IGNORECASE)
         self.year_pattern = re.compile(rf'^({prefix_pipe_string})\s+(\d{{4}})(/\d{{2}})?$', re.IGNORECASE)
-        self.decade_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{3}}0){decade_suffix}$', re.IGNORECASE)
-        self.century_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{2}}).?\s*{century_suffix}.?$', re.IGNORECASE)
+        self.decade_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{3}}0){decade_suffix}', re.IGNORECASE)
+        self.century_pattern = re.compile(rf'^({prefix_pipe_string + "|"})\s*(\d{{2}}).?\s*({century_suffix})$', re.IGNORECASE)
 
         self.earliest = date(
                 settings.EDWOCA_FIXED_DATES['birth']['year'],
@@ -163,6 +223,13 @@ class Period(DocumentationStatusMixin):
                     day = monthrange(year, month)[1]
             return date(year, month, day)
 
+        unknown_decade_match = self.unknown_decade_pattern.match(date_string)
+
+        if unknown_decade_match:
+            if bound == 'upper':
+                return self.latest
+            return self.earliest
+
         decade_match = self.decade_pattern.match(date_string)
 
         if decade_match:
@@ -191,7 +258,7 @@ class Period(DocumentationStatusMixin):
         century_match = self.century_pattern.match(date_string)
 
         if century_match:
-            year -= 100
+            year = int(century_match.group(2)) * 100 - 100
             if century_match.group(1):
                 prefix = resolve_period(century_match.group(1))
                 if bound=='lower':

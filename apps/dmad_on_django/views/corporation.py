@@ -57,3 +57,11 @@ class CorporationUnlinkView(UnlinkView):
 
 class CorporationPullView(PullView):
     model = Corporation
+
+
+class CorporationRawDataView(BaseRawDataView):
+    model = Corporation
+
+
+class CorporationAuthorityDataView(BaseAuthorityDataView):
+    model = Corporation

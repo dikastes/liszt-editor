@@ -1,0 +1,35 @@
+{% extends 'edwoca/base.html' %}
+
+{% load i18n %}
+
+{% block content %}
+
+{% if property %}
+    {% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_prolog.html' %}
+{% endif %}
+
+<h2 class="my-5">
+    {{ view_title }}
+</h2>
+
+<form id="form" method="post">
+    {% csrf_token %}
+    {{ form.as_daisy }}
+
+    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+</form>
+
+{% if property %}
+    {% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_epilog.html' %}
+{% endif %}
+
+{% if not object.items.count %}
+    <span class="text-primary mr-5">
+        {% translate 'there are no items yet' %}
+    </span>
+    <a class="font-bold" href="{% url 'edwoca:manifestation_relations' object.id %}">
+        → {% translate 'create items' %}
+    </a>
+{% endif %}
+
+{% endblock %}

@@ -1,17 +1,20 @@
 {% extends 'edwoca/base.html' %}
 
+{% load i18n %}
+
 {% block content %}
 
 {% include 'edwoca/partials/item/preview-divs/comment_prolog.html' %}
 
-<div class="bg-white border border-base-300 p-5">
-    <h2 class="card-title mt-0"> Kommentar für {{ object }} </h2>
+    <h2 class="my-5"> 
+        {% translate 'comment' %}
+    </h2>
 
-    <form method="post">
+    <form method="post" id="form">
         {% csrf_token %}
         {{ form.as_daisy }}
 
-        <input type="submit" value="Speichern" class="hidden" id="submit-form">
+        <input type="submit" class="hidden" id="submit-form">
     </form>
-</div>
+
 {% endblock %}

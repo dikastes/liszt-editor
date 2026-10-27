@@ -89,6 +89,9 @@ class ZotItem(models.Model):
         ordering = ['-zot_version']
 
     def __str__(self):
+        return self.zot_short_title
+
+    def get_citation(self):
         if self.zot_pub_title == 'None':
             if self.author:
                 return f"{self.author}: {self.zot_title}"

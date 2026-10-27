@@ -1,3 +1,17 @@
-<div class="mt-5 mx-10 truncate text-lg xl:text-3xl">
-    <h1> {{object}} </h1>
+<div class="mt-5 mx-5 md:mx-10 text-lg lg:text-2xl xl:text-3xl flex">
+    <div class="flex-none">
+        {{ object.title_prefix }}
+    </div>
+    <div class="flex-none">
+        &nbsp;
+    </div>
+    <div class="shrink truncate">
+        {{ object.title_body }}
+    </div>
+    <div class="flex-none">
+        &nbsp;
+    </div>
+    <div class="flex-none">
+        {{ object.title_suffix }}
+    </div>
 </div>

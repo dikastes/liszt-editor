@@ -85,7 +85,6 @@ class Place(DisplayableModel):
         self.geographic_area_codes.all().delete()
         PlaceGeographicAreaCode.create_geographic_area_codes(self)
 
-
     def fetch_raw(self):
         trials = max_trials
         url = f"http://d-nb.info/gnd/{self.gnd_id}"
@@ -118,7 +117,9 @@ class Place(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        if self.interim_designator:
+            return self.interim_designator
+        return _('without name')
 
     def get_designator(self):
         if self.gnd_id:
@@ -128,20 +129,12 @@ class Place(DisplayableModel):
     def get_absolute_url(self):
         return reverse('dmad_on_django:place_update', kwargs={'pk': self.pk})
 
-    def __str__(self):
-        name = _('<< error >>')
-        if self.names.filter(status=Status.PRIMARY).count():
-            name = self.names.filter(status=Status.PRIMARY).first()
-        if self.gnd_id:
-            return f'{name} ({self.gnd_id})'
-        return self.interim_designator
-
     def get_table(self):
 
         return [("Long", self.long),
                 ("Lat", self.lat)]+\
                 PlaceGeographicAreaCode.get_area_code_table(self.geographic_area_codes)
-    
+
     def get_overview_title(self):
 
         return "Angaben"

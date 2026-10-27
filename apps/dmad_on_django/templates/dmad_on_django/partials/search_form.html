@@ -2,11 +2,11 @@
 
 <form
     method="get"
-    action="{{ action_url }}"
+    action="{% url action_url %}"
     class="flex-1 flex m-0 bg-white"
     id="search-form"
     {% if hx_get %}
-        hx-get="{{ hx_get }}"
+        hx-get="{% url hx_get %}"
         hx-target="#search-results-container"
         hx-trigger="input delay:500ms"
         hx-push-url="true"

@@ -57,3 +57,11 @@ class PersonUnlinkView(UnlinkView):
 
 class PersonPullView(PullView):
     model = Person
+
+
+class PersonRawDataView(BaseRawDataView):
+    model = Person
+
+
+class PersonAuthorityDataView(BaseAuthorityDataView):
+    model = Person

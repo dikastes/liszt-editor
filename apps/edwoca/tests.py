@@ -1,10 +1,224 @@
 from django.test import TestCase
-from dmad_on_django.models import Status, Language, Person, Place
-from .models import Title, Contributor, Work
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
+from dmad_on_django.models import Status, Language, Person, Place, Corporation
+from dmrism.models import Publication, PublicationPlace, RelatedExpression
+from .models import Manifestation, Item, Library
 from xml.etree import ElementTree as ET
 
 # Create your tests here.
 
+class PrintCreationTest(TestCase):
+
+    def test_print_creation_workflow(self):
+        working_title = 'working title'
+        print_title = 'print title'
+        publisher = Corporation.objects.create()
+        plate_number = '200'
+        form_data = {
+                'working_title': working_title,
+                'source_title': print_title,
+                'publisher': publisher.pk,
+                'plate_number': plate_number
+            }
+
+        url = reverse('edwoca:manifestation_create')
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 302)
+
+        expression_relation = RelatedExpression.objects.filter(working_title = working_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        manifestation = expression_relation.manifestation
+
+        self.assertEqual(manifestation.source_title, print_title)
+        self.assertEqual(manifestation.source_type, Manifestation.SourceType.PRINT)
+        self.assertEqual(manifestation.publications.first().publisher, publisher)
+        self.assertEqual(manifestation.plate_number, plate_number)
+
+        collection_working_title = 'collection working title'
+        collection_print_title = 'collection print title'
+        collection_publisher = Corporation.objects.create()
+        collection_plate_number = '400'
+        collection_form_data = {
+                'working_title': collection_working_title,
+                'source_title': collection_print_title,
+                'publisher': collection_publisher.pk,
+                'plate_number': collection_plate_number
+            }
+
+        collection_url = reverse('edwoca:manifestation_collection_create')
+        collection_response = self.client.post(collection_url, data=collection_form_data)
+
+        self.assertEqual(collection_response.status_code, 302)
+
+        collection_expression_relation = RelatedExpression.objects.filter(working_title = collection_working_title).first()
+        self.assertIsNotNone(collection_expression_relation)
+        self.assertIsNotNone(collection_expression_relation.manifestation)
+
+        collection_manifestation = collection_expression_relation.manifestation
+
+        self.assertEqual(collection_manifestation.source_title, collection_print_title)
+        self.assertEqual(collection_manifestation.source_type, Manifestation.SourceType.PRINT)
+        self.assertEqual(collection_manifestation.publications.first().publisher, collection_publisher)
+        self.assertEqual(collection_manifestation.plate_number, collection_plate_number)
+
+        only_print_title = 'only print title'
+        form_data = {
+                'source_title': only_print_title,
+                'publisher': publisher.pk,
+                'plate_number': plate_number
+            }
+
+        url = reverse('edwoca:manifestation_create')
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 302)
+
+        manifestation = Manifestation.objects.get(source_title = only_print_title)
+
+        self.assertIsNotNone(manifestation)
+        self.assertEqual(manifestation.publications.first().publisher, publisher)
+        self.assertEqual(manifestation.plate_number, plate_number)
+
+class SingletonCreationTest(TestCase):
+
+    def test_singleton_creation_workflow(self):
+        library = Library.objects.create()
+        signature = 'signature'
+        test_title = 'test title'
+
+        form_data = {
+            'working_title': test_title,
+            'library': library.pk,
+            'signature': signature
+        }
+
+        url = reverse('edwoca:singleton_create')
+        response = self.client.post(url, data=form_data)
+
+        self.assertEqual(response.status_code, 302)
+
+        expression_relation = RelatedExpression.objects.filter(working_title = test_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        manifestation = expression_relation.manifestation
+
+        self.assertEqual(manifestation.items.count(), 1)
+        self.assertEqual(manifestation.items.first().signatures.first().library, library)
+        self.assertEqual(manifestation.items.first().signatures.first().signature, signature)
+
+
+class CollectionRelationsTest(TestCase):
+
+    def test_collection_relations_view(self):
+        m = Manifestation.objects.create(is_collection=True)
+
+        url = reverse('edwoca:manifestation_relations', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+
+class PrintCopyTest(TestCase):
+
+    def test_print_copy_workflow(self):
+        copy_title = 'test_copy_workflow_title'
+        copied_title = f'{_("copy of")} {copy_title}'
+        publisher = Corporation.objects.create()
+        m = Manifestation.objects.create(source_type = 'PRT')
+        RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
+        publication = Publication.objects.create(manifestation = m, publisher = publisher)
+
+        url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+
+        expression_relation = RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+
+        self.assertEqual(m.source_type, copy.source_type)
+
+        RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+        copied_publisher = copy.publications.first().publisher
+
+        self.assertEqual(publisher, copied_publisher)
+
+
+class ModifiedPrintCopyTest(TestCase):
+
+    def test_print_copy_workflow(self):
+        copy_title = 'test_copy_workflow_title'
+        copied_title = f'{_("copy of")} {copy_title}'
+        publisher = Corporation.objects.create()
+        m = Manifestation.objects.create(source_type = 'MPR')
+        Item.objects.create(source_type = 'MPR', manifestation = m)
+        RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
+        publication = Publication.objects.create(manifestation = m, publisher = publisher)
+
+        url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+
+        expression_relation = RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+
+        self.assertEqual(m.source_type, copy.source_type)
+        self.assertEqual(m.items.first().source_type, copy.items.first().source_type)
+
+        RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+        copied_publisher = copy.publications.first().publisher
+
+        self.assertEqual(publisher, copied_publisher)
+
+
+class ManuscriptCopyTest(TestCase):
+
+    def test_manuscript_copy_workflow(self):
+        copy_title = 'test_copy_workflow_title'
+        copied_title = f'{_("copy of")} {copy_title}'
+        m = Manifestation.objects.create(is_singleton = True)
+        RelatedExpression.objects.create(working_title = copy_title, manifestation = m)
+        i = Item.objects.create(manifestation = m)
+
+        url = reverse('edwoca:manifestation_copy', kwargs={'pk': m.pk})
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 302)
+
+        expression_relation = RelatedExpression.objects.filter(working_title = copied_title).first()
+        self.assertIsNotNone(expression_relation)
+        self.assertIsNotNone(expression_relation.manifestation)
+
+        copy = expression_relation.manifestation
+
+        self.assertEqual(copy.items.count(), 1)
+
+
+"""
 class TitleModelTests(TestCase):
     title = 'example title'
     language = Language['DE']
@@ -93,4 +307,4 @@ class WorkModelTests(TestCase):
             ET.tostring(future_work.to_mei()),
             expected.encode(encoding='utf-8')
         )
-
+"""

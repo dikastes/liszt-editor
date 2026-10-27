@@ -1,35 +1,23 @@
-{% comment %} this doesn't seem to be necessary {% endcomment %}
 {% extends 'edwoca/base.html' %}
 
 {% block content %}
-<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
-    {% include 'edwoca/partials/manifestation/preview-divs/source_type_prolog.html' %}
-</div>
+{% include 'edwoca/partials/manifestation/preview-divs/classification_prolog.html' %}
 
-<div class="bg-white border border-base-300 p-5">
+<form method="post" id="form">
+    {% csrf_token %}
+    <div class="flex flex-col xl:flex-row gap-10">
+        <div class="flex-1">
+            {{ form.as_daisy }}
+        </div>
+        <div class="flex-1">
+            {{ form.edition_type_as_daisy }}
+            {{ function_form.as_daisy }}
+        </div>
+    </div>
 
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_daisy }}
+    <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
+</form>
 
-        <input type="submit" value="{{ button_label }}" id="submit-form" class="hidden">
-    </form>
-</div>
-
-<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
-    <p class="prose">
-        {% include 'edwoca/partials/manifestation/manifestation_history_preview.html' %}
-    </p>
-    <p class="prose">
-        {% include 'edwoca/partials/contributors_preview.html' %}
-    </p>
-    <p class="prose">
-        {% include 'edwoca/partials/bib_preview.html' %}
-    </p>
-</div>
-
-<div class="border border-base-300 bg-base-200 p-5 w-full mt-5">
-    {% include 'edwoca/partials/manifestation/preview-divs/source_type_epilog.html' %}
-</div>
+{% include 'edwoca/partials/manifestation/preview-divs/classification_epilog.html' %}
 
 {% endblock %}

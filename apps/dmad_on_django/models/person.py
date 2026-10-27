@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import FilteredRelation, Q, Value
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from json import dumps, loads
@@ -11,6 +12,7 @@ from .place import Place
 from .geographicareacodes import PersonGeographicAreaCode
 from .subjectterm import SubjectTerm
 from slub_pylobid.pylobid import PyLobidPerson, GNDAPIError
+from django.db.models.functions import Coalesce, Lower, NullIf
 
 
 class PersonName(models.Model):
@@ -55,6 +57,9 @@ class PersonName(models.Model):
         return name.parse_comma_separated_string(comma_separated_string)
 
     def __str__(self):
+        return f'{self.last_name}, {self.first_name}'
+
+    def get_natural_name(self):
         return f'{self.first_name} {self.last_name}'
 
 
@@ -89,8 +94,23 @@ class Person(DisplayableModel):
         related_name='death_place_of'
     )
     activity_places = models.ManyToManyField(Place)
-
     professions = models.ManyToManyField(SubjectTerm)
+
+    @classmethod
+    def get_ordering_annotations(cls):
+        return {
+            'primary_name': FilteredRelation(
+                'names',
+                condition=Q(names__status=Status.PRIMARY)
+            ),
+            'sort_name': Lower(
+                Coalesce(
+                    NullIf('primary_name__last_name', Value('')),
+                    NullIf('interim_designator', Value('')),
+                    Value('zzz')
+                )
+            ),
+        }
 
     def get_search_placeholder():
         return _('search persons')
@@ -203,7 +223,14 @@ class Person(DisplayableModel):
     def get_default_name(self):
         if self.names.count() > 0:
             return self.names.get(status=Status.PRIMARY).__str__()
-        return 'ohne Name'
+        if self.interim_designator:
+            return self.interim_designator
+        return _('without name')
+
+    def get_natural_name(self):
+        if self.names.count() > 0:
+            return self.names.get(status=Status.PRIMARY).get_natural_name()
+        return self.interim_designator or _('without name')
 
     def get_table(self):
             rows = [
@@ -237,11 +264,6 @@ class Person(DisplayableModel):
 
     def str_with_link(self):
         return get_model_link(self)
-
-    def __str__(self):
-        if self.gnd_id:
-            return f'{self.get_default_name()} ({self.gnd_id})'
-        return self.interim_designator
 
     @staticmethod
     def map_gender(gnd_gender):

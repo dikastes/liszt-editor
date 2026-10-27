@@ -2,13 +2,12 @@ from django import forms
 from django.shortcuts import redirect, render
 from django.urls import reverse_lazy, reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import CreateView, UpdateView, DeleteView, ListView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView, DetailView
 from django.http import JsonResponse, HttpResponseRedirect
 from liszt_util.forms import FramedSearchForm
 import dmad_on_django.models as dmad_models
 from dmad_on_django.models import Person, Work, Place, SubjectTerm, Corporation
 from haystack.generic_views import SearchView
-from haystack.query import SearchQuerySet
 from json import dumps
 from dmad_on_django.forms import formWidgets, DmadCreateForm, DmadUpdateForm
 from liszt_util.tools import camel_to_snake_case, snake_to_camel_case
@@ -86,9 +85,12 @@ class DmadBaseViewMixin:
                kwargs={'pk': self.object.id})
 
 
-class DmadCreateView(DmadBaseViewMixin, CreateView):
+class DmadCreateView(NavbarContextMixin, DmadBaseViewMixin, CreateView):
     template_name = 'dmad_on_django/create.html'
-    fields = ['interim_designator', 'gnd_id', 'comment']
+    fields = ['interim_designator', 'comment', 'gnd_id']
+
+    def get_model(self):
+        return self.model
 
     def get_form_class(self):
         return forms.modelform_factory(
@@ -100,7 +102,18 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['view_title'] = 'Datensatz anlegen'
+        search_string = self.request.GET.get('q', '')
+        context['object_list'] = []
+        if search_string:
+            context['object_list'] = [
+                {
+                    'label': entity['label'],
+                    'id': entity['id'].replace('https://d-nb.info/gnd/', '')
+                }
+                for entity
+                in self.model.search(search_string)
+            ]
+        context['q'] = search_string
         return context
 
     def post(self, request, *args, **kwargs):
@@ -114,8 +127,19 @@ class DmadCreateView(DmadBaseViewMixin, CreateView):
             pass
         return response
 
+    def get(self, *args, **kwargs):
+        response = super().get(*args, **kwargs)
 
-class DmadUpdateView(DmadBaseViewMixin, NavbarContextMixin, UpdateView):
+        if self.request.htmx:
+            context = self.get_context_data()
+            return render(
+                    self.request,
+                    'dmad_on_django/partials/gnd_search.html',
+                    context
+                )
+        return response
+
+class DmadUpdateView(DmadBaseViewMixin, UpdateView):
     template_name = 'dmad_on_django/form_view.html'
 
     def get_form_class(self):
@@ -128,13 +152,13 @@ class DmadUpdateView(DmadBaseViewMixin, NavbarContextMixin, UpdateView):
 
     def get_form_fields(self):
         if not self.object.gnd_id:
-            return ['interim_designator', 'comment', 'rework_in_gnd']
+            return ['interim_designator', 'comment', 'first_editor', 'rework_in_gnd']
         return ['comment', 'rework_in_gnd']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # braucht man das?
         context['object'] = self.object
+        context['view'] = 'update'
         return context
 
     def get_model(self):
@@ -148,7 +172,8 @@ class LinkView(DmadBaseViewMixin, UpdateView):
     def get_form_class(self):
         return forms.modelform_factory(
             self.model,
-            form=AsDaisyModelForm,
+            #form=AsDaisyModelForm,
+            form=DmadCreateForm,
             fields=self.fields,
             widgets=formWidgets
         )
@@ -171,7 +196,7 @@ class UnlinkView(DmadBaseViewMixin, UpdateView):
 
     def post(self, request, **kwargs):
         response = super().post(self, request, **kwargs)
-        self.object.gnd_id = ''
+        self.object.gnd_id = None
         self.object.save()
         return response
 
@@ -201,8 +226,10 @@ class ListContextMixin(NavbarContextMixin):
         context.update({
             'active': camel_to_snake_case(self.model.__name__),
             'type': self.kwargs.get('type'),
-            'search_url': reverse_lazy(f'dmad_on_django:{self.get_model_name()}_search')
+            'search_url': f'dmad_on_django:{self.get_model_name()}_search',
+            'available_sorts': getattr(self.model, 'ordering_fields', {}),
         })
+
         if hasattr(self, 'sqs'):
             context.update({
                 'rework_count': self.sqs.filter(rework_in_gnd=True).count(),
@@ -213,7 +240,6 @@ class ListContextMixin(NavbarContextMixin):
                 'rework_count': self.model.objects.filter(rework_in_gnd=True).count(),
                 'stub_count': self.model.objects.filter(gnd_id__isnull=True).count(),
             })
-
 
         return context
 
@@ -229,7 +255,9 @@ class DmadListView(ListContextMixin, ListView):
         context = super().get_context_data(**kwargs)
 
         placeholder = self.model.get_search_placeholder()
+
         context['form'] = FramedSearchForm(placeholder=placeholder)
+        #context['search_url'] = f'dmad_on_django:{camel_to_snake_case(self.model.__name__)}_search'
 
         return context
 
@@ -242,6 +270,11 @@ class DmadListView(ListContextMixin, ListView):
         if type_ == 'stub':
             qs = qs.filter(gnd_id__isnull = True)
 
+        sort_param = self.request.GET.get('sort')
+        descending = self.request.GET.get('dir') == 'desc'
+
+        if hasattr(qs, 'order_by_fields'):
+            return qs.order_by_fields(sort_key=sort_param, descending=descending)
         return qs
 
     def get(self, *args, **kwargs):
@@ -284,6 +317,7 @@ class DmadSearchView(ListContextMixin, NavbarContextMixin, SearchView):
         context = super().get_context_data(**kwargs)
 
         context['object_list'] = [r.object for r in context['object_list']]
+        #context['search_url'] = f'dmad_on_django:{camel_to_snake_case(self.model.__name__)}_search'
 
         return context
 
@@ -312,3 +346,21 @@ class DmadSearchView(ListContextMixin, NavbarContextMixin, SearchView):
 
     def get_model(self):
         return self.model
+
+
+class BaseAuthorityDataView(DmadBaseViewMixin, DetailView):
+    template_name = 'dmad_on_django/authority_data_view.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+        context['view'] = 'authority_data'
+        return context
+
+
+class BaseRawDataView(DmadBaseViewMixin, DetailView):
+    template_name = 'dmad_on_django/raw_data_view.html'
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+        context['view'] = 'raw_data'
+        return context

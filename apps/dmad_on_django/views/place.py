@@ -52,3 +52,11 @@ class PlaceUnlinkView(UnlinkView):
 
 class PlacePullView(PullView):
     model = Place
+
+
+class PlaceRawDataView(BaseRawDataView):
+    model = Place
+
+
+class PlaceAuthorityDataView(BaseAuthorityDataView):
+    model = Place
