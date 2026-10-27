@@ -14,8 +14,9 @@ from ...models import Manifestation as EdwocaManifestation, Letter, Expression, 
 from ..base import *
 from ...models import ManifestationTitle, ManifestationTitleHandwriting, ItemDigitalCopy
 from bib.models import ZotItem
-from django.db.models import Q, Model
+from bib.tasks import update_zotero_items
 from django.forms import inlineformset_factory
+from django.db.models import Q, Model
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
@@ -435,6 +436,10 @@ class ManifestationBibliographyUpdateView(BaseBibliographyUpdateView):
     def get_success_url(self):
         return reverse_lazy('edwoca:manifestation_bibliography', kwargs={'pk': self.object.id})
 
+def bib_update_view(request):
+    task = update_zotero_items.delay()
+
+    return redirect(request.META['HTTP_REFERER'])
 
 class ManifestationCommentUpdateView(SimpleFormView):
     model = Manifestation
