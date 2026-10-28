@@ -436,10 +436,12 @@ class ManifestationBibliographyUpdateView(BaseBibliographyUpdateView):
     def get_success_url(self):
         return reverse_lazy('edwoca:manifestation_bibliography', kwargs={'pk': self.object.id})
 
+
 def bib_update_view(request):
     task = update_zotero_items.delay()
 
     return redirect(request.META['HTTP_REFERER'])
+
 
 class ManifestationCommentUpdateView(SimpleFormView):
     model = Manifestation
