@@ -3,6 +3,8 @@
 # Example: ./import_manifestations.sh ../some_other_dir/
 
 CSV_PATH_PREFIX=${1:-liszt_csv/}
+shopt -s expand_aliases
+alias python="uv run"
 
 #echo importing 1b fragments
 #python manage.py import_manifestations_from_csv "${CSV_PATH_PREFIX}liszt_1b_long.csv" -st autograph -mf fragment

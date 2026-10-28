@@ -312,7 +312,7 @@ class BaseLetterContributorForm(ModelForm):
     edition_name = CharField(
             required = False,
             widget = Meta.widgets['edition_name'],
-            label = _('edtion name')
+            label = _('edition name')
         )
     source_name_inferred = BooleanField(
             widget = CheckboxInput(attrs = {

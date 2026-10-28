@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 16:43+0200\n"
+"POT-Creation-Date: 2026-10-27 10:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -94,7 +94,7 @@ msgstr "Schreibmittel"
 msgid "dubious writer"
 msgstr "Schreiber unsicher"
 
-#: apps/dmrism/models/base.py:203 apps/dmrism/models/item.py:698
+#: apps/dmrism/models/base.py:203 apps/dmrism/models/item.py:699
 msgid "<writer>"
 msgstr "<Schreiber>"
 
@@ -123,12 +123,14 @@ msgid "assumed"
 msgstr "unsicher"
 
 #: apps/dmrism/models/item.py:25
+#, fuzzy
+#| msgid "proof"
 msgid "proof copy"
-msgstr "Nachweisexemplar"
+msgstr "Korrekturabzug"
 
 #: apps/dmrism/models/item.py:26
 msgid "annotated proof copy"
-msgstr "annotiertes Nachweisexemplar"
+msgstr ""
 
 #: apps/dmrism/models/item.py:27 apps/dmrism/models/manifestation.py:69
 msgid "modified print"
@@ -144,7 +146,7 @@ msgstr "Folgeauflage"
 
 #: apps/dmrism/models/item.py:39 apps/dmrism/models/manifestation.py:136
 msgid "source type"
-msgstr "Typ"
+msgstr "Quellentyp"
 
 #: apps/dmrism/models/item.py:45 apps/dmrism/models/manifestation.py:190
 msgid "RISM id"
@@ -209,7 +211,7 @@ msgstr "Aufführungsmaterial"
 
 #: apps/dmrism/models/item.py:125
 msgid "correction sheet"
-msgstr "Korrektur"
+msgstr "Korrekturblatt"
 
 #: apps/dmrism/models/item.py:129
 msgid "stitch template"
@@ -227,135 +229,135 @@ msgstr "Handexemplar"
 msgid "edition"
 msgstr "Auflage"
 
-#: apps/dmrism/models/item.py:304
+#: apps/dmrism/models/item.py:305
 msgid "name"
 msgstr "Name"
 
-#: apps/dmrism/models/item.py:311
+#: apps/dmrism/models/item.py:312
 msgid "siglum"
 msgstr "Sigle"
 
-#: apps/dmrism/models/item.py:319
+#: apps/dmrism/models/item.py:320
 msgid "corporation"
 msgstr "Körperschaft"
 
-#: apps/dmrism/models/item.py:344
+#: apps/dmrism/models/item.py:345
 msgid "Current"
 msgstr "aktuell"
 
-#: apps/dmrism/models/item.py:345
+#: apps/dmrism/models/item.py:346
 msgid "Former"
 msgstr "vormalig"
 
-#: apps/dmrism/models/item.py:353
+#: apps/dmrism/models/item.py:354
 msgid "holding institution"
 msgstr "Bestandshaltende Institution"
 
-#: apps/dmrism/models/item.py:358
+#: apps/dmrism/models/item.py:359
 msgid "signature"
 msgstr "Signatur"
 
-#: apps/dmrism/models/item.py:365
+#: apps/dmrism/models/item.py:366
 msgid "status"
 msgstr "Status"
 
-#: apps/dmrism/models/item.py:369
+#: apps/dmrism/models/item.py:370
 msgid "without signature"
 msgstr " "
 
-#: apps/dmrism/models/item.py:376
+#: apps/dmrism/models/item.py:377
 msgid "<< institution >>"
 msgstr "<< Institution >>"
 
-#: apps/dmrism/models/item.py:424
+#: apps/dmrism/models/item.py:425
 msgid "acquisition"
 msgstr "Erwerb"
 
-#: apps/dmrism/models/item.py:425
+#: apps/dmrism/models/item.py:426
 msgid "disposition"
 msgstr "Abgabe"
 
-#: apps/dmrism/models/item.py:426
+#: apps/dmrism/models/item.py:427
 msgid "ownership"
 msgstr "Besitz"
 
-#: apps/dmrism/models/item.py:455 apps/dmrism/models/item.py:499
+#: apps/dmrism/models/item.py:456 apps/dmrism/models/item.py:500
 msgid "period status"
 msgstr "Datierungsereignis"
 
-#: apps/dmrism/models/item.py:462
+#: apps/dmrism/models/item.py:463
 msgid " et al."
 msgstr " et al."
 
-#: apps/dmrism/models/item.py:466 apps/dmrism/models/item.py:506
+#: apps/dmrism/models/item.py:467 apps/dmrism/models/item.py:507
 msgid "<< new provenance station >>"
 msgstr "<< neue Provenienz >>"
 
-#: apps/dmrism/models/item.py:467
+#: apps/dmrism/models/item.py:468
 msgid "no year"
 msgstr "o. J."
 
-#: apps/dmrism/models/item.py:532
+#: apps/dmrism/models/item.py:533
 msgid "Digitized"
 msgstr "Digitalisat"
 
-#: apps/dmrism/models/item.py:533
+#: apps/dmrism/models/item.py:534
 msgid "IIIF Manifest"
 msgstr "IIIF-Manifest"
 
-#: apps/dmrism/models/item.py:534
+#: apps/dmrism/models/item.py:535
 msgid "Private"
 msgstr "Privat"
 
-#: apps/dmrism/models/item.py:535
+#: apps/dmrism/models/item.py:536
 msgid "Working copy"
 msgstr "Arbeitsdigitalisat"
 
-#: apps/dmrism/models/item.py:544 apps/dmrism/models/item.py:590
+#: apps/dmrism/models/item.py:545 apps/dmrism/models/item.py:591
 msgid "URL"
 msgstr "URL"
 
-#: apps/dmrism/models/item.py:551
+#: apps/dmrism/models/item.py:552
 msgid "link type"
 msgstr "Linktyp"
 
-#: apps/dmrism/models/item.py:597
+#: apps/dmrism/models/item.py:598
 msgid "web reference comment"
 msgstr "Kommentar"
 
-#: apps/dmrism/models/item.py:639
+#: apps/dmrism/models/item.py:640
 msgid "correction"
 msgstr "Korrektur"
 
-#: apps/dmrism/models/item.py:643
+#: apps/dmrism/models/item.py:644
 msgid "ownership note"
 msgstr "Besitzvermerk"
 
-#: apps/dmrism/models/item.py:647
+#: apps/dmrism/models/item.py:648
 msgid "date note"
 msgstr "Datierungsvermerk"
 
-#: apps/dmrism/models/item.py:651
+#: apps/dmrism/models/item.py:652
 msgid "dedication"
 msgstr "Widmung"
 
-#: apps/dmrism/models/item.py:655
+#: apps/dmrism/models/item.py:656
 msgid "addition"
 msgstr "Hinzufügung"
 
-#: apps/dmrism/models/item.py:659
+#: apps/dmrism/models/item.py:660
 msgid "note"
 msgstr "Notiz"
 
-#: apps/dmrism/models/item.py:663
+#: apps/dmrism/models/item.py:664
 msgid "title"
 msgstr "Titel"
 
-#: apps/dmrism/models/item.py:668
+#: apps/dmrism/models/item.py:669
 msgid "description of title correction"
 msgstr "Beschreibung der Annotation"
 
-#: apps/dmrism/models/item.py:699
+#: apps/dmrism/models/item.py:700
 msgid "<handwriting>"
 msgstr "<Handschrift>"
 
@@ -424,16 +426,18 @@ msgid "questionable autograph"
 msgstr "Fragliches Autograph"
 
 #: apps/dmrism/models/manifestation.py:70
+#, fuzzy
+#| msgid "print type"
 msgid "print"
-msgstr "Druck"
+msgstr "Drucktyp"
 
 #: apps/dmrism/models/manifestation.py:86
 msgid "complete"
-msgstr "vollständig erhalten"
+msgstr "vollständig"
 
 #: apps/dmrism/models/manifestation.py:87
 msgid "incomplete"
-msgstr "unvollständig erhalten"
+msgstr "unvollständig"
 
 #: apps/dmrism/models/manifestation.py:91
 msgid "source title"
@@ -445,7 +449,7 @@ msgstr "Titelblatt (diplomatische Umschrift)"
 
 #: apps/dmrism/models/manifestation.py:128
 msgid "manifestation form"
-msgstr "Stadium"
+msgstr "Quellenform"
 
 #: apps/dmrism/models/manifestation.py:144
 msgid "print type"
@@ -489,7 +493,7 @@ msgstr "interner Kommentar"
 
 #: apps/dmrism/models/manifestation.py:234
 msgid "private print comment"
-msgstr "interner Kommentar"
+msgstr "interner Kommentar zu den Druckspezifika"
 
 #: apps/dmrism/models/manifestation.py:250
 msgid "specific figure"
@@ -553,7 +557,7 @@ msgstr "Teilausgabe"
 
 #: apps/dmrism/models/manifestation.py:344
 msgid "without proof copy"
-msgstr "ohne Nachweisexemplar, Druck ermittelt"
+msgstr ""
 
 #: apps/dmrism/models/manifestation.py:421
 msgid "empty"
@@ -599,38 +603,20 @@ msgstr "hat Bezug zu"
 msgid "is derivative of"
 msgstr "ist Ableitung von"
 
-#~ msgid "print proof"
-#~ msgstr "Korrekturabzug"
-
-#~ msgid "item stage"
-#~ msgstr "Stadium"
-
-#~ msgid "is revision of"
-#~ msgstr "ist Ableitung von"
-
-#~ msgid "first editor"
-#~ msgstr "Erstbearbeiter*in"
-
-#~ msgid "history"
-#~ msgstr "Geschichte"
-
-#~ msgid "manuscript proof"
-#~ msgstr "Entwurf"
-
 #~ msgid "first save"
 #~ msgstr "Datum"
 
 #~ msgid "last save"
 #~ msgstr "letzte Bearbeitung"
 
-#~ msgid "print with autograph entries"
-#~ msgstr "Druck mit autographen Eintragungen"
+#~ msgid "first editor"
+#~ msgstr "Erstbearbeiter*in"
 
 #~ msgid "ownership period"
 #~ msgstr "Besitzzeitraum"
 
-#~ msgid "completeness"
-#~ msgstr "Vollständigkeit"
+#~ msgid "ownership date"
+#~ msgstr "Besitzzeitpunkt"
 
 #~ msgid "constituting"
 #~ msgstr "konstituierend"
@@ -641,5 +627,29 @@ msgstr "ist Ableitung von"
 #~ msgid "Excerpts"
 #~ msgstr "Ausschnitt"
 
+#~ msgid "Sketches"
+#~ msgstr "Entwurf"
+
 #~ msgid "Fragments"
 #~ msgstr "Fragment"
+
+#~ msgid "print with autograph entries"
+#~ msgstr "Druck mit autographen Eintragungen"
+
+#~ msgid "history"
+#~ msgstr "Geschichte"
+
+#~ msgid "print proof"
+#~ msgstr "Korrekturabzug"
+
+#~ msgid "item stage"
+#~ msgstr "Stadium"
+
+#~ msgid "is revision of"
+#~ msgstr "ist Ableitung von"
+
+#~ msgid "manuscript proof"
+#~ msgstr "Entwurf"
+
+#~ msgid "completeness"
+#~ msgstr "Vollständigkeit"

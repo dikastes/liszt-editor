@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-16 16:43+0200\n"
+"POT-Creation-Date: 2026-10-27 10:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -169,7 +169,7 @@ msgid "source name"
 msgstr "Name (nach Originalquelle)"
 
 #: apps/edwoca/forms/letter.py:315
-msgid "edtion name"
+msgid "edition name"
 msgstr "Name (nach Edition)"
 
 #: apps/edwoca/forms/letter.py:333 apps/edwoca/forms/letter.py:349
@@ -260,71 +260,71 @@ msgstr "Bibliothek auswählen"
 msgid "copy of"
 msgstr "Kopie von"
 
-#: apps/edwoca/models/base.py:1041
+#: apps/edwoca/models/base.py:1042
 msgid "<< publisher >>"
 msgstr "<< Verlag >>"
 
-#: apps/edwoca/models/base.py:1141
+#: apps/edwoca/models/base.py:1142
 msgid "Composer"
 msgstr "Komponist"
 
-#: apps/edwoca/models/base.py:1142
+#: apps/edwoca/models/base.py:1143
 msgid "Writer"
 msgstr "Schreiber"
 
-#: apps/edwoca/models/base.py:1143
+#: apps/edwoca/models/base.py:1144
 msgid "Translator"
 msgstr "Übersetzer"
 
-#: apps/edwoca/models/base.py:1144
+#: apps/edwoca/models/base.py:1145
 msgid "Poet"
 msgstr "Dichter"
 
-#: apps/edwoca/models/base.py:1145
+#: apps/edwoca/models/base.py:1146
 msgid "Dedicatee"
 msgstr "Widmungsträger"
 
-#: apps/edwoca/models/base.py:1165 apps/edwoca/models/base.py:1274
+#: apps/edwoca/models/base.py:1166 apps/edwoca/models/base.py:1275
 #: apps/edwoca/models/expression.py:165
 #: apps/edwoca/templates/edwoca/bib_update.html:29
 #: apps/edwoca/templates/edwoca/partials/forms/provenance_station_form.html:100
 msgid "title"
 msgstr "Titel"
 
-#: apps/edwoca/models/base.py:1171
+#: apps/edwoca/models/base.py:1172
 msgid "status"
 msgstr "Status"
 
-#: apps/edwoca/models/base.py:1177
+#: apps/edwoca/models/base.py:1178
 msgid "language"
 msgstr "Sprache"
 
-#: apps/edwoca/models/base.py:1194
+#: apps/edwoca/models/base.py:1195
 msgid "Published"
 msgstr "veröffentlicht"
 
-#: apps/edwoca/models/base.py:1230
+#: apps/edwoca/models/base.py:1231
 msgid "description of modification"
 msgstr "Beschreibung der Modifikationen"
 
-#: apps/edwoca/models/base.py:1258 apps/edwoca/models/base.py:1270
+#: apps/edwoca/models/base.py:1259 apps/edwoca/models/base.py:1271
 #: apps/edwoca/models/expression.py:247
 msgid "note"
 msgstr "Notiz"
 
-#: apps/edwoca/models/base.py:1262
+#: apps/edwoca/models/base.py:1263
 msgid "addition"
 msgstr "Hinzufügung"
 
-#: apps/edwoca/models/base.py:1266
+#: apps/edwoca/models/base.py:1267
 msgid "correction"
 msgstr "Korrektur"
 
-#: apps/edwoca/models/base.py:1290
+#: apps/edwoca/models/base.py:1291
 msgid "<writer>"
 msgstr "<Schreiber>"
 
-#: apps/edwoca/models/base.py:1291
+#: apps/edwoca/models/base.py:1292
 msgid "<handwriting>"
 msgstr "<Handschrift>"
 
@@ -566,7 +566,7 @@ msgstr "Kategorie"
 #: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:27
 #: apps/edwoca/templates/edwoca/partials/work/work_menu.html:56
 #: apps/edwoca/templates/edwoca/provenance.html:64
-#: apps/edwoca/views/manifestation/common.py:442
+#: apps/edwoca/views/manifestation/common.py:447
 msgid "comment"
 msgstr "Kommentar"
 
@@ -650,12 +650,12 @@ msgstr "Nachweis entfernen"
 msgid "no bibliographic datasets have been linked"
 msgstr "keine verknüpften Literatureinträge"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:58
+#: apps/edwoca/templates/edwoca/bib_update.html:57
 msgid "search bibliography"
 msgstr "Literatur durchsuchen"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:60
-#: apps/edwoca/templates/edwoca/bib_update.html:115
+#: apps/edwoca/templates/edwoca/bib_update.html:59
+#: apps/edwoca/templates/edwoca/bib_update.html:122
 #: apps/edwoca/templates/edwoca/history.html:50
 #: apps/edwoca/templates/edwoca/letter_update.html:150
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:113
@@ -668,8 +668,8 @@ msgstr "Literatur durchsuchen"
 msgid "search"
 msgstr "suchen"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:75
-#: apps/edwoca/templates/edwoca/bib_update.html:130
+#: apps/edwoca/templates/edwoca/bib_update.html:74
+#: apps/edwoca/templates/edwoca/bib_update.html:137
 #: apps/edwoca/templates/edwoca/history.html:65
 #: apps/edwoca/templates/edwoca/letter_update.html:161
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:164
@@ -684,12 +684,16 @@ msgstr "suchen"
 msgid "no search results"
 msgstr "keine Suchergebnisse"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:85
+#: apps/edwoca/templates/edwoca/bib_update.html:87
+msgid "bib_update_button"
+msgstr "Bibliografie aktualisieren"
+
+#: apps/edwoca/templates/edwoca/bib_update.html:92
 #: apps/edwoca/templates/edwoca/list.html:86 apps/edwoca/views/letter.py:12
 msgid "letters"
 msgstr "Briefe"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:97
+#: apps/edwoca/templates/edwoca/bib_update.html:104
 #: apps/edwoca/templates/edwoca/history.html:31
 #: apps/edwoca/templates/edwoca/library_update.html:31
 #: apps/edwoca/templates/edwoca/manifestation_print.html:29
@@ -710,11 +714,11 @@ msgstr "Briefe"
 msgid "remove"
 msgstr "entfernen"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:104
+#: apps/edwoca/templates/edwoca/bib_update.html:111
 msgid "no letters have been linked"
 msgstr "keine verknüpften Briefe"
 
-#: apps/edwoca/templates/edwoca/bib_update.html:113
+#: apps/edwoca/templates/edwoca/bib_update.html:120
 msgid "search letters"
 msgstr "Briefe durchsuchen"
 
@@ -1025,16 +1029,16 @@ msgstr "Fassungen"
 #: apps/edwoca/templates/edwoca/list.html:32
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:344
 #: apps/edwoca/templates/edwoca/partials/library/library_menu.html:17
-#: apps/edwoca/views/manifestation/common.py:75
-#: apps/edwoca/views/manifestation/common.py:98
+#: apps/edwoca/views/manifestation/common.py:76
+#: apps/edwoca/views/manifestation/common.py:99
 msgid "manuscripts"
 msgstr "Handschriften"
 
 #: apps/edwoca/templates/edwoca/list.html:42
 #: apps/edwoca/templates/edwoca/manifestation_relations.html:469
 #: apps/edwoca/templates/edwoca/partials/library/library_menu.html:25
-#: apps/edwoca/views/manifestation/common.py:49
-#: apps/edwoca/views/manifestation/common.py:62
+#: apps/edwoca/views/manifestation/common.py:50
+#: apps/edwoca/views/manifestation/common.py:63
 msgid "prints"
 msgstr "Drucke"
 
@@ -1583,6 +1587,8 @@ msgid "remove modification"
 msgstr "Modifikation entfernen"
 
 #: apps/edwoca/templates/edwoca/partials/forms/dedication_form.html:14
+#, fuzzy
+#| msgid "Dedicatee"
 msgid "dedicatee"
 msgstr "Widmungsträger"
 
@@ -1863,15 +1869,15 @@ msgstr "Provenienz anlegen"
 msgid "singleton"
 msgstr "Handschrift"
 
-#: apps/edwoca/views/manifestation/common.py:222
+#: apps/edwoca/views/manifestation/common.py:223
 msgid "search manuscripts"
 msgstr "Handschriften durchsuchen"
 
-#: apps/edwoca/views/manifestation/common.py:223
+#: apps/edwoca/views/manifestation/common.py:224
 msgid "search collections"
 msgstr "Sammlungen durchsuchen"
 
-#: apps/edwoca/views/manifestation/common.py:224
+#: apps/edwoca/views/manifestation/common.py:225
 msgid "search prints"
 msgstr "Drucke durchsuchen"
 
@@ -1914,6 +1920,39 @@ msgstr "Personen durchsuchen"
 msgid "search expressions"
 msgstr "Fassungen durchsuchen"
 
+#~ msgid "not before"
+#~ msgstr "nicht vor"
+
+#~ msgid "not after"
+#~ msgstr "nicht nach"
+
+#~ msgid "date according to edition (standardized)"
+#~ msgstr "Datierung nach Edition (standardisiert)"
+
+#~ msgid "based on edition"
+#~ msgstr "nach Edition"
+
+#~ msgid "date according to source (standardized)"
+#~ msgstr "Datierung nach Originalquelle (standardisiert)"
+
+#~ msgid "choose publisher"
+#~ msgstr "Verlag auswählen"
+
+#~ msgid "pages"
+#~ msgstr "Seiten"
+
+#~ msgid "edtion name"
+#~ msgstr "Name (nach Edition)"
+
+#~ msgid "link item"
+#~ msgstr "Exemplar verknüpfen"
+
+#~ msgid "please enter search term"
+#~ msgstr "Bitte Suchbegriff eingeben"
+
+#~ msgid "create manuscript part (separated)"
+#~ msgstr "Handschrift (separierter Teil)"
+
 #~ msgid "has as derivative"
 #~ msgstr "hat als Ableitung"
 
@@ -1947,9 +1986,6 @@ msgstr "Fassungen durchsuchen"
 #~ msgid "search manifestations"
 #~ msgstr "Handschriften durchsuchen"
 
-#~ msgid "link item"
-#~ msgstr "Exemplar verknüpfen"
-
 #~ msgid "is part (constituting) of"
 #~ msgstr "ist Teil von (konstituierend)"
 
@@ -1961,21 +1997,6 @@ msgstr "Fassungen durchsuchen"
 
 #~ msgid "search corporations"
 #~ msgstr "Körperschaften durchsuchen"
-
-#~ msgid "date according to edition (standardized)"
-#~ msgstr "Datierung nach Edition (standardisiert)"
-
-#~ msgid "based on edition"
-#~ msgstr "nach Edition"
-
-#~ msgid "date according to source (standardized)"
-#~ msgstr "Datierung nach Originalquelle (standardisiert)"
-
-#~ msgid "choose publisher"
-#~ msgstr "Verlag auswählen"
-
-#~ msgid "please enter search term"
-#~ msgstr "Bitte Suchbegriff eingeben"
 
 #~ msgid "place inferred assumed"
 #~ msgstr "Ort unsicher ermittelt"
