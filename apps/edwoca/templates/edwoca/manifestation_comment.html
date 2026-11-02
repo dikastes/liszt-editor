@@ -23,7 +23,7 @@
     {% include 'edwoca/partials/'|add:entity_type|add:'/preview-divs/'|add:property|add:'_epilog.html' %}
 {% endif %}
 
-{% if not object.items.count %}
+{% if not object.items.count and not object.component_of %}
     <span class="text-primary mr-5">
         {% translate 'there are no items yet' %}
     </span>

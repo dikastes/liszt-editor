@@ -16,7 +16,7 @@
     </div>
 {% endif %}
 
-{% if not object.is_singleton %}
+{% if not object.is_singleton and not object.component_of %}
     <h2 class="my-5"> 
         {% translate 'items' %}
     </h2>

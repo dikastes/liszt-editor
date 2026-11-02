@@ -170,38 +170,40 @@
 
     {{ manifestation_form.comment_as_daisy }}
 
-    <h3 class="my-5">
-        {% translate 'template copy' %}
-    </h3>
+    {% if not object.component_of %}
+        <h3 class="my-5">
+            {% translate 'template copy' %}
+        </h3>
 
-    {% if object.template_item %}
-        <div class="signature-form">
-            <label class="form-control">
-                <div class="label">
-                    <span class="label-text">
-                    </span>
-                </div>
-                <div class="pseudo-input border border-black">
-                </div>
-            </label>
-            <label class="mb-5 items-center input input-bordered flex-1 gap-5 flex" disabled>
-                {% translate 'library' %}
-                <input class="w-full grow" value="{{ object.template_item.current_signature.library }}"/>
-            </label>
-            <label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
-                Signatur
-                <input class="w-full grow" value="{{ object.template_item.current_signature.signature }}"/>
-            </label>
-        </div>
-    {% else %}
-        {% if object.items.count %}
-            <p class="text-primary">
-                {% translate 'no template item' %}
-            </p>
+        {% if object.template_item %}
+            <div class="signature-form">
+                <label class="form-control">
+                    <div class="label">
+                        <span class="label-text">
+                        </span>
+                    </div>
+                    <div class="pseudo-input border border-black">
+                    </div>
+                </label>
+                <label class="mb-5 items-center input input-bordered flex-1 gap-5 flex" disabled>
+                    {% translate 'library' %}
+                    <input class="w-full grow" value="{{ object.template_item.current_signature.library }}"/>
+                </label>
+                <label class="items-center input input-bordered flex-1 gap-5 flex" disabled>
+                    Signatur
+                    <input class="w-full grow" value="{{ object.template_item.current_signature.signature }}"/>
+                </label>
+            </div>
         {% else %}
-            <p class="text-primary">
-                {% translate 'no items' %}
-            </p>
+            {% if object.items.count %}
+                <p class="text-primary">
+                    {% translate 'no template item' %}
+                </p>
+            {% else %}
+                <p class="text-primary">
+                    {% translate 'no items' %}
+                </p>
+            {% endif %}
         {% endif %}
     {% endif %}
 
