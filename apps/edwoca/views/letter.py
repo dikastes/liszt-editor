@@ -220,9 +220,11 @@ def letter_update(request, pk):
             letter.source_period.save()
 
         if 'edition_period-calculate-machine-readable-date' in request.POST:
+            letter.edition_period.save()
             letter.edition_period.parse_display()
             letter.edition_period.save()
         if 'source_period-calculate-machine-readable-date' in request.POST:
+            letter.source_period.save()
             letter.source_period.parse_display()
             letter.source_period.save()
 
