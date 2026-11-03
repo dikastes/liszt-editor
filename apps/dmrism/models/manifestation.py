@@ -359,6 +359,18 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return None
 
     @property
+    def constituent_of(self):
+        if self.part_of:
+            return self.part_of
+        if self.component_of:
+            return self.component_of
+        raise Exception('Called constituent of on a non constituent')
+
+    @property
+    def collection_constituents(self):
+        return self.collection_parts.order_by().union(self.collection_components.order_by()).order_by('order_index')
+
+    @property
     def may_have_component(self):
         return self.is_collection or self.part_of is not None
 

@@ -1167,18 +1167,22 @@ def manifestation_unset_collection(request, pk):
 @require_POST
 def collection_part_swap_view(request, pk, parent_pk, direction):
     def initialize_order_indices(qs):
-        for i, child in enumerate(qs.all()):
-            if child.order_index == 0:
-                child.order_index = i
-                child.save()
+        def duplicate_index(qs):
+            index_list = []
+            for child in qs.all():
+                if child.order_index in index_list:
+                    return child
+                index_list += [ child.order_index ]
+            return False
+
+        while (child := duplicate_index(qs)):
+            child.order_index += 1
+            child.save()
 
     manifestation = get_object_or_404(EdwocaManifestation, pk=pk)
     parent_manifestation = get_object_or_404(EdwocaManifestation, pk=parent_pk)
 
-    if parent_manifestation.collection_parts.count():
-        initialize_order_indices(parent_manifestation.collection_parts)
-    if parent_manifestation.collection_components.count():
-        initialize_order_indices(parent_manifestation.collection_components)
+    initialize_order_indices(parent_manifestation.collection_constituents)
 
     success = swap_order(manifestation, direction)
 

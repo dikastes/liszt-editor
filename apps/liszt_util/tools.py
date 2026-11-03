@@ -1,7 +1,9 @@
 from json import dumps, loads
 
+import operator
+from functools import reduce
 from django.db import transaction
-from django.db.models import Max, QuerySet, F, FilteredRelation
+from django.db.models import Max, QuerySet, F, FilteredRelation, Q
 from django.utils.safestring import mark_safe
 from .models import Sortable
 
@@ -104,16 +106,11 @@ def swap_order(obj, direction) -> bool:
     current_index = obj.order_index
     group_field_names = obj._group_field_names
 
-    group_found = False
-    for name in group_field_names:
-        group_value = getattr(obj, name)
-        if group_value:
-            group_filter = {name: group_value}
-            group_found = True
-            break
-
-    if not group_found:
-        return False
+    # retrieve parent pk
+    pk = [ value.pk for name in group_field_names if (value := getattr(obj, name)) ].pop()
+    filter = [ Q(**{name: pk}) for name in group_field_names if name ]
+    # this yiels something like Q(component_of = xyz) | Q(part_of = xyz)
+    reduced_filter = reduce(operator.or_, filter)
 
     if direction == 'up':
         # Objekt mit dem nächstkleineren Index
@@ -121,7 +118,7 @@ def swap_order(obj, direction) -> bool:
         neighbour = (
             ModelClass
             .objects
-            .filter(order_index__lt=current_index, **group_filter)
+            .filter(Q(order_index__lt=current_index) & reduced_filter)
             .order_by('-order_index').first()
         )
 
@@ -130,7 +127,7 @@ def swap_order(obj, direction) -> bool:
         neighbour = (
             ModelClass
             .objects
-            .filter(order_index__gt=current_index, **group_filter)
+            .filter(Q(order_index__gt=current_index) & reduced_filter)
             .order_by('order_index').first()
         )
     else:
@@ -144,7 +141,7 @@ def swap_order(obj, direction) -> bool:
         neighbour_index = neighbour.order_index
 
         # Max-Index in der Gruppe ermitteln und +1 addieren, um Eindeutigkeit zu garantieren
-        max_index = ModelClass.objects.filter(**group_filter).aggregate(Max('order_index'))['order_index__max']
+        max_index = ModelClass.objects.filter(reduced_filter).aggregate(Max('order_index'))['order_index__max']
 
         # Sicherer temporärer Index: Maximaler Index + 1
         temp_index = max_index + 1
