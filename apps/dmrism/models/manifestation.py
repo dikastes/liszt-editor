@@ -11,7 +11,7 @@ from dmad_on_django.models import Language, Status, Period, Person, Corporation
 from dmad_on_django.models.base import DocumentationStatusMixin
 from bib.models import ZotItem
 from iso639 import find as lang_find
-from liszt_util.tools import RenderRawJSONMixin
+from liszt_util.tools import RenderRawJSONMixin, pad_numbers
 from liszt_util.models import Sortable
 
 
@@ -86,6 +86,10 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         COMPLETE= 'CP', _('complete')
         INCOMPLETE= 'INC', _('incomplete')
 
+    # denormalized textfield holding signature for manuscripts and publisher/plate number for prints
+    sorting_key = models.TextField(
+            default = ''
+        )
     source_title = models.TextField(
             blank = True,
             verbose_name = _('source title'),
@@ -359,6 +363,18 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return None
 
     @property
+    def constituent_of(self):
+        if self.part_of:
+            return self.part_of
+        if self.component_of:
+            return self.component_of
+        raise Exception('Called constituent of on a non constituent')
+
+    @property
+    def collection_constituents(self):
+        return self.collection_parts.order_by().union(self.collection_components.order_by()).order_by('order_index')
+
+    @property
     def may_have_component(self):
         return self.is_collection or self.part_of is not None
 
@@ -453,6 +469,17 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return self.standardized_search_entry()
 
     def save(self, *args, **kwargs):
+        if self.pk and not self.is_singleton:
+            if self.publications.count():
+                first_publication = self.publications.first()
+                if (first_publisher := first_publication.publisher):
+                    year = ''
+                    if (period := self.period) and (not_before := period.not_before):
+                        year = not_before.year
+                    # put plate numbers before years
+                    plate_or_year = 'a' + pad_numbers(self.plate_number, 15) or 'z' + str(year)
+                    self.sorting_key = first_publisher.get_default_name() + plate_or_year
+
         if not self.period:
             self.period = Period.objects.create()
         # chatgpt sagt das soll nach clean und nicht nach save

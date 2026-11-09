@@ -20,6 +20,11 @@ class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
             document=True,
             use_template=True
         )
+    sorting_key = indexes.CharField(
+            model_attr = 'sorting_key',
+            indexed=True,
+            stored=True
+        )
     signature_normalized = indexes.CharField(
             model_attr = 'get_current_signature_normalized',
             indexed=True,
@@ -56,6 +61,11 @@ class ItemIndex(indexes.SearchIndex, indexes.Indexable):
             use_template=True
         )
     manifestation_is_singleton = indexes.BooleanField(model_attr = 'manifestation__is_singleton')
+    sorting_key = indexes.CharField(
+            model_attr = 'sorting_key',
+            indexed=True,
+            stored=True
+        )
 
     def get_model(self):
         return Item

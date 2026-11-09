@@ -16,7 +16,7 @@ from ...models import ManifestationTitle, ManifestationTitleHandwriting, ItemDig
 from bib.models import ZotItem
 from bib.tasks import update_zotero_items
 from django.forms import inlineformset_factory
-from django.db.models import Q, Model
+from django.db.models import Q, Model, FilteredRelation
 from django.http import Http404, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy, reverse
@@ -43,7 +43,7 @@ class ManifestationListView(EdwocaListView):
     model = EdwocaManifestation
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_singleton = False)
+        return super().get_queryset().filter(is_singleton = False).order_by('-needs_review', 'sorting_key')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -56,7 +56,7 @@ class ManifestationSearchView(EdwocaSearchView):
     form_class = ManifestationSearchForm
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_singleton = False)
+        return super().get_queryset().filter(is_singleton = False).order_by('-needs_review', 'sorting_key')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,7 +68,7 @@ class SingletonListView(EdwocaListView):
     model = EdwocaManifestation
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_singleton = True)
+        return super().get_queryset().filter(is_singleton = True).order_by('-needs_review', 'sorting_key')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -82,7 +82,7 @@ class SingletonSearchView(EdwocaSearchView):
     form_class = ManifestationSearchForm
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_singleton = True)
+        return super().get_queryset().filter(is_singleton = True).order_by('-needs_review', 'sorting_key')
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('q', '')
@@ -1167,18 +1167,22 @@ def manifestation_unset_collection(request, pk):
 @require_POST
 def collection_part_swap_view(request, pk, parent_pk, direction):
     def initialize_order_indices(qs):
-        for i, child in enumerate(qs.all()):
-            if child.order_index == 0:
-                child.order_index = i
-                child.save()
+        def duplicate_index(qs):
+            index_list = []
+            for child in qs.all():
+                if child.order_index in index_list:
+                    return child
+                index_list += [ child.order_index ]
+            return False
+
+        while (child := duplicate_index(qs)):
+            child.order_index += 1
+            child.save()
 
     manifestation = get_object_or_404(EdwocaManifestation, pk=pk)
     parent_manifestation = get_object_or_404(EdwocaManifestation, pk=parent_pk)
 
-    if parent_manifestation.collection_parts.count():
-        initialize_order_indices(parent_manifestation.collection_parts)
-    if parent_manifestation.collection_components.count():
-        initialize_order_indices(parent_manifestation.collection_components)
+    initialize_order_indices(parent_manifestation.collection_constituents)
 
     success = swap_order(manifestation, direction)
 
