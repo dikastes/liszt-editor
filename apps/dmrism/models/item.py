@@ -281,7 +281,7 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         return old_manifestation
 
     def save(self, *args, **kwargs):
-        if self.signatures.filter(status = ItemSignature.Status.CURRENT).count():
+        if self.pk and self.signatures.filter(status = ItemSignature.Status.CURRENT).count():
             current_signature = self.signatures.get(status = ItemSignature.Status.CURRENT)
             if (library := current_signature.library) and (siglum := library.siglum):
                 self.sorting_key = siglum + pad_numbers(current_signature.signature, 9)

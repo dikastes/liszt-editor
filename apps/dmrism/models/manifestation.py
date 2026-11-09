@@ -11,7 +11,7 @@ from dmad_on_django.models import Language, Status, Period, Person, Corporation
 from dmad_on_django.models.base import DocumentationStatusMixin
 from bib.models import ZotItem
 from iso639 import find as lang_find
-from liszt_util.tools import RenderRawJSONMixin
+from liszt_util.tools import RenderRawJSONMixin, pad_numbers
 from liszt_util.models import Sortable
 
 
@@ -469,7 +469,7 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return self.standardized_search_entry()
 
     def save(self, *args, **kwargs):
-        if not self.is_singleton:
+        if self.pk and not self.is_singleton:
             if self.publications.count():
                 first_publication = self.publications.first()
                 if (first_publisher := first_publication.publisher):
