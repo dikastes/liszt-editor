@@ -86,6 +86,10 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         COMPLETE= 'CP', _('complete')
         INCOMPLETE= 'INC', _('incomplete')
 
+    # denormalized textfield holding signature for manuscripts and publisher/plate number for prints
+    sorting_key = models.TextField(
+            default = ''
+        )
     source_title = models.TextField(
             blank = True,
             verbose_name = _('source title'),
@@ -465,6 +469,17 @@ class Manifestation(Sortable, RenderRawJSONMixin, WemiBaseClass, TrackedModel):
         return self.standardized_search_entry()
 
     def save(self, *args, **kwargs):
+        if not self.is_singleton:
+            if self.publications.count():
+                first_publication = self.publications.first()
+                if (first_publisher := first_publication.publisher):
+                    year = ''
+                    if (period := self.period) and (not_before := period.not_before):
+                        year = not_before.year
+                    # put plate numbers before years
+                    plate_or_year = 'a' + pad_numbers(self.plate_number, 15) or 'z' + str(year)
+                    self.sorting_key = first_publisher.get_default_name() + plate_or_year
+
         if not self.period:
             self.period = Period.objects.create()
         # chatgpt sagt das soll nach clean und nicht nach save

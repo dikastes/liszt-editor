@@ -1,6 +1,7 @@
 from json import dumps, loads
 
 import operator
+import re
 from functools import reduce
 from django.db import transaction
 from django.db.models import Max, QuerySet, F, FilteredRelation, Q
@@ -156,3 +157,7 @@ def swap_order(obj, direction) -> bool:
         ModelClass.objects.filter(pk=obj.pk).update(order_index=neighbour_index)
 
     return True
+
+
+def pad_numbers(text, width):
+    return re.sub(r'\d+', lambda match: match.group(0).zfill(width), text)

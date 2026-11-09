@@ -7,6 +7,7 @@ from django.db.models import Q, UniqueConstraint, F
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from liszt_util.models import Sortable
+from liszt_util.tools import pad_numbers
 
 
 class Item(Sortable, WemiBaseClass, TrackedModel):
@@ -30,6 +31,10 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         FIRST_EDITION = '1', _('first issue')
         FOLLOWING_EDITION = 'F', _('following issue')
 
+    # denormalized textfield holding signature
+    sorting_key = models.TextField(
+            default = ''
+        )
     source_type = models.CharField(
             max_length = 3,
             choices = SourceType,
@@ -276,6 +281,15 @@ class Item(Sortable, WemiBaseClass, TrackedModel):
         return old_manifestation
 
     def save(self, *args, **kwargs):
+        if self.signatures.filter(status = ItemSignature.Status.CURRENT).count():
+            current_signature = self.signatures.get(status = ItemSignature.Status.CURRENT)
+            if (library := current_signature.library) and (siglum := library.siglum):
+                self.sorting_key = siglum + pad_numbers(current_signature.signature, 9)
+
+            if self.manifestation.is_singleton:
+                self.manifestation.sorting_key = self.sorting_key
+                self.manifestation.save()
+
         if self.manifestation.is_singleton:
             other_items_exists = Item.objects.filter(
                 manifestation=self.manifestation
