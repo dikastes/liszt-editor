@@ -56,7 +56,7 @@ class ManifestationSearchView(EdwocaSearchView):
     form_class = ManifestationSearchForm
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_singleton = False).order_by('-needs_review', 'sorting_key')
+        return super().get_queryset().filter(is_singleton = False).order_by('needs_review', 'sorting_key')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -68,7 +68,7 @@ class SingletonListView(EdwocaListView):
     model = EdwocaManifestation
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_singleton = True).order_by('-needs_review', 'sorting_key')
+        return super().get_queryset().filter(is_singleton = True).order_by('sorting_key')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -82,7 +82,7 @@ class SingletonSearchView(EdwocaSearchView):
     form_class = ManifestationSearchForm
 
     def get_queryset(self):
-        return super().get_queryset().filter(is_singleton = True).order_by('-needs_review', 'sorting_key')
+        return super().get_queryset().filter(is_singleton = True).order_by('sorting_key')
 
     def get(self, request, *args, **kwargs):
         query = request.GET.get('q', '')
