@@ -1,23 +1,22 @@
-from idlelib.debugobj_r import remote_object_tree_item
-
 from lark import Lark, Transformer
 
 ebnf_grammar = r"""
     textfield: entry*
-    
-    entry: (segment "//")* flag_segment
-    
+
+    entry: (segment "//")* flags_segment
+
     segment: /[^\/]+/
-    
+
     flags_segment: "W" ("|" "Q")? | "Q" ("|" "W")
     
-    %import commons.WS
+    %import common.WS
     %ignore WS
 """
 
+
 class StructuralTransformer(Transformer):
     def segment(self, items):
-        return str(items[0].replace("\xa0", " ")).strip()
+        return str(items[0]).replace("\xa0", " ").strip()
 
     def flags_segment(self, tokens):
         val = "".join(str(t) for t in tokens).upper()
@@ -26,6 +25,7 @@ class StructuralTransformer(Transformer):
             "is_w": "W" in val,
             "is_q": "Q" in val,
         }
+
     def entry(self, items):
         flags = items[-1]
         segments = items[:-1]
@@ -36,3 +36,6 @@ class StructuralTransformer(Transformer):
 
     def textfield(self, entries):
         return list(entries)
+
+
+parser = Lark(ebnf_grammar, start="textfield", parser="lalr", transformer=StructuralTransformer())
