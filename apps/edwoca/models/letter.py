@@ -47,6 +47,8 @@ class LetterWorkReference(models.Model):
     comment = models.TextField(null=True, blank=True)
     source_level_mentioning = models.BooleanField(default=False)
     work_level_mentioning = models.BooleanField(default=False)
+    performances = models.BooleanField(default=False)
+    page = models.IntegerField(default=0)
 
 
     # TODO: Werkerwähnung, Entstehung, Quellentransfer, Aufführungen, WVZ, Werktitel, Kommentar (intern), Erwähnung (W OR Q)

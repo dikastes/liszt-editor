@@ -18,6 +18,8 @@ class Migration(migrations.Migration):
                 ('reference', models.TextField(blank=True, null=True)),
                 ('entstehung', models.BooleanField(default=False)),
                 ('source_transfer', models.BooleanField(default=False)),
+                ('performances', models.BooleanField(default=False)),
+                ('page',models.IntegerField(default=0)),
                 ('work_catalogue_number', models.TextField(blank=True, null=True)),
                 ('work_title', models.TextField(blank=True, null=True)),
                 ('comment', models.TextField(blank=True, null=True)),
