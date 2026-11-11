@@ -7,11 +7,11 @@ from lark import Lark, Transformer
 ebnf_grammar = r"""
     textfield: (_NL* entry)* _NL*
 
-    // Ein Eintrag darf nun mit '//' beginnen, um Zeilenumbrüche vor einem Trenner abzufangen
-    entry: [SEP] segment (SEP segment)* [SEP flags_segment]
-         | [SEP] flags_segment
+    // Ein Eintrag darf optional mit SEP beginnen (falls die erste Zelle leer war)
+    entry: [SEP] segment (SEP segment)* [SEP flags_segment] [SEP]
+         | [SEP] flags_segment [SEP]
 
-    SEP.6: "//"
+    SEP.6: /[ \t]*\/\/[ \t]*/
 
     segment: keyword_entstehung
            | keyword_source_transfer
@@ -20,7 +20,6 @@ ebnf_grammar = r"""
            | seite
            | raw_text
 
-    // Zuweisung zu großgeschriebenen Terminals
     keyword_entstehung:       ENTSTEHUNG_TERMINAL
     keyword_source_transfer:  SOURCE_TRANSFER_TERMINAL
     keyword_auffuehrung:      AUFFUEHRUNG_TERMINAL
@@ -29,23 +28,27 @@ ebnf_grammar = r"""
     raw_text:                 RAW_TEXT_TERMINAL
     flags_segment:            FLAGS_TERMINAL
 
-    // --- Terminals (MÜSSEN großgeschrieben sein, damit die Priorität (.5) vom Lexer respektiert wird) ---
-    ENTSTEHUNG_TERMINAL.5:      /Entstehung(?=\s*(?:\/\/|\r|\n|$))/i
-    SOURCE_TRANSFER_TERMINAL.5: /Quellentransfer(?=\s*(?:\/\/|\r|\n|$))/i
-    AUFFUEHRUNG_TERMINAL.5:     /Auff(?:ü|ue)hrung(?:en)?(?=\s*(?:\/\/|\r|\n|$))/i
+    // --- Terminals ---
+    ENTSTEHUNG_TERMINAL.5:      /Entstehung(?=[ \t]*(?:\/\/|\r|\n|$))/i
+    SOURCE_TRANSFER_TERMINAL.5: /Quellentransfer(?=[ \t]*(?:\/\/|\r|\n|$))/i
+    AUFFUEHRUNG_TERMINAL.5:     /Auff(?:ü|ue)hrung(?:en)?(?=[ \t]*(?:\/\/|\r|\n|$))/i
 
-    FLAGS_TERMINAL.5: /(?:GSA\s*60\/\s*)?[WQ](?:\s*(?:\||oder)\s*[WQ])*(?:\s*\(\?\))?(?=\s*(?:\/\/|\r|\n|$))/i
+    // HIER BEHOBEN: Alle \vert{} wurden durch echte Pipes | ersetzt
+    WVZ_TERMINAL.4: /(?:[\(\[]?(?:R|S)\s*\d+[a-zA-Z]*(?:[\/,\-]\s*\d+[a-zA-Z]*(?:[\-\+]\d+)?)*(?:\s*(?:a\s+und\s+b|a\s+oder\s+b|\([1234]\.\s*Fassung\)|\[\s*a,\s*b\s*oder\s*c\?\s*\]|[\(\[]\?[\)\]]|\?))?[\)\]]?|[\(\[]?Eckhardt\/Mueller:?\s*[A-Za-z0-9\/\-]+[\)\]]?|\[\s*nicht\s+erfasst\?\s*\]|Konzept\s+nicht\s+erfasst|––|\?)(?:\s*(?:\|{1,2}|oder|;|,|-)\s*(?:[\(\[]?(?:R|S)?\s*\d+[a-zA-Z]*(?:[\/,\-]\s*\d+[a-zA-Z]*(?:[\-\+]\d+)?)*(?:\s*(?:a\s+und\s+b|a\s+oder\s+b|\([1234]\.\s*Fassung\)|\[\s*a,\s*b\s*oder\s*c\?\s*\]|[\(\[]\?[\)\]]|\?))?[\)\]]?|[\(\[]?Eckhardt\/Mueller:?\s*[A-Za-z0-9\/\-]+[\)\]]?|etc\.|\?))*(?=[ \t]*(?:\/\/|\r|\n|$))/i
 
-    WVZ_TERMINAL.4: /(?:[\(\[]?(?:R\vert{}S)\s*\d+[a-zA-Z]*(?:[\/,\-]\s*\d+[a-zA-Z]*(?:[\-\+]\d+)?)*(?:\s*(?:a\s+und\s+b\vert{}a\s+oder\s+b\vert{}\([1234]\.\s*Fassung\)\vert{}\[\s*a,\s*b\s*oder\s*c\?\s*\]\vert{}[\(\[]\?[\)\]]\vert{}\?))?[\)\]]?|[\(\[]?Eckhardt\/Mueller:?\s*[A-Za-z0-9\/\-]+[\)\]]?|\[\s*nicht\s+erfasst\?\s*\]|Konzept\s+nicht\s+erfasst|––|\?)(?:\s*(?:\|{1,2}|oder|;|,|-)\s*(?:[\(\[]?(?:R\vert{}S)?\s*\d+[a-zA-Z]*(?:[\/,\-]\s*\d+[a-zA-Z]*(?:[\-\+]\d+)?)*(?:\s*(?:a\s+und\s+b\vert{}a\s+oder\s+b\vert{}\([1234]\.\s*Fassung\)\vert{}\[\s*a,\s*b\s*oder\s*c\?\s*\]\vert{}[\(\[]\?[\)\]]\vert{}\?))?[\)\]]?|[\(\[]?Eckhardt\/Mueller:?\s*[A-Za-z0-9\/\-]+[\)\]]?|etc\.|\?))*(?=\s*(?:\/\/|\r|\n|$))/i
+    SEITE_TERMINAL.3: /\d+(?:\s*[\-–]\s*\d+)?\s*f{0,2}(?=[ \t]*(?:\/\/|\r|\n|$))/
 
-    SEITE_TERMINAL.3: /\d+(?:\s*[\-–]\s*\d+)?\s*f{0,2}(?=\s*(?:\/\/|\r|\n|$))/
+    // Flags müssen zwingend am Ende der Zeile stehen
+    FLAGS_TERMINAL.5: /(?:GSA\s*60\/\s*)?[WQ](?:\s*(?:\||oder)\s*[WQ])*(?:\s*\(\?\))?(?=[ \t]*(?:\r|\n|$))/i
 
-    RAW_TEXT_TERMINAL.1: /(?:(?!\/\/)[^\s\r\n\/]|\/(?!\/))(?:(?!\/\/)[^\r\n])*?(?=\s*(?:\/\/|\r|\n|$))/
+    // Freitext schluckt gierig alles außer // und Zeilenumbrüche
+    RAW_TEXT_TERMINAL.1: /(?:(?!\/\/)[^\r\n])+/
 
     _NL: /[\r\n]+/
     %import common.WS_INLINE
     %ignore WS_INLINE
 """
+
 
 class FastHistoricalTransformer(Transformer):
     def wvz_segment(self, children):
@@ -83,7 +86,6 @@ class FastHistoricalTransformer(Transformer):
         if cleaned and isinstance(cleaned[-1], dict) and "work_level_mentioning" in cleaned[-1]:
             flags = cleaned.pop()
 
-        # Update: performances und page wurden passend zum Django Model integriert
         data = {
             "reference": None,
             "entstehung": False,
@@ -98,10 +100,11 @@ class FastHistoricalTransformer(Transformer):
         }
 
         unassigned_texts = []
+        wvz_parts = []
 
         for key, val in cleaned:
-            if key == "wvz_number" and data["work_catalogue_number"] is None:
-                data["work_catalogue_number"] = val
+            if key == "wvz_number":
+                wvz_parts.append(val)
             elif key == "entstehung":
                 data["entstehung"] = True
             elif key == "source_transfer":
@@ -109,11 +112,16 @@ class FastHistoricalTransformer(Transformer):
             elif key == "performances":
                 data["performances"] = True
             elif key == "seite":
+                # Extrahiert nur die erste Ziffer für das Integer-Feld
                 match = re.search(r'\d+', val)
                 if match:
                     data["page"] = int(match.group())
             elif key == "raw_text":
-                unassigned_texts.append(val)
+                if val:
+                    unassigned_texts.append(val)
+
+        if wvz_parts:
+            data["work_catalogue_number"] = " // ".join(wvz_parts)
 
         if unassigned_texts:
             data["reference"] = unassigned_texts.pop(0)
@@ -156,8 +164,10 @@ def run_letter_migration(apps, schema_editor):
         if not raw_text or not raw_text.strip():
             continue
 
+        processed_text = re.sub(r'[\r\n]+(?=[ \t]*\/\/)', ' ', raw_text.strip())
+
         try:
-            parsed_entries = parser.parse(raw_text.strip())
+            parsed_entries = parser.parse(processed_text)
             for entry_data in parsed_entries:
                 entry_data["letter_id"] = letter.id
                 batch.append(LetterWorkReference(**entry_data))
