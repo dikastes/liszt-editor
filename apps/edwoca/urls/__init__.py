@@ -6,6 +6,7 @@ app_name='edwoca'
 
 urlpatterns = [
     path('', views.index, name = 'index'),
+    path('export/database', views.dump, name = 'dump'),
     path('works/', include('edwoca.urls.work')),
     path('expressions/', include('edwoca.urls.expression')),
     path('manifestations/', include('edwoca.urls.manifestation')),

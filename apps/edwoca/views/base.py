@@ -1,5 +1,5 @@
 from django.forms import inlineformset_factory
-from django.http import Http404
+from django.http import Http404, FileResponse
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
@@ -17,6 +17,21 @@ from dmrism.models import Library
 from edwoca import forms as edwoca_forms
 from edwoca import models as edwoca_models
 from django.apps import apps
+from pathlib import Path
+from django.conf import settings
+
+
+def dump(request):
+    db_path = Path(settings.BASE_DIR) / 'data' / 'db.sqlite3'
+
+    if not db_path.exists():
+        raise Http404('database file not found')
+
+    return FileResponse(
+            open(db_path, 'rb'),
+            as_attachment = True,
+            filename = 'db.sqlite3'
+        )
 
 
 def index(request):
@@ -178,8 +193,7 @@ class EdwocaSearchView(SearchView):
     def get_queryset(self):
         qs = super().get_queryset()
 
-        return (qs.models(getattr(edwoca_models, self.get_model_name()))
-                .order_by('id'))
+        return qs.models(getattr(edwoca_models, self.get_model_name()))
 
 
 class SimpleFormView(EntityMixin, UpdateView):
