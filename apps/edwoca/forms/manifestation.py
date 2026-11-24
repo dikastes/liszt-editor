@@ -1102,7 +1102,8 @@ class ManifestationSearchForm(FramedSearchForm):
         query_norm = re.sub(r'[^A-Za-z0-9]', '', query).lower()
 
         if query.isnumeric() and (int_q := int(query)) > 99:
-            return self.searchqueryset.filter(signature_numbers = int_q)
+            filter = SQ(signature_numbers = int_q) | SQ(plate_number = query)
+            return self.searchqueryset.filter(filter)
 
         sqs = self.searchqueryset.filter(
                 SQ(content = query) |
