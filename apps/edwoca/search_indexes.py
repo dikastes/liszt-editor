@@ -25,6 +25,11 @@ class ManifestationIndex(indexes.SearchIndex, indexes.Indexable):
             indexed=True,
             stored=True
         )
+    plate_number = indexes.CharField(
+            model_attr = 'plate_number',
+            indexed=True,
+            stored=True
+        )
     signature_normalized = indexes.CharField(
             model_attr = 'get_current_signature_normalized',
             indexed=True,

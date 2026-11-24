@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-27 10:54+0100\n"
+"POT-Creation-Date: 2026-11-24 11:16+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -566,7 +566,7 @@ msgstr "Kategorie"
 #: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/manuscript.html:27
 #: apps/edwoca/templates/edwoca/partials/work/work_menu.html:56
 #: apps/edwoca/templates/edwoca/provenance.html:64
-#: apps/edwoca/views/manifestation/common.py:447
+#: apps/edwoca/views/manifestation/common.py:449
 msgid "comment"
 msgstr "Kommentar"
 
@@ -680,7 +680,7 @@ msgstr "suchen"
 #: apps/edwoca/templates/edwoca/partials/forms/_modification_form.html:115
 #: apps/edwoca/templates/edwoca/partials/forms/handwriting_form.html:60
 #: apps/edwoca/templates/edwoca/partials/htmx/display_results.html:27
-#: apps/edwoca/views/base.py:62
+#: apps/edwoca/views/base.py:77
 msgid "no search results"
 msgstr "keine Suchergebnisse"
 
@@ -809,11 +809,11 @@ msgstr "modifizierter Druck"
 
 #: apps/edwoca/templates/edwoca/item_manuscript.html:35
 msgid "proof copy"
-msgstr ""
+msgstr "Nachweisexemplar"
 
 #: apps/edwoca/templates/edwoca/item_manuscript.html:38
 msgid "annotated proof copy"
-msgstr ""
+msgstr "annotiertes Nachweisexemplar"
 
 #: apps/edwoca/templates/edwoca/item_manuscript.html:58
 msgid "annotations"
@@ -1007,7 +1007,7 @@ msgstr "für Suche nach"
 
 #: apps/edwoca/templates/edwoca/library_update.html:8
 #: apps/edwoca/templates/edwoca/list.html:173
-#: apps/edwoca/templates/edwoca/manifestation_update.html:189
+#: apps/edwoca/templates/edwoca/manifestation_update.html:190
 #: apps/edwoca/templatetags/entity_labels.py:18
 msgid "library"
 msgstr "Bibliothek"
@@ -1501,15 +1501,15 @@ msgstr "Identifizierung"
 msgid "expression"
 msgstr "Fassung"
 
-#: apps/edwoca/templates/edwoca/manifestation_update.html:175
+#: apps/edwoca/templates/edwoca/manifestation_update.html:176
 msgid "template copy"
 msgstr "Vorlageexemplar"
 
-#: apps/edwoca/templates/edwoca/manifestation_update.html:200
+#: apps/edwoca/templates/edwoca/manifestation_update.html:201
 msgid "no template item"
 msgstr "kein Vorlageexemplar"
 
-#: apps/edwoca/templates/edwoca/manifestation_update.html:204
+#: apps/edwoca/templates/edwoca/manifestation_update.html:205
 #: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:69
 #: apps/edwoca/templates/edwoca/partials/manifestation/preview-paragraphs/head.html:9
 #: apps/edwoca/templates/edwoca/partials/navigation/manifestation_navigation.html:480
@@ -1587,8 +1587,6 @@ msgid "remove modification"
 msgstr "Modifikation entfernen"
 
 #: apps/edwoca/templates/edwoca/partials/forms/dedication_form.html:14
-#, fuzzy
-#| msgid "Dedicatee"
 msgid "dedicatee"
 msgstr "Widmungsträger"
 
@@ -1654,13 +1652,11 @@ msgid "data"
 msgstr "Daten"
 
 #: apps/edwoca/templates/edwoca/partials/manifestation/collection_part_list.html:17
-#: apps/edwoca/templates/edwoca/partials/manifestation/collection_part_list.html:51
 #: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:24
 msgid "move up"
 msgstr "nach oben bewegen"
 
 #: apps/edwoca/templates/edwoca/partials/manifestation/collection_part_list.html:29
-#: apps/edwoca/templates/edwoca/partials/manifestation/collection_part_list.html:63
 #: apps/edwoca/templates/edwoca/partials/manifestation/item_list.html:35
 msgid "move down"
 msgstr "nach unten bewegen"
